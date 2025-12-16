@@ -24,6 +24,11 @@ function getDBConnection() {
         return $pdo;
     } catch (\PDOException $e) {
         // Ini akan menghentikan eksekusi dan mengirim error 500 yang jelas
+        // Log error ke file di server untuk debugging, tanpa menampilkannya ke user.
+        // Pastikan folder root web Anda memiliki izin tulis untuk file php_error.log.
+        $log_path = $_SERVER['DOCUMENT_ROOT'] . '/php_error.log';
+        error_log("PDO Connection Error: " . $e->getMessage(), 3, $log_path);
+
         http_response_code(500);
         header('Content-Type: application/json');
         echo json_encode(array(
@@ -39,5 +44,4 @@ function sendJSONResponse($data, $statusCode = 200) {
     header('Content-Type: application/json');
     http_response_code($statusCode);
     echo json_encode($data);
-    exit;
 }

@@ -52,13 +52,7 @@ try {
         sendJSONResponse(array('success' => false, 'message' => 'Akun Anda belum diaktifkan oleh Administrator.'), 403);
     }
 
-    $password_match = false;
-    // Password Bypass untuk Debugging (HANYA UNTUK TESTING)
-    if ($password === '12345678') {
-        $password_match = true;
-    } else {
-        $password_match = password_verify($password, $user['password_hash']);
-    }
+    $password_match = password_verify($password, $user['password_hash']);
 
     if (!$password_match) {
         sendJSONResponse(array('success' => false, 'message' => 'Username atau kata sandi salah.'), 401);

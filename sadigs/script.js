@@ -94,6 +94,32 @@ document.addEventListener('DOMContentLoaded', () => {
     // =================================================================
     const signupForm = document.getElementById('signup-form');
     if (signupForm) {
+
+        // Fungsi untuk memuat status kuota dan menyesuaikan UI
+        async function loadAndApplyQuotas() {
+            try {
+                const response = await fetch(API_BASE_URL + 'quota.php', { cache: 'no-cache' });
+                const data = await response.json();
+
+                if (data.success && data.quotas) {
+                    data.quotas.forEach(quota => {
+                        // Jika kuota untuk peran ini sudah penuh
+                        if (quota.is_full) {
+                            // Cari checkbox yang sesuai dengan role_name
+                            const checkbox = document.querySelector(`input[name="role"][value="${quota.role_name}"]`);
+                            if (checkbox) {
+                                // Sembunyikan seluruh elemen <label> yang membungkus checkbox
+                                checkbox.parentElement.style.display = 'none';
+                            }
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Gagal memuat data kuota:', error);
+                // Jika gagal, tidak melakukan apa-apa, biarkan semua checkbox terlihat
+            }
+        }
+
         signupForm.addEventListener('submit', async function(e) {
             e.preventDefault();
 
@@ -143,6 +169,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 displayMessage(`GAGAL KONEKSI SERVER: ${error.message}`, 'error');
             }
         });
+
+        // Panggil fungsi untuk memuat kuota saat halaman signup dimuat
+        loadAndApplyQuotas();
     }
 
 

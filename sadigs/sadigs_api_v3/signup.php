@@ -49,15 +49,22 @@ try {
         $stmt_quota->execute($check_roles);
         $quotas = $stmt_quota->fetchAll(PDO::FETCH_KEY_PAIR); // ['RoleName' => 'max_limit']
 
-        foreach ($quotas as $role_name => $max_limit) {
-            // PERBAIKAN KRITIS: Menggunakan u.id karena ini adalah Primary Key di tabel users
-            $sql_count = "SELECT COUNT(ur.user_id) FROM user_roles ur JOIN users u ON ur.user_id = u.id WHERE ur.role_name = :role_name AND u.is_active = TRUE";
-            $stmt_count = $pdo->prepare($sql_count);
-            $stmt_count->execute(['role_name' => $role_name]);
-            $current_count = $stmt_count->fetchColumn();
-            
-            if ($current_count >= $max_limit) {
-                sendJSONResponse(array('success' => false, 'message' => "Pendaftaran gagal: Kuota untuk peran '{$role_name}' sudah penuh."), 403);
+        // Optimasi: Hitung semua peran yang relevan dalam satu query menggunakan GROUP BY
+        $sql_count = "
+            SELECT ur.role_name, COUNT(ur.user_id) as current_count
+            FROM user_roles ur 
+            JOIN users u ON ur.user_id = u.user_id 
+            WHERE ur.role_name IN ({$in_placeholder}) AND u.is_active = TRUE
+            GROUP BY ur.role_name
+        ";
+        $stmt_count = $pdo->prepare($sql_count);
+        $stmt_count->execute($check_roles);
+        $current_counts = $stmt_count->fetchAll(PDO::FETCH_KEY_PAIR); // ['RoleName' => 'current_count']
+
+        foreach ($check_roles as $role_to_check) {
+            $current_count = $current_counts[$role_to_check] ?? 0;
+            if (isset($quotas[$role_to_check]) && $current_count >= $quotas[$role_to_check]) {
+                sendJSONResponse(array('success' => false, 'message' => "Pendaftaran gagal: Kuota untuk peran '{$role_to_check}' sudah penuh."), 403);
             }
         }
     }

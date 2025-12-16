@@ -105,8 +105,8 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $max_limit = $quota_settings[$role_name] ?? -1; // -1 jika role tidak diatur (uncontrolled)
 
         // SQL untuk menghitung user AKTIF yang memiliki peran ini
-        // PENTING: Menggunakan u.id karena ini adalah Primary Key di tabel users
-        $sql_count = "SELECT COUNT(ur.user_id) FROM user_roles ur JOIN users u ON ur.user_id = u.id WHERE ur.role_name = :role_name AND u.is_active = TRUE";
+        // PERBAIKAN KRITIS: Menggunakan u.user_id yang merupakan Primary Key di tabel users
+        $sql_count = "SELECT COUNT(ur.user_id) FROM user_roles ur JOIN users u ON ur.user_id = u.user_id WHERE ur.role_name = :role_name AND u.is_active = TRUE";
         $stmt_count = $pdo->prepare($sql_count);
         $stmt_count->execute(['role_name' => $role_name]);
         $current_count = $stmt_count->fetchColumn();

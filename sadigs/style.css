@@ -32,6 +32,23 @@
     --color-success-bg: #e0f2f1;
     --color-success-text: #00695c;
     --color-success-border: #b2dfdb;
+    --color-danger: #d32f2f;
+    --color-danger-dark: #b71c1c;
+
+    /* Shadow Variables */
+    --shadow-sm: 0 3px 10px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 15px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.2);
+
+    /* Transparent Colors */
+    --color-secondary-transparent: rgba(38, 102, 127, 0.3);
+    --color-white-transparent: rgba(255, 255, 255, 0.1);
+    --filter-glow-white: drop-shadow(0 0 8px rgba(255, 255, 255, 0.4));
+
+    /* Interaction Shadows */
+    --shadow-interact-primary: 0 4px 10px rgba(79, 183, 179, 0.1);
+    --shadow-interact-secondary: 0 8px 20px rgba(38, 102, 127, 0.1);
+    --shadow-button: 0 5px 15px rgba(38, 102, 127, 0.2);
 }
 
 body {
@@ -66,7 +83,7 @@ body {
     background-color: var(--color-primary); /* WARNA UTAMA/HIJAU TURQUOISE */
     color: white;
     padding: 30px 20px;
-    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--shadow-md);
     position: sticky;
     top: 0;
     z-index: 10;
@@ -83,7 +100,7 @@ body {
 
 .sidebar .sidebar-header .app-logo {
     width: 50px; /* Logo kecil */
-    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.4));
+    filter: var(--filter-glow-white);
 }
 
 .sidebar .sidebar-header h2 {
@@ -111,19 +128,19 @@ body {
 }
 
 .sidebar nav a:hover {
-    background-color: rgba(38, 102, 127, 0.3); /* Translucent Secondary Color for hover */
+    background-color: var(--color-secondary-transparent);
 }
 
 .sidebar nav a.active {
-    background-color: var(--color-secondary); /* WARNA KEDUA/BIRU TUA untuk aktif */
+    background-color: var(--color-secondary);
     font-weight: 600;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15); /* This is subtle enough to remain as is */
 }
 
 .sidebar #btn-logout {
     margin-top: auto;
     padding: 10px 20px;
-    background-color: #d32f2f;
+    background-color: var(--color-danger);
     color: white;
     border: none;
     border-radius: 8px;
@@ -135,14 +152,14 @@ body {
 }
 
 .sidebar #btn-logout:hover {
-    background-color: #b71c1c;
+    background-color: var(--color-danger-dark);
 }
 
 /* USER INFO DI SIDEBAR */
 #sidebar-user-info {
     padding: 10px 0 20px 0;
     margin-bottom: 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid var(--color-white-transparent);
     text-align: left;
 }
 
@@ -195,7 +212,7 @@ body {
     background-color: var(--color-background-white);
     padding: 30px;
     border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    box-shadow: var(--shadow-md);
     text-align: left;
     margin-bottom: 30px;
 }
@@ -223,7 +240,7 @@ body {
     border-radius: 10px;
     transition: all 0.3s;
     cursor: pointer;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-sm);
     background-color: var(--color-background-white);
     position: relative;
     overflow: hidden;
@@ -237,7 +254,7 @@ body {
 
 .module-item:hover {
     border-color: var(--color-secondary);
-    box-shadow: 0 8px 20px rgba(38, 102, 127, 0.1);
+    box-shadow: var(--shadow-interact-secondary);
     transform: translateY(-2px);
 }
 
@@ -323,7 +340,7 @@ body {
     border-top: 5px solid var(--color-secondary);
     border-bottom: 5px solid var(--color-secondary);
     border-radius: 12px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    box-shadow: var(--shadow-lg);
     text-align: center;
 }
 
@@ -385,8 +402,8 @@ body {
 }
 .form-group input:focus {
     border-color: var(--color-primary);
-    background-color: var(--color-background-white); /* Use pure white on focus */
-    box-shadow: 0 4px 10px rgba(79, 183, 179, 0.1);
+    background-color: var(--color-background-white);
+    box-shadow: var(--shadow-interact-primary);
     outline: none;
 }
 
@@ -409,7 +426,7 @@ body {
     background-color: var(--color-background-lighter);
 }
 .role-option:hover {
-    background-color: #f0fafa;
+    background-color: var(--color-background-light); /* Using existing variable for consistency */
     border-color: var(--color-primary);
 }
 .role-option input[type="checkbox"] {
@@ -417,12 +434,12 @@ body {
     width: 18px;
     height: 18px;
     accent-color: var(--color-secondary);
-    border: 1px solid #aaa;
+    border: 1px solid var(--color-border);
 }
 .role-option span {
-    font-size: 0.95rem;
-    font-weight: 500;
-    color: var(--color-text-muted);
+    font-size: 0.95rem; 
+    font-weight: 500; 
+    color: var(--color-text-muted); 
 }
 
 /* TOMBOL UTAMA (LOGIN/DAFTAR) */
@@ -438,7 +455,7 @@ body {
     cursor: pointer;
     transition: transform 0.2s;
     margin-top: 10px;
-    box-shadow: 0 5px 15px rgba(38, 102, 127, 0.2);
+    box-shadow: var(--shadow-button);
 }
 .btn-main:hover, #btn-login:hover {
     transform: translateY(-2px);
