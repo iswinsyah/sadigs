@@ -1,5 +1,6 @@
 <?php
-// Mulai output buffering untuk menangkap output yang tidak diinginkan (seperti warning)
+// Mulai output buffering untuk menangkap output yang tidak diinginkan (seperti warning).
+// Ini harus menjadi baris PERTAMA di file.
 ob_start();
 
 // --- KODE DEBUG (Biarkan aktif selama pengembangan) ---
