@@ -1,5 +1,8 @@
 <?php
-// --- KODE DEBUG DARI HOSTINGER START (Wajib Ada di semua API) ---
+// Mulai output buffering untuk menangkap output yang tidak diinginkan (seperti warning)
+ob_start();
+
+// --- KODE DEBUG (Biarkan aktif selama pengembangan) ---
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 ini_set('log_errors', 1);
@@ -8,7 +11,7 @@ error_reporting(E_ALL);
 // --- KODE DEBUG DARI HOSTINGER END ---
 
 // =================================================================
-// SADIGS 3.0: LOGIKA UTAMA LOGIN (Fungsi Koneksi Di-embed)
+// SADIGS 3.0: LOGIKA UTAMA LOGIN
 // FIX KRITIS: Menghapus require_once dan mengimplementasikan fungsi internal.
 // FIX KRITIS: Mengganti semua referensi 'id' dengan 'user_id'.
 // =================================================================
@@ -67,6 +70,9 @@ try {
     if (empty($roles_db)) {
          sendJSONResponse(array('success' => false, 'message' => 'Akun ini tidak memiliki peran yang terdaftar.'), 403);
     }
+    
+    // Regenerasi ID Sesi untuk keamanan (mencegah Session Fixation)
+    session_regenerate_id(true);
     
     // FIX KRITIS: Menyimpan user_id ke sesi
     $_SESSION['user_id'] = $user['user_id'];
