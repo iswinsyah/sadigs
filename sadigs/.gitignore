@@ -10,3 +10,8 @@ sadigs_api_v3/config.php
 # Abaikan folder spesifik editor kode (opsional)
 .vscode/
 .idea/
+
+# Abaikan file backup dan arsip
+*.sql
+*.zip
+*.bak
