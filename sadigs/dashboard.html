@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | SADIGS 3.0</title>
+    <!-- Memuat Tailwind CSS untuk styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Menggunakan font Inter secara default */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Mengatur scrollbar di sidebar agar tidak terlalu mengganggu */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+        }
+        
+        /* CSS Tambahan untuk Kustomisasi Warna */
+        /* Warna SADIGS: #4FB7B3 (Main Teal) dan #26667F (Secondary Blue) */
+        
+        /* PENTING: Memastikan Sidebar Styling yang Konsisten */
+        .w-64 { width: 16rem; min-width: 16rem; }
+        .bg-main { background-color: #4FB7B3; } /* Warna Sidebar */
+
+        /* CSS untuk Layout Dashboard Card yang Konsisten */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        /* Font size override for better dashboard readability */
+        .stat-value {
+            font-size: 2.25rem; /* text-4xl */
+            font-weight: 800;
+            color: #26667F; /* Biru Tua */
+        }
+        
+        /* Menu Styling Fix (Memaksa link block) */
+        .menu-link {
+            display: flex;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 150ms ease-in-out;
+            align-items: center;
+        }
+        .menu-link:hover {
+            background-color: #e0fafa; /* teal-50 */
+            color: #155e75; /* dark teal hover text */
+        }
+        .menu-link-active {
+            background-color: #f0fafa; /* Warna aktif ringan */
+            color: #155e75;
+            font-weight: 600;
+        }
+
+        /* NEW: STYLING UNTUK MODUL AKSES CEPAT */
+        .module-card {
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+        }
+        .module-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(38, 102, 127, 0.2);
+            border-color: #26667F;
+        }
+        .module-card-icon {
+            font-size: 2.5rem;
+            color: #26667F; /* Secondary Blue */
+            margin-bottom: 1rem;
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            .w-64 {
+                width: 100%;
+                min-width: 100%;
+            }
+            /* Sembunyikan sidebar di mobile dan ubah main content padding */
+            .sidebar-desktop {
+                display: none;
+            }
+            main {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<!-- Mengubah layout body menjadi flex horizontal penuh layar -->
+<body class="bg-gray-100 min-h-screen flex">
+
+    <!-- Sidebar Kiri (Desktop View) -->
+    <div class="w-64 bg-main shadow-2xl p-6 flex flex-col border-r border-gray-300 overflow-y-auto custom-scrollbar sidebar-desktop">
+        
+        <!-- Header -->
+        <div class="text-2xl font-extrabold mb-8 text-white flex items-center">
+            <img 
+                src="https://raw.githubusercontent.com/villaqurankotabatu-commits/gambarvqbm/f44bf009884af11aba2c967a2401026225f7b02b/vila%20quran.png" 
+                alt="Logo Vila Quran" 
+                class="w-8 h-8 rounded-full object-cover mr-3 shadow-md"
+                onerror="this.onerror=null; this.src='https://placehold.co/32x32/14B8A6/ffffff?text=VQ'" 
+            />
+            SADIGS 3.0
+        </div>
+        
+        <!-- User Info -->
+        <div class="text-sm text-white mb-4 border-b border-white/20 pb-4">
+            <span class="font-normal block text-white/70">Selamat datang,</span>
+            <span id="sidebar-username" class="font-semibold text-lg">Memuat...</span>
+        </div>
+
+        <!-- FRAME MENU (3 DIV BERBEDA) -->
+        <div class="flex flex-col space-y-4 flex-1">
+            
+            <!-- Kategori 1: UMUM (DIV ATAS) -->
+            <div id="menu-group-umum" class="bg-white p-4 rounded-xl shadow-lg border border-gray-100">
+                <h3 class="text-xs font-bold tracking-wider uppercase text-gray-500 pb-2 px-1 border-b mb-1">UMUM</h3>
+                <div class="space-y-1">
+                    <!-- Dashboard Utama (Active Link) -->
+                    <a href="dashboard.html" class="menu-link menu-link-active text-teal-700">
+                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                         <span>Dashboard Utama</span>
+                    </a>
+                    <!-- Kalender Akademik -->
+                    <a href="#" class="menu-link text-gray-800 hover:bg-main-light hover:text-main-dark">
+                        <svg class="w-5 h-5 mr-3 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        <span>Kalender Akademik</span>
+                    </a>
+                    <!-- Informasi Sekolah -->
+                    <a href="#" class="menu-link text-gray-800 hover:bg-main-light hover:text-main-dark">
+                        <svg class="w-5 h-5 mr-3 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span>Informasi Sekolah</span>
+                    </a>
+                    <!-- Pengaturan Akun -->
+                     <a href="#" class="menu-link text-gray-800 hover:bg-main-light hover:text-main-dark">
+                        <svg class="w-5 h-5 mr-3 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35-.638.223-.976.99-.976 1.724v.256c0 .734.338 1.491.976 1.724 1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35.638-.223.976-.99.976-1.724v-.256c0-.734-.338-1.491-.976-1.724-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37a1.724 1.724 0 002.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        <span>Pengaturan Akun</span>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Kategori 2: ADMINISTRASI & MODUL (Pegawai) (DIV TENGAH) -->
+            <div id="menu-group-pegawai" class="bg-white p-4 rounded-xl shadow-lg border border-gray-100">
+                <h3 class="text-xs font-bold tracking-wider uppercase text-gray-500 pb-2 px-1 border-b mb-1">ADMINISTRASI & MODUL</h3>
+                <div class="space-y-1">
+                    <!-- Absensi Harian -->
+                    <a href="#" class="menu-link text-gray-800 hover:bg-main-light hover:text-main-dark">
+                        <svg class="w-5 h-5 mr-3 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                        <span>Absensi Harian</span>
+                    </a>
+                    <!-- Absensi Rapat -->
+                    <a href="#" class="menu-link text-gray-800 hover:bg-main-light hover:text-main-dark">
+                        <svg class="w-5 h-5 mr-3 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                        <span>Absensi Rapat</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Kategori 3: KHUSUS (PERAN DINAMIS) (DIV BAWAH) -->
+            <div id="menu-group-peran" class="bg-white p-4 rounded-xl shadow-lg border border-gray-100">
+                <h3 class="text-xs font-bold tracking-wider uppercase text-gray-500 pb-2 px-1 border-b mb-1">MENU PERAN KHUSUS</h3>
+                <div id="dynamic-menu-links" class="space-y-1">
+                    <p class="text-gray-400 text-sm p-3">Menu khusus akan muncul di sini.</p>
+                </div>
+            </div>
+            
+        </div>
+        <!-- AKHIR FRAME MENU -->
+
+        <div class="mt-auto pt-6 border-t border-white/20">
+            <button id="logout-btn" class="w-full p-3 bg-red-600 text-white font-semibold rounded-xl shadow-md transition duration-150 hover:bg-red-700 flex items-center justify-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Area Konten Utama -->
+    <main id="main-content-area" class="flex-1 p-10 overflow-y-auto">
+        <!-- Konten akan dimuat di sini oleh JavaScript berdasarkan peran pengguna -->
+    </main>
+
+<script>
+    const API_BASE_URL = '/sadigs_api_v3/'; 
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        
+        const usernameDisplay = document.getElementById('sidebar-username');
+        const logoutButton = document.getElementById('logout-btn');
+        const dynamicMenuLinksContainer = document.getElementById('dynamic-menu-links'); // Target Div Bawah
+        const mainContentArea = document.getElementById('main-content-area'); // Target Konten Utama
+
+        // --- DEFINISI PERAN ---
+        const yayasanRoles = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan'];
+        const kepalaSekolahRoles = ['Kepala Sekolah']; // NEW ROLE
+        const studentRoles = ['Santri', 'Walisantri'];
+        
+        // =========================================================
+        // 1. FUNGSI UTAMA: Cek Sesi, Render Menu & Konten
+        // =========================================================
+
+        async function checkSession() {
+            for (let i = 0; i < 3; i++) {
+                try {
+                    const response = await fetch(API_BASE_URL + 'session_check.php');
+                    const data = await response.json();
+
+                    if (data.success) {
+                        usernameDisplay.textContent = data.username;
+                        
+                        // Render semua elemen berdasarkan peran
+                        renderDynamicMenu(data.roles);
+                        renderMainContent(data.roles); 
+                        return;
+                    } else {
+                        window.location.href = 'index.html';
+                        return;
+                    }
+                } catch (error) {
+                    console.error(`Session check failed (Attempt ${i + 1}):`, error);
+                    if (i < 2) {
+                        await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
+                    } else {
+                        window.location.href = 'index.html';
+                        return;
+                    }
+                }
+            }
+        }
+        
+        // =========================================================
+        // 2. LOGIKA RENDERING MENU DINAMIS (Div Bawah)
+        // =========================================================
+        function renderDynamicMenu(userRoles) {
+            let hasYayasanAccess = userRoles.some(role => yayasanRoles.includes(role));
+            
+            dynamicMenuLinksContainer.innerHTML = '';
+            let menuHtml = '';
+
+            // Render Menu Khusus (Hanya untuk Yayasan)
+            if (hasYayasanAccess) {
+                // Menu 1: Atur Kuota Role
+                menuHtml += `
+                    <a href="quota_management.html" class="menu-link text-gray-800 hover:bg-main-light hover:text-main-dark">
+                        <svg class="w-5 h-5 mr-3 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                        <span>Atur Kuota Role</span>
+                    </a>
+                `;
+                // Menu 2: Verifikasi Pegawai (BARU)
+                menuHtml += `
+                    <a href="verification_management.html" class="menu-link text-gray-800 hover:bg-main-light hover:text-main-dark">
+                        <svg class="w-5 h-5 mr-3 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.14-2.052-.403-3.016z"></path></svg>
+                        <span>Verifikasi Pegawai</span>
+                    </a>
+                `;
+            }
+            
+            if (menuHtml) {
+                dynamicMenuLinksContainer.innerHTML = menuHtml;
+            } else {
+                dynamicMenuLinksContainer.innerHTML = `
+                    <p class="text-gray-400 text-sm p-3">Tidak ada menu khusus untuk peran Anda.</p>
+                `;
+            }
+        }
+
+        // =========================================================
+        // 3. LOGIKA RENDERING KONTEN UTAMA (URUTAN HIERARKI)
+        // =========================================================
+        function renderMainContent(userRoles) {
+            
+            const isStudentRole = userRoles.some(role => studentRoles.includes(role));
+            const isYayasanRole = userRoles.some(role => yayasanRoles.includes(role));
+            const isKepalaSekolahRole = userRoles.some(role => kepalaSekolahRoles.includes(role)); // NEW CHECK
+
+            let contentHTML = `
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">Dashboard Aplikasi</h1>
+                <p class="text-gray-500 mb-8">Ringkasan, Statistik, dan Akses Cepat Modul</p>
+            `;
+
+            if (isStudentRole) {
+                contentHTML += getSantriDashboardHTML();
+            } else if (isYayasanRole) {
+                // Prioritas 1: Yayasan (Tinjauan Keuangan/Aset)
+                contentHTML += getYayasanDashboardHTML();
+            } else if (isKepalaSekolahRole) {
+                // Prioritas 2: Kepala Sekolah (Tinjauan Akademik/Operasional)
+                contentHTML += getKepalaSekolahDashboardHTML();
+            }
+            // Tambahkan peran lain di sini (Kepala Asrama, Ustadz, dll.)
+            else {
+                // Fallback: Staf/Pegawai umum (Absensi/Input)
+                contentHTML += getStaffDashboardHTML();
+            }
+            
+            mainContentArea.innerHTML = contentHTML;
+        }
+
+        // ---------------------------------------------------------
+        // KONTEN DASHBOARD SANTRI
+        // ---------------------------------------------------------
+        function getSantriDashboardHTML() {
+            return `
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                    <!-- Card Tugas -->
+                    <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-red-500 col-span-1">
+                        <p class="text-sm text-gray-500 uppercase font-medium">Tugas Tertunda</p>
+                        <p class="text-3xl font-bold text-red-600 mt-2">2 Tugas</p>
+                        <a href="#" class="text-sm text-teal-500 hover:underline mt-2 inline-block">Lihat Semua Tugas</a>
+                    </div>
+                    <!-- Card Hafalan -->
+                    <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-green-500 col-span-1">
+                        <p class="text-sm text-gray-500 uppercase font-medium">Target Hafalan</p>
+                        <p class="text-3xl font-bold text-green-600 mt-2">Juz 30 (95% Selesai)</p>
+                        <a href="#" class="text-sm text-teal-500 hover:underline mt-2 inline-block">Laporan Lengkap</a>
+                    </div>
+                    <!-- Card Absensi -->
+                    <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-yellow-500 col-span-1">
+                        <p class="text-sm text-gray-500 uppercase font-medium">Absensi Pekan Ini</p>
+                        <p class="text-3xl font-bold text-yellow-600 mt-2">1 Izin (Sakit)</p>
+                        <a href="#" class="text-sm text-teal-500 hover:underline mt-2 inline-block">Ajukan Izin/Cuti</a>
+                    </div>
+                </div>
+
+                <!-- Jadwal Harian -->
+                <div class="bg-white p-6 rounded-xl shadow-lg mb-8">
+                    <h2 class="text-xl font-semibold text-gray-700 mb-4 border-b pb-2">Jadwal Harian Anda</h2>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Waktu</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kegiatan</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lokasi</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">04:30</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Sholat Subuh & Halaqah Al-Quran</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Masjid</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">07:00</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Sarapan Pagi</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Dapur Umum</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">08:00</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 font-semibold text-teal-600">Pelajaran Fiqih</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Kelas A</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // ---------------------------------------------------------
+        // KONTEN DASHBOARD YAYASAN
+        // ---------------------------------------------------------
+        function getYayasanDashboardHTML() {
+            return `
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">Ringkasan Eksekutif Yayasan</h1>
+                <p class="text-gray-500 mb-8">Tinjauan cepat statistik kunci dan status administrasi.</p>
+                
+                <!-- Kartu Statistik (Keuangan & Administrasi) -->
+                <div class="stat-grid mb-8">
+                    <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-blue-600">
+                        <p class="text-sm text-gray-500 uppercase font-medium">Total Aset Bersih</p>
+                        <p class="stat-value mt-2 text-blue-800">Rp 1.5 M</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-green-600">
+                        <p class="text-sm text-gray-500 uppercase font-medium">Penerimaan Dana Bulan Ini</p>
+                        <p class="stat-value mt-2 text-green-800">Rp 45 Juta</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-red-600">
+                        <p class="text-sm text-gray-500 uppercase font-medium">Anggaran Terpakai</p>
+                        <p class="stat-value mt-2 text-red-600">85%</p>
+                    </div>
+                </div>
+
+                <!-- Akses Cepat Modul Penting -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <!-- Modul Kuota Role -->
+                    <a href="quota_management.html" class="module-card bg-white border border-teal-500 hover:border-2">
+                        <div class="module-card-icon">👥</div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Manajemen Kuota Role</h3>
+                        <p class="text-gray-500 text-sm">Mengatur batas pendaftaran untuk setiap peran pengguna di sekolah.</p>
+                        <span class="text-teal-600 font-semibold mt-4">Akses Sekarang →</span>
+                    </a>
+                    
+                    <!-- Modul Verifikasi Pegawai (BARU) -->
+                    <a href="verification_management.html" class="module-card bg-white border border-blue-500 hover:border-2">
+                         <div class="module-card-icon">✅</div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Verifikasi Pegawai Baru</h3>
+                        <p class="text-gray-500 text-sm">Tinjau dan aktifkan akun pegawai yang statusnya masih tertunda.</p>
+                        <span class="text-blue-600 font-semibold mt-4">Tinjau Sekarang →</span>
+                    </a>
+                </div>
+            `;
+        }
+        
+        // ---------------------------------------------------------
+        // KONTEN DASHBOARD KEPALA SEKOLAH (BARU)
+        // ---------------------------------------------------------
+        function getKepalaSekolahDashboardHTML() {
+            return `
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">Tinjauan Akademik & Operasional</h1>
+                <p class="text-gray-500 mb-8">Fokus pada kinerja staf, laporan kehadiran, dan status kelulusan santri.</p>
+                
+                <!-- Kartu Kinerja (Tinjauan Akademik) -->
+                <div class="stat-grid mb-8">
+                    <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-purple-600">
+                        <p class="text-sm text-gray-500 uppercase font-medium">Rata-rata Nilai Kelas (Semester)</p>
+                        <p class="stat-value mt-2 text-purple-800">88.5</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-orange-600">
+                        <p class="text-sm text-gray-500 uppercase font-medium">Tingkat Kehadiran Guru (%)</p>
+                        <p class="stat-value mt-2 text-orange-800">98%</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-teal-600">
+                        <p class="text-sm text-gray-500 uppercase font-medium">Validasi Laporan Tertunda</p>
+                        <p class="stat-value mt-2 text-teal-800">4 Laporan</p>
+                    </div>
+                </div>
+
+                <!-- Akses Cepat Validasi dan Kinerja -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <!-- Modul Validasi Laporan -->
+                    <a href="#" class="module-card bg-white border border-purple-500 hover:border-2">
+                        <div class="module-card-icon" style="color: #8B5CF6;">📝</div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Validasi Laporan Guru</h3>
+                        <p class="text-gray-500 text-sm">Menyetujui dan memverifikasi laporan bulanan, nilai, dan absensi guru/staf.</p>
+                        <span class="text-purple-600 font-semibold mt-4">Tinjau Sekarang →</span>
+                    </a>
+                    
+                    <!-- Modul Kinerja Guru -->
+                    <a href="#" class="module-card bg-white border border-orange-500 hover:border-2">
+                         <div class="module-card-icon" style="color: #F97316;">📊</div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Evaluasi Kinerja Staf</h3>
+                        <p class="text-gray-500 text-sm">Monitoring metrik dan efektivitas kinerja pengajar dan staf non-akademik.</p>
+                        <span class="text-orange-600 font-semibold mt-4">Tinjau Sekarang →</span>
+                    </a>
+                </div>
+            `;
+        }
+
+
+        // ---------------------------------------------------------
+        // KONTEN DASHBOARD STAF (FALLBACK/DEFAULT)
+        // ---------------------------------------------------------
+        function getStaffDashboardHTML() {
+            return `
+                <!-- Kartu Statistik -->
+                <div class="stat-grid mb-8">
+                    <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-teal-500">
+                        <p class="text-sm text-gray-500 uppercase font-medium">Total Santri Aktif</p>
+                        <p class="stat-value text-blue-800 mt-2">1,250</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-teal-500">
+                        <p class="text-sm text-gray-500 uppercase font-medium">Total Staf Pengajar/Ustadz</p>
+                        <p class="stat-value text-blue-800 mt-2">35</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-yellow-500">
+                        <p class="text-sm text-gray-500 uppercase font-medium">Pengumuman Baru</p>
+                        <p class="stat-value text-blue-800 mt-2">7</p>
+                    </div>
+                </div>
+
+                <!-- Bagian Lain di Konten Utama (Akses Cepat Modul) -->
+                <div class="bg-white p-6 rounded-xl shadow-lg mb-8">
+                     <h2 class="text-xl font-semibold text-gray-700 mb-4 border-b pb-2">Akses Cepat Modul</h2>
+                     <p class="text-gray-500">Area ini akan diisi dengan kartu akses dinamis.</p>
+                </div>
+            `;
+        }
+        
+        // 4. Handle Logout Button
+        if (logoutButton) {
+            logoutButton.addEventListener('click', () => {
+                window.location.href = API_BASE_URL + 'logout.php';
+            });
+        }
+
+        checkSession(); 
+    });
+</script>
+</body>
+</html>

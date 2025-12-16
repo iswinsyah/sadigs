@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atur Kuota Role | SADIGS 3.0</title>
+    <!-- Memuat Tailwind CSS untuk styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Menggunakan font Inter secara default */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Styling Sidebar (DIAMBIL DARI DASHBOARD.HTML) */
+        .w-64 { width: 16rem; min-width: 16rem; }
+        .bg-main { background-color: #4FB7B3; } /* Warna Sidebar */
+        .menu-link {
+            display: flex;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 150ms ease-in-out;
+            align-items: center;
+            color: #1f2937; /* Gray-800 */
+        }
+        .menu-link:hover {
+            background-color: #e0fafa;
+            color: #155e75;
+        }
+        .menu-link-active {
+            background-color: #f0fafa;
+            color: #155e75;
+            font-weight: 600;
+        }
+
+        /* --- STYLING KHUSUS KUOTA --- */
+        .quota-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .quota-header h1 {
+            color: #26667F;
+            font-size: 2rem;
+            margin: 0;
+            font-weight: 800;
+        }
+        .access-warning {
+            padding: 15px;
+            background-color: #f7f3e0;
+            border: 1px solid #f0e6c8;
+            color: #856404;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        .quota-card {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+        .quota-list { text-align: left; margin-top: 20px; }
+        .quota-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .quota-input input {
+            width: 80px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 0.95rem;
+        }
+        #btn-save {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #4FB7B3, #389c98); 
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 30px;
+            box-shadow: 0 5px 15px rgba(79, 183, 179, 0.3);
+        }
+        #btn-save:hover { transform: translateY(-2px); }
+        .error { background-color: #ffebee; color: #c62828; border: 1px solid #ffcdd2; }
+        .success { background-color: #e0f2f1; color: #00695c; border: 1px solid #b2dfdb; }
+        .message-box { padding: 10px; border-radius: 6px; font-size: 0.9rem; display: none; text-align: left; margin-top: 15px; }
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            .w-64 { width: 100%; min-width: 100%; }
+            .sidebar-desktop { display: none; }
+            main { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex">
+
+    <!-- Sidebar Kiri (Desktop View) - Struktur Tailwind Dashboard -->
+    <div class="w-64 bg-main shadow-2xl p-6 flex flex-col border-r border-gray-300 overflow-y-auto custom-scrollbar sidebar-desktop">
+        
+        <div class="text-2xl font-extrabold mb-8 text-white flex items-center">
+            <img 
+                src="https://raw.githubusercontent.com/villaqurankotabatu-commits/gambarvqbm/f44bf009884af11aba2c967a2401026225f7b02b/vila%20quran.png" 
+                alt="Logo Vila Quran" 
+                class="w-8 h-8 rounded-full object-cover mr-3 shadow-md"
+                onerror="this.onerror=null; this.src='https://placehold.co/32x32/14B8A6/ffffff?text=VQ'" 
+            />
+            SADIGS 3.0
+        </div>
+        
+        <div class="text-sm text-white mb-4 border-b border-white/20 pb-4">
+            <span class="font-normal block text-white/70">Selamat datang,</span>
+            <span id="sidebar-username" class="font-semibold text-lg">Memuat...</span>
+        </div>
+
+        <div class="flex flex-col space-y-4 flex-1">
+            
+            <!-- Kategori 1: UMUM -->
+            <div id="menu-group-umum" class="bg-white p-4 rounded-xl shadow-lg border border-gray-100">
+                <h3 class="text-xs font-bold tracking-wider uppercase text-gray-500 pb-2 px-1 border-b mb-1">UMUM</h3>
+                <div class="space-y-1">
+                    <a href="dashboard.html" class="menu-link text-gray-800">
+                         <svg class="w-5 h-5 mr-3 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                         <span>Dashboard Utama</span>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Kategori 3: KHUSUS (PERAN DINAMIS) -->
+            <div id="menu-group-peran" class="bg-white p-4 rounded-xl shadow-lg border border-gray-100">
+                <h3 class="text-xs font-bold tracking-wider uppercase text-gray-500 pb-2 px-1 border-b mb-1">MENU PERAN KHUSUS</h3>
+                <div id="dynamic-menu-links" class="space-y-1">
+                    <!-- Kuota Management Link (Active on this page) -->
+                    <a href="quota_management.html" class="menu-link menu-link-active text-teal-700">
+                        <svg class="w-5 h-5 mr-3 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                        <span>Atur Kuota Role</span>
+                    </a>
+                </div>
+            </div>
+            
+        </div>
+
+        <div class="mt-auto pt-6 border-t border-white/20">
+            <button id="logout-btn" class="w-full p-3 bg-red-600 text-white font-semibold rounded-xl shadow-md transition duration-150 hover:bg-red-700 flex items-center justify-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Area Konten Utama -->
+    <main id="main-content-area" class="flex-1 p-10 overflow-y-auto">
+        <div class="quota-container">
+            <div class="quota-header">
+                <h1>Pengaturan Kuota Role</h1>
+                <p>Tentukan batas maksimum pendaftar untuk setiap peran di sekolah.</p>
+            </div>
+
+            <!-- Peringatan Akses Khusus Yayasan -->
+            <div class="access-warning">
+                <p>⚠️ **AREA ADMINISTRASI YAYASAN**. Hanya akun dengan peran Yayasan yang dapat mengubah pengaturan kuota.</p>
+            </div>
+        
+            <div class="quota-card">
+                <!-- Form Pengaturan Kuota -->
+                <form id="quotaForm">
+                    
+                    <div class="quota-list" id="quota-list-container">
+                        <!-- Daftar Kuota akan dimuat di sini oleh JavaScript -->
+                        <div style="text-align: center; color: #666; padding: 20px;">Memuat data kuota...</div>
+                    </div>
+
+                    <button type="submit" id="btn-save">Simpan Kuota Role</button>
+                    
+                    <!-- Pesan Status -->
+                    <div id="msg-box" class="message-box"></div>
+                </form>
+            </div>
+            
+        </div>
+    </main>
+
+<script>
+    // Jalur API relatif ke root subdomain
+    const API_BASE_URL = '/sadigs_api_v3/'; 
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        
+        const usernameDisplay = document.getElementById('sidebar-username');
+        const logoutButton = document.getElementById('logout-btn');
+        const msgBox = document.getElementById('msg-box');
+        const quotaListContainer = document.getElementById('quota-list-container');
+        const quotaForm = document.getElementById('quotaForm');
+
+        // --- DEFINISI PERAN ---
+        const yayasanRoles = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan'];
+        
+        // =========================================================
+        // 1. FUNGSI UTAMA: Cek Sesi dan Muat Menu
+        // =========================================================
+
+        async function checkSession() {
+            // Menggunakan API_BASE_URL absolut dari root domain
+            const sessionApiUrl = `/sadigs_api_v3/session_check.php`;
+            
+            try {
+                const response = await fetch(sessionApiUrl);
+                const data = await response.json();
+
+                if (data.success) {
+                    usernameDisplay.textContent = data.username;
+                    renderDynamicMenu(data.roles);
+                    return;
+                } else {
+                    window.location.href = 'index.html'; // Redirect ke login jika sesi tidak valid
+                    return;
+                }
+            } catch (error) {
+                console.error(`Session check failed:`, error);
+                window.location.href = 'index.html';
+                return;
+            }
+        }
+        
+        // Menyederhanakan rendering menu karena ini adalah halaman Kuota
+        function renderDynamicMenu(userRoles) {
+             let hasYayasanAccess = userRoles.some(role => yayasanRoles.includes(role));
+             // Menonaktifkan Akses Jika Bukan Yayasan (Security Layer)
+             if (!hasYayasanAccess) {
+                 msgBox.className = 'message-box error';
+                 msgBox.textContent = 'Akses ditolak: Anda tidak memiliki peran Yayasan untuk melihat halaman ini.';
+                 msgBox.style.display = 'block';
+                 quotaForm.style.pointerEvents = 'none'; // Menonaktifkan form
+                 quotaForm.querySelector('#btn-save').disabled = true;
+             }
+        }
+
+
+        // 2. Ambil data Kuota
+        async function fetchQuotas() {
+            quotaListContainer.innerHTML = '<div style="text-align: center; color: #4FB7B3; padding: 20px;">Memuat data kuota...</div>';
+            msgBox.style.display = 'none';
+
+            try {
+                // Memanggil quota.php dengan method GET
+                const response = await fetch(API_BASE_URL + 'quota.php');
+                const data = await response.json();
+                
+                if (data.success) {
+                    renderQuotas(data.quotas);
+                } else {
+                    quotaListContainer.innerHTML = `<div class="error" style="display: block;">Gagal memuat kuota: ${data.message}</div>`;
+                }
+
+            } catch (error) {
+                quotaListContainer.innerHTML = `<div class="error" style="display: block;">Kesalahan koneksi API Kuota. (${error.message})</div>`;
+            }
+        }
+
+        // 3. Render Form
+        function renderQuotas(quotas) {
+            quotaListContainer.innerHTML = '';
+            if (quotas.length === 0) {
+                 quotaListContainer.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">Tidak ada pengaturan kuota di database. Pastikan tabel quota_settings sudah terisi.</div>';
+                 return;
+            }
+
+            quotas.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'quota-item';
+                itemDiv.innerHTML = `
+                    <label for="quota-${item.role_name.replace(/\s/g, '_')}">${item.role_name}</label>
+                    <div class="quota-input">
+                        <input type="number" 
+                               id="quota-${item.role_name.replace(/\s/g, '_')}" 
+                               name="${item.role_name}" 
+                               value="${item.max_limit}" 
+                               min="0" 
+                               required>
+                    </div>
+                `;
+                quotaListContainer.appendChild(itemDiv);
+            });
+        }
+
+        // 4. Handle Submit
+        quotaForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(quotaForm);
+            const quotas = {};
+            for (const [key, value] of formData.entries()) {
+                quotas[key] = parseInt(value, 10);
+            }
+
+            msgBox.style.display = 'block';
+            msgBox.className = 'message-box success';
+            msgBox.textContent = 'Menyimpan perubahan...';
+
+            try {
+                const response = await fetch(API_BASE_URL + 'quota.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(quotas)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    msgBox.className = 'message-box success';
+                    msgBox.textContent = data.message;
+                    fetchQuotas(); 
+                } else {
+                    msgBox.className = 'message-box error';
+                    msgBox.textContent = data.message || 'Gagal menyimpan kuota.';
+                }
+            } catch (error) {
+                msgBox.className = 'message-box error';
+                msgBox.textContent = 'Kesalahan jaringan atau server saat menyimpan.';
+            }
+        });
+
+        // 5. Handle Logout Button
+        if (logoutButton) {
+            logoutButton.addEventListener('click', () => {
+                window.location.href = API_BASE_URL + 'logout.php';
+            });
+        }
+
+
+        // Eksekusi Awal
+        checkSession(); 
+        fetchQuotas();
+
+    });
+</script>
+</body>
+</html>

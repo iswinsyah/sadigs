@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengaturan Akun Pengguna</title>
+    <!-- Load Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Use Inter font -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 sm:p-8 flex items-start justify-center">
+
+    <div id="app" class="w-full max-w-2xl bg-white shadow-xl rounded-xl p-6 sm:p-8 md:p-10 transition-all duration-300">
+        
+        <header class="mb-8 border-b pb-4">
+            <h1 class="text-3xl font-extrabold text-gray-900 flex items-center">
+                <svg class="w-8 h-8 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.942 3.313.804 2.458 2.338a1.724 1.724 0 00-.58 2.15l.38 1.124c.783 2.306-.784 4.886-3.18 4.886h-3.5c-2.395 0-3.96-2.58-3.178-4.886l.38-1.124a1.724 1.724 0 00-.58-2.15c-.856-1.534.93-3.28 2.458-2.338a1.724 1.724 0 002.573-1.066z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                Pengaturan Akun
+            </h1>
+            <p class="text-sm text-gray-500 mt-1">Kelola informasi profil dan detail akun Anda.</p>
+        </header>
+
+        <div id="loadingIndicator" class="text-center py-10 text-gray-600">
+            <svg class="animate-spin h-5 w-5 text-indigo-500 mx-auto mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Memuat data akun...
+        </div>
+
+        <div id="userInfo" class="bg-gray-50 p-4 rounded-lg mb-6 shadow-inner hidden">
+            <p class="text-xs text-gray-600 font-medium">ID Pengguna (untuk debug/kolaborasi):</p>
+            <p id="displayUserId" class="text-sm font-mono text-gray-800 break-all mt-1"></p>
+        </div>
+
+        <form id="settingsForm" class="space-y-6 hidden">
+            
+            <!-- Full Name Field -->
+            <div>
+                <label for="full_name" class="block text-sm font-medium text-gray-700">Nama Lengkap</label>
+                <input type="text" id="full_name" name="full_name" placeholder="Masukkan nama lengkap Anda"
+                       class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition duration-150" required>
+            </div>
+
+            <!-- Email Field -->
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-700">Alamat Email</label>
+                <input type="email" id="email" name="email" placeholder="Masukkan email aktif Anda"
+                       class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition duration-150" required>
+            </div>
+
+            <!-- Bio Field -->
+            <div>
+                <label for="bio" class="block text-sm font-medium text-gray-700">Bio/Deskripsi Singkat</label>
+                <textarea id="bio" name="bio" rows="3" placeholder="Ceritakan sedikit tentang diri Anda..."
+                          class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition duration-150"></textarea>
+            </div>
+
+            <!-- Message Box for Feedback -->
+            <div id="messageBox" class="p-3 rounded-lg text-sm hidden" role="alert"></div>
+
+            <!-- Submit Button -->
+            <button type="submit" id="submitButton"
+                    class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-md text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out disabled:opacity-50">
+                <span id="buttonText">Simpan Perubahan</span>
+                <svg id="buttonSpinner" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+            </button>
+        </form>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, onSnapshot, collection, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global Firebase Variables (Provided by Canvas Environment)
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        let db;
+        let auth;
+        let userId = null;
+        let isAuthReady = false;
+
+        // UI Elements
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const settingsForm = document.getElementById('settingsForm');
+        const submitButton = document.getElementById('submitButton');
+        const buttonText = document.getElementById('buttonText');
+        const buttonSpinner = document.getElementById('buttonSpinner');
+        const messageBox = document.getElementById('messageBox');
+        const displayUserId = document.getElementById('displayUserId');
+        const userInfoDiv = document.getElementById('userInfo');
+        
+        // Form Fields
+        const fullNameInput = document.getElementById('full_name');
+        const emailInput = document.getElementById('email');
+        const bioInput = document.getElementById('bio');
+        
+        // Firestore Path Constants
+        const USER_DATA_COLLECTION = 'user_data';
+        const PROFILE_DOC_ID = 'profile';
+
+        /**
+         * Menampilkan pesan notifikasi di UI
+         * @param {string} type - 'success', 'error', atau 'info'
+         * @param {string} message - Pesan yang akan ditampilkan
+         */
+        function showMessage(type, message) {
+            messageBox.textContent = message;
+            messageBox.className = 'p-3 rounded-lg text-sm'; // Reset classes
+            
+            switch (type) {
+                case 'success':
+                    messageBox.classList.add('bg-green-100', 'text-green-800');
+                    break;
+                case 'error':
+                    messageBox.classList.add('bg-red-100', 'text-red-800');
+                    break;
+                case 'info':
+                default:
+                    messageBox.classList.add('bg-blue-100', 'text-blue-800');
+                    break;
+            }
+            messageBox.classList.remove('hidden');
+        }
+
+        /**
+         * Menginisialisasi Firebase dan Autentikasi
+         */
+        async function initFirebase() {
+            if (!firebaseConfig) {
+                showMessage('error', 'Konfigurasi Firebase tidak ditemukan.');
+                return;
+            }
+
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                setLogLevel('Debug'); // Untuk logging Firebase
+
+                // 1. Autentikasi
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                // 2. Listener Status Autentikasi
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        displayUserId.textContent = userId;
+                        userInfoDiv.classList.remove('hidden');
+                        isAuthReady = true;
+                        console.log("Firebase Auth Ready. User ID:", userId);
+                        
+                        // Setelah Auth siap, mulai dengarkan data profil
+                        listenToProfileData();
+                    } else {
+                        userId = crypto.randomUUID(); // Fallback untuk non-authenticated user
+                        displayUserId.textContent = 'Anonim (ID Lokal: ' + userId.substring(0, 8) + '...)';
+                        userInfoDiv.classList.remove('hidden');
+                        isAuthReady = true;
+                        console.log("Signed in anonymously or using local ID.");
+                        
+                        // Tetap dengarkan data (walaupun pathnya tidak terjamin)
+                        listenToProfileData();
+                    }
+                });
+
+            } catch (error) {
+                console.error("Firebase Initialization Error:", error);
+                showMessage('error', 'Gagal menginisialisasi Firebase. Cek console.');
+                loadingIndicator.classList.add('hidden');
+            }
+        }
+
+        /**
+         * Menyiapkan listener real-time untuk data profil dari Firestore
+         */
+        function listenToProfileData() {
+            if (!isAuthReady || !userId) return;
+
+            // Path untuk data privat: /artifacts/{appId}/users/{userId}/user_data/profile
+            const docRef = doc(db, 'artifacts', appId, 'users', userId, USER_DATA_COLLECTION, PROFILE_DOC_ID);
+            
+            console.log("Attaching Firestore listener to:", docRef.path);
+
+            onSnapshot(docRef, (docSnapshot) => {
+                loadingIndicator.classList.add('hidden');
+                settingsForm.classList.remove('hidden');
+                
+                if (docSnapshot.exists()) {
+                    const data = docSnapshot.data();
+                    console.log("Current data:", data);
+                    
+                    // Isi form dengan data yang ada di Firestore
+                    fullNameInput.value = data.full_name || '';
+                    emailInput.value = data.email || '';
+                    bioInput.value = data.bio || '';
+
+                    showMessage('info', 'Data profil dimuat dari server.');
+                } else {
+                    console.log("No profile data found. Using empty form.");
+                    // Inisialisasi data default di form jika dokumen belum ada
+                    fullNameInput.value = '';
+                    emailInput.value = '';
+                    bioInput.value = '';
+                    showMessage('info', 'Dokumen profil baru akan dibuat saat Anda menyimpan.');
+                }
+            }, (error) => {
+                console.error("Error listening to profile data:", error);
+                showMessage('error', `Gagal memuat data: ${error.message}`);
+                loadingIndicator.classList.add('hidden');
+                settingsForm.classList.remove('hidden');
+            });
+        }
+
+        /**
+         * Menangani pengiriman formulir dan menyimpan data ke Firestore
+         */
+        settingsForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!userId) {
+                showMessage('error', 'Pengguna belum terautentikasi. Coba muat ulang.');
+                return;
+            }
+
+            // Nonaktifkan tombol dan tampilkan spinner
+            submitButton.disabled = true;
+            buttonText.textContent = 'Menyimpan...';
+            buttonSpinner.classList.remove('hidden');
+            messageBox.classList.add('hidden');
+
+            const newFullName = fullNameInput.value.trim();
+            const newEmail = emailInput.value.trim();
+            const newBio = bioInput.value.trim();
+
+            if (!newFullName || !newEmail) {
+                showMessage('error', 'Nama lengkap dan Email wajib diisi.');
+                resetButton();
+                return;
+            }
+
+            const profileData = {
+                full_name: newFullName,
+                email: newEmail,
+                bio: newBio,
+                user_id: userId, // Simpan userId di dokumen sebagai referensi
+                last_updated: new Date().toISOString()
+            };
+
+            // Path untuk dokumen profil
+            const docRef = doc(db, 'artifacts', appId, 'users', userId, USER_DATA_COLLECTION, PROFILE_DOC_ID);
+            
+            try {
+                // setDoc dengan merge:true akan membuat dokumen jika belum ada
+                // atau hanya memperbarui field yang ada.
+                await setDoc(docRef, profileData, { merge: true });
+
+                // Setelah berhasil, listener onSnapshot akan otomatis memperbarui form
+                showMessage('success', 'Pengaturan akun berhasil disimpan!');
+                
+            } catch (error) {
+                console.error("Error saving profile data:", error);
+                showMessage('error', `Gagal menyimpan data: ${error.message}.`);
+            } finally {
+                resetButton();
+            }
+        });
+        
+        /**
+         * Mengembalikan tombol submit ke keadaan semula
+         */
+        function resetButton() {
+            submitButton.disabled = false;
+            buttonText.textContent = 'Simpan Perubahan';
+            buttonSpinner.classList.add('hidden');
+        }
+
+        // Mulai inisialisasi Firebase saat window dimuat
+        window.onload = initFirebase;
+
+    </script>
+</body>
+</html>

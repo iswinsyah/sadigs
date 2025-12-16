@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar SADIGS 3.0</title>
+    <!-- Font Premium: Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
+    <!-- Memuat file CSS eksternal -->
+    <link rel="stylesheet" href="style.css"> 
+    
+    <style>
+        /* CSS KHUSUS HALAMAN INI (Digabung untuk kemudahan) */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #4FB7B3; 
+            background-image: linear-gradient(135deg, #4FB7B3 0%, #389c98 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .login-card, .auth-card {
+            background-color: #ffffff;
+            width: 100%;
+            max-width: 400px;
+            padding: 35px 30px;
+            border-top: 5px solid #26667F;
+            border-bottom: 5px solid #26667F;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+        
+        .signup-card {
+             max-width: 450px;
+        }
+
+        .header-section { margin-bottom: 30px; }
+        .app-logo { width: 80px; margin-bottom: 15px; }
+        .header-section h1 { font-size: 2rem; color: #26667F; font-weight: 800; margin: 5px 0; }
+        .header-section h2 { font-size: 0.95rem; color: #666; font-weight: 500; margin: 0; }
+        .header-section h2.institute { font-size: 1.1rem; color: #26667F; font-weight: 700; margin-top: 5px; }
+
+        .form-group { margin-bottom: 20px; text-align: left; }
+        .form-group label { display: block; margin-bottom: 8px; color: #555; font-size: 0.85rem; font-weight: 600; }
+        .form-group input { width: 100%; padding: 14px 15px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 0.95rem; box-sizing: border-box; background-color: #fcfcfc; }
+        .form-group input:focus { border-color: #4FB7B3; box-shadow: 0 4px 10px rgba(79, 183, 179, 0.1); outline: none; }
+
+        /* ROLE SELECTION STYLING */
+        .role-selection {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .role-option {
+            flex-grow: 1;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            background-color: #fcfcfc;
+        }
+        .role-option:hover { background-color: #f0fafa; border-color: #4FB7B3; }
+        .role-option input[type="checkbox"] { 
+            margin-right: 12px;
+            width: 18px;
+            height: 18px;
+            accent-color: #26667F;
+            border: 1px solid #aaa;
+        }
+        .role-option span { font-size: 0.95rem; font-weight: 500; color: #444; }
+
+        #btn-signup { width: 100%; padding: 14px; background: linear-gradient(135deg, #26667F, #1a4a5e); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: transform 0.2s; margin-top: 10px; box-shadow: 0 5px 15px rgba(38, 102, 127, 0.2); }
+        #btn-signup:hover { transform: translateY(-2px); }
+
+        .auth-footer { margin-top: 25px; font-size: 0.9rem; color: #666; }
+        .auth-footer a { color: #26667F; font-weight: 700; text-decoration: none; }
+
+        .message-box { margin-top: 15px; padding: 10px; border-radius: 6px; font-size: 0.9rem; display: none; text-align: left; }
+        .error { background-color: #ffebee; color: #c62828; border: 1px solid #ffcdd2; }
+        .success { background-color: #e0f2f1; color: #00695c; border: 1px solid #b2dfdb; }
+    </style>
+</head>
+<body>
+
+    <div class="auth-card signup-card">
+        
+        <!-- Area Logo dan Header -->
+        <div class="header-section">
+            <img src="https://raw.githubusercontent.com/villaqurankotabatu-commits/gambarvqbm/f44bf009884af11aba2c967a2401026225f7b02b/vila%20quran.png" 
+                 alt="Logo Villa Quran" 
+                 class="app-logo">
+            
+            <h1>SADIGS 3.0</h1>
+            <h2>Sistem Administrasi Digital Sekolah</h2>
+            <h2 class="institute">VILLA QURAN BARON MALANG</h2>
+        </div>
+
+        <!-- Formulir -->
+        <form id="signup-form">
+            
+            <!-- Bidang Nama Pengguna (Username) -->
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" placeholder="Masukkan Username Anda" required autocomplete="off">
+            </div>
+
+            <!-- Bidang Email -->
+            <div class="form-group">
+                <label for="email">Alamat Email</label>
+                <input type="email" id="email" name="email" placeholder="contoh@email.com" required>
+            </div>
+
+            <!-- Bidang Kata Sandi -->
+            <div class="form-group">
+                <label for="password">Kata Sandi</label>
+                <input type="password" id="password" name="password" placeholder="Minimal 8 karakter" required>
+            </div>
+            
+            <!-- Pilihan Peran (Role) -->
+            <div class="form-group">
+                <label>Pilih Peran Anda (Bisa pilih lebih dari satu)</label>
+                <div class="role-selection">
+                    
+                    <label class="role-option"><input type="checkbox" name="role" value="Kepala Sekolah"><span>Kepala Sekolah</span></label>
+                    <label class="role-option"><input type="checkbox" name="role" value="Sekretaris Sekolah"><span>Sekretaris Sekolah</span></label>
+                    <label class="role-option"><input type="checkbox" name="role" value="Bendahara Sekolah"><span>Bendahara Sekolah</span></label>
+                    <label class="role-option"><input type="checkbox" name="role" value="Kepala Asrama"><span>Kepala Asrama</span></label>
+                    <label class="role-option"><input type="checkbox" name="role" value="Musyrif"><span>Musyrif</span></label>
+                    <label class="role-option"><input type="checkbox" name="role" value="Ustadz"><span>Ustadz</span></label>
+                    <label class="role-option"><input type="checkbox" name="role" value="Santri"><span>Santri</span></label>
+                    <label class="role-option"><input type="checkbox" name="role" value="Walisantri"><span>Walisantri</span></label>
+
+                </div>
+            </div>
+            
+            <!-- Tombol Submit -->
+            <button type="submit" id="btn-signup">Daftar Akun</button>
+        </form>
+
+        <!-- Pesan Status (Untuk JavaScript) -->
+        <div id="msg-box" class="message-box"></div>
+
+        <!-- Tautan Masuk -->
+        <div class="auth-footer">
+            Sudah punya akun? 
+            <a href="index.html">Masuk di sini</a>
+        </div>
+    </div>
+
+    <!-- Menautkan ke script.js eksternal -->
+    <script src="script.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,12 @@
+# Abaikan file log error PHP
+php_error.log
+sadigs_api_v3/php_error.log
+
+# Abaikan file konfigurasi database yang berisi kredensial
+# Ini mencegah password lokal Anda terkirim ke GitHub.
+sadigs_api_v3/db_connect.php
+sadigs_api_v3/config.php
+
+# Abaikan folder spesifik editor kode (opsional)
+.vscode/
+.idea/
