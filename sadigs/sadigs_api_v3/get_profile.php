@@ -20,13 +20,15 @@ try {
     exit; // Error sudah ditangani di db_connect.php
 }
 
-// Asumsi: user_id dikirim melalui body POST
-// Dalam aplikasi nyata, user_id harus diverifikasi melalui token sesi atau JWT
-if (!isset($_POST['user_id']) || empty($_POST['user_id'])) {
+// Mendapatkan data dari body request JSON
+$data = json_decode(file_get_contents("php://input"), true);
+
+// Validasi input
+if (!isset($data['user_id']) || empty($data['user_id'])) {
     sendJSONResponse(['success' => false, 'message' => 'ID pengguna (user_id) diperlukan.'], 400);
 }
 
-$user_id = $_POST['user_id'];
+$user_id = $data['user_id'];
 
 try {
     // Query untuk mengambil detail profil pengguna
