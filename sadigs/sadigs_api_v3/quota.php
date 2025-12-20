@@ -38,6 +38,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
         sendJSONResponse(['success' => true, 'quotas' => $result]);
     } catch (Exception $e) {
+        // Pastikan error log tercatat
+        error_log("Quota API Error: " . $e->getMessage());
         sendJSONResponse(['success' => false, 'message' => 'Gagal mengambil data kuota.'], 500);
     }
 
