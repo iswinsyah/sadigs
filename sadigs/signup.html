@@ -87,7 +87,7 @@
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Terjadi kesalahan koneksi ke server.');
+                alert('Terjadi kesalahan: ' + error.message);
             } finally {
                 btn.disabled = false;
                 btn.innerText = originalText;

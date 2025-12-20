@@ -3,6 +3,9 @@
 // SADIGS 3.0: SIGNUP (CLEAN VERSION)
 // =================================================================
 
+// Buffer output untuk mencegah error HTML merusak JSON
+ob_start();
+
 // Pastikan db_connect dimuat
 require_once 'db_connect.php';
 
