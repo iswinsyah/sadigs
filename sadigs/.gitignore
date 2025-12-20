@@ -15,3 +15,8 @@ php_error.log
 mitra/
 psb/
 seo/
+
+# File lama dan konfigurasi server
+.htaccess
+default_lama.php
+index_lama.html
