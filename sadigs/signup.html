@@ -3,83 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daftar SADIGS 3.0</title>
-    <!-- Font Premium: Poppins -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
-    <!-- Memuat file CSS eksternal -->
-    <link rel="stylesheet" href="style.css"> 
+    <title>Daftar Akun | SADIGS 3.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
 </head>
-<body>
+<body class="bg-gray-100 h-screen flex items-center justify-center">
 
-    <div class="auth-card signup-card">
-        
-        <!-- Area Logo dan Header -->
-        <div class="header-section">
-            <img src="https://raw.githubusercontent.com/villaqurankotabatu-commits/gambarvqbm/f44bf009884af11aba2c967a2401026225f7b02b/vila%20quran.png" 
-                 alt="Logo Villa Quran"
-                 width="80"
-                 height="80" 
-                 class="app-logo">
-            
-            <h1>SADIGS 3.0</h1>
-            <h2>Sistem Administrasi Digital Sekolah</h2>
-            <h2 class="institute">VILLA QURAN BARON MALANG</h2>
+    <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md border-t-4 border-teal-500">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-extrabold text-gray-800">Buat Akun Baru</h1>
+            <p class="text-gray-500 mt-2">Bergabung dengan Sistem Akademik Digital</p>
         </div>
 
-        <!-- Formulir -->
-        <form id="signup-form">
-            
-            <!-- Bidang Nama Pengguna (Username) -->
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" name="username" placeholder="Masukkan Username Anda" required autocomplete="off">
+        <form id="signupForm" class="space-y-5">
+            <!-- Username -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                <input type="text" id="username" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition" placeholder="Contoh: ahmad123" required>
             </div>
 
-            <!-- Bidang Email -->
-            <div class="form-group">
-                <label for="email">Alamat Email</label>
-                <input type="email" id="email" name="email" placeholder="contoh@email.com" required>
+            <!-- Email -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input type="email" id="email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition" placeholder="nama@email.com" required>
             </div>
 
-            <!-- Bidang Kata Sandi -->
-            <div class="form-group">
-                <label for="password">Kata Sandi</label>
-                <input type="password" id="password" name="password" placeholder="Minimal 8 karakter" required>
+            <!-- Password -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Kata Sandi</label>
+                <input type="password" id="password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition" placeholder="Minimal 8 karakter" required minlength="8">
             </div>
-            
-            <!-- Pilihan Peran (Role) -->
-            <div class="form-group">
-                <label>Pilih Peran Anda (Bisa pilih lebih dari satu)</label>
-                <div class="role-selection">
-                    
-                    <label class="role-option"><input type="checkbox" name="role" value="Kepala Sekolah"><span>Kepala Sekolah</span></label>
-                    <label class="role-option"><input type="checkbox" name="role" value="Sekretaris Sekolah"><span>Sekretaris Sekolah</span></label>
-                    <label class="role-option"><input type="checkbox" name="role" value="Bendahara Sekolah"><span>Bendahara Sekolah</span></label>
-                    <label class="role-option"><input type="checkbox" name="role" value="Kepala Asrama"><span>Kepala Asrama</span></label>
-                    <label class="role-option"><input type="checkbox" name="role" value="Musyrif"><span>Musyrif</span></label>
-                    <label class="role-option"><input type="checkbox" name="role" value="Ustadz"><span>Ustadz</span></label>
-                    <label class="role-option"><input type="checkbox" name="role" value="Santri"><span>Santri</span></label>
-                    <label class="role-option"><input type="checkbox" name="role" value="Walisantri"><span>Walisantri</span></label>
 
-                </div>
+            <!-- Role Selection -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Daftar Sebagai</label>
+                <select id="role" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition bg-white" required>
+                    <option value="" disabled selected>Pilih Peran...</option>
+                    <option value="Santri">Santri</option>
+                    <option value="Walisantri">Walisantri</option>
+                    <option value="Ustadz">Ustadz / Pengajar</option>
+                    <option value="Kepala Sekolah">Kepala Sekolah</option>
+                    <option value="Musyrif">Musyrif (Asrama)</option>
+                </select>
+                <p class="text-xs text-gray-400 mt-1">*Peran pegawai memerlukan verifikasi admin.</p>
             </div>
-            
+
             <!-- Tombol Submit -->
-            <button type="submit" id="btn-signup">Daftar Akun</button>
+            <button type="submit" id="submitBtn" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 rounded-lg transition duration-200 shadow-md">
+                Daftar Sekarang
+            </button>
         </form>
 
-        <!-- Pesan Status (Untuk JavaScript) -->
-        <div id="msg-box" class="message-box"></div>
-
-        <!-- Tautan Masuk -->
-        <div class="auth-footer">
+        <div class="mt-6 text-center text-sm text-gray-600">
             Sudah punya akun? 
-            <a href="index.html">Masuk di sini</a>
+            <a href="index.html" class="text-teal-600 font-bold hover:underline">Login di sini</a>
         </div>
     </div>
 
-    <!-- Menautkan ke script.js eksternal -->
-    <script src="script.js"></script>
+    <script>
+        document.getElementById('signupForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const btn = document.getElementById('submitBtn');
+            const originalText = btn.innerText;
+            btn.disabled = true;
+            btn.innerText = 'Memproses...';
 
+            const data = {
+                username: document.getElementById('username').value,
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value,
+                roles: [document.getElementById('role').value] // Backend mengharapkan array
+            };
+
+            try {
+                const response = await fetch('sadigs_api_v3/signup.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                // Cek jika respons bukan JSON (misal error PHP fatal)
+                const contentType = response.headers.get("content-type");
+                if (!contentType || !contentType.includes("application/json")) {
+                    throw new Error("Server tidak merespons dengan JSON. Cek error log.");
+                }
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('Pendaftaran Berhasil! ' + result.message);
+                    window.location.href = 'index.html';
+                } else {
+                    alert('Gagal: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan koneksi ke server.');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = originalText;
+            }
+        });
+    </script>
 </body>
 </html>

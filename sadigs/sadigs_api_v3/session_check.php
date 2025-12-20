@@ -1,11 +1,8 @@
 <?php
-// --- KODE DEBUG DARI HOSTINGER START (Wajib Ada di semua API) ---
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-ini_set('log_errors', 1);
-ini_set('error_log', $_SERVER['DOCUMENT_ROOT'] . '/php_error.log'); 
-error_reporting(E_ALL);
-// --- KODE DEBUG DARI HOSTINGER END ---
+// =================================================================
+// SADIGS 3.0: SESSION CHECK (CLEAN VERSION)
+// =================================================================
+ob_start();
 
 // Menggunakan satu sumber koneksi dan fungsi utility
 require_once 'db_connect.php';
@@ -13,7 +10,6 @@ require_once 'db_connect.php';
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-date_default_timezone_set('Asia/Jakarta');
 
 // Logika di bawah ini tidak memerlukan koneksi DB, hanya cek sesi yang sudah dibuat saat login
 // Namun, dengan require_once 'db_connect.php', kita sudah mendapatkan fungsi sendJSONResponse()

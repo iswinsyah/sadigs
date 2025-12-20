@@ -8,6 +8,11 @@ header('Content-Type: application/json');
 // Memuat file koneksi database terpusat (PDO)
 require_once 'db_connect.php';
 
+// Memulai sesi untuk verifikasi otorisasi
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 // Hanya mengizinkan metode POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     sendJSONResponse(['success' => false, 'message' => 'Metode tidak diizinkan. Gunakan POST.'], 405);
@@ -29,6 +34,11 @@ if (!isset($data['user_id']) || empty($data['user_id'])) {
 }
 
 $user_id = $data['user_id'];
+
+// Verifikasi bahwa pengguna sudah login sebelum memberikan data
+if (!isset($_SESSION['user_id'])) {
+    sendJSONResponse(['success' => false, 'message' => 'Akses ditolak. Silakan login terlebih dahulu.'], 401);
+}
 
 try {
     // Query untuk mengambil detail profil pengguna
