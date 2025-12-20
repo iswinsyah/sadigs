@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabel Kalender Pendidikan | SADIGS 3.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Custom Scrollbar untuk Tabel */
+        .custom-scrollbar::-webkit-scrollbar { height: 10px; width: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+
+    <!-- HEADER MOBILE -->
+    <div class="lg:hidden flex justify-between items-center bg-teal-600 text-white p-4 shadow-md sticky top-0 z-50">
+        <div class="font-bold text-xl flex items-center gap-2"><span>SADIGS 3.0</span></div>
+        <button id="mobileMenuBtn" class="focus:outline-none p-1 rounded hover:bg-teal-700 transition"><i data-lucide="menu" class="w-7 h-7"></i></button>
+    </div>
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR -->
+        <aside id="sidebar" class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col transition-transform transform -translate-x-full lg:translate-x-0 fixed lg:static h-full z-40 shadow-2xl lg:shadow-none">
+            <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-teal-600 text-white">
+                <h1 class="text-2xl font-extrabold tracking-wider">SADIGS</h1>
+            </div>
+            <div class="p-6 border-b border-gray-100 bg-teal-50">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-teal-200 flex items-center justify-center text-teal-800 font-bold text-lg shadow-sm"><span id="userInitial">U</span></div>
+                    <div class="overflow-hidden">
+                        <p id="sidebarUsername" class="font-bold text-gray-800 text-sm truncate">Memuat...</p>
+                        <p id="sidebarRole" class="text-xs text-gray-500 truncate font-medium">Role...</p>
+                    </div>
+                </div>
+            </div>
+            <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1 no-scrollbar">
+                <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-teal-600 rounded-lg transition font-medium">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard
+                </a>
+                <div id="menuYayasan" class="hidden">
+                    <p class="px-4 mt-6 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">Yayasan</p>
+                    <a href="verification_management.html" class="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 hover:text-teal-600 rounded-lg transition font-medium"><i data-lucide="users" class="w-5 h-5"></i> Verifikasi Pegawai</a>
+                    <a href="quota_management.html" class="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 hover:text-teal-600 rounded-lg transition font-medium"><i data-lucide="settings" class="w-5 h-5"></i> Atur Kuota</a>
+                    <a href="calendar_settings.html" class="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 hover:text-teal-600 rounded-lg transition font-medium"><i data-lucide="calendar" class="w-5 h-5"></i> Atur Kalender</a>
+                    <a href="calendar_view.html" class="flex items-center gap-3 px-4 py-3 text-teal-700 bg-teal-50 rounded-lg font-semibold shadow-sm"><i data-lucide="table" class="w-5 h-5"></i> Tabel Kalender</a>
+                </div>
+                <p class="px-4 mt-6 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">Akun</p>
+                <a href="profile.html" class="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 hover:text-teal-600 rounded-lg transition font-medium">
+                    <i data-lucide="user" class="w-5 h-5"></i> Profil Saya
+                </a>
+                <button id="logoutBtn" class="w-full flex items-center gap-3 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition mt-4 font-medium"><i data-lucide="log-out" class="w-5 h-5"></i> Keluar</button>
+            </nav>
+        </aside>
+        <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden lg:hidden backdrop-blur-sm"></div>
+
+        <!-- KONTEN UTAMA -->
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative">
+            <header class="mb-6 flex justify-between items-center">
+                <div>
+                    <h2 class="text-2xl lg:text-3xl font-bold text-gray-800">Tabel Kalender Pendidikan</h2>
+                    <p class="text-gray-500 text-sm mt-1">Tahun Ajaran Berjalan</p>
+                </div>
+                <a href="calendar_settings.html" class="hidden md:flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+                    <i data-lucide="settings" class="w-4 h-4"></i> Pengaturan
+                </a>
+            </header>
+
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="overflow-x-auto custom-scrollbar">
+                    <table class="min-w-full border-collapse text-sm">
+                        <thead>
+                            <tr id="calendarHeadRow" class="bg-gray-100 border-b border-gray-200">
+                                <!-- Header akan diisi oleh JS -->
+                            </tr>
+                        </thead>
+                        <tbody id="calendarBody" class="divide-y divide-gray-200">
+                            <!-- Body akan diisi oleh JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // Mobile Menu Logic
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        function toggleSidebar() {
+            sidebar.classList.toggle('-translate-x-full');
+            sidebarOverlay.classList.toggle('hidden');
+        }
+        mobileMenuBtn.addEventListener('click', toggleSidebar);
+        sidebarOverlay.addEventListener('click', toggleSidebar);
+
+        // --- GENERATE TABLE ---
+        const months = [
+            'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',
+            'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni'
+        ];
+
+        const theadRow = document.getElementById('calendarHeadRow');
+        const tbody = document.getElementById('calendarBody');
+
+        // 1. Buat Header (Kolom A1 & B1-AF1)
+        const thBulan = document.createElement('th');
+        thBulan.className = "p-3 text-left font-bold text-gray-700 sticky left-0 bg-gray-100 z-10 border-r border-gray-200 min-w-[150px]";
+        thBulan.textContent = "Nama Bulan";
+        theadRow.appendChild(thBulan);
+
+        for (let i = 1; i <= 31; i++) {
+            const th = document.createElement('th');
+            th.className = "p-2 text-center font-semibold text-gray-600 min-w-[40px] border-r border-gray-100 last:border-r-0";
+            th.textContent = i;
+            theadRow.appendChild(th);
+        }
+
+        // 2. Buat Baris Bulan (Kolom A2-A13 & Isi Tanggal)
+        months.forEach(month => {
+            const tr = document.createElement('tr');
+            tr.className = "hover:bg-gray-50 transition-colors";
+
+            // Nama Bulan
+            const tdMonth = document.createElement('td');
+            tdMonth.className = "p-3 font-medium text-gray-800 sticky left-0 bg-white z-10 border-r border-gray-200 shadow-[4px_0_24px_rgba(0,0,0,0.02)]";
+            tdMonth.textContent = month;
+            tr.appendChild(tdMonth);
+
+            // Sel Tanggal (Kosong dulu)
+            for (let i = 1; i <= 31; i++) {
+                const td = document.createElement('td');
+                td.className = "p-1 border-r border-gray-100 last:border-r-0 text-center relative h-10";
+                // Di sini nanti bisa ditambahkan logika untuk menandai hari libur/kegiatan
+                tr.appendChild(td);
+            }
+            tbody.appendChild(tr);
+        });
+
+        // --- SESSION CHECK ---
+        fetch('sadigs_api_v3/session_check.php')
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success) window.location.href = 'index.html';
+                document.getElementById('sidebarUsername').textContent = data.username;
+                document.getElementById('userInitial').textContent = data.username.charAt(0).toUpperCase();
+                document.getElementById('sidebarRole').textContent = data.roles[0] || 'User';
+                
+                const yayasanRoles = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan'];
+                if (data.roles.some(r => yayasanRoles.includes(r))) {
+                    document.getElementById('menuYayasan').classList.remove('hidden');
+                }
+            })
+            .catch(() => window.location.href = 'index.html');
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            if(confirm('Keluar aplikasi?')) window.location.href = 'sadigs_api_v3/logout.php';
+        });
+    </script>
+</body>
+</html>
