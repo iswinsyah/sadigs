@@ -58,14 +58,15 @@
                     <!-- Div 2: KEPEGAWAIAN -->
                     <div class="bg-gray-50 rounded-lg p-2">
                         <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KEPEGAWAIAN</h3>
-                        <a href="verification_management.html" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="users" class="w-5 h-5"></i> Verifikasi Pegawai</a>
-                        <a href="quota_management.html" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="user-cog" class="w-5 h-5"></i> Atur Kuota</a>
+                        <a id="navVerifikasi" href="verification_management.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="users" class="w-5 h-5"></i> Verifikasi Pegawai</a>
+                        <a id="navQuota" href="quota_management.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="user-cog" class="w-5 h-5"></i> Atur Kuota</a>
+                        <a id="navAbsensi" href="attendance.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="map-pin" class="w-5 h-5"></i> Absensi Pegawai</a>
                     </div>
 
                     <!-- Div 3: KHUSUS -->
-                    <div class="bg-gray-50 rounded-lg p-2">
+                    <div id="groupKhusus" class="hidden bg-gray-50 rounded-lg p-2">
                         <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KHUSUS</h3>
-                        <a href="calendar_settings.html" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="calendar-cog" class="w-5 h-5"></i> Atur Kalender</a>
+                        <a id="navCalendarSettings" href="calendar_settings.html" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="calendar-cog" class="w-5 h-5"></i> Atur Kalender</a>
                     </div>
                 </div>
                 
@@ -191,10 +192,23 @@
                 document.getElementById('userInitial').textContent = sessionData.username.charAt(0).toUpperCase();
                 document.getElementById('sidebarRole').textContent = sessionData.roles[0] || 'User';
                 
-                // Cek Menu Yayasan
+                // LOGIKA MENU SIDEBAR
                 const yayasanRoles = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan'];
-                if (sessionData.roles.some(r => yayasanRoles.includes(r))) {
+                const pegawaiRoles = ['Kepala Sekolah', 'Kepala Asrama', 'Sekretaris Sekolah', 'Bendahara Sekolah', 'Musyrif'];
+
+                const isYayasan = sessionData.roles.some(r => yayasanRoles.includes(r));
+                const isPegawai = sessionData.roles.some(r => pegawaiRoles.includes(r));
+
+                if (isYayasan || isPegawai) {
                     document.getElementById('menuYayasan').classList.remove('hidden');
+                }
+                if (isYayasan) {
+                    document.getElementById('navVerifikasi').classList.remove('hidden');
+                    document.getElementById('navQuota').classList.remove('hidden');
+                    document.getElementById('groupKhusus').classList.remove('hidden');
+                }
+                if (isPegawai) {
+                    document.getElementById('navAbsensi').classList.remove('hidden');
                 }
                 
                 // --- LOGIKA PERAN (BARU) ---
