@@ -14,38 +14,45 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $data = json_decode(file_get_contents("php://input"), true);
-$role = $data['role'] ?? '';
+$roles = $data['roles'] ?? [];
 
-if (empty($role)) {
-    sendJSONResponse(['success' => false, 'message' => 'Peran harus dipilih.'], 400);
+if (empty($roles) || !is_array($roles)) {
+    sendJSONResponse(['success' => false, 'message' => 'Setidaknya satu peran harus dipilih.'], 400);
 }
 
 try {
     $pdo = getDBConnection();
     
-    // 1. Cek Kuota
-    $stmt_quota = $pdo->prepare("SELECT max_limit FROM quota_settings WHERE role_name = :role");
-    $stmt_quota->execute(['role' => $role]);
-    $max_limit = $stmt_quota->fetchColumn();
+    // 1. Cek Kuota (Looping untuk setiap peran)
+    // Ambil semua setting kuota dulu untuk efisiensi
+    $stmt_settings = $pdo->query("SELECT role_name, max_limit FROM quota_settings");
+    $quota_settings = $stmt_settings->fetchAll(PDO::FETCH_KEY_PAIR);
 
-    if ($max_limit !== false && $max_limit > 0) {
-        $sql_count = "SELECT COUNT(*) FROM user_roles ur JOIN users u ON ur.user_id = u.user_id WHERE ur.role_name = :role AND u.is_active = 1";
-        $stmt_count = $pdo->prepare($sql_count);
-        $stmt_count->execute(['role' => $role]);
-        $current_count = $stmt_count->fetchColumn();
+    foreach ($roles as $role) {
+        if (isset($quota_settings[$role]) && $quota_settings[$role] > 0) {
+            $max_limit = $quota_settings[$role];
+            
+            $sql_count = "SELECT COUNT(*) FROM user_roles ur JOIN users u ON ur.user_id = u.user_id WHERE ur.role_name = :role AND u.is_active = 1";
+            $stmt_count = $pdo->prepare($sql_count);
+            $stmt_count->execute(['role' => $role]);
+            $current_count = $stmt_count->fetchColumn();
 
-        if ($current_count >= $max_limit) {
-            sendJSONResponse(['success' => false, 'message' => "Kuota untuk posisi '$role' sudah penuh."], 400);
+            if ($current_count >= $max_limit) {
+                sendJSONResponse(['success' => false, 'message' => "Kuota untuk posisi '$role' sudah penuh."], 400);
+            }
         }
     }
 
     // 2. Mulai Transaksi
     $pdo->beginTransaction();
 
-    // Insert Role
+    // Insert Roles (Looping)
     $sql_insert_role = "INSERT INTO user_roles (user_id, role_name) VALUES (:user_id, :role_name)";
     $stmt_role = $pdo->prepare($sql_insert_role);
-    $stmt_role->execute(['user_id' => $_SESSION['user_id'], 'role_name' => $role]);
+
+    foreach ($roles as $role) {
+        $stmt_role->execute(['user_id' => $_SESSION['user_id'], 'role_name' => $role]);
+    }
 
     // Update User jadi Non-Aktif (Menunggu Validasi)
     $sql_update_user = "UPDATE users SET is_active = 0 WHERE user_id = :user_id";
