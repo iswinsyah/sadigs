@@ -74,39 +74,35 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- Semester Ganjil -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Awal Semester Ganjil</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Awal Semester Ganjil (AS1)</label>
                             <input type="date" name="awal_semester_ganjil" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Pembagian Rapot Sem. Ganjil</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Pembagian Rapot Sem. Ganjil (RP1)</label>
                             <input type="date" name="raport_semester_ganjil" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none">
                         </div>
                         
                         <!-- Semester Genap -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Awal Semester Genap</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Awal Semester Genap (AS2)</label>
                             <input type="date" name="awal_semester_genap" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Pembagian Rapot Sem. Genap</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Pembagian Rapot Sem. Genap (RP2)</label>
                             <input type="date" name="raport_semester_genap" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none">
                         </div>
 
                         <!-- Hari Besar -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Tahun Baru Islam</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tahun Baru Islam (TBI)</label>
                             <input type="date" name="tahun_baru_islam" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Maulid Nabi</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Maulid Nabi (MLN)</label>
                             <input type="date" name="maulid_nabi" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Idul Adha</label>
-                            <input type="date" name="idul_adha" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Isra' Mi'raj</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Isra' Mi'raj (IMN)</label>
                             <input type="date" name="isra_miraj" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none">
                         </div>
                     </div>
@@ -150,15 +146,18 @@
 
         // Definisi Field Rentang Tanggal
         const rangeFields = [
-            { key: 'uts_ganjil', label: 'Ujian Tengah Semester Ganjil' },
-            { key: 'uas_ganjil', label: 'Ujian Akhir Semester Ganjil' },
-            { key: 'pas_ganjil', label: 'Penilaian Akhir Semester Ganjil' },
-            { key: 'uts_genap', label: 'Ujian Tengah Semester Genap' },
-            { key: 'uas_genap', label: 'Ujian Akhir Semester Genap' },
-            { key: 'pas_genap', label: 'Penilaian Akhir Semester Genap' },
-            { key: 'libur_sebelum_hari_raya', label: 'Libur Sebelum Hari Raya' },
-            { key: 'libur_setelah_hari_raya', label: 'Libur Setelah Hari Raya' },
-            { key: 'idul_fitri', label: 'Idul Fitri' }
+            { key: 'uts_ganjil', label: 'Ujian Tengah Semester Ganjil (UT1)' },
+            { key: 'uas_ganjil', label: 'Ujian Akhir Semester Ganjil (UA1)' },
+            { key: 'pas_ganjil', label: 'Penilaian Akhir Semester Ganjil (PA1)' },
+            { key: 'uts_genap', label: 'Ujian Tengah Semester Genap (UT2)' },
+            { key: 'uas_genap', label: 'Ujian Akhir Semester Genap (UA2)' },
+            { key: 'pas_genap', label: 'Penilaian Akhir Semester Genap (PA2)' },
+            { key: 'libur_sebelum_hari_raya', label: 'Libur Sebelum Hari Raya (LHR)' },
+            { key: 'libur_setelah_hari_raya', label: 'Libur Setelah Hari Raya (LHR)' },
+            { key: 'idul_fitri', label: 'Idul Fitri (IDF)' },
+            { key: 'idul_adha', label: 'Idul Adha (IDA)' },
+            { key: 'libur_semester_1', label: 'Libur Semester 1 (LS1)' },
+            { key: 'libur_semester_2', label: 'Libur Semester 2 (LS2)' }
         ];
 
         // Render Range Inputs
