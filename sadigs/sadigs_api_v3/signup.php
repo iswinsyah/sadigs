@@ -51,8 +51,8 @@ try {
     // Hash Password
     $password_hash = password_hash($password, PASSWORD_BCRYPT);
     
-    // 3. Insert User (Default is_active = 0)
-    $sql_insert_user = "INSERT INTO users (username, email, password_hash, is_active) VALUES (:username, :email, :password_hash, 0)";
+    // 3. Insert User (Default is_active = 1 sementara)
+    $sql_insert_user = "INSERT INTO users (username, email, password_hash, is_active) VALUES (:username, :email, :password_hash, 1)";
     $stmt_user = $pdo->prepare($sql_insert_user);
     $stmt_user->execute(['username' => $username, 'email' => $email, 'password_hash' => $password_hash]);
     $user_id = $pdo->lastInsertId();
@@ -70,7 +70,7 @@ try {
 
     sendJSONResponse(array(
         'success' => true,
-        'message' => 'Pendaftaran berhasil! Silakan tunggu verifikasi admin.'
+        'message' => 'Pendaftaran berhasil! Akun Anda langsung aktif.'
     ));
 
 } catch (\PDOException $e) {
