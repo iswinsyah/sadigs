@@ -89,6 +89,14 @@
                     </table>
                 </div>
             </div>
+
+            <!-- LEGENDA WARNA -->
+            <div class="mt-6 p-4 bg-white rounded-xl shadow-sm border border-gray-200">
+                <h4 class="font-bold text-gray-700 mb-3">Legenda:</h4>
+                <div id="legendContainer" class="flex flex-wrap gap-x-6 gap-y-2">
+                    <!-- Legenda akan diisi oleh JS -->
+                </div>
+            </div>
         </main>
     </div>
 
@@ -106,6 +114,30 @@
         mobileMenuBtn.addEventListener('click', toggleSidebar);
         sidebarOverlay.addEventListener('click', toggleSidebar);
 
+        // --- DEFINISI SINGKATAN & WARNA ---
+        const eventStyles = {
+            // Key harus sama dengan 'name' di form calendar_settings.html
+            'awal_semester_ganjil': { abbr: 'AS1', color: 'bg-blue-200 text-blue-800', label: 'Agenda Semester' },
+            'raport_semester_ganjil': { abbr: 'RP1', color: 'bg-blue-200 text-blue-800', label: 'Agenda Semester' },
+            'awal_semester_genap': { abbr: 'AS2', color: 'bg-blue-200 text-blue-800', label: 'Agenda Semester' },
+            'raport_semester_genap': { abbr: 'RP2', color: 'bg-blue-200 text-blue-800', label: 'Agenda Semester' },
+            'tahun_baru_islam': { abbr: 'TBI', color: 'bg-green-200 text-green-800', label: 'Hari Besar' },
+            'maulid_nabi': { abbr: 'MLN', color: 'bg-green-200 text-green-800', label: 'Hari Besar' },
+            'isra_miraj': { abbr: 'IMN', color: 'bg-green-200 text-green-800', label: 'Hari Besar' },
+            'uts_ganjil': { abbr: 'UT1', color: 'bg-yellow-200 text-yellow-800', label: 'Periode Ujian' },
+            'uas_ganjil': { abbr: 'UA1', color: 'bg-yellow-200 text-yellow-800', label: 'Periode Ujian' },
+            'pas_ganjil': { abbr: 'PA1', color: 'bg-yellow-200 text-yellow-800', label: 'Periode Ujian' },
+            'uts_genap': { abbr: 'UT2', color: 'bg-yellow-200 text-yellow-800', label: 'Periode Ujian' },
+            'uas_genap': { abbr: 'UA2', color: 'bg-yellow-200 text-yellow-800', label: 'Periode Ujian' },
+            'pas_genap': { abbr: 'PA2', color: 'bg-yellow-200 text-yellow-800', label: 'Periode Ujian' },
+            'libur_sebelum_hari_raya': { abbr: 'LHR', color: 'bg-red-200 text-red-800', label: 'Periode Libur' },
+            'libur_setelah_hari_raya': { abbr: 'LHR', color: 'bg-red-200 text-red-800', label: 'Periode Libur' },
+            'idul_fitri': { abbr: 'IDF', color: 'bg-red-200 text-red-800', label: 'Periode Libur' },
+            'idul_adha': { abbr: 'IDA', color: 'bg-red-200 text-red-800', label: 'Periode Libur' },
+            'libur_semester_1': { abbr: 'LS1', color: 'bg-red-200 text-red-800', label: 'Periode Libur' },
+            'libur_semester_2': { abbr: 'LS2', color: 'bg-red-200 text-red-800', label: 'Periode Libur' },
+        };
+
         // --- GENERATE TABLE ---
         const months = [
             'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',
@@ -114,6 +146,10 @@
 
         const theadRow = document.getElementById('calendarHeadRow');
         const tbody = document.getElementById('calendarBody');
+        const monthNameToIndex = {
+            'Juli': 6, 'Agustus': 7, 'September': 8, 'Oktober': 9, 'November': 10, 'Desember': 11,
+            'Januari': 0, 'Februari': 1, 'Maret': 2, 'April': 3, 'Mei': 4, 'Juni': 5
+        };
 
         // 1. Buat Header (Kolom A1 & B1-AF1)
         const thBulan = document.createElement('th');
@@ -142,7 +178,7 @@
             // Sel Tanggal (Kosong dulu)
             for (let i = 1; i <= 31; i++) {
                 const td = document.createElement('td');
-                td.className = "p-1 border-r border-gray-100 last:border-r-0 text-center relative h-10";
+                td.className = "p-1 border-r border-gray-100 last:border-r-0 text-center relative h-10 font-bold text-xs";
                 // Di sini nanti bisa ditambahkan logika untuk menandai hari libur/kegiatan
                 tr.appendChild(td);
             }
@@ -150,25 +186,94 @@
         });
 
         // --- SESSION CHECK ---
-        fetch('sadigs_api_v3/session_check.php')
-            .then(res => res.json())
-            .then(data => {
-                if (!data.success) window.location.href = 'index.html';
-                document.getElementById('sidebarUsername').textContent = data.username;
-                document.getElementById('userInitial').textContent = data.username.charAt(0).toUpperCase();
-                document.getElementById('sidebarRole').textContent = data.roles[0] || 'User';
+        async function initPage() {
+            try {
+                const sessionRes = await fetch('sadigs_api_v3/session_check.php');
+                const sessionData = await sessionRes.json();
+                if (!sessionData.success) {
+                    window.location.href = 'index.html';
+                    return;
+                }
+                document.getElementById('sidebarUsername').textContent = sessionData.username;
+                document.getElementById('userInitial').textContent = sessionData.username.charAt(0).toUpperCase();
+                document.getElementById('sidebarRole').textContent = sessionData.roles[0] || 'User';
                 
                 const yayasanRoles = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan'];
-                if (data.roles.some(r => yayasanRoles.includes(r))) {
+                if (sessionData.roles.some(r => yayasanRoles.includes(r))) {
                     document.getElementById('menuYayasan').classList.remove('hidden');
                 }
-            })
-            .catch(() => window.location.href = 'index.html');
+
+                // --- Ambil data kalender dan isi tabel ---
+                const calRes = await fetch('sadigs_api_v3/calendar.php?t=' + new Date().getTime());
+                const calData = await calRes.json();
+                if (calData.success && calData.events) {
+                    populateTable(calData.events);
+                    populateLegend();
+                }
+
+            } catch (error) {
+                console.error("Initialization failed:", error);
+                window.location.href = 'index.html';
+            }
+        }
+
+        function populateTable(events) {
+            // Tentukan tahun ajaran
+            const today = new Date();
+            const startYear = (today.getMonth() < 6) ? today.getFullYear() - 1 : today.getFullYear();
+
+            const tableRows = tbody.querySelectorAll('tr');
+            tableRows.forEach((row, monthRowIndex) => {
+                const monthName = months[monthRowIndex];
+                const monthIndex = monthNameToIndex[monthName];
+                const year = (monthIndex >= 6) ? startYear : startYear + 1;
+
+                const cells = row.querySelectorAll('td');
+                for (let day = 1; day <= 31; day++) {
+                    const cell = cells[day]; // cells[0] adalah nama bulan
+                    if (!cell) continue;
+
+                    const cellDate = new Date(year, monthIndex, day);
+                    // Pastikan tanggal valid untuk bulan tersebut (misal: tidak ada 31 Februari)
+                    if (cellDate.getMonth() !== monthIndex) continue;
+
+                    for (const eventKey in events) {
+                        const event = events[eventKey];
+                        if (!event.start) continue;
+
+                        const startDate = new Date(event.start + 'T00:00:00');
+                        const endDate = event.end ? new Date(event.end + 'T00:00:00') : startDate;
+
+                        if (cellDate >= startDate && cellDate <= endDate) {
+                            const style = eventStyles[eventKey];
+                            if (style) {
+                                cell.innerHTML = `<div class="w-full h-full flex items-center justify-center ${style.color} rounded-sm">${style.abbr}</div>`;
+                                cell.title = style.label; // Tooltip
+                                break; // Pindah ke sel berikutnya setelah event ditemukan
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function populateLegend() {
+            const legendContainer = document.getElementById('legendContainer');
+            const addedLabels = new Set();
+            Object.values(eventStyles).forEach(style => {
+                if (!addedLabels.has(style.label)) {
+                    legendContainer.innerHTML += `<div class="flex items-center gap-2 text-sm"><span class="w-4 h-4 rounded ${style.color}"></span><span>${style.label}</span></div>`;
+                    addedLabels.add(style.label);
+                }
+            });
+        }
 
         // Logout
         document.getElementById('logoutBtn').addEventListener('click', () => {
             if(confirm('Keluar aplikasi?')) window.location.href = 'sadigs_api_v3/logout.php';
         });
+
+        initPage();
     </script>
 </body>
 </html>
