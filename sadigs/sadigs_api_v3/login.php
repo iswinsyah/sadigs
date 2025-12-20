@@ -65,7 +65,7 @@ try {
     sendJSONResponse(array(
         'success' => true, 
         'message' => 'Login berhasil!',
-        'redirect_path' => '../dashboard.html'
+        'redirect_path' => 'dashboard.html'
     ));
 
 } catch (\PDOException $e) {
