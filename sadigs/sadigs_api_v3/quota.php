@@ -42,12 +42,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $pdo->beginTransaction();
         
         // Gunakan INSERT ... ON DUPLICATE KEY UPDATE agar jika belum ada dibuat, jika ada diupdate
-        $sql = "INSERT INTO quota_settings (role_name, max_limit) VALUES (:role, :limit) 
-                ON DUPLICATE KEY UPDATE max_limit = :limit";
+        // FIX: Menggunakan parameter berbeda untuk UPDATE karena PDO::ATTR_EMULATE_PREPARES = false
+        $sql = "INSERT INTO quota_settings (role_name, max_limit) VALUES (:role, :limit_val) 
+                ON DUPLICATE KEY UPDATE max_limit = :limit_update";
         $stmt = $pdo->prepare($sql);
 
         foreach ($data as $role => $limit) {
-            $stmt->execute(['role' => $role, 'limit' => (int)$limit]);
+            $stmt->execute([
+                'role' => $role, 
+                'limit_val' => (int)$limit,
+                'limit_update' => (int)$limit
+            ]);
         }
         
         $pdo->commit();
