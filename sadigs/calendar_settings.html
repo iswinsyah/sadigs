@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalender Pendidikan | SADIGS 3.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+
+    <!-- HEADER MOBILE -->
+    <div class="lg:hidden flex justify-between items-center bg-teal-600 text-white p-4 shadow-md sticky top-0 z-50">
+        <div class="font-bold text-xl flex items-center gap-2"><span>SADIGS 3.0</span></div>
+        <button id="mobileMenuBtn" class="focus:outline-none p-1 rounded hover:bg-teal-700 transition"><i data-lucide="menu" class="w-7 h-7"></i></button>
+    </div>
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR -->
+        <aside id="sidebar" class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col transition-transform transform -translate-x-full lg:translate-x-0 fixed lg:static h-full z-40 shadow-2xl lg:shadow-none">
+            <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-teal-600 text-white">
+                <h1 class="text-2xl font-extrabold tracking-wider">SADIGS</h1>
+            </div>
+            <div class="p-6 border-b border-gray-100 bg-teal-50">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-teal-200 flex items-center justify-center text-teal-800 font-bold text-lg shadow-sm"><span id="userInitial">U</span></div>
+                    <div class="overflow-hidden">
+                        <p id="sidebarUsername" class="font-bold text-gray-800 text-sm truncate">Memuat...</p>
+                        <p id="sidebarRole" class="text-xs text-gray-500 truncate font-medium">Role...</p>
+                    </div>
+                </div>
+            </div>
+            <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1 no-scrollbar">
+                <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-teal-600 rounded-lg transition font-medium">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard
+                </a>
+                <div id="menuYayasan" class="hidden">
+                    <p class="px-4 mt-6 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">Yayasan</p>
+                    <a href="verification_management.html" class="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 hover:text-teal-600 rounded-lg transition font-medium"><i data-lucide="users" class="w-5 h-5"></i> Verifikasi Pegawai</a>
+                    <a href="quota_management.html" class="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 hover:text-teal-600 rounded-lg transition font-medium"><i data-lucide="settings" class="w-5 h-5"></i> Atur Kuota</a>
+                    <a href="calendar_settings.html" class="flex items-center gap-3 px-4 py-3 text-teal-700 bg-teal-50 rounded-lg font-semibold shadow-sm"><i data-lucide="calendar" class="w-5 h-5"></i> Kalender Akademik</a>
+                </div>
+                <p class="px-4 mt-6 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">Akun</p>
+                <a href="profile.html" class="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 hover:text-teal-600 rounded-lg transition font-medium">
+                    <i data-lucide="user" class="w-5 h-5"></i> Profil Saya
+                </a>
+                <button id="logoutBtn" class="w-full flex items-center gap-3 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition mt-4 font-medium"><i data-lucide="log-out" class="w-5 h-5"></i> Keluar</button>
+            </nav>
+        </aside>
+        <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden lg:hidden backdrop-blur-sm"></div>
+
+        <!-- KONTEN UTAMA -->
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative">
+            <header class="mb-8">
+                <h2 class="text-2xl lg:text-3xl font-bold text-gray-800">Pengaturan Kalender Pendidikan</h2>
+                <p class="text-gray-500 text-sm mt-1">Atur jadwal semester, ujian, dan hari libur sekolah.</p>
+            </header>
+
+            <form id="calendarForm" class="max-w-5xl space-y-8">
+                
+                <!-- BAGIAN 1: TANGGAL TUNGGAL -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <h3 class="text-lg font-bold text-teal-800 mb-4 flex items-center gap-2">
+                        <i data-lucide="calendar-days" class="w-5 h-5"></i> Agenda Tanggal Tunggal
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Semester Ganjil -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Awal Semester Ganjil</label>
+                            <input type="date" name="awal_semester_ganjil" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Pembagian Rapot Sem. Ganjil</label>
+                            <input type="date" name="raport_semester_ganjil" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none">
+                        </div>
+                        
+                        <!-- Semester Genap -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Awal Semester Genap</label>
+                            <input type="date" name="awal_semester_genap" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Pembagian Rapot Sem. Genap</label>
+                            <input type="date" name="raport_semester_genap" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none">
+                        </div>
+
+                        <!-- Hari Besar -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tahun Baru Islam</label>
+                            <input type="date" name="tahun_baru_islam" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Maulid Nabi</label>
+                            <input type="date" name="maulid_nabi" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Idul Adha</label>
+                            <input type="date" name="idul_adha" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Isra' Mi'raj</label>
+                            <input type="date" name="isra_miraj" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BAGIAN 2: RENTANG TANGGAL -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <h3 class="text-lg font-bold text-teal-800 mb-4 flex items-center gap-2">
+                        <i data-lucide="calendar-range" class="w-5 h-5"></i> Agenda Rentang Tanggal
+                    </h3>
+                    <div class="space-y-4">
+                        <!-- Helper Function untuk membuat row rentang -->
+                        <div id="rangeInputsContainer" class="grid grid-cols-1 gap-4">
+                            <!-- Diisi oleh JS atau manual di bawah -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end">
+                    <button type="submit" id="saveBtn" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-8 rounded-lg transition shadow-md flex items-center gap-2">
+                        <i data-lucide="save" class="w-5 h-5"></i> Simpan Kalender
+                    </button>
+                </div>
+            </form>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // Mobile Menu Logic
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        function toggleSidebar() {
+            sidebar.classList.toggle('-translate-x-full');
+            sidebarOverlay.classList.toggle('hidden');
+        }
+        mobileMenuBtn.addEventListener('click', toggleSidebar);
+        sidebarOverlay.addEventListener('click', toggleSidebar);
+
+        // Definisi Field Rentang Tanggal
+        const rangeFields = [
+            { key: 'uts_ganjil', label: 'Ujian Tengah Semester Ganjil' },
+            { key: 'uas_ganjil', label: 'Ujian Akhir Semester Ganjil' },
+            { key: 'pas_ganjil', label: 'Penilaian Akhir Semester Ganjil' },
+            { key: 'uts_genap', label: 'Ujian Tengah Semester Genap' },
+            { key: 'uas_genap', label: 'Ujian Akhir Semester Genap' },
+            { key: 'pas_genap', label: 'Penilaian Akhir Semester Genap' },
+            { key: 'libur_sebelum_hari_raya', label: 'Libur Sebelum Hari Raya' },
+            { key: 'libur_setelah_hari_raya', label: 'Libur Setelah Hari Raya' },
+            { key: 'idul_fitri', label: 'Idul Fitri' }
+        ];
+
+        // Render Range Inputs
+        const rangeContainer = document.getElementById('rangeInputsContainer');
+        rangeFields.forEach(field => {
+            const div = document.createElement('div');
+            div.className = "grid grid-cols-1 md:grid-cols-3 gap-4 items-end border-b border-gray-50 pb-4 last:border-0";
+            div.innerHTML = `
+                <div class="md:col-span-1">
+                    <label class="block text-sm font-medium text-gray-700">${field.label}</label>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">Dari Tanggal</label>
+                    <input type="date" name="${field.key}_start" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">Sampai Tanggal</label>
+                    <input type="date" name="${field.key}_end" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none text-sm">
+                </div>
+            `;
+            rangeContainer.appendChild(div);
+        });
+
+        // Load Data
+        async function initPage() {
+            try {
+                // 1. Cek Sesi
+                const sessionRes = await fetch('sadigs_api_v3/session_check.php');
+                const sessionData = await sessionRes.json();
+
+                if (!sessionData.success) {
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                document.getElementById('sidebarUsername').textContent = sessionData.username;
+                document.getElementById('userInitial').textContent = sessionData.username.charAt(0).toUpperCase();
+                document.getElementById('sidebarRole').textContent = sessionData.roles[0] || 'User';
+                
+                const yayasanRoles = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan'];
+                if (sessionData.roles.some(r => yayasanRoles.includes(r))) {
+                    document.getElementById('menuYayasan').classList.remove('hidden');
+                } else {
+                    alert('Akses ditolak. Halaman ini khusus Yayasan.');
+                    window.location.href = 'dashboard.html';
+                    return;
+                }
+
+                // 2. Ambil Data Kalender
+                const calRes = await fetch('sadigs_api_v3/calendar.php');
+                const calData = await calRes.json();
+
+                if (calData.success && calData.events) {
+                    // Isi Single Dates
+                    const singleInputs = document.querySelectorAll('input[type="date"]:not([name*="_start"]):not([name*="_end"])');
+                    singleInputs.forEach(input => {
+                        if (calData.events[input.name]) {
+                            input.value = calData.events[input.name].start;
+                        }
+                    });
+
+                    // Isi Range Dates
+                    rangeFields.forEach(field => {
+                        if (calData.events[field.key]) {
+                            const startInput = document.querySelector(`input[name="${field.key}_start"]`);
+                            const endInput = document.querySelector(`input[name="${field.key}_end"]`);
+                            if (startInput) startInput.value = calData.events[field.key].start;
+                            if (endInput) endInput.value = calData.events[field.key].end;
+                        }
+                    });
+                }
+
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        // Save Data
+        document.getElementById('calendarForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('saveBtn');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = 'Menyimpan...';
+
+            const formData = new FormData(e.target);
+            const data = {};
+
+            // Proses data form menjadi struktur JSON yang diinginkan API
+            // Single dates
+            const singleInputs = document.querySelectorAll('input[type="date"]:not([name*="_start"]):not([name*="_end"])');
+            singleInputs.forEach(input => {
+                if (input.value) {
+                    data[input.name] = { start: input.value, end: null };
+                }
+            });
+
+            // Range dates
+            rangeFields.forEach(field => {
+                const start = formData.get(`${field.key}_start`);
+                const end = formData.get(`${field.key}_end`);
+                if (start || end) {
+                    data[field.key] = { start: start, end: end };
+                }
+            });
+
+            try {
+                const res = await fetch('sadigs_api_v3/calendar.php', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+                
+                if (result.success) {
+                    alert('Kalender berhasil disimpan!');
+                } else {
+                    alert('Gagal: ' + result.message);
+                }
+            } catch (error) {
+                alert('Terjadi kesalahan koneksi.');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        });
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            if(confirm('Keluar aplikasi?')) window.location.href = 'sadigs_api_v3/logout.php';
+        });
+
+        initPage();
+    </script>
+</body>
+</html>
