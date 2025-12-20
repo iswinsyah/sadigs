@@ -10,3 +10,8 @@ php_error.log
 # Abaikan file sistem
 .DS_Store
 .vscode/
+
+# Folder lama di server yang tidak boleh dihapus
+mitra/
+psb/
+seo/
