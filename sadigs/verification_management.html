@@ -166,7 +166,10 @@
                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">${user.roles}</span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                                <button onclick="activateUser(${user.user_id})" class="text-white bg-teal-600 hover:bg-teal-700 px-3 py-1.5 rounded-md transition shadow-sm text-xs font-bold">
+                                <button onclick="openEditModal(${user.user_id}, '${user.roles}')" class="text-teal-600 hover:text-teal-900 bg-teal-50 hover:bg-teal-100 px-3 py-1.5 rounded-md transition mr-2 text-xs font-bold border border-teal-200">
+                                    Edit Peran
+                                </button>
+                                <button onclick="activateUser(${user.user_id})" class="text-white bg-green-600 hover:bg-green-700 px-3 py-1.5 rounded-md transition shadow-sm text-xs font-bold">
                                     Aktifkan Akun
                                 </button>
                             </td>
@@ -182,6 +185,100 @@
             }
         }
 
+        // --- LOGIKA EDIT ROLE ---
+        let currentEditingUserId = null;
+
+        async function openEditModal(userId, currentRolesString) {
+            currentEditingUserId = userId;
+            const modal = document.getElementById('editRoleModal');
+            const container = document.getElementById('modalRoleList');
+            const currentRoles = currentRolesString.split(', ');
+
+            // Reset & Show Modal
+            container.innerHTML = '<p class="text-center text-gray-500">Memuat peran...</p>';
+            modal.classList.remove('hidden');
+
+            // Load Roles dari Quota API (untuk dapat daftar lengkap)
+            try {
+                const res = await fetch('sadigs_api_v3/quota.php?t=' + new Date().getTime());
+                const data = await res.json();
+                
+                container.innerHTML = '';
+                
+                // Helper render checkbox
+                const addCheckbox = (role) => {
+                    const isChecked = currentRoles.includes(role) ? 'checked' : '';
+                    const div = document.createElement('div');
+                    div.innerHTML = `
+                        <label class="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
+                            <input type="checkbox" name="edit_roles" value="${role}" class="w-4 h-4 text-teal-600 rounded" ${isChecked}>
+                            <span class="ml-2 text-sm text-gray-700">${role}</span>
+                        </label>
+                    `;
+                    container.appendChild(div);
+                };
+
+                // 1. Default Roles
+                ['Santri', 'Walisantri'].forEach(r => addCheckbox(r));
+
+                // 2. Pegawai Roles
+                if (data.success && data.quotas) {
+                    Object.keys(data.quotas).forEach(r => addCheckbox(r));
+                }
+
+            } catch (e) {
+                container.innerHTML = '<p class="text-red-500">Gagal memuat daftar peran.</p>';
+            }
+        }
+
+        function closeEditModal() {
+            document.getElementById('editRoleModal').classList.add('hidden');
+            currentEditingUserId = null;
+        }
+
+        async function saveEditedRoles() {
+            if (!currentEditingUserId) return;
+
+            const checkboxes = document.querySelectorAll('input[name="edit_roles"]:checked');
+            const selectedRoles = Array.from(checkboxes).map(cb => cb.value);
+
+            if (selectedRoles.length === 0) {
+                alert('Pilih minimal satu peran.');
+                return;
+            }
+
+            const btn = document.getElementById('saveRoleBtn');
+            const originalText = btn.innerText;
+            btn.innerText = 'Menyimpan...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch('sadigs_api_v3/verification.php', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ 
+                        user_id: currentEditingUserId, 
+                        action: 'update_roles',
+                        roles: selectedRoles 
+                    })
+                });
+                const result = await res.json();
+
+                if (result.success) {
+                    alert('Peran berhasil diperbarui!');
+                    closeEditModal();
+                    loadPendingUsers(); // Refresh tabel utama
+                } else {
+                    alert('Gagal: ' + result.message);
+                }
+            } catch (error) {
+                alert('Terjadi kesalahan koneksi.');
+            } finally {
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        }
+
         window.activateUser = async function(userId) {
             if (!confirm('Apakah Anda yakin ingin mengaktifkan akun ini?')) return;
 
@@ -189,7 +286,7 @@
                 const res = await fetch('sadigs_api_v3/verification.php', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ user_id: userId })
+                    body: JSON.stringify({ user_id: userId, action: 'activate' })
                 });
                 const result = await res.json();
 
@@ -211,5 +308,27 @@
 
         initPage();
     </script>
+
+    <!-- MODAL EDIT ROLE -->
+    <div id="editRoleModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
+            <div class="bg-teal-600 px-6 py-4 flex justify-between items-center">
+                <h3 class="text-white font-bold text-lg">Edit Peran Pegawai</h3>
+                <button onclick="closeEditModal()" class="text-teal-100 hover:text-white">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <p class="text-sm text-gray-500 mb-4">Silakan koreksi peran untuk pengguna ini sebelum diaktifkan.</p>
+                <div id="modalRoleList" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar border border-gray-100 rounded-lg p-2">
+                    <!-- Checkbox dimuat via JS -->
+                </div>
+                <div class="mt-6 flex justify-end gap-3">
+                    <button onclick="closeEditModal()" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg text-sm font-medium transition">Batal</button>
+                    <button id="saveRoleBtn" onclick="saveEditedRoles()" class="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm font-bold shadow-md transition">Simpan Perubahan</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

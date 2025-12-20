@@ -1,142 +1,92 @@
 <?php
-// --- KODE DEBUG DARI HOSTINGER START (Wajib Ada di semua API) ---
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-ini_set('log_errors', 1);
-ini_set('error_log', $_SERVER['DOCUMENT_ROOT'] . '/php_error.log'); 
-error_reporting(E_ALL);
-// --- KODE DEBUG DARI HOSTINGER END ---
-
 // =================================================================
-// SADIGS 3.0: LOGIKA VERIFIKASI PEGAWAI - SELF-CONTAINED
-// FIX KRITIS: Menggunakan u.user_id (kolom PK di users) dan bukan u.id.
+// SADIGS 3.0: VERIFICATION API
 // =================================================================
-
-// Menggunakan satu sumber koneksi dan fungsi utility
+ob_start();
 require_once 'db_connect.php';
 
-// =================================================================
-// Fungsi Pembantu Cek Otorisasi Yayasan (Hanya Yayasan yang bisa memverifikasi)
-// =================================================================
-function checkYayasanRole() {
-    if (session_status() === PHP_SESSION_NONE) {
-        session_start();
-    }
-    if (!isset($_SESSION['roles'])) {
-        return false;
-    }
-    
-    $yayasan_roles = array('Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan');
-    
-    foreach ($_SESSION['roles'] as $role) {
-        if (in_array($role, $yayasan_roles)) {
-            return true;
-        }
-    }
-    return false;
-}
-
-// Memulai sesi PHP
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-date_default_timezone_set('Asia/Jakarta');
 
-// Cek Otorisasi sebelum melanjutkan (Ini harus selalu diaktifkan untuk keamanan!)
-if (!checkYayasanRole()) {
-    sendJSONResponse(array('success' => false, 'message' => 'Akses ditolak. Hanya Pengurus Yayasan yang dapat melakukan verifikasi.'), 403);
+// Cek Otorisasi (Hanya Yayasan)
+$allowed_roles = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan'];
+$user_roles = $_SESSION['roles'] ?? [];
+if (empty(array_intersect($allowed_roles, $user_roles))) {
+    sendJSONResponse(['success' => false, 'message' => 'Akses ditolak.'], 403);
 }
 
-try {
-    $pdo = getDBConnection();
-} catch (Exception $e) {
-    exit; // Koneksi gagal ditangani di getDBConnection()
-}
+$pdo = getDBConnection();
 
-// Peran Pegawai yang Wajib diverifikasi saat pendaftaran
-$employee_roles = array('Kepala Sekolah', 'Kepala Asrama', 'Sekretaris Sekolah', 'Bendahara Sekolah', 'Musyrif', 'Ustadz');
-$employee_roles_placeholder = implode(',', array_fill(0, count($employee_roles), '?'));
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    // Ambil daftar user yang belum aktif (is_active = 0)
+    try {
+        // Kita gunakan GROUP_CONCAT untuk menggabungkan role jika user punya banyak role
+        $sql = "
+            SELECT u.user_id, u.username, u.email, u.created_at,
+                   GROUP_CONCAT(ur.role_name SEPARATOR ', ') as roles
+            FROM users u
+            LEFT JOIN user_roles ur ON u.user_id = ur.user_id
+            WHERE u.is_active = 0
+            GROUP BY u.user_id
+            ORDER BY u.created_at DESC
+        ";
+        $stmt = $pdo->query($sql);
+        $users = $stmt->fetchAll();
+        
+        sendJSONResponse(['success' => true, 'pending_users' => $users]);
+    } catch (Exception $e) {
+        sendJSONResponse(['success' => false, 'message' => 'Gagal memuat data.'], 500);
+    }
 
-
-// =================================================================
-// LOGIKA POST (VERIFIKASI / AKTIVASI AKUN)
-// =================================================================
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Handle Aktivasi atau Edit Role
     $data = json_decode(file_get_contents("php://input"), true);
     $user_id = $data['user_id'] ?? null;
+    $action = $data['action'] ?? 'activate'; // 'activate' atau 'update_roles'
 
-    if (empty($user_id)) {
-        sendJSONResponse(array('success' => false, 'message' => 'ID pengguna wajib diisi.'), 400);
+    if (!$user_id) {
+        sendJSONResponse(['success' => false, 'message' => 'User ID diperlukan.'], 400);
     }
 
     try {
-        $pdo->beginTransaction();
-        
-        // 1. Aktivasi Akun
-        // MENGGUNAKAN user_id (primary key di tabel users) untuk UPDATE
-        $sql_activate = "UPDATE users SET is_active = 1 WHERE user_id = :user_id AND is_active = 0";
-        $stmt_activate = $pdo->prepare($sql_activate);
-        $stmt_activate->execute(['user_id' => $user_id]);
+        if ($action === 'activate') {
+            // AKTIVASI AKUN
+            $sql = "UPDATE users SET is_active = 1 WHERE user_id = :user_id";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute(['user_id' => $user_id]);
+            
+            sendJSONResponse(['success' => true, 'message' => 'Akun berhasil diaktifkan.']);
+            
+        } elseif ($action === 'update_roles') {
+            // UPDATE ROLE
+            $new_roles = $data['roles'] ?? [];
+            if (empty($new_roles)) {
+                sendJSONResponse(['success' => false, 'message' => 'Minimal satu peran harus dipilih.'], 400);
+            }
 
-        if ($stmt_activate->rowCount() === 0) {
-            $pdo->rollBack();
-            sendJSONResponse(array('success' => false, 'message' => 'Akun tidak ditemukan atau sudah aktif.'), 404);
+            $pdo->beginTransaction();
+
+            // 1. Hapus role lama
+            $stmt_del = $pdo->prepare("DELETE FROM user_roles WHERE user_id = :user_id");
+            $stmt_del->execute(['user_id' => $user_id]);
+
+            // 2. Cek Kuota (Opsional: Bisa dilewati untuk Admin, tapi baiknya dicek)
+            // Di sini kita skip cek kuota agar Admin punya kuasa penuh (override)
+
+            // 3. Insert role baru
+            $stmt_ins = $pdo->prepare("INSERT INTO user_roles (user_id, role_name) VALUES (:user_id, :role_name)");
+            foreach ($new_roles as $role) {
+                $stmt_ins->execute(['user_id' => $user_id, 'role_name' => $role]);
+            }
+
+            $pdo->commit();
+            sendJSONResponse(['success' => true, 'message' => 'Peran berhasil diperbarui.']);
         }
 
-        $pdo->commit();
-        sendJSONResponse(array(
-            'success' => true,
-            'message' => 'Akun pegawai berhasil diaktifkan!'
-        ));
-
-    } catch (\PDOException $e) {
-        if ($pdo->inTransaction()) {
-            $pdo->rollBack();
-        }
-        error_log("Verification POST Error: " . $e->getMessage());
-        sendJSONResponse(array('success' => false, 'message' => 'Kesalahan sistem saat aktivasi akun.'), 500);
-    }
-} 
-// =================================================================
-// LOGIKA GET (AMBIL DAFTAR PENDING)
-// =================================================================
-elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    
-    // Bergabung dengan user_roles untuk mengambil semua peran yang terdaftar dengan is_active = 0
-    // MENGGUNAKAN u.user_id untuk SELECT, JOIN, dan GROUP BY (seperti yang dibutuhkan MySQL)
-    $sql_get = "
-        SELECT 
-            u.user_id, 
-            u.username, 
-            u.email, 
-            GROUP_CONCAT(ur.role_name SEPARATOR ', ') AS roles 
-        FROM users u
-        JOIN user_roles ur ON u.user_id = ur.user_id
-        WHERE u.is_active = 0 
-        GROUP BY u.user_id, u.username, u.email
-        HAVING SUM(ur.role_name IN ({$employee_roles_placeholder})) > 0
-        ORDER BY u.user_id ASC;
-    ";
-    
-    try {
-        $stmt_get = $pdo->prepare($sql_get);
-        // Eksekusi dengan array $employee_roles
-        $stmt_get->execute($employee_roles); 
-        $pending_users = $stmt_get->fetchAll(PDO::FETCH_ASSOC);
-        
-        sendJSONResponse(array(
-            'success' => true,
-            'pending_users' => $pending_users
-        ));
-    } catch (\PDOException $e) {
-        // Ini adalah error yang Anda dapatkan sebelumnya, yang seharusnya sudah teratasi dengan u.user_id
-        error_log("Verification GET DB Error: " . $e->getMessage());
-        sendJSONResponse(array('success' => false, 'message' => 'Gagal mengambil data dari database.'), 500);
+    } catch (Exception $e) {
+        if ($pdo->inTransaction()) $pdo->rollBack();
+        sendJSONResponse(['success' => false, 'message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
     }
 }
-// =================================================================
-// LOGIKA FALLBACK
-// =================================================================
-else {
-    sendJSONResponse(array('success' => false, 'message' => 'Metode permintaan tidak didukung.'), 405);
-}
+?>
