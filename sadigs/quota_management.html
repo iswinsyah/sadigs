@@ -37,20 +37,42 @@
                     </div>
                 </div>
             </div>
-            <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1 no-scrollbar">
-                <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-teal-600 rounded-lg transition font-medium">
-                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard
-                </a>
-                <div id="menuYayasan" class="hidden">
-                    <p class="px-4 mt-6 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">Yayasan</p>
-                    <a href="verification_management.html" class="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 hover:text-teal-600 rounded-lg transition font-medium"><i data-lucide="users" class="w-5 h-5"></i> Verifikasi Pegawai</a>
-                    <a href="quota_management.html" class="flex items-center gap-3 px-4 py-3 text-teal-700 bg-teal-50 rounded-lg font-semibold shadow-sm"><i data-lucide="settings" class="w-5 h-5"></i> Atur Kuota</a>
+            <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-2 no-scrollbar">
+                
+                <!-- Div 1: UMUM -->
+                <div class="bg-gray-50 rounded-lg p-2">
+                    <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">UMUM</h3>
+                    <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm">
+                        <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard
+                    </a>
+                    <a href="calendar_view.html" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm">
+                        <i data-lucide="table" class="w-5 h-5"></i> Tabel Kalender
+                    </a>
+                    <a href="profile.html" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm">
+                        <i data-lucide="user" class="w-5 h-5"></i> Profil Saya
+                    </a>
                 </div>
-                <p class="px-4 mt-6 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">Akun</p>
-                <a href="profile.html" class="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 hover:text-teal-600 rounded-lg transition font-medium">
-                    <i data-lucide="user" class="w-5 h-5"></i> Profil Saya
-                </a>
-                <button id="logoutBtn" class="w-full flex items-center gap-3 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition mt-4 font-medium"><i data-lucide="log-out" class="w-5 h-5"></i> Keluar</button>
+
+                <!-- Container untuk menu Yayasan -->
+                <div id="menuYayasan" class="hidden space-y-2">
+                    <!-- Div 2: KEPEGAWAIAN -->
+                    <div class="bg-gray-50 rounded-lg p-2">
+                        <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KEPEGAWAIAN</h3>
+                        <a href="verification_management.html" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="users" class="w-5 h-5"></i> Verifikasi Pegawai</a>
+                        <a href="quota_management.html" class="flex items-center gap-3 px-3 py-2.5 text-teal-700 bg-white rounded-md transition font-semibold text-sm shadow-sm"><i data-lucide="user-cog" class="w-5 h-5"></i> Atur Kuota</a>
+                    </div>
+
+                    <!-- Div 3: KHUSUS -->
+                    <div class="bg-gray-50 rounded-lg p-2">
+                        <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KHUSUS</h3>
+                        <a href="calendar_settings.html" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="calendar-cog" class="w-5 h-5"></i> Atur Kalender</a>
+                    </div>
+                </div>
+                
+                <!-- Tombol Logout -->
+                <div class="pt-2">
+                    <button id="logoutBtn" class="w-full flex items-center gap-3 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition font-medium"><i data-lucide="log-out" class="w-5 h-5"></i> Keluar</button>
+                </div>
             </nav>
         </aside>
         <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden lg:hidden backdrop-blur-sm"></div>
