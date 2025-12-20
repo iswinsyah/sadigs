@@ -47,6 +47,26 @@ try {
     if ($stmt_check->fetchColumn() > 0) {
         sendJSONResponse(array('success' => false, 'message' => 'Username atau Email sudah terdaftar.'), 409);
     }
+
+    // 1.5 Cek Kuota Pendaftaran (LOGIKA BARU)
+    // Ambil semua batasan kuota dari database
+    $stmt_quota = $pdo->query("SELECT role_name, max_limit FROM quota_settings");
+    $quotas = $stmt_quota->fetchAll(PDO::FETCH_KEY_PAIR);
+
+    foreach ($roles as $role) {
+        // Jika role memiliki batasan kuota (ada di tabel dan > 0)
+        if (isset($quotas[$role]) && $quotas[$role] > 0) {
+            // Hitung jumlah user AKTIF yang memiliki role ini
+            $sql_count = "SELECT COUNT(*) FROM user_roles ur JOIN users u ON ur.user_id = u.user_id WHERE ur.role_name = :role AND u.is_active = 1";
+            $stmt_count = $pdo->prepare($sql_count);
+            $stmt_count->execute(['role' => $role]);
+            $current_count = $stmt_count->fetchColumn();
+
+            if ($current_count >= $quotas[$role]) {
+                sendJSONResponse(array('success' => false, 'message' => "Pendaftaran ditolak: Kuota untuk posisi '$role' sudah penuh."), 400);
+            }
+        }
+    }
     
     // 2. Mulai Transaksi
     $pdo->beginTransaction();
@@ -54,8 +74,8 @@ try {
     // Hash Password
     $password_hash = password_hash($password, PASSWORD_BCRYPT);
     
-    // 3. Insert User (Default is_active = 1 sementara)
-    $sql_insert_user = "INSERT INTO users (username, email, password_hash, is_active) VALUES (:username, :email, :password_hash, 1)";
+    // 3. Insert User (Default is_active = 0 agar butuh verifikasi)
+    $sql_insert_user = "INSERT INTO users (username, email, password_hash, is_active) VALUES (:username, :email, :password_hash, 0)";
     $stmt_user = $pdo->prepare($sql_insert_user);
     $stmt_user->execute(['username' => $username, 'email' => $email, 'password_hash' => $password_hash]);
     $user_id = $pdo->lastInsertId();
@@ -73,7 +93,7 @@ try {
 
     sendJSONResponse(array(
         'success' => true,
-        'message' => 'Pendaftaran berhasil! Akun Anda langsung aktif.'
+        'message' => 'Pendaftaran berhasil! Silakan tunggu verifikasi admin.'
     ));
 
 } catch (\PDOException $e) {
