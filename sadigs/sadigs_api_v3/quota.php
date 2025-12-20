@@ -9,28 +9,46 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Cek Otorisasi (Hanya Yayasan)
-$allowed_roles = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan'];
-$user_roles = $_SESSION['roles'] ?? [];
-$has_access = !empty(array_intersect($allowed_roles, $user_roles));
-
-if (!$has_access) {
-    sendJSONResponse(['success' => false, 'message' => 'Akses ditolak. Hanya Yayasan yang berhak.'], 403);
-}
-
 $pdo = getDBConnection();
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    // Ambil data kuota saat ini
+    // PUBLIC ACCESS: Mengambil data kuota dan status ketersediaan
     try {
         $stmt = $pdo->query("SELECT role_name, max_limit FROM quota_settings");
-        $quotas = $stmt->fetchAll(PDO::FETCH_KEY_PAIR); // Output: ['Kepala Sekolah' => 1, 'Ustadz' => 10]
-        sendJSONResponse(['success' => true, 'quotas' => $quotas]);
+        $settings = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        $result = [];
+        // Query untuk menghitung jumlah user AKTIF per role
+        $sql_count = "SELECT COUNT(*) FROM user_roles ur JOIN users u ON ur.user_id = u.user_id WHERE ur.role_name = :role AND u.is_active = 1";
+        $stmt_count = $pdo->prepare($sql_count);
+
+        foreach ($settings as $row) {
+            $role = $row['role_name'];
+            $limit = (int)$row['max_limit'];
+            
+            $stmt_count->execute(['role' => $role]);
+            $current = (int)$stmt_count->fetchColumn();
+            
+            $result[$role] = [
+                'max_limit' => $limit,
+                'current_count' => $current,
+                'is_full' => ($limit > 0 && $current >= $limit)
+            ];
+        }
+
+        sendJSONResponse(['success' => true, 'quotas' => $result]);
     } catch (Exception $e) {
         sendJSONResponse(['success' => false, 'message' => 'Gagal mengambil data kuota.'], 500);
     }
 
 } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // PROTECTED ACCESS: Hanya Yayasan yang boleh mengubah
+    $allowed_roles = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan'];
+    $user_roles = $_SESSION['roles'] ?? [];
+    if (empty(array_intersect($allowed_roles, $user_roles))) {
+        sendJSONResponse(['success' => false, 'message' => 'Akses ditolak. Hanya Yayasan yang berhak.'], 403);
+    }
+
     // Simpan data kuota
     $data = json_decode(file_get_contents("php://input"), true);
     
