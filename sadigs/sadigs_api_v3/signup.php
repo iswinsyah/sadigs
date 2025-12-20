@@ -18,9 +18,14 @@ $data = json_decode(file_get_contents("php://input"), true);
 $username = $data['username'] ?? '';
 $email = $data['email'] ?? '';
 $password = $data['password'] ?? '';
-$roles = $data['roles'] ?? []; // Array of selected roles
+$roles = $data['roles'] ?? [];
 
-if (empty($username) || empty($email) || empty($password) || empty($roles)) {
+// Pastikan selalu ada role default (Santri) jika kosong
+if (empty($roles)) {
+    $roles = ['Santri'];
+}
+
+if (empty($username) || empty($email) || empty($password)) {
     sendJSONResponse(array('success' => false, 'message' => 'Semua bidang wajib diisi.'), 400);
 }
 
