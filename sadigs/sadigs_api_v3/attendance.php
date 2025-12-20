@@ -24,7 +24,8 @@ if (empty(array_intersect($allowed_roles, $user_roles))) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $data = json_decode(file_get_contents("php://input"), true);
+    $json = file_get_contents("php://input");
+    $data = json_decode($json, true) ?? []; // Pastikan data selalu array, hindari crash pada PHP versi lama
     
     $password = $data['password'] ?? '';
     $type = $data['type'] ?? ''; // 'Masuk' atau 'Pulang'
