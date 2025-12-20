@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verifikasi Pegawai | SADIGS 3.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+
+    <!-- HEADER MOBILE -->
+    <div class="lg:hidden flex justify-between items-center bg-teal-600 text-white p-4 shadow-md sticky top-0 z-50">
+        <div class="font-bold text-xl flex items-center gap-2"><span>SADIGS 3.0</span></div>
+        <button id="mobileMenuBtn" class="focus:outline-none p-1 rounded hover:bg-teal-700 transition"><i data-lucide="menu" class="w-7 h-7"></i></button>
+    </div>
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR -->
+        <aside id="sidebar" class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col transition-transform transform -translate-x-full lg:translate-x-0 fixed lg:static h-full z-40 shadow-2xl lg:shadow-none">
+            <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-teal-600 text-white">
+                <h1 class="text-2xl font-extrabold tracking-wider">SADIGS</h1>
+            </div>
+            <div class="p-6 border-b border-gray-100 bg-teal-50">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-teal-200 flex items-center justify-center text-teal-800 font-bold text-lg shadow-sm"><span id="userInitial">U</span></div>
+                    <div class="overflow-hidden">
+                        <p id="sidebarUsername" class="font-bold text-gray-800 text-sm truncate">Memuat...</p>
+                        <p id="sidebarRole" class="text-xs text-gray-500 truncate font-medium">Role...</p>
+                    </div>
+                </div>
+            </div>
+            <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1 no-scrollbar">
+                <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-teal-600 rounded-lg transition font-medium">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard
+                </a>
+                <div id="menuYayasan" class="hidden">
+                    <p class="px-4 mt-6 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">Yayasan</p>
+                    <a href="verification_management.html" class="flex items-center gap-3 px-4 py-3 text-teal-700 bg-teal-50 rounded-lg font-semibold shadow-sm"><i data-lucide="users" class="w-5 h-5"></i> Verifikasi Pegawai</a>
+                    <a href="quota_management.html" class="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 hover:text-teal-600 rounded-lg transition font-medium"><i data-lucide="settings" class="w-5 h-5"></i> Atur Kuota</a>
+                </div>
+                <p class="px-4 mt-6 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">Akun</p>
+                <a href="profile.html" class="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 hover:text-teal-600 rounded-lg transition font-medium">
+                    <i data-lucide="user" class="w-5 h-5"></i> Profil Saya
+                </a>
+                <button id="logoutBtn" class="w-full flex items-center gap-3 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition mt-4 font-medium"><i data-lucide="log-out" class="w-5 h-5"></i> Keluar</button>
+            </nav>
+        </aside>
+        <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden lg:hidden backdrop-blur-sm"></div>
+
+        <!-- KONTEN UTAMA -->
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative">
+            <header class="mb-8">
+                <h2 class="text-2xl lg:text-3xl font-bold text-gray-800">Verifikasi Pegawai</h2>
+                <p class="text-gray-500 text-sm mt-1">Daftar pegawai baru yang menunggu persetujuan aktivasi akun.</p>
+            </header>
+
+            <div class="max-w-6xl">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Username</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Email</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Peran yang Diajukan</th>
+                                    <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="userTableBody" class="bg-white divide-y divide-gray-200">
+                                <!-- Data akan dimuat di sini -->
+                                <tr>
+                                    <td colspan="4" class="px-6 py-10 text-center text-gray-500">Memuat data...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Empty State -->
+                    <div id="emptyState" class="hidden flex flex-col items-center justify-center py-12 px-4 text-center">
+                        <div class="bg-green-50 p-4 rounded-full mb-3">
+                            <i data-lucide="check-circle" class="w-8 h-8 text-green-500"></i>
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-900">Semua Beres!</h3>
+                        <p class="text-gray-500 mt-1">Tidak ada pendaftar baru yang perlu diverifikasi saat ini.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // Mobile Menu Logic
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        function toggleSidebar() {
+            sidebar.classList.toggle('-translate-x-full');
+            sidebarOverlay.classList.toggle('hidden');
+        }
+        mobileMenuBtn.addEventListener('click', toggleSidebar);
+        sidebarOverlay.addEventListener('click', toggleSidebar);
+
+        // Load Data
+        async function initPage() {
+            try {
+                // 1. Cek Sesi
+                const sessionRes = await fetch('sadigs_api_v3/session_check.php');
+                const sessionData = await sessionRes.json();
+
+                if (!sessionData.success) {
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                // Update Sidebar Info
+                document.getElementById('sidebarUsername').textContent = sessionData.username;
+                document.getElementById('userInitial').textContent = sessionData.username.charAt(0).toUpperCase();
+                document.getElementById('sidebarRole').textContent = sessionData.roles[0] || 'User';
+                
+                // Cek Akses Yayasan
+                const yayasanRoles = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan'];
+                if (sessionData.roles.some(r => yayasanRoles.includes(r))) {
+                    document.getElementById('menuYayasan').classList.remove('hidden');
+                } else {
+                    alert('Akses ditolak. Halaman ini khusus Yayasan.');
+                    window.location.href = 'dashboard.html';
+                    return;
+                }
+
+                // 2. Ambil Data Pending Users
+                loadPendingUsers();
+
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        async function loadPendingUsers() {
+            const tbody = document.getElementById('userTableBody');
+            const emptyState = document.getElementById('emptyState');
+            
+            try {
+                const res = await fetch('sadigs_api_v3/verification.php');
+                const data = await res.json();
+
+                if (data.success && data.pending_users && data.pending_users.length > 0) {
+                    tbody.innerHTML = '';
+                    emptyState.classList.add('hidden');
+                    
+                    data.pending_users.forEach(user => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${user.username}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${user.email}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">${user.roles}</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                                <button onclick="activateUser(${user.user_id})" class="text-white bg-teal-600 hover:bg-teal-700 px-3 py-1.5 rounded-md transition shadow-sm text-xs font-bold">
+                                    Aktifkan Akun
+                                </button>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                } else {
+                    tbody.innerHTML = '';
+                    emptyState.classList.remove('hidden');
+                }
+            } catch (error) {
+                tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-red-500">Gagal memuat data.</td></tr>';
+            }
+        }
+
+        window.activateUser = async function(userId) {
+            if (!confirm('Apakah Anda yakin ingin mengaktifkan akun ini?')) return;
+
+            try {
+                const res = await fetch('sadigs_api_v3/verification.php', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ user_id: userId })
+                });
+                const result = await res.json();
+
+                if (result.success) {
+                    alert('Akun berhasil diaktifkan!');
+                    loadPendingUsers(); // Refresh tabel
+                } else {
+                    alert('Gagal: ' + result.message);
+                }
+            } catch (error) {
+                alert('Terjadi kesalahan koneksi.');
+            }
+        }
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            if(confirm('Keluar aplikasi?')) window.location.href = 'sadigs_api_v3/logout.php';
+        });
+
+        initPage();
+    </script>
+</body>
+</html>

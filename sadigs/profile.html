@@ -106,6 +106,34 @@
                         </div>
                     </form>
                 </div>
+
+                <!-- Manajemen Peran (BARU) -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Manajemen Peran</h3>
+                    
+                    <div class="mb-6">
+                        <p class="text-sm text-gray-600 mb-2 font-medium">Peran Anda Saat Ini:</p>
+                        <div id="currentRolesDisplay" class="flex flex-wrap gap-2">
+                            <span class="text-sm text-gray-400 italic">Memuat...</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-teal-50 p-5 rounded-xl border border-teal-100">
+                        <h4 class="text-sm font-bold text-teal-800 mb-3 flex items-center gap-2">
+                            <i data-lucide="plus-circle" class="w-4 h-4"></i> Ajukan Peran Tambahan
+                        </h4>
+                        <div id="roleSelectionList" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar mb-4 pr-2">
+                            <!-- Checkbox akan dimuat di sini -->
+                            <p class="text-sm text-gray-400 text-center py-4">Memuat opsi peran...</p>
+                        </div>
+                        <button type="button" id="submitRoleBtn" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-lg transition text-sm shadow-sm">
+                            Ajukan Peran Terpilih
+                        </button>
+                        <p class="text-xs text-gray-500 mt-3 text-center leading-relaxed">
+                            <span class="text-red-500 font-bold">*</span> Perhatian: Akun Anda akan <strong>dinonaktifkan sementara</strong> untuk proses verifikasi Yayasan setelah mengajukan peran baru. Anda harus login ulang setelah diverifikasi.
+                        </p>
+                    </div>
+                </div>
             </div>
         </main>
     </div>
@@ -146,6 +174,25 @@
                 if (sessionData.roles.some(r => yayasanRoles.includes(r))) {
                     document.getElementById('menuYayasan').classList.remove('hidden');
                 }
+                
+                // --- LOGIKA PERAN (BARU) ---
+                const currentRoles = sessionData.roles || [];
+                const rolesDisplay = document.getElementById('currentRolesDisplay');
+                rolesDisplay.innerHTML = '';
+                
+                if (currentRoles.length === 0) {
+                    rolesDisplay.innerHTML = '<span class="text-sm text-gray-500 italic bg-gray-100 px-3 py-1 rounded-full">Belum ada peran</span>';
+                } else {
+                    currentRoles.forEach(r => {
+                        const span = document.createElement('span');
+                        span.className = 'px-3 py-1 bg-white text-teal-700 border border-teal-200 rounded-full text-xs font-bold shadow-sm';
+                        span.textContent = r;
+                        rolesDisplay.appendChild(span);
+                    });
+                }
+                
+                // Muat opsi peran yang tersedia
+                loadAvailableRoles(currentRoles);
 
                 // 2. Ambil Detail Profil dari get_profile.php
                 // Kita perlu kirim user_id via POST sesuai logika get_profile.php yang ada
@@ -182,6 +229,53 @@
             }
         }
 
+        // Fungsi Muat Opsi Peran
+        function loadAvailableRoles(userRoles) {
+            const container = document.getElementById('roleSelectionList');
+            
+            const renderRoles = (quotas = {}) => {
+                container.innerHTML = '';
+                
+                // Helper: Cek apakah user sudah punya peran ini
+                const hasRole = (r) => userRoles.includes(r);
+
+                // Fungsi tambah opsi
+                const addOption = (role, info) => {
+                    const isOwned = hasRole(role);
+                    const div = document.createElement('div');
+                    const quotaText = info ? `<span class="text-xs text-teal-600 font-medium bg-white px-2 py-0.5 rounded border border-teal-100 ml-auto">Sisa: ${info.max_limit - info.current_count}</span>` : '';
+                    const disabledAttr = isOwned ? 'disabled checked' : '';
+                    const labelClass = isOwned ? 'opacity-60 cursor-not-allowed bg-gray-100' : 'cursor-pointer hover:bg-white bg-white/50';
+                    const ownedText = isOwned ? '<span class="text-xs text-gray-500 ml-2 font-medium">(Sudah Dimiliki)</span>' : '';
+
+                    div.innerHTML = `
+                        <label class="flex items-center p-3 border border-gray-200 rounded-lg ${labelClass} transition">
+                            <input type="checkbox" name="selected_roles" value="${role}" class="w-4 h-4 text-teal-600 border-gray-300 focus:ring-teal-500 rounded" ${disabledAttr}>
+                            <span class="ml-3 font-medium text-gray-700 text-sm">${role}</span>
+                            ${ownedText}
+                            ${!isOwned ? quotaText : ''}
+                        </label>
+                    `;
+                    container.appendChild(div);
+                };
+
+                // 1. Default Roles
+                ['Santri', 'Walisantri'].forEach(role => addOption(role, null));
+
+                // 2. Quota Roles
+                for (const [role, info] of Object.entries(quotas)) {
+                    if (!info.is_full && info.max_limit > 0) {
+                        addOption(role, info);
+                    }
+                }
+            };
+
+            fetch('sadigs_api_v3/quota.php?t=' + new Date().getTime())
+                .then(res => res.json())
+                .then(data => renderRoles(data.success ? data.quotas : {}))
+                .catch(() => renderRoles({}));
+        }
+
         // Save Data
         document.getElementById('profileForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -215,6 +309,33 @@
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = originalText;
+            }
+        });
+
+        // Submit Peran Baru
+        document.getElementById('submitRoleBtn').addEventListener('click', async () => {
+            // Hanya ambil yang dicentang DAN tidak disabled (artinya peran baru)
+            const selectedCheckboxes = document.querySelectorAll('input[name="selected_roles"]:checked:not(:disabled)');
+            const selectedRoles = Array.from(selectedCheckboxes).map(cb => cb.value);
+
+            if (selectedRoles.length === 0) {
+                alert('Silakan pilih setidaknya satu peran baru untuk diajukan.');
+                return;
+            }
+
+            if(!confirm('Anda yakin ingin mengajukan peran ini? Akun Anda akan dinonaktifkan sementara menunggu verifikasi Yayasan.')) return;
+
+            const res = await fetch('sadigs_api_v3/select_role.php', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ roles: selectedRoles })
+            });
+            const result = await res.json();
+            
+            alert(result.message);
+            if (result.success) {
+                // Redirect ke login karena sesi dihancurkan
+                window.location.href = 'index.html';
             }
         });
 

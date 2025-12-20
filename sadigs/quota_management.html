@@ -43,7 +43,7 @@
                 </a>
                 <div id="menuYayasan" class="hidden">
                     <p class="px-4 mt-6 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">Yayasan</p>
-                    <a href="#" class="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 hover:text-teal-600 rounded-lg transition font-medium"><i data-lucide="users" class="w-5 h-5"></i> Verifikasi Pegawai</a>
+                    <a href="verification_management.html" class="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 hover:text-teal-600 rounded-lg transition font-medium"><i data-lucide="users" class="w-5 h-5"></i> Verifikasi Pegawai</a>
                     <a href="quota_management.html" class="flex items-center gap-3 px-4 py-3 text-teal-700 bg-teal-50 rounded-lg font-semibold shadow-sm"><i data-lucide="settings" class="w-5 h-5"></i> Atur Kuota</a>
                 </div>
                 <p class="px-4 mt-6 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">Akun</p>
@@ -166,7 +166,7 @@
                     inputs.forEach(input => {
                         const roleName = input.name;
                         if (quotaData.quotas[roleName] !== undefined) {
-                            input.value = quotaData.quotas[roleName];
+                            input.value = quotaData.quotas[roleName].max_limit;
                         }
                     });
                 }

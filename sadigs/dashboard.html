@@ -61,7 +61,7 @@
                 <!-- Menu Khusus Yayasan (Hidden by default) -->
                 <div id="menuYayasan" class="hidden">
                     <p class="px-4 mt-6 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">Yayasan</p>
-                    <a href="#" class="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 hover:text-teal-600 rounded-lg transition font-medium">
+                    <a href="verification_management.html" class="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 hover:text-teal-600 rounded-lg transition font-medium">
                         <i data-lucide="users" class="w-5 h-5"></i>
                         Verifikasi Pegawai
                     </a>
@@ -90,7 +90,7 @@
         <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden lg:hidden backdrop-blur-sm"></div>
 
         <!-- KONTEN UTAMA -->
-        <main class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative">
+        <main id="mainContent" class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative">
             <!-- Header Halaman -->
             <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                 <div>
@@ -143,6 +143,23 @@
                 &copy; 2025 SADIGS 3.0 - Sistem Administrasi Digital Sekolah
             </footer>
         </main>
+
+        <!-- FORMULIR PEMILIHAN PERAN (Muncul jika user belum punya peran) -->
+        <div id="roleSelectionContainer" class="hidden flex-1 bg-gray-50 p-8 flex items-center justify-center h-full">
+            <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-lg border-t-4 border-teal-600">
+                <div class="text-center mb-6">
+                    <div class="bg-teal-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i data-lucide="user-plus" class="w-8 h-8 text-teal-600"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800">Pilih Peran Anda</h2>
+                    <p class="text-gray-500 mt-2">Silakan pilih posisi atau peran Anda di sekolah untuk melanjutkan.</p>
+                </div>
+                <div id="roleSelectionList" class="space-y-3 mb-6 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
+                    <!-- Daftar peran akan dimuat di sini -->
+                </div>
+                <button id="submitRoleBtn" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 rounded-lg transition shadow-md disabled:opacity-50">Simpan & Ajukan Validasi</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -179,11 +196,18 @@
                 if (data.success) {
                     document.getElementById('sidebarUsername').textContent = data.username;
                     document.getElementById('userInitial').textContent = data.username.charAt(0).toUpperCase();
-                    
                     const roles = data.roles || [];
-                    const mainRole = roles.length > 0 ? roles[0] : 'User';
-                    document.getElementById('sidebarRole').textContent = mainRole;
-                    document.getElementById('mainRoleDisplay').textContent = mainRole;
+
+                    // LOGIKA BARU: Jika belum punya peran
+                    if (roles.length === 0) {
+                        document.getElementById('mainContent').classList.add('hidden');
+                        document.getElementById('roleSelectionContainer').classList.remove('hidden');
+                        loadAvailableRoles(); // Muat daftar peran
+                    } else {
+                        const mainRole = roles[0];
+                        document.getElementById('sidebarRole').textContent = mainRole;
+                        document.getElementById('mainRoleDisplay').textContent = mainRole;
+                    }
 
                     // Tampilkan Menu Yayasan jika punya akses
                     const yayasanRoles = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan'];
@@ -195,6 +219,83 @@
                 }
             })
             .catch(() => window.location.href = 'index.html');
+
+        // Fungsi Muat Peran untuk Form Seleksi
+        function loadAvailableRoles() {
+            const container = document.getElementById('roleSelectionList');
+            
+            // Fungsi helper untuk merender daftar
+            const renderRoles = (quotas = {}) => {
+                container.innerHTML = '';
+                
+                // 1. Tambahkan opsi Default (Tanpa Kuota) - Selalu muncul
+                const defaultRoles = ['Santri', 'Walisantri'];
+                defaultRoles.forEach(role => {
+                    addRoleOption(container, role, null);
+                });
+
+                // 2. Tambahkan opsi Pegawai (Berdasarkan Kuota)
+                for (const [role, info] of Object.entries(quotas)) {
+                    if (!info.is_full && info.max_limit > 0) {
+                        addRoleOption(container, role, info);
+                    }
+                }
+            };
+
+            fetch('sadigs_api_v3/quota.php?t=' + new Date().getTime())
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.quotas) {
+                        renderRoles(data.quotas);
+                    } else {
+                        renderRoles({}); // Render default saja jika tidak ada data kuota
+                    }
+                })
+                .catch(err => {
+                    console.error("Gagal memuat kuota:", err);
+                    // Fallback: Tetap tampilkan peran default jika server error
+                    renderRoles({});
+                });
+        }
+
+        function addRoleOption(container, role, info) {
+            const div = document.createElement('div');
+            const quotaText = info ? `<span class="text-xs text-teal-600 font-medium bg-teal-50 px-2 py-1 rounded-full ml-auto">Sisa: ${info.max_limit - info.current_count}</span>` : '';
+            
+            div.innerHTML = `
+                <label class="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition">
+                    <input type="checkbox" name="selected_roles" value="${role}" class="w-5 h-5 text-teal-600 border-gray-300 focus:ring-teal-500 rounded">
+                    <span class="ml-3 font-medium text-gray-700">${role}</span>
+                    ${quotaText}
+                </label>
+            `;
+            container.appendChild(div);
+        }
+
+        // Submit Peran
+        document.getElementById('submitRoleBtn').addEventListener('click', async () => {
+            const selectedCheckboxes = document.querySelectorAll('input[name="selected_roles"]:checked');
+            const selectedRoles = Array.from(selectedCheckboxes).map(cb => cb.value);
+
+            if (selectedRoles.length === 0) {
+                alert('Silakan pilih setidaknya satu peran.');
+                return;
+            }
+
+            if(!confirm('Anda yakin memilih peran-peran ini? Akun akan menunggu validasi Yayasan setelah ini.')) return;
+
+            const res = await fetch('sadigs_api_v3/select_role.php', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ roles: selectedRoles })
+            });
+            const result = await res.json();
+            
+            alert(result.message);
+            if (result.success) {
+                window.location.href = 'index.html';
+            }
+        });
 
         // Logika Logout
         document.getElementById('logoutBtn').addEventListener('click', () => {
