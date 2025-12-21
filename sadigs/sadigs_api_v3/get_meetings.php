@@ -3,7 +3,7 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 0);
 header('Content-Type: application/json');
-require_once '../db_connect.php';
+require_once 'db_connect.php';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
