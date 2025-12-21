@@ -29,6 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     $password = $data['password'] ?? '';
     $type = $data['type'] ?? ''; // 'Masuk' atau 'Pulang'
+    $category = $data['category'] ?? 'Absensi Harian';
     $lat = $data['latitude'] ?? null;
     $lng = $data['longitude'] ?? null;
     $addr = $data['address'] ?? '';
@@ -48,24 +49,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             sendJSONResponse(['success' => false, 'message' => 'Password salah. Absensi gagal.'], 401);
         }
 
-        // 4. Cek Duplikasi (Opsional: Cegah absen masuk 2x sehari)
+        // 4. Cek Duplikasi (Cegah absen masuk 2x sehari untuk kategori yang sama)
         if ($type === 'Masuk') {
             $today = date('Y-m-d');
-            $stmtCheck = $pdo->prepare("SELECT id FROM attendance_logs WHERE user_id = :uid AND attendance_type = 'Masuk' AND DATE(timestamp) = :today");
-            $stmtCheck->execute(['uid' => $_SESSION['user_id'], 'today' => $today]);
+            $stmtCheck = $pdo->prepare("SELECT id FROM attendance_logs WHERE user_id = :uid AND attendance_type = 'Masuk' AND category = :category AND DATE(timestamp) = :today");
+            $stmtCheck->execute(['uid' => $_SESSION['user_id'], 'category' => $category, 'today' => $today]);
             if ($stmtCheck->rowCount() > 0) {
-                sendJSONResponse(['success' => false, 'message' => 'Anda sudah absen masuk hari ini.'], 400);
+                sendJSONResponse(['success' => false, 'message' => "Anda sudah melakukan absen masuk untuk $category hari ini."], 400);
             }
         }
 
         // 5. Simpan Absensi
         // Kita gunakan NOW() dari database untuk waktu yang tidak bisa dimanipulasi user
-        $sql = "INSERT INTO attendance_logs (user_id, attendance_type, timestamp, latitude, longitude, address) 
-                VALUES (:uid, :type, NOW(), :lat, :lng, :addr)";
+        $sql = "INSERT INTO attendance_logs (user_id, attendance_type, category, timestamp, latitude, longitude, address) 
+                VALUES (:uid, :type, :category, NOW(), :lat, :lng, :addr)";
         $stmtInsert = $pdo->prepare($sql);
         $stmtInsert->execute([
             'uid' => $_SESSION['user_id'],
             'type' => $type,
+            'category' => $category,
             'lat' => $lat,
             'lng' => $lng,
             'addr' => $addr

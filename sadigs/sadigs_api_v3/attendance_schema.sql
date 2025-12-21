@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS attendance_logs (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     attendance_type ENUM('Masuk', 'Pulang') NOT NULL,
+    category VARCHAR(50) NOT NULL DEFAULT 'Absensi Harian',
     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP, -- Waktu Server (Anti-Manipulasi)
     latitude DECIMAL(10, 8),
     longitude DECIMAL(11, 8),
