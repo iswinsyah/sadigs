@@ -165,6 +165,45 @@
                             </div>
                         </div>
 
+                        <!-- 7. Peserta yang Diundang -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Peserta yang Diundang</label>
+                            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-100 p-2 rounded transition">
+                                    <input type="checkbox" name="invited_roles" value="Sekretaris Yayasan" class="w-4 h-4 text-teal-600 rounded focus:ring-teal-500 border-gray-300">
+                                    <span class="text-sm text-gray-700">Sekretaris Yayasan</span>
+                                </label>
+                                <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-100 p-2 rounded transition">
+                                    <input type="checkbox" name="invited_roles" value="Bendahara Yayasan" class="w-4 h-4 text-teal-600 rounded focus:ring-teal-500 border-gray-300">
+                                    <span class="text-sm text-gray-700">Bendahara Yayasan</span>
+                                </label>
+                                <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-100 p-2 rounded transition">
+                                    <input type="checkbox" name="invited_roles" value="Kepala Sekolah" class="w-4 h-4 text-teal-600 rounded focus:ring-teal-500 border-gray-300">
+                                    <span class="text-sm text-gray-700">Kepala Sekolah</span>
+                                </label>
+                                <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-100 p-2 rounded transition">
+                                    <input type="checkbox" name="invited_roles" value="Kepala Asrama" class="w-4 h-4 text-teal-600 rounded focus:ring-teal-500 border-gray-300">
+                                    <span class="text-sm text-gray-700">Kepala Asrama</span>
+                                </label>
+                                <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-100 p-2 rounded transition">
+                                    <input type="checkbox" name="invited_roles" value="Sekretaris Sekolah" class="w-4 h-4 text-teal-600 rounded focus:ring-teal-500 border-gray-300">
+                                    <span class="text-sm text-gray-700">Sekretaris Sekolah</span>
+                                </label>
+                                <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-100 p-2 rounded transition">
+                                    <input type="checkbox" name="invited_roles" value="Bendahara Sekolah" class="w-4 h-4 text-teal-600 rounded focus:ring-teal-500 border-gray-300">
+                                    <span class="text-sm text-gray-700">Bendahara Sekolah</span>
+                                </label>
+                                <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-100 p-2 rounded transition">
+                                    <input type="checkbox" name="invited_roles" value="Musyrif" class="w-4 h-4 text-teal-600 rounded focus:ring-teal-500 border-gray-300">
+                                    <span class="text-sm text-gray-700">Musyrif</span>
+                                </label>
+                                <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-100 p-2 rounded transition">
+                                    <input type="checkbox" name="invited_roles" value="Ustadz" class="w-4 h-4 text-teal-600 rounded focus:ring-teal-500 border-gray-300">
+                                    <span class="text-sm text-gray-700">Ustadz</span>
+                                </label>
+                            </div>
+                        </div>
+
                         <div class="flex justify-end pt-4">
                             <button type="submit" id="submitBtn" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-md flex items-center gap-2">
                                 <i data-lucide="send" class="w-4 h-4"></i> Buat Undangan
@@ -261,6 +300,7 @@
 
             const formData = new FormData(e.target);
             const data = Object.fromEntries(formData.entries());
+            data.invited_roles = formData.getAll('invited_roles'); // Ambil semua nilai checkbox
 
             try {
                 const res = await fetch('sadigs_api_v3/create_meeting.php', {

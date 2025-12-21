@@ -28,36 +28,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = json_decode($json, true) ?? [];
 
     // Validasi Input
-    if (empty($data['meeting_name']) || empty($data['meeting_time']) || empty($data['location']) || empty($data['inviter']) || empty($data['routine'])) {
-        sendJSONResponse(['success' => false, 'message' => 'Kolom utama wajib diisi.'], 400);
-    }
-
-    // Validasi Kondisional berdasarkan Rutinitas
-    $routine = $data['routine'];
-    if ($routine === 'sekali' && (empty($data['meeting_date']) || empty($data['day']))) {
-        sendJSONResponse(['success' => false, 'message' => 'Tanggal dan Hari wajib diisi untuk rapat sekali.'], 400);
-    }
-    if ($routine === 'setiap_pekan' && empty($data['day'])) {
-        sendJSONResponse(['success' => false, 'message' => 'Hari wajib diisi untuk rapat pekanan.'], 400);
-    }
-    if ($routine === 'setiap_bulan' && empty($data['meeting_date'])) {
-        sendJSONResponse(['success' => false, 'message' => 'Tanggal wajib diisi untuk rapat bulanan.'], 400);
+    if (empty($data['meeting_name']) || empty($data['meeting_time']) || empty($data['location']) || empty($data['inviter']) || empty($data['routine']) || empty($data['invited_roles'])) {
+        sendJSONResponse(['success' => false, 'message' => 'Semua kolom wajib diisi.'], 400);
     }
 
     try {
-        $sql = "INSERT INTO meetings (meeting_name, meeting_date, meeting_time, location, agenda, inviter, routine, day) 
-                VALUES (:name, :date, :time, :location, :agenda, :inviter, :routine, :day)";
+        $sql = "INSERT INTO meetings (meeting_name, meeting_date, meeting_time, location, agenda, inviter, routine, day, invited_roles) 
+                VALUES (:name, :date, :time, :location, :agenda, :inviter, :routine, :day, :invited_roles)";
         
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             'name' => $data['meeting_name'],
-            'date' => !empty($data['meeting_date']) ? $data['meeting_date'] : null,
+            'date' => $data['meeting_date'],
             'time' => $data['meeting_time'],
             'location' => $data['location'],
             'agenda' => $data['agenda'] ?? '',
-            'inviter' => $data['inviter'],
-            'routine' => $data['routine'],
-            'day' => !empty($data['day']) ? $data['day'] : null
+            'inviter' => $data['inviter']
         ]);
 
         sendJSONResponse(['success' => true, 'message' => 'Undangan rapat berhasil dibuat.']);

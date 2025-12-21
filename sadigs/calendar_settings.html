@@ -222,6 +222,9 @@
                 const yayasanRoles = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan'];
                 if (sessionData.roles.some(r => yayasanRoles.includes(r))) {
                     document.getElementById('menuYayasan').classList.remove('hidden');
+                    document.getElementById('navVerifikasi').classList.remove('hidden');
+                    document.getElementById('navQuota').classList.remove('hidden');
+                    document.getElementById('groupKhusus').classList.remove('hidden');
                 } else {
                     alert('Akses ditolak. Halaman ini khusus Yayasan.');
                     window.location.href = 'dashboard.html';

@@ -9,5 +9,6 @@ CREATE TABLE IF NOT EXISTS meetings (
     inviter VARCHAR(100) NOT NULL, -- Ketua Yayasan, Kepala Sekolah, atau Kepala Asrama
     routine ENUM('sekali', 'setiap_pekan', 'setiap_bulan') NOT NULL DEFAULT 'sekali',
     day VARCHAR(20), -- Senin, Selasa, dll (Bisa NULL jika rutin bulanan)
+    invited_roles TEXT, -- Menyimpan array JSON peran yang diundang
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
