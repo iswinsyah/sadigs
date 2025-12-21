@@ -13,10 +13,11 @@ if (!isset($_SESSION['user_id'])) {
     sendJSONResponse(['success' => false, 'message' => 'Unauthorized'], 401);
 }
 
-$pdo = getDBConnection();
 $user_roles = $_SESSION['roles'] ?? [];
 
 try {
+    $pdo = getDBConnection();
+
     // Ambil rapat:
     // 1. Rutinitas 'sekali' yang terjadi di bulan & tahun ini
     // 2. Rutinitas 'setiap_pekan' atau 'setiap_bulan' (selalu relevan)
