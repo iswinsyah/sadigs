@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemen Akses Menu | SADIGS 3.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar { height: 8px; width: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+
+    <div class="flex h-screen overflow-hidden">
+        <!-- SIDEBAR -->
+        <aside id="sidebar" class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col hidden lg:flex">
+            <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-teal-600 text-white">
+                <h1 class="text-2xl font-extrabold tracking-wider">SADIGS</h1>
+            </div>
+            <div class="p-6">
+                <a href="dashboard.html" class="flex items-center gap-2 text-gray-600 hover:text-teal-600 transition">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i> Kembali ke Dashboard
+                </a>
+            </div>
+        </aside>
+
+        <!-- KONTEN UTAMA -->
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative">
+            <header class="mb-8 flex justify-between items-center">
+                <div>
+                    <h2 class="text-2xl lg:text-3xl font-bold text-gray-800">Manajemen Akses Menu</h2>
+                    <p class="text-gray-500 text-sm mt-1">Atur visibilitas menu untuk setiap peran (Role).</p>
+                </div>
+                <button onclick="saveChanges()" id="saveBtn" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-md flex items-center gap-2">
+                    <i data-lucide="save" class="w-4 h-4"></i> Simpan Perubahan
+                </button>
+            </header>
+
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="overflow-x-auto custom-scrollbar">
+                    <table class="min-w-full border-collapse text-sm">
+                        <thead class="bg-gray-100">
+                            <tr id="tableHeader">
+                                <th class="p-4 text-left font-bold text-gray-700 border-b border-r border-gray-200 sticky left-0 bg-gray-100 min-w-[200px]">
+                                    Menu ID
+                                </th>
+                                <!-- Kolom Role akan diisi JS -->
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody" class="divide-y divide-gray-200">
+                            <tr><td class="p-8 text-center text-gray-500">Memuat data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="mt-4 p-4 bg-blue-50 text-blue-800 rounded-lg text-sm border border-blue-100">
+                <p class="font-bold mb-1"><i data-lucide="info" class="w-4 h-4 inline mr-1"></i> Catatan:</p>
+                <ul class="list-disc list-inside ml-2">
+                    <li>Centang kotak untuk <strong>mengizinkan</strong> peran melihat menu tersebut.</li>
+                    <li>Perubahan akan langsung berlaku setelah tombol "Simpan" ditekan.</li>
+                    <li>Pastikan Anda tidak menghapus akses Anda sendiri ke menu ini!</li>
+                </ul>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        let currentMatrix = {};
+        let roleList = [];
+        let menuList = [];
+
+        async function initPage() {
+            // Cek Sesi
+            const sessionRes = await fetch('sadigs_api_v3/session_check.php');
+            const sessionData = await sessionRes.json();
+            if (!sessionData.success) { window.location.href = 'index.html'; return; }
+
+            // Cek Otorisasi (Hanya Ketua Yayasan)
+            if (!sessionData.roles.includes('Ketua Yayasan')) {
+                alert('Akses Ditolak. Halaman ini hanya untuk Ketua Yayasan.');
+                window.location.href = 'dashboard.html';
+                return;
+            }
+
+            loadData();
+        }
+
+        async function loadData() {
+            try {
+                const res = await fetch('sadigs_api_v3/menu_manager.php');
+                const data = await res.json();
+
+                if (data.success) {
+                    roleList = data.roles;
+                    menuList = data.menus;
+                    currentMatrix = data.matrix;
+                    renderTable();
+                } else {
+                    alert('Gagal memuat data: ' + data.message);
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Terjadi kesalahan koneksi.');
+            }
+        }
+
+        function renderTable() {
+            const thead = document.getElementById('tableHeader');
+            const tbody = document.getElementById('tableBody');
+
+            // 1. Render Header (Roles)
+            // Reset header tapi sisakan kolom pertama
+            while (thead.children.length > 1) { thead.removeChild(thead.lastChild); }
+            
+            roleList.forEach(role => {
+                const th = document.createElement('th');
+                th.className = "p-4 text-center font-bold text-gray-700 border-b border-gray-200 min-w-[100px]";
+                th.textContent = role;
+                thead.appendChild(th);
+            });
+
+            // 2. Render Body (Menus)
+            tbody.innerHTML = '';
+            menuList.forEach(menuId => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-gray-50";
+
+                // Kolom Nama Menu
+                const tdName = document.createElement('td');
+                tdName.className = "p-3 font-medium text-gray-800 border-r border-gray-200 sticky left-0 bg-white";
+                tdName.innerHTML = `<span class="font-mono text-xs text-teal-600 bg-teal-50 px-2 py-1 rounded">${menuId}</span>`;
+                tr.appendChild(tdName);
+
+                // Kolom Checkbox per Role
+                roleList.forEach(role => {
+                    const td = document.createElement('td');
+                    td.className = "p-3 text-center border-r border-gray-100 last:border-r-0";
+                    
+                    const isChecked = (currentMatrix[menuId] && currentMatrix[menuId][role] === 1);
+                    
+                    td.innerHTML = `
+                        <input type="checkbox" 
+                            class="w-5 h-5 text-teal-600 rounded border-gray-300 focus:ring-teal-500 cursor-pointer"
+                            data-role="${role}" 
+                            data-menu="${menuId}"
+                            ${isChecked ? 'checked' : ''}>
+                    `;
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function saveChanges() {
+            const btn = document.getElementById('saveBtn');
+            const originalText = btn.innerHTML;
+            btn.disabled = true; btn.innerHTML = 'Menyimpan...';
+
+            // Kumpulkan data dari semua checkbox
+            const updates = [];
+            const checkboxes = document.querySelectorAll('input[type="checkbox"][data-role]');
+            
+            checkboxes.forEach(cb => {
+                updates.push({
+                    role: cb.dataset.role,
+                    menu: cb.dataset.menu,
+                    state: cb.checked ? 1 : 0
+                });
+            });
+
+            try {
+                const res = await fetch('sadigs_api_v3/menu_manager.php', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ updates: updates })
+                });
+                const result = await res.json();
+                if (result.success) alert('Pengaturan berhasil disimpan!');
+                else alert('Gagal: ' + result.message);
+            } catch (e) { alert('Terjadi kesalahan koneksi.'); }
+            finally { btn.disabled = false; btn.innerHTML = originalText; }
+        }
+
+        initPage();
+    </script>
+</body>
+</html>
