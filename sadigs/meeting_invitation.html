@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buat Undangan Rapat | SADIGS 3.0</title>
+    <title>Formulir Undang Rapat | SADIGS 3.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -54,12 +54,12 @@
                         <a id="navVerifikasi" href="verification_management.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="users" class="w-5 h-5"></i> Verifikasi Pegawai</a>
                         <a id="navQuota" href="quota_management.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="user-cog" class="w-5 h-5"></i> Atur Kuota</a>
                         <a id="navAbsensi" href="attendance.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="map-pin" class="w-5 h-5"></i> Absensi Pegawai</a>
-                        <a id="navRapat" href="meeting_invitation.html" class="flex items-center gap-3 px-3 py-2.5 text-teal-700 bg-white rounded-md transition font-semibold text-sm shadow-sm"><i data-lucide="mail" class="w-5 h-5"></i> Undangan Rapat</a>
                     </div>
                     <!-- Div 3: KHUSUS -->
                     <div id="groupKhusus" class="hidden bg-gray-50 rounded-lg p-2">
                         <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KHUSUS</h3>
                         <a id="navCalendarSettings" href="calendar_settings.html" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="calendar-cog" class="w-5 h-5"></i> Atur Kalender</a>
+                        <a id="navRapat" href="meeting_invitation.html" class="flex items-center gap-3 px-3 py-2.5 text-teal-700 bg-white rounded-md transition font-semibold text-sm shadow-sm"                                                                                                                        ><i data-lucide="mail" class="w-5 h-5"></i> Formulir Undang Rapat</a>
                     </div>
                 </div>
                 <div class="pt-2">
@@ -72,13 +72,14 @@
         <!-- KONTEN UTAMA -->
         <main class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative">
             <header class="mb-8">
-                <h2 class="text-2xl lg:text-3xl font-bold text-gray-800">Buat Undangan Rapat</h2>
+                <h2 class="text-2xl lg:text-3xl font-bold text-gray-800">Formulir Undang Rapat</h2>
                 <p class="text-gray-500 text-sm mt-1">Jadwalkan rapat dan otomatis terhubung dengan absensi pegawai.</p>
             </header>
 
-            <div class="max-w-3xl">
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-8 items-start">
+                <!-- KOLOM 1: FORMULIR -->
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <form id="meetingForm" class="space-y-6">
+                    <form id="meetingForm" class="space-y-5">
                         <!-- 1. Nama Rapat -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Nama Rapat</label>
@@ -170,6 +171,10 @@
                             <label class="block text-sm font-medium text-gray-700 mb-2">Peserta yang Diundang</label>
                             <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-100 p-2 rounded transition">
+                                    <input type="checkbox" name="invited_roles" value="Ketua Yayasan" class="w-4 h-4 text-teal-600 rounded focus:ring-teal-500 border-gray-300">
+                                    <span class="text-sm text-gray-700">Ketua Yayasan</span>
+                                </label>
+                                <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-100 p-2 rounded transition">
                                     <input type="checkbox" name="invited_roles" value="Sekretaris Yayasan" class="w-4 h-4 text-teal-600 rounded focus:ring-teal-500 border-gray-300">
                                     <span class="text-sm text-gray-700">Sekretaris Yayasan</span>
                                 </label>
@@ -210,6 +215,36 @@
                             </button>
                         </div>
                     </form>
+                </div>
+
+                <!-- KOLOM 2: PREVIEW TEMPLATE -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 sticky top-8">
+                    <div class="flex justify-between items-center mb-4 border-b pb-4">
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-800">Preview Pesan</h3>
+                            <p class="text-xs text-gray-500">Template otomatis untuk WhatsApp/Email</p>
+                        </div>
+                        <button type="button" id="copyTextBtn" class="text-sm bg-teal-50 hover:bg-teal-100 text-teal-700 px-4 py-2 rounded-lg transition flex items-center gap-2 font-semibold border border-teal-200">
+                            <i data-lucide="copy" class="w-4 h-4"></i> Salin Teks
+                        </button>
+                    </div>
+                    
+                    <div class="bg-gray-50 p-5 rounded-lg border border-gray-200 relative">
+                        <!-- Area Teks Template -->
+                        <pre id="invitationPreview" class="whitespace-pre-wrap font-sans text-sm text-gray-700 leading-relaxed font-medium"></pre>
+                        
+                        <!-- Watermark/Placeholder jika kosong -->
+                        <div id="previewPlaceholder" class="absolute inset-0 flex items-center justify-center text-gray-400 text-sm pointer-events-none">
+                            Isi formulir untuk melihat preview
+                        </div>
+                    </div>
+
+                    <div class="mt-4 bg-blue-50 p-3 rounded-lg flex gap-3 items-start">
+                        <i data-lucide="info" class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5"></i>
+                        <p class="text-xs text-blue-700">
+                            Pastikan data sudah benar sebelum menyalin. Tanggal dan Hari akan menyesuaikan otomatis berdasarkan pilihan rutinitas.
+                        </p>
+                    </div>
                 </div>
             </div>
         </main>
@@ -252,6 +287,7 @@
                 if (sessionData.roles.some(r => yayasanRoles.includes(r))) {
                     document.getElementById('navVerifikasi').classList.remove('hidden');
                     document.getElementById('navQuota').classList.remove('hidden');
+                    // groupKhusus akan di-unhide di bawah jika user punya akses rapat
                     document.getElementById('groupKhusus').classList.remove('hidden');
                 }
                 if (sessionData.roles.some(r => pegawaiRoles.includes(r))) {
@@ -267,6 +303,7 @@
         const dayInput = dayContainer.querySelector('select');
         const dateInput = dateContainer.querySelector('input');
 
+        // Update Visibility & Required
         function updateVisibility() {
             const routine = routineSelect.value;
             
@@ -288,9 +325,78 @@
                 dateContainer.classList.remove('hidden');
                 dateInput.required = true;
             }
+            updatePreview(); // Update preview saat visibilitas berubah
         }
         routineSelect.addEventListener('change', updateVisibility);
-        updateVisibility(); // Jalankan logika saat halaman pertama kali dimuat
+        
+        // --- LOGIKA PREVIEW TEMPLATE ---
+        const formInputs = document.querySelectorAll('#meetingForm input, #meetingForm select, #meetingForm textarea');
+        const previewEl = document.getElementById('invitationPreview');
+        const placeholderEl = document.getElementById('previewPlaceholder');
+
+        function updatePreview() {
+            const name = document.querySelector('[name="meeting_name"]').value;
+            const routine = routineSelect.value;
+            let day = document.querySelector('[name="day"]').value;
+            let dateVal = document.querySelector('[name="meeting_date"]').value;
+            const time = document.querySelector('[name="meeting_time"]').value;
+            const location = document.querySelector('[name="location"]').value;
+            const agenda = document.querySelector('[name="agenda"]').value;
+            const inviter = document.querySelector('[name="inviter"]').value;
+
+            // Format Tanggal Indonesia
+            let formattedDate = dateVal;
+            if (dateVal) {
+                const d = new Date(dateVal);
+                const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+                formattedDate = `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+                
+                // Jika hari kosong (misal rutinitas bulanan), ambil dari tanggal
+                if (!day && routine === 'setiap_bulan') {
+                    const days = ['Ahad', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+                    day = days[d.getDay()];
+                }
+            } else if (routine === 'setiap_pekan') {
+                formattedDate = '(Setiap Pekan)';
+            }
+
+            // Tampilkan placeholder jika belum ada data minimal
+            if (!name && !time && !location) {
+                previewEl.textContent = '';
+                placeholderEl.classList.remove('hidden');
+                return;
+            }
+            placeholderEl.classList.add('hidden');
+
+            // Template Teks
+            const template = `Kepada Yang Kami Hormati
+Para Asatidz 
+Yang dimuliakan Allah,
+
+Assalamualaikum wr wb.
+
+Sehubungan dengan agenda koordinasi berkala, kami mengundang Bapak/Ibu Para Asatidz untuk hadir dalam rapat rutin ${name || '...'} yang akan dilaksanakan pada:
+
+Hari        : ${day || '...'}
+Tanggal     : ${formattedDate || '...'}
+Waktu       : ${time || '...'} WIB
+Tempat      : ${location || '...'}
+
+Agenda      : ${agenda || '-'}
+
+Mengingat pentingnya agenda ini, kehadiran para asatidz sangat kami harapkan tepat pada waktunya. 
+
+Terima kasih atas perhatian dan kerja samanya.
+
+Wassalamualaikum wr wb,
+
+${inviter || '...'}`;
+
+            previewEl.textContent = template;
+        }
+
+        // Pasang listener ke semua input untuk update realtime
+        formInputs.forEach(input => input.addEventListener('input', updatePreview));
 
         document.getElementById('meetingForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -315,8 +421,22 @@
             finally { btn.disabled = false; btn.innerHTML = originalText; }
         });
 
+        // Tombol Salin Teks
+        document.getElementById('copyTextBtn').addEventListener('click', () => {
+            const text = previewEl.textContent;
+            if (!text) return;
+            navigator.clipboard.writeText(text).then(() => {
+                const originalBtnText = document.getElementById('copyTextBtn').innerHTML;
+                document.getElementById('copyTextBtn').innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> Tersalin!`;
+                setTimeout(() => {
+                    document.getElementById('copyTextBtn').innerHTML = originalBtnText;
+                    lucide.createIcons();
+                }, 2000);
+            });
+        });
+
         document.getElementById('logoutBtn').addEventListener('click', () => { if(confirm('Keluar aplikasi?')) window.location.href = 'sadigs_api_v3/logout.php'; });
-        initPage();
+        initPage().then(() => updateVisibility()); // Init page lalu update visibility awal
     </script>
 </body>
 </html>
