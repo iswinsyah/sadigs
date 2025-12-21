@@ -1,4 +1,8 @@
 <?php
+// Pastikan output selalu JSON bersih, sembunyikan error PHP dari output
+error_reporting(E_ALL);
+ini_set('display_errors', 0);
+header('Content-Type: application/json');
 require_once '../db_connect.php';
 
 if (session_status() === PHP_SESSION_NONE) {
@@ -49,6 +53,9 @@ try {
             // Format Tanggal untuk tampilan
             if ($meeting['routine'] === 'setiap_pekan') {
                 $meeting['display_date'] = 'Setiap Pekan';
+                if (!empty($meeting['day'])) {
+                    $meeting['display_date'] .= " (" . $meeting['day'] . ")";
+                }
             } elseif ($meeting['routine'] === 'setiap_bulan') {
                 $d = date('d', strtotime($meeting['meeting_date']));
                 $meeting['display_date'] = "Setiap tanggal $d";

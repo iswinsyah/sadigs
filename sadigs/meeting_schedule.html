@@ -162,13 +162,19 @@
 
             try {
                 const res = await fetch('sadigs_api_v3/get_meetings.php');
+                
+                // Cek status HTTP
+                if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+                
                 const data = await res.json();
 
                 if (data.success && data.meetings && data.meetings.length > 0) {
                     tbody.innerHTML = '';
                     emptyState.classList.add('hidden');
 
-                    data.meetings.forEach(m => {
+                    // Batasi maksimal 10 baris
+                    const limitedMeetings = data.meetings.slice(0, 10);
+                    limitedMeetings.forEach(m => {
                         const tr = document.createElement('tr');
                         tr.className = "hover:bg-gray-50 transition";
                         tr.innerHTML = `
@@ -179,9 +185,7 @@
                             <td class="px-6 py-4 text-sm text-gray-600 max-w-xs truncate" title="${m.agenda}">${m.agenda || '-'}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${m.inviter}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-center">
-                                <button class="text-xs bg-teal-50 text-teal-700 hover:bg-teal-100 border border-teal-200 px-3 py-1.5 rounded-full font-bold transition">
-                                    Hadir
-                                </button>
+                                <input type="checkbox" class="w-5 h-5 text-teal-600 rounded focus:ring-teal-500 border-gray-300 cursor-pointer">
                             </td>
                         `;
                         tbody.appendChild(tr);
@@ -191,6 +195,7 @@
                     emptyState.classList.remove('hidden');
                 }
             } catch (error) {
+                console.error("Error fetching meetings:", error); // Log error ke console untuk debugging
                 tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-4 text-center text-red-500">Gagal memuat data.</td></tr>';
             }
         }
