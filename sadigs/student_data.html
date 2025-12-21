@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biodata Santri | SADIGS 3.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+
+    <div class="flex h-screen overflow-hidden">
+        <!-- SIDEBAR (Akan diisi oleh JS yang sama dengan dashboard) -->
+        <aside id="sidebar" class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col hidden lg:flex">
+            <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-teal-600 text-white">
+                <h1 class="text-2xl font-extrabold tracking-wider">SADIGS</h1>
+            </div>
+            <div class="p-6">
+                <a href="dashboard.html" class="flex items-center gap-2 text-gray-600 hover:text-teal-600 transition">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i> Kembali ke Dashboard
+                </a>
+            </div>
+        </aside>
+
+        <!-- KONTEN UTAMA -->
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative">
+            <header class="mb-8">
+                <h2 class="text-2xl lg:text-3xl font-bold text-gray-800">Biodata Santri</h2>
+                <p class="text-gray-500 text-sm mt-1">Lengkapi data diri untuk keperluan akademik dan pembagian kelas.</p>
+            </header>
+
+            <div class="max-w-3xl bg-white p-8 rounded-xl shadow-sm border border-gray-100">
+                <form id="studentForm" class="space-y-6">
+                    
+                    <!-- Data Pribadi -->
+                    <div class="border-b pb-4">
+                        <h3 class="text-lg font-bold text-teal-800 mb-4">Data Pribadi</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">NISN (Jika ada)</label>
+                                <input type="text" name="nisn" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Asal Sekolah</label>
+                                <input type="text" name="previous_school" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Tempat Lahir</label>
+                                <input type="text" name="birth_place" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Lahir</label>
+                                <input type="date" name="birth_date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none">
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Alamat Lengkap</label>
+                            <textarea name="address" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Data Wali -->
+                    <div>
+                        <h3 class="text-lg font-bold text-teal-800 mb-4">Data Wali / Orang Tua</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Nama Wali</label>
+                                <input type="text" name="parent_name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">No. HP Wali (WhatsApp)</label>
+                                <input type="text" name="parent_phone" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none" placeholder="08xxxxxxxxxx" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end pt-4">
+                        <button type="submit" id="saveBtn" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-8 rounded-lg transition shadow-md flex items-center gap-2">
+                            <i data-lucide="save" class="w-5 h-5"></i> Simpan Biodata
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        async function initPage() {
+            // Cek Sesi
+            const sessionRes = await fetch('sadigs_api_v3/session_check.php');
+            const sessionData = await sessionRes.json();
+            if (!sessionData.success) { window.location.href = 'index.html'; return; }
+
+            // Cek apakah Santri
+            if (!sessionData.roles.includes('Santri')) {
+                alert('Halaman ini khusus untuk Santri.');
+                window.location.href = 'dashboard.html';
+                return;
+            }
+
+            // Load Data
+            try {
+                const res = await fetch('sadigs_api_v3/student_data.php');
+                const result = await res.json();
+                if (result.success && result.data) {
+                    const d = result.data;
+                    const form = document.getElementById('studentForm');
+                    if(d.nisn) form.querySelector('[name="nisn"]').value = d.nisn;
+                    if(d.previous_school) form.querySelector('[name="previous_school"]').value = d.previous_school;
+                    if(d.birth_place) form.querySelector('[name="birth_place"]').value = d.birth_place;
+                    if(d.birth_date) form.querySelector('[name="birth_date"]').value = d.birth_date;
+                    if(d.address) form.querySelector('[name="address"]').value = d.address;
+                    if(d.parent_name) form.querySelector('[name="parent_name"]').value = d.parent_name;
+                    if(d.parent_phone) form.querySelector('[name="parent_phone"]').value = d.parent_phone;
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        document.getElementById('studentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('saveBtn');
+            const originalText = btn.innerHTML;
+            btn.disabled = true; btn.innerHTML = 'Menyimpan...';
+
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                const res = await fetch('sadigs_api_v3/student_data.php', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+                if (result.success) alert('Biodata berhasil disimpan!');
+                else alert('Gagal: ' + result.message);
+            } catch (error) { alert('Terjadi kesalahan koneksi.'); }
+            finally { btn.disabled = false; btn.innerHTML = originalText; }
+        });
+
+        initPage();
+    </script>
+</body>
+</html>
