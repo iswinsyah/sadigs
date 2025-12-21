@@ -43,7 +43,7 @@ try {
     $pdo->beginTransaction();
     
     // Bersihkan tabel dulu agar tidak duplikat saat dijalankan ulang
-    $pdo->exec("TRUNCATE TABLE menu_permissions");
+    $pdo->exec("DELETE FROM menu_permissions");
 
     $stmt = $pdo->prepare("INSERT INTO menu_permissions (role_name, menu_id, can_view) VALUES (?, ?, 1)");
 
