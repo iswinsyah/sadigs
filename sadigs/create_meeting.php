@@ -29,7 +29,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Validasi Input
     if (empty($data['meeting_name']) || empty($data['meeting_time']) || empty($data['location']) || empty($data['inviter']) || empty($data['routine']) || empty($data['invited_roles'])) {
-        sendJSONResponse(['success' => false, 'message' => 'Semua kolom wajib diisi.'], 400);
+        sendJSONResponse(['success' => false, 'message' => 'Kolom utama (Nama, Waktu, Tempat, Pengundang, Rutinitas, Peserta) wajib diisi.'], 400);
+    }
+
+    // Validasi kondisional untuk hari dan tanggal
+    if ($data['routine'] === 'sekali' && (empty($data['day']) || empty($data['meeting_date']))) {
+        sendJSONResponse(['success' => false, 'message' => 'Untuk rutinitas "Sekali", Hari dan Tanggal wajib diisi.'], 400);
+    }
+    if ($data['routine'] === 'setiap_pekan' && empty($data['day'])) {
+        sendJSONResponse(['success' => false, 'message' => 'Untuk rutinitas "Setiap Pekan", Hari wajib diisi.'], 400);
+    }
+    if ($data['routine'] === 'setiap_bulan' && empty($data['meeting_date'])) {
+        sendJSONResponse(['success' => false, 'message' => 'Untuk rutinitas "Setiap Bulan", Tanggal wajib diisi.'], 400);
     }
 
     try {
@@ -39,11 +50,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             'name' => $data['meeting_name'],
-            'date' => $data['meeting_date'],
+            'date' => !empty($data['meeting_date']) ? $data['meeting_date'] : null,
             'time' => $data['meeting_time'],
             'location' => $data['location'],
             'agenda' => $data['agenda'] ?? '',
-            'inviter' => $data['inviter']
+            'inviter' => $data['inviter'],
+            'routine' => $data['routine'],
+            'day' => !empty($data['day']) ? $data['day'] : null,
+            'invited_roles' => json_encode($data['invited_roles']) // Simpan sebagai JSON
         ]);
 
         sendJSONResponse(['success' => true, 'message' => 'Undangan rapat berhasil dibuat.']);
