@@ -143,6 +143,12 @@
                     <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Manajemen Peran</h3>
                     
                     <div class="mb-6">
+                        <div id="pendingVerificationNotice" class="hidden mb-4 p-4 bg-yellow-50 text-yellow-800 border border-yellow-200 rounded-lg text-sm">
+                            <p class="font-bold flex items-center gap-2">
+                                <i data-lucide="hourglass" class="w-4 h-4"></i> Menunggu Verifikasi
+                            </p>
+                            <p class="mt-1">Peran yang Anda ajukan sedang ditinjau oleh Yayasan. Menu lain akan muncul setelah akun Anda diaktifkan.</p>
+                        </div>
                         <p class="text-sm text-gray-600 mb-2 font-medium">Peran Anda Saat Ini:</p>
                         <div id="currentRolesDisplay" class="flex flex-wrap gap-2">
                             <span class="text-sm text-gray-400 italic">Memuat...</span>
@@ -224,9 +230,25 @@
                 const rolesDisplay = document.getElementById('currentRolesDisplay');
                 rolesDisplay.innerHTML = '';
                 
-                if (currentRoles.length === 0) {
-                    rolesDisplay.innerHTML = '<span class="text-sm text-gray-500 italic bg-gray-100 px-3 py-1 rounded-full">Belum ada peran</span>';
+                // Cek apakah ada peran yang pending dari data mentah
+                const rawRoles = sessionData.raw_roles || [];
+                const hasPending = rawRoles.some(r => r.status === 'pending');
+
+                if (hasPending) {
+                    document.getElementById('pendingVerificationNotice').classList.remove('hidden');
+                }
+
+                if (rawRoles.length > 0) {
+                    rawRoles.forEach(r => {
+                        const statusClass = r.status === 'pending' ? 'bg-yellow-100 text-yellow-800 border-yellow-200' : 'bg-white text-teal-700 border-teal-200';
+                        const statusText = r.status === 'pending' ? ' (Pending)' : '';
+                        const span = document.createElement('span');
+                        span.className = `px-3 py-1 rounded-full text-xs font-bold shadow-sm border ${statusClass}`;
+                        span.textContent = r.role_name + statusText;
+                        rolesDisplay.appendChild(span);
+                    });
                 } else {
+                     rolesDisplay.innerHTML = '<span class="text-sm text-gray-500 italic bg-gray-100 px-3 py-1 rounded-full">Belum ada peran</span>';
                     currentRoles.forEach(r => {
                         const span = document.createElement('span');
                         span.className = 'px-3 py-1 bg-white text-teal-700 border border-teal-200 rounded-full text-xs font-bold shadow-sm';
@@ -236,7 +258,7 @@
                 }
                 
                 // Muat opsi peran yang tersedia
-                loadAvailableRoles(currentRoles);
+                loadAvailableRoles(rawRoles.map(r => r.role_name));
 
                 // 2. Ambil Detail Profil dari get_profile.php
                 // Kita perlu kirim user_id via POST sesuai logika get_profile.php yang ada

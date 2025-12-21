@@ -1,73 +1,63 @@
 <?php
-// =================================================================
-// SADIGS 3.0: LOGIN (CLEAN VERSION)
-// =================================================================
-
-// Buffer output untuk mencegah error HTML
 ob_start();
-
 require_once 'db_connect.php';
 
-// Mulai sesi
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $input = json_decode(file_get_contents('php://input'), true);
+    $username = $input['username'] ?? '';
+    $password = $input['password'] ?? '';
 
-// Ambil data JSON
-$data = json_decode(file_get_contents("php://input"), true);
-
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    sendJSONResponse(array('success' => false, 'message' => 'Metode harus POST.'), 405);
-}
-
-$username = $data['username'] ?? '';
-$password = $data['password'] ?? '';
-
-if (empty($username) || empty($password)) {
-    sendJSONResponse(array('success' => false, 'message' => 'Username dan kata sandi harus diisi.'), 400);
-}
-
-try {
-    $pdo = getDBConnection();
-    
-    // 1. Cari User berdasarkan Username
-    $sql_user = "SELECT user_id, username, password_hash, is_active FROM users WHERE username = :username";
-    $stmt_user = $pdo->prepare($sql_user);
-    $stmt_user->execute(['username' => $username]);
-    $user = $stmt_user->fetch();
-
-    // 2. Verifikasi User & Password
-    if (!$user) {
-        sendJSONResponse(array('success' => false, 'message' => 'Username atau kata sandi salah.'), 401);
-    }
-    
-    if (!password_verify($password, $user['password_hash'])) {
-        sendJSONResponse(array('success' => false, 'message' => 'Username atau kata sandi salah.'), 401);
+    if (empty($username) || empty($password)) {
+        sendJSONResponse(['success' => false, 'message' => 'Username dan password wajib diisi.'], 400);
+        exit;
     }
 
-    // 3. Cek Status Aktif
-    if ($user['is_active'] == 0) {
-        sendJSONResponse(array('success' => false, 'message' => 'Akun belum diaktifkan oleh Admin.'), 403);
+    try {
+        $pdo = getDBConnection();
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ?");
+        $stmt->execute([$username]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($user && password_verify($password, $user['password_hash'])) {
+            
+            // Ambil semua peran user
+            $role_stmt = $pdo->prepare("SELECT role_name, status FROM user_roles WHERE user_id = ?");
+            $role_stmt->execute([$user['user_id']]);
+            $roles_data = $role_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $approved_roles = [];
+            $has_pending_roles = false;
+            foreach ($roles_data as $role) {
+                if ($role['status'] === 'approved') {
+                    $approved_roles[] = $role['role_name'];
+                }
+                if ($role['status'] === 'pending') {
+                    $has_pending_roles = true;
+                }
+            }
+
+            // Cek jika user tidak aktif (ditolak/dinonaktifkan manual)
+            if ($user['is_active'] == 0) {
+                sendJSONResponse(['success' => false, 'message' => 'Akun Anda tidak aktif. Hubungi administrator.'], 403);
+                exit;
+            }
+
+            // Buat Sesi
+            if (session_status() === PHP_SESSION_NONE) session_start();
+            $_SESSION['user_id'] = $user['user_id'];
+            $_SESSION['username'] = $user['username'];
+            $_SESSION['roles'] = $approved_roles;
+
+            // Tentukan halaman redirect
+            $redirect_path = ($has_pending_roles || empty($approved_roles)) ? 'profile.html' : 'dashboard.html';
+
+            sendJSONResponse(['success' => true, 'message' => 'Login berhasil!', 'redirect_path' => $redirect_path]);
+
+        } else {
+            sendJSONResponse(['success' => false, 'message' => 'Username atau password salah.'], 401);
+        }
+    } catch (Exception $e) {
+        sendJSONResponse(['success' => false, 'message' => 'Terjadi kesalahan server: ' . $e->getMessage()], 500);
     }
-
-    // 4. Ambil Roles
-    $sql_roles = "SELECT role_name FROM user_roles WHERE user_id = :user_id";
-    $stmt_roles = $pdo->prepare($sql_roles);
-    $stmt_roles->execute(['user_id' => $user['user_id']]);
-    $roles_db = $stmt_roles->fetchAll(PDO::FETCH_COLUMN, 0);
-
-    // 5. Set Session
-    session_regenerate_id(true);
-    $_SESSION['user_id'] = $user['user_id'];
-    $_SESSION['username'] = $user['username'];
-    $_SESSION['roles'] = $roles_db; 
-    
-    sendJSONResponse(array(
-        'success' => true, 
-        'message' => 'Login berhasil!',
-        'redirect_path' => 'dashboard.html'
-    ));
-
-} catch (\PDOException $e) {
-    sendJSONResponse(array('success' => false, 'message' => 'Login Error: ' . $e->getMessage()), 500);
 }
+?>

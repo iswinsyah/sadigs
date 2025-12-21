@@ -1,8 +1,4 @@
 <?php
-// =================================================================
-// SADIGS 3.0: SELECT ROLE (AFTER LOGIN)
-// =================================================================
-ob_start();
 require_once 'db_connect.php';
 
 if (session_status() === PHP_SESSION_NONE) {
@@ -10,75 +6,47 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 if (!isset($_SESSION['user_id'])) {
-    sendJSONResponse(['success' => false, 'message' => 'Akses ditolak.'], 401);
+    sendJSONResponse(['success' => false, 'message' => 'Sesi tidak valid.'], 401);
+    exit;
 }
 
-$data = json_decode(file_get_contents("php://input"), true);
-$roles = $data['roles'] ?? [];
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $input = json_decode(file_get_contents('php://input'), true);
+    $selected_roles = $input['roles'] ?? [];
+    $user_id = $_SESSION['user_id'];
 
-if (empty($roles) || !is_array($roles)) {
-    sendJSONResponse(['success' => false, 'message' => 'Setidaknya satu peran harus dipilih.'], 400);
-}
+    if (empty($selected_roles)) {
+        sendJSONResponse(['success' => false, 'message' => 'Pilih setidaknya satu peran.'], 400);
+        exit;
+    }
 
-try {
-    $pdo = getDBConnection();
-    
-    // 1. Cek Kuota (Looping untuk setiap peran)
-    // Ambil semua setting kuota dulu untuk efisiensi
-    $stmt_settings = $pdo->query("SELECT role_name, max_limit FROM quota_settings");
-    $quota_settings = $stmt_settings->fetchAll(PDO::FETCH_KEY_PAIR);
+    try {
+        $pdo = getDBConnection();
+        $pdo->beginTransaction();
 
-    foreach ($roles as $role) {
-        if (isset($quota_settings[$role]) && $quota_settings[$role] > 0) {
-            $max_limit = $quota_settings[$role];
-            
-            $sql_count = "SELECT COUNT(*) FROM user_roles ur JOIN users u ON ur.user_id = u.user_id WHERE ur.role_name = :role AND u.is_active = 1";
-            $stmt_count = $pdo->prepare($sql_count);
-            $stmt_count->execute(['role' => $role]);
-            $current_count = $stmt_count->fetchColumn();
+        // 1. Hapus peran lama jika ada (untuk kasus pengajuan ulang)
+        $stmt = $pdo->prepare("DELETE FROM user_roles WHERE user_id = ?");
+        $stmt->execute([$user_id]);
 
-            if ($current_count >= $max_limit) {
-                sendJSONResponse(['success' => false, 'message' => "Kuota untuk posisi '$role' sudah penuh."], 400);
-            }
+        // 2. Masukkan peran baru yang diajukan
+        $sql = "INSERT INTO user_roles (user_id, role_name, status) VALUES (?, ?, 'pending')";
+        $stmt = $pdo->prepare($sql);
+        foreach ($selected_roles as $role) {
+            $stmt->execute([$user_id, $role]);
         }
-    }
 
-    // 2. Mulai Transaksi
-    $pdo->beginTransaction();
+        // 3. **PENTING**: Jangan non-aktifkan akunnya. Biarkan is_active = 1
+        // agar user bisa login kembali dan melihat status "pending" di profilnya.
+        // Cukup hancurkan sesi agar mereka harus login ulang.
 
-    // Insert Roles (Looping)
-    $sql_insert_role = "INSERT INTO user_roles (user_id, role_name) VALUES (:user_id, :role_name)";
-    $stmt_role = $pdo->prepare($sql_insert_role);
+        $pdo->commit();
 
-    foreach ($roles as $role) {
-        $stmt_role->execute(['user_id' => $_SESSION['user_id'], 'role_name' => $role]);
-    }
+        session_destroy(); // Hancurkan sesi agar user harus login ulang
+        sendJSONResponse(['success' => true, 'message' => 'Peran berhasil diajukan. Silakan login kembali. Akun Anda sedang menunggu verifikasi.']);
 
-    // Update User jadi Non-Aktif (Menunggu Validasi)
-    $sql_update_user = "UPDATE users SET is_active = 0 WHERE user_id = :user_id";
-    $stmt_update = $pdo->prepare($sql_update_user);
-    $stmt_update->execute(['user_id' => $_SESSION['user_id']]);
-
-    $pdo->commit();
-
-    // Hapus sesi (Logout paksa)
-    $_SESSION = array();
-    if (ini_get("session.use_cookies")) {
-        $params = session_get_cookie_params();
-        setcookie(session_name(), '', time() - 42000, $params["path"], $params["domain"], $params["secure"], $params["httponly"]);
-    }
-    session_destroy();
-
-    sendJSONResponse([
-        'success' => true, 
-        'message' => 'Peran berhasil dipilih. Akun Anda sekarang menunggu validasi Yayasan.'
-    ]);
-
-} catch (\PDOException $e) {
-    if ($pdo->inTransaction()) {
+    } catch (Exception $e) {
         $pdo->rollBack();
+        sendJSONResponse(['success' => false, 'message' => 'Terjadi kesalahan server: ' . $e->getMessage()], 500);
     }
-    error_log("Select Role Error: " . $e->getMessage());
-    sendJSONResponse(['success' => false, 'message' => 'Terjadi kesalahan sistem.'], 500);
 }
 ?>
