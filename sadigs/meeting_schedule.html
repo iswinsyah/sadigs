@@ -144,9 +144,14 @@
                 if (sessionData.roles.some(r => pegawaiRoles.includes(r))) {
                     document.getElementById('navAbsensi').classList.remove('hidden');
                 }
-                // Menu Rapat (Pembuat)
-                const meetingRoles = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan', 'Kepala Sekolah', 'Kepala Asrama', 'Sekretaris Sekolah', 'Bendahara Sekolah', 'Musyrif', 'Ustadz'];
-                if (sessionData.roles.some(r => meetingRoles.includes(r))) {
+                
+                // Menu Jadwal Rapat (Semua yang bisa diundang)
+                // Karena ini halaman jadwal, menu ini aktif (tidak hidden), jadi tidak perlu di-unhide.
+                // Tapi kita perlu unhide menu Formulir jika user berhak.
+
+                // Menu Formulir Undangan Rapat (Hanya Pembuat)
+                const createMeetingRoles = ['Ketua Yayasan', 'Kepala Sekolah', 'Kepala Asrama'];
+                if (sessionData.roles.some(r => createMeetingRoles.includes(r))) {
                     document.getElementById('navRapat').classList.remove('hidden');
                 }
 

@@ -184,11 +184,16 @@
                     return;
                 }
                 
-                // Menu Rapat (Ketua Yayasan)
-                const meetingRoles = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan', 'Kepala Sekolah', 'Kepala Asrama', 'Sekretaris Sekolah', 'Bendahara Sekolah', 'Musyrif', 'Ustadz'];
-                if (sessionData.roles.some(r => meetingRoles.includes(r))) {
-                    document.getElementById('navRapat').classList.remove('hidden');
+                // Menu Jadwal Rapat (Semua yang bisa diundang)
+                const viewMeetingRoles = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan', 'Kepala Sekolah', 'Kepala Asrama', 'Sekretaris Sekolah', 'Bendahara Sekolah', 'Musyrif', 'Ustadz'];
+                if (sessionData.roles.some(r => viewMeetingRoles.includes(r))) {
                     document.getElementById('navJadwalRapat').classList.remove('hidden');
+                }
+
+                // Menu Formulir Undangan Rapat (Hanya Pembuat)
+                const createMeetingRoles = ['Ketua Yayasan', 'Kepala Sekolah', 'Kepala Asrama'];
+                if (sessionData.roles.some(r => createMeetingRoles.includes(r))) {
+                    document.getElementById('navRapat').classList.remove('hidden');
                 }
 
                 // 2. Ambil Data Kuota dari Database

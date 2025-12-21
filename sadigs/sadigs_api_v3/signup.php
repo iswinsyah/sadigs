@@ -1,71 +1,48 @@
 <?php
 // =================================================================
-// SADIGS 3.0: SIGNUP (CLEAN VERSION)
+// SADIGS 3.0: SIGNUP API
 // =================================================================
-
-// Buffer output untuk mencegah error HTML merusak JSON
-ob_start();
-
-// Pastikan db_connect dimuat
+header('Content-Type: application/json');
 require_once 'db_connect.php';
 
-// Pastikan metode request adalah POST
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    sendJSONResponse(array('success' => false, 'message' => 'Permintaan tidak sah.'), 400);
-}
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Ambil data JSON dari fetch()
+    $input = file_get_contents('php://input');
+    $data = json_decode($input, true);
 
-// Ambil data JSON
-$data = json_decode(file_get_contents("php://input"), true);
+    $username = trim($data['username'] ?? '');
+    $email = trim($data['email'] ?? '');
+    $gender = trim($data['gender'] ?? ''); // Tangkap data gender
+    $password = $data['password'] ?? '';
 
-// Validasi Input Dasar
-$username = $data['username'] ?? '';
-$email = $data['email'] ?? '';
-$password = $data['password'] ?? '';
-
-if (empty($username) || empty($email) || empty($password)) {
-    sendJSONResponse(array('success' => false, 'message' => 'Semua bidang wajib diisi.'), 400);
-}
-
-if (strlen($password) < 8) {
-    sendJSONResponse(array('success' => false, 'message' => 'Kata sandi minimal 8 karakter.'), 400);
-}
-
-try {
-    $pdo = getDBConnection();
-    
-    // 1. Cek Duplikasi Username/Email
-    $sql_check = "SELECT COUNT(*) FROM users WHERE username = :username OR email = :email";
-    $stmt_check = $pdo->prepare($sql_check);
-    $stmt_check->execute(['username' => $username, 'email' => $email]);
-    
-    if ($stmt_check->fetchColumn() > 0) {
-        sendJSONResponse(array('success' => false, 'message' => 'Username atau Email sudah terdaftar.'), 409);
+    // Validasi Input
+    if (empty($username) || empty($email) || empty($gender) || empty($password)) {
+        sendJSONResponse(['success' => false, 'message' => 'Semua kolom (termasuk Jenis Kelamin) wajib diisi.'], 400);
+        exit;
     }
 
-    // 2. Mulai Transaksi
-    $pdo->beginTransaction();
-    
-    // Hash Password
-    $password_hash = password_hash($password, PASSWORD_BCRYPT);
-    
-    // 3. Insert User (Default is_active = 1 agar bisa login ke dashboard untuk pilih peran)
-    $sql_insert_user = "INSERT INTO users (username, email, password_hash, is_active) VALUES (:username, :email, :password_hash, 1)";
-    $stmt_user = $pdo->prepare($sql_insert_user);
-    $stmt_user->execute(['username' => $username, 'email' => $email, 'password_hash' => $password_hash]);
-    $user_id = $pdo->lastInsertId();
+    try {
+        $pdo = getDBConnection();
 
-    // Commit
-    $pdo->commit();
+        // 1. Cek apakah username/email sudah ada
+        $stmt = $pdo->prepare("SELECT user_id FROM users WHERE username = ? OR email = ?");
+        $stmt->execute([$username, $email]);
+        if ($stmt->fetch()) {
+            sendJSONResponse(['success' => false, 'message' => 'Username atau Email sudah terdaftar.'], 409);
+            exit;
+        }
 
-    sendJSONResponse(array(
-        'success' => true,
-        'message' => 'Pendaftaran berhasil! Silakan login untuk memilih peran.'
-    ));
+        // 2. Hash Password & Simpan Data
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+        
+        $sql = "INSERT INTO users (username, email, gender, password_hash, created_at) VALUES (?, ?, ?, ?, NOW())";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$username, $email, $gender, $hashed_password]);
 
-} catch (\PDOException $e) {
-    if ($pdo->inTransaction()) {
-        $pdo->rollBack();
+        sendJSONResponse(['success' => true, 'message' => 'Akun berhasil dibuat. Silakan login.']);
+
+    } catch (Exception $e) {
+        sendJSONResponse(['success' => false, 'message' => 'Terjadi kesalahan server: ' . $e->getMessage()], 500);
     }
-    error_log("Signup DB Error: " . $e->getMessage());
-    sendJSONResponse(array('success' => false, 'message' => 'Terjadi kesalahan sistem saat pendaftaran.'), 500);
 }
+?>
