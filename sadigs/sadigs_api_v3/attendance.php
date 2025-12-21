@@ -59,7 +59,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        // 5. Simpan Absensi
+        // 5. Validasi Rapat (Jika kategori adalah Rapat)
+        if (in_array($category, ['Absensi Rapat Pekanan', 'Absensi Rapat Khusus'])) {
+            $today = date('Y-m-d');
+            // Cek apakah ada rapat hari ini
+            $stmtMeeting = $pdo->prepare("SELECT * FROM meetings WHERE meeting_date = :today");
+            $stmtMeeting->execute(['today' => $today]);
+            $meeting = $stmtMeeting->fetch();
+
+            if (!$meeting) {
+                sendJSONResponse(['success' => false, 'message' => "Tidak ada jadwal rapat yang ditemukan untuk hari ini ($today). Absensi ditolak."], 400);
+            }
+            // Opsional: Bisa ditambahkan validasi jam rapat (misal: absen hanya boleh 1 jam sebelum/sesudah jam rapat)
+        }
+
+        // 6. Simpan Absensi
         // Kita gunakan NOW() dari database untuk waktu yang tidak bisa dimanipulasi user
         $sql = "INSERT INTO attendance_logs (user_id, attendance_type, category, timestamp, latitude, longitude, address) 
                 VALUES (:uid, :type, :category, NOW(), :lat, :lng, :addr)";
