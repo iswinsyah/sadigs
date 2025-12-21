@@ -1,67 +1,52 @@
 <?php
-// =================================================================
-// SADIGS 3.0: UPDATE PROFILE
-// =================================================================
-ob_start();
 require_once 'db_connect.php';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Pastikan user login
 if (!isset($_SESSION['user_id'])) {
-    sendJSONResponse(['success' => false, 'message' => 'Akses ditolak.'], 401);
+    sendJSONResponse(['success' => false, 'message' => 'Sesi tidak valid.'], 401);
+    exit;
 }
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    sendJSONResponse(['success' => false, 'message' => 'Metode harus POST.'], 405);
-}
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $input = file_get_contents('php://input');
+    $data = json_decode($input, true);
 
-$data = json_decode(file_get_contents("php://input"), true);
-$user_id = $_SESSION['user_id']; // Ambil ID dari sesi demi keamanan
+    $full_name = $data['full_name'] ?? null;
+    $gender = $data['gender'] ?? null;
+    $bio = $data['bio'] ?? null;
+    $password = $data['password'] ?? null;
 
-$full_name = $data['full_name'] ?? '';
-$bio = $data['bio'] ?? '';
-$password = $data['password'] ?? '';
-
-try {
-    $pdo = getDBConnection();
-    
-    // Cek apakah user ingin ganti password
-    if (!empty($password)) {
-        if (strlen($password) < 8) {
-            sendJSONResponse(['success' => false, 'message' => 'Password baru minimal 8 karakter.'], 400);
-        }
-        $password_hash = password_hash($password, PASSWORD_BCRYPT);
-        
-        // Update Data + Password
-        $sql = "UPDATE users SET full_name = :full_name, bio = :bio, password_hash = :password_hash WHERE user_id = :user_id";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([
-            'full_name' => $full_name,
-            'bio' => $bio,
-            'password_hash' => $password_hash,
-            'user_id' => $user_id
-        ]);
-    } else {
-        // Update Data Saja (Tanpa Password)
-        $sql = "UPDATE users SET full_name = :full_name, bio = :bio WHERE user_id = :user_id";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([
-            'full_name' => $full_name,
-            'bio' => $bio,
-            'user_id' => $user_id
-        ]);
+    if (empty($gender) || !in_array($gender, ['Laki-laki', 'Perempuan'])) {
+        sendJSONResponse(['success' => false, 'message' => 'Jenis kelamin tidak valid.'], 400);
+        exit;
     }
 
-    sendJSONResponse([
-        'success' => true, 
-        'message' => 'Profil berhasil diperbarui.'
-    ]);
+    try {
+        $pdo = getDBConnection();
+        
+        $sql = "UPDATE users SET full_name = ?, gender = ?, bio = ? WHERE user_id = ?";
+        $params = [$full_name, $gender, $bio, $_SESSION['user_id']];
 
-} catch (\PDOException $e) {
-    error_log("Update Profile Error: " . $e->getMessage());
-    sendJSONResponse(['success' => false, 'message' => 'Gagal memperbarui profil.'], 500);
+        if (!empty($password)) {
+            if (strlen($password) < 8) {
+                sendJSONResponse(['success' => false, 'message' => 'Password baru harus minimal 8 karakter.'], 400);
+                exit;
+            }
+            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+            $sql = "UPDATE users SET full_name = ?, gender = ?, bio = ?, password_hash = ? WHERE user_id = ?";
+            $params = [$full_name, $gender, $bio, $hashed_password, $_SESSION['user_id']];
+        }
+        
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+
+        sendJSONResponse(['success' => true, 'message' => 'Profil berhasil diperbarui.']);
+
+    } catch (Exception $e) {
+        sendJSONResponse(['success' => false, 'message' => 'Terjadi kesalahan server: ' . $e->getMessage()], 500);
+    }
 }
 ?>

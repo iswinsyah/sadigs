@@ -27,3 +27,4 @@ session_destroy();
 // Redirect ke halaman login (index.html)
 header("Location: ../index.html"); 
 exit;
+?>
