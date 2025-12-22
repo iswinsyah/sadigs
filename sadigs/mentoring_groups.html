@@ -150,7 +150,7 @@
 
         async function loadMusyrifs() {
             try {
-                const res = await fetch('sadigs_api_v3/get_musyrifs.php');
+                const res = await fetch('sadigs_api_v3/get_musyrifs.php?t=' + new Date().getTime());
                 const result = await res.json();
                 if (result.success) {
                     availableMusyrifs = result.data;
@@ -161,8 +161,9 @@
         async function loadMentoringData() {
             const tbody = document.getElementById('mentoringTableBody');
             try {
-                const res = await fetch('sadigs_api_v3/get_mentoring_groups.php');
+                const res = await fetch('sadigs_api_v3/get_mentoring_groups.php?t=' + new Date().getTime());
                 const result = await res.json();
+                console.log("Data Mentoring:", result); // Debugging di Console
 
                 if (!result.success) {
                     tbody.innerHTML = `<tr><td colspan="3" class="px-6 py-10 text-center text-red-500">Gagal memuat data: ${result.message}</td></tr>`;
