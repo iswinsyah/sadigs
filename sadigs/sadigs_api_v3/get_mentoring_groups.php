@@ -15,8 +15,10 @@ $pdo = getDBConnection();
 try {
     // Ambil semua santri dan musyrifnya (LEFT JOIN agar santri yang belum dapat musyrif tetap muncul)
     $sql = "SELECT 
+                s.user_id AS student_id,
                 s.username AS student_username,
                 s.full_name AS student_name,
+                ma.musyrif_id,
                 m.username AS musyrif_username
             FROM users s
             JOIN user_roles ur ON s.user_id = ur.user_id

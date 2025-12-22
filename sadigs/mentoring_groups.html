@@ -65,7 +65,7 @@
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">No</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Username Santri</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Nama Santri</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Username Musyrif</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Musyrif Pembimbing</th>
                             </tr>
                         </thead>
                         <tbody id="mentoringTableBody" class="bg-white divide-y divide-gray-200">
@@ -85,22 +85,78 @@
         // Mobile Menu Logic
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
         const sidebar = document.getElementById('sidebar');
-        if(mobileMenuBtn && sidebar) {
-            mobileMenuBtn.addEventListener('click', () => {
-                sidebar.classList.toggle('hidden');
-                sidebar.classList.toggle('flex');
-                sidebar.classList.toggle('absolute');
-                sidebar.classList.toggle('z-50');
-                sidebar.classList.toggle('h-full');
-            });
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        function toggleSidebar() {
+            sidebar.classList.toggle('-translate-x-full');
+            sidebarOverlay.classList.toggle('hidden');
         }
+        mobileMenuBtn.addEventListener('click', toggleSidebar);
+        sidebarOverlay.addEventListener('click', toggleSidebar);
+
+        let availableMusyrifs = [];
+        let canEdit = false;
 
         async function initPage() {
             const sessionRes = await fetch('sadigs_api_v3/session_check.php');
             const sessionData = await sessionRes.json();
             if (!sessionData.success) { window.location.href = 'index.html'; return; }
 
+            // FIX: Arahkan Walisantri langsung ke halaman pemilihan anak
+            if (sessionData.roles.includes('Walisantri')) {
+                const biodataLink = document.getElementById('navBiodataSantri');
+                if (biodataLink) {
+                    biodataLink.href = 'select_student.html';
+                }
+            }
+
+            document.getElementById('sidebarUsername').textContent = sessionData.username;
+            document.getElementById('userInitial').textContent = sessionData.username.charAt(0).toUpperCase();
+            document.getElementById('sidebarRole').textContent = sessionData.roles[0] || 'User';
+
+            // --- LOGIKA MENU DINAMIS (DATABASE) ---
+            // Ini memastikan halaman ini hanya bisa diakses jika diizinkan di Manajemen Akses
+            try {
+                const permRes = await fetch('sadigs_api_v3/get_menu_permissions.php');
+                const permData = await permRes.json();
+                if (permData.success) {
+                    const allowedMenus = permData.permissions || [];
+                    
+                    // 1. Cek Izin Halaman Ini
+                    if (!allowedMenus.includes('navMentoring')) {
+                        alert('Akses Ditolak. Anda tidak memiliki izin untuk mengakses fitur Kelompok Mentoring.');
+                        window.location.href = 'dashboard.html';
+                        return;
+                    }
+
+                    // 2. Tampilkan Menu Sidebar
+                    allowedMenus.forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) el.classList.remove('hidden');
+                    });
+                    if (document.querySelector('#menuYayasan a:not(.hidden)')) document.getElementById('menuYayasan').classList.remove('hidden');
+                    if (document.querySelector('#groupKhusus a:not(.hidden)')) document.getElementById('groupKhusus').classList.remove('hidden');
+                    if (document.querySelector('#groupSantri a:not(.hidden)')) document.getElementById('groupSantri').classList.remove('hidden');
+                }
+            } catch (e) { console.error("Gagal memuat izin menu:", e); }
+
+            // Cek hak akses edit (Hanya Yayasan, Kepala Sekolah, Kepala Asrama)
+            const editRoles = ['Ketua Yayasan', 'Kepala Sekolah', 'Kepala Asrama'];
+            canEdit = sessionData.roles.some(r => editRoles.includes(r));
+
+            if (canEdit) {
+                await loadMusyrifs();
+            }
             loadMentoringData();
+        }
+
+        async function loadMusyrifs() {
+            try {
+                const res = await fetch('sadigs_api_v3/get_musyrifs.php');
+                const result = await res.json();
+                if (result.success) {
+                    availableMusyrifs = result.data;
+                }
+            } catch (e) { console.error("Gagal memuat musyrif", e); }
         }
 
         async function loadMentoringData() {
@@ -114,13 +170,32 @@
                     result.data.forEach((row, index) => {
                         const tr = document.createElement('tr');
                         tr.className = "hover:bg-gray-50 transition";
+                        
+                        // Render Dropdown jika punya akses edit, Text biasa jika tidak
+                        let musyrifCellContent = '';
+                        if (canEdit) {
+                            let options = `<option value="">-- Pilih Musyrif --</option>`;
+                            availableMusyrifs.forEach(m => {
+                                const selected = (row.musyrif_id == m.user_id) ? 'selected' : '';
+                                options += `<option value="${m.user_id}" ${selected}>${m.full_name} (${m.username})</option>`;
+                            });
+                            
+                            musyrifCellContent = `
+                                <select onchange="assignMusyrif(${row.student_id}, this.value)" class="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-utama outline-none bg-white">
+                                    ${options}
+                                </select>
+                            `;
+                        } else {
+                            musyrifCellContent = row.musyrif_username 
+                                ? `<span class="px-2 py-1 bg-blue-50 text-blue-700 rounded-md font-medium text-xs">${row.musyrif_username}</span>` 
+                                : '<span class="text-gray-400 italic">Belum ditentukan</span>';
+                        }
+
                         tr.innerHTML = `
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${index + 1}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${row.student_username}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${row.student_name || '-'}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                                ${row.musyrif_username ? `<span class="px-2 py-1 bg-blue-50 text-blue-700 rounded-md font-medium text-xs">${row.musyrif_username}</span>` : '<span class="text-gray-400 italic">Belum ditentukan</span>'}
-                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${musyrifCellContent}</td>
                         `;
                         tbody.appendChild(tr);
                     });
@@ -132,6 +207,33 @@
                 tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-10 text-center text-red-500">Gagal memuat data.</td></tr>';
             }
         }
+
+        async function assignMusyrif(studentId, musyrifId) {
+            if (!musyrifId) return; // Jangan proses jika memilih opsi kosong
+
+            try {
+                const res = await fetch('sadigs_api_v3/assign_mentor.php', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ student_id: studentId, musyrif_id: musyrifId })
+                });
+                const result = await res.json();
+                
+                if (result.success) {
+                    // Opsional: Tampilkan notifikasi kecil (toast)
+                    // alert('Berhasil disimpan'); 
+                } else {
+                    alert('Gagal menyimpan: ' + result.message);
+                }
+            } catch (e) {
+                alert('Terjadi kesalahan koneksi.');
+            }
+        }
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            if(confirm('Keluar aplikasi?')) window.location.href = 'sadigs_api_v3/logout.php';
+        });
 
         initPage();
     </script>
