@@ -32,7 +32,39 @@
             </header>
 
             <div class="max-w-3xl bg-white p-8 rounded-xl shadow-sm border border-gray-100">
-                <form id="studentForm" class="space-y-6">
+                <!-- PENTING: enctype diperlukan untuk upload file -->
+                <form id="studentForm" class="space-y-6" enctype="multipart/form-data">
+                    
+                    <!-- UPLOAD DOKUMEN -->
+                    <div class="border-b pb-6">
+                        <h3 class="text-lg font-bold text-teal-800 mb-4 flex items-center gap-2"><i data-lucide="upload-cloud" class="w-5 h-5"></i> Upload Dokumen (Opsional)</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                            <!-- Foto Santri -->
+                            <div class="flex flex-col items-center">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">1. Foto Santri (3x4)</label>
+                                <img id="photo_preview" src="https://via.placeholder.com/150x200.png?text=Foto+Santri" alt="Preview Foto" class="w-32 h-40 object-cover rounded-lg shadow-md mb-2 bg-gray-100">
+                                <input type="file" name="student_photo" accept="image/*" class="text-xs text-gray-600 file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100">
+                            </div>
+                            <!-- Dokumen Lain -->
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">2. Foto Kartu Keluarga</label>
+                                    <div id="kk_status" class="flex items-center gap-2 text-sm text-gray-500"></div>
+                                    <input type="file" name="kk_photo" accept="image/*,application/pdf" class="text-xs text-gray-600 file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">3. Foto Akte Kelahiran</label>
+                                    <div id="birth_cert_status" class="flex items-center gap-2 text-sm text-gray-500"></div>
+                                    <input type="file" name="birth_cert_photo" accept="image/*,application/pdf" class="text-xs text-gray-600 file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">4. Foto Ijazah Terakhir</label>
+                                    <div id="ijazah_status" class="flex items-center gap-2 text-sm text-gray-500"></div>
+                                    <input type="file" name="ijazah_photo" accept="image/*,application/pdf" class="text-xs text-gray-600 file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     
                     <!-- 1. DATA DIRI SANTRI -->
                     <div class="border-b pb-4">
@@ -287,9 +319,37 @@
                     if(d.parent_phone) form.querySelector('[name="parent_phone"]').value = d.parent_phone;
                     if(d.guardian_job) form.querySelector('[name="guardian_job"]').value = d.guardian_job;
                     if(d.guardian_address) form.querySelector('[name="guardian_address"]').value = d.guardian_address;
+
+                    // Update UI untuk file yang sudah ada
+                    if(d.student_photo_path) {
+                        document.getElementById('photo_preview').src = d.student_photo_path + '?t=' + new Date().getTime(); // Cache busting
+                    }
+                    updateFileStatus('kk_status', d.kk_photo_path, 'Kartu Keluarga');
+                    updateFileStatus('birth_cert_status', d.birth_cert_photo_path, 'Akte Kelahiran');
+                    updateFileStatus('ijazah_status', d.ijazah_photo_path, 'Ijazah');
                 }
             } catch (e) { console.error(e); }
         }
+
+        // Helper untuk menampilkan status file
+        function updateFileStatus(elementId, path, docName) {
+            const el = document.getElementById(elementId);
+            if (path) {
+                el.innerHTML = `<i data-lucide="check-circle" class="w-4 h-4 text-green-500"></i> <a href="${path}" target="_blank" class="text-green-600 hover:underline">Sudah terupload. Lihat file.</a>`;
+            } else {
+                el.innerHTML = `<i data-lucide="x-circle" class="w-4 h-4 text-gray-400"></i> Belum ada file.`;
+            }
+            lucide.createIcons();
+        }
+
+        // Preview foto santri saat dipilih
+        document.querySelector('[name="student_photo"]').addEventListener('change', function(e) {
+            if (e.target.files && e.target.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (event) => document.getElementById('photo_preview').src = event.target.result;
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
 
         document.getElementById('studentForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -297,18 +357,19 @@
             const originalText = btn.innerHTML;
             btn.disabled = true; btn.innerHTML = 'Menyimpan...';
 
+            // Gunakan FormData langsung karena ada file
             const formData = new FormData(e.target);
-            const data = Object.fromEntries(formData.entries());
 
             try {
                 const res = await fetch('sadigs_api_v3/student_data.php', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(data)
+                    // Hapus header Content-Type, browser akan set otomatis untuk FormData
+                    body: formData
                 });
                 const result = await res.json();
                 if (result.success) alert('Biodata berhasil disimpan!');
                 else alert('Gagal: ' + result.message);
+                window.location.reload(); // Reload halaman untuk lihat perubahan
             } catch (error) { alert('Terjadi kesalahan koneksi.'); }
             finally { btn.disabled = false; btn.innerHTML = originalText; }
         });
