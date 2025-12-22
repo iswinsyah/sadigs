@@ -33,6 +33,7 @@ if (isset($_SESSION['user_id'], $_SESSION['username'])) {
     // Sesi valid, kirimkan data ke dashboard.html
     sendJSONResponse(array(
         'success' => true,
+        'user_id' => $_SESSION['user_id'],
         'username' => $_SESSION['username'],
         'roles' => $approved_roles, // Hanya kirim peran yang sudah disetujui
         'raw_roles' => $raw_roles // Kirim data mentah untuk UI profil

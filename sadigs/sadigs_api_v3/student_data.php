@@ -12,13 +12,41 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $pdo = getDBConnection();
-$user_id = $_SESSION['user_id'];
+$logged_in_user_id = $_SESSION['user_id'];
+$logged_in_username = $_SESSION['username'];
+$roles = $_SESSION['roles'] ?? [];
+
+// Tentukan user_id target yang akan di-query
+$target_user_id = $logged_in_user_id; // Defaultnya adalah diri sendiri
+
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['id'])) {
+    $target_user_id = $_GET['id'];
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['target_user_id'])) {
+    $target_user_id = $_POST['target_user_id'];
+}
+
+// --- SECURITY CHECK ---
+// Jika user yang login adalah Walisantri dan mencoba mengakses data anak,
+// pastikan anak tersebut adalah anaknya.
+if (in_array('Walisantri', $roles) && $target_user_id != $logged_in_user_id) {
+    $stmt_check = $pdo->prepare("SELECT user_id FROM student_details WHERE user_id = ? AND parent_username = ?");
+    $stmt_check->execute([$target_user_id, $logged_in_username]);
+    if ($stmt_check->rowCount() == 0) {
+        sendJSONResponse(['success' => false, 'message' => 'Akses ditolak. Anda tidak berhak mengubah data santri ini.'], 403);
+        exit;
+    }
+} 
+// Jika user yang login adalah Santri, dia hanya boleh akses datanya sendiri.
+elseif (in_array('Santri', $roles) && $target_user_id != $logged_in_user_id) {
+    sendJSONResponse(['success' => false, 'message' => 'Akses ditolak. Anda hanya bisa mengubah data diri sendiri.'], 403);
+    exit;
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     try {
         // Ambil data gabungan dari users dan student_details
         $stmt = $pdo->prepare("SELECT u.username, u.full_name, u.gender, sd.* FROM users u LEFT JOIN student_details sd ON u.user_id = sd.user_id WHERE u.user_id = ?");
-        $stmt->execute([$user_id]);
+        $stmt->execute([$target_user_id]);
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
         
         // Jika belum ada data, kirim object kosong agar frontend tidak error
@@ -38,7 +66,7 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         define('UPLOAD_DIR', __DIR__ . '/uploads/student_docs/');
         if (!is_dir(UPLOAD_DIR)) mkdir(UPLOAD_DIR, 0777, true);
 
-        function handle_upload($file_key, $user_id, $doc_type, $pdo) {
+        function handle_upload($file_key, $target_user_id, $doc_type, $pdo) {
             if (isset($_FILES[$file_key]) && $_FILES[$file_key]['error'] === UPLOAD_ERR_OK) {
                 // Validasi Ukuran File (Maksimal 2MB = 2 * 1024 * 1024 bytes)
                 if ($_FILES[$file_key]['size'] > 2 * 1024 * 1024) {
@@ -47,7 +75,7 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 // Hapus file lama jika ada
                 $stmt_old = $pdo->prepare("SELECT {$doc_type}_path FROM student_details WHERE user_id = ?");
-                $stmt_old->execute([$user_id]);
+                $stmt_old->execute([$target_user_id]);
                 $old_path = $stmt_old->fetchColumn();
                 if ($old_path && file_exists(__DIR__ . '/' . $old_path)) {
                     unlink(__DIR__ . '/' . $old_path);
@@ -55,7 +83,7 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 $file = $_FILES[$file_key];
                 $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
-                $filename = "{$user_id}_{$doc_type}_" . time() . "." . $ext;
+                $filename = "{$target_user_id}_{$doc_type}_" . time() . "." . $ext;
                 $destination = UPLOAD_DIR . $filename;
                 
                 if (move_uploaded_file($file['tmp_name'], $destination)) {
@@ -67,15 +95,15 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $paths = [
-            'student_photo_path' => handle_upload('student_photo', $user_id, 'student_photo', $pdo),
-            'kk_photo_path' => handle_upload('kk_photo', $user_id, 'kk_photo', $pdo),
-            'birth_cert_photo_path' => handle_upload('birth_cert_photo', $user_id, 'birth_cert', $pdo),
-            'ijazah_photo_path' => handle_upload('ijazah_photo', $user_id, 'ijazah', $pdo),
+            'student_photo_path' => handle_upload('student_photo', $target_user_id, 'student_photo', $pdo),
+            'kk_photo_path' => handle_upload('kk_photo', $target_user_id, 'kk_photo', $pdo),
+            'birth_cert_photo_path' => handle_upload('birth_cert_photo', $target_user_id, 'birth_cert', $pdo),
+            'ijazah_photo_path' => handle_upload('ijazah_photo', $target_user_id, 'ijazah', $pdo),
         ];
 
         // Ambil path lama jika tidak ada upload baru, agar tidak terhapus
         $stmt_current = $pdo->prepare("SELECT student_photo_path, kk_photo_path, birth_cert_photo_path, ijazah_photo_path FROM student_details WHERE user_id = ?");
-        $stmt_current->execute([$user_id]);
+        $stmt_current->execute([$target_user_id]);
         $current_paths = $stmt_current->fetch(PDO::FETCH_ASSOC);
         if ($current_paths) {
             foreach ($paths as $key => &$value) {
@@ -103,7 +131,7 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!empty($new_username)) {
             // Cek apakah username ini dipakai orang lain (bukan diri sendiri)
             $stmtCheckUser = $pdo->prepare("SELECT user_id FROM users WHERE username = ? AND user_id != ?");
-            $stmtCheckUser->execute([$new_username, $user_id]);
+            $stmtCheckUser->execute([$new_username, $target_user_id]);
             if ($stmtCheckUser->rowCount() > 0) {
                 sendJSONResponse(['success' => false, 'message' => "Username Santri '$new_username' sudah digunakan oleh akun lain."], 409);
                 exit;
@@ -119,7 +147,7 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $input['username'] ?? '',
             $input['full_name'] ?? '',
             $input['gender'] ?? '',
-            $user_id
+            $target_user_id
         ]);
 
         // 2. Update Detail Santri (Student Details Table)
@@ -161,7 +189,7 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
-            'uid' => $user_id,
+            'uid' => $target_user_id,
             's_photo' => $paths['student_photo_path'],
             'ijazah_photo' => $paths['ijazah_photo_path'],
             'kk_photo' => $paths['kk_photo_path'],

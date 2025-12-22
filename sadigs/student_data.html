@@ -259,7 +259,13 @@
                     </div>
 
                     <div class="flex justify-end pt-4">
-                        <button type="submit" id="saveBtn" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-8 rounded-lg transition shadow-md flex items-center gap-2">
+                        <button type="button" id="editBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition shadow-md flex items-center gap-2">
+                            <i data-lucide="edit" class="w-5 h-5"></i> Edit Data
+                        </button>
+                        <button type="button" id="cancelBtn" class="hidden ml-2 bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-8 rounded-lg transition shadow-md flex items-center gap-2">
+                            <i data-lucide="x" class="w-5 h-5"></i> Batal
+                        </button>
+                        <button type="submit" id="saveBtn" class="hidden ml-2 bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-8 rounded-lg transition shadow-md flex items-center gap-2">
                             <i data-lucide="save" class="w-5 h-5"></i> Simpan Biodata
                         </button>
                     </div>
@@ -270,6 +276,7 @@
 
     <script>
         lucide.createIcons();
+        let targetUserId = null;
 
         async function initPage() {
             // Cek Sesi
@@ -277,9 +284,47 @@
             const sessionData = await sessionRes.json();
             if (!sessionData.success) { window.location.href = 'index.html'; return; }
 
+            const urlParams = new URLSearchParams(window.location.search);
+            const idFromUrl = urlParams.get('id');
+
+            // Logika Pengalihan dan Penentuan ID Target
+            if (sessionData.roles.includes('Walisantri')) {
+                if (!idFromUrl) {
+                    // Jika Walisantri akses tanpa ID, arahkan ke halaman pemilihan anak
+                    window.location.href = 'select_student.html';
+                    return;
+                }
+                targetUserId = idFromUrl;
+            } else if (sessionData.roles.includes('Santri')) {
+                // Santri hanya bisa edit data diri sendiri, abaikan ID di URL
+                targetUserId = sessionData.user_id; // Mengasumsikan session_check.php mengembalikan user_id
+            } else {
+                // Role lain (misal admin) yang mungkin diberi akses
+                if (!idFromUrl) {
+                    alert('Harap tentukan ID santri yang akan dilihat.');
+                    window.location.href = 'dashboard.html';
+                    return;
+                }
+                targetUserId = idFromUrl;
+            }
+            
+            // Jika user_id tidak ada di session_check untuk Santri, biarkan backend yang menentukan dari sesi
+            if (sessionData.roles.includes('Santri')) {
+                targetUserId = null; 
+            }
+
             // Load Data
             try {
-                const res = await fetch('sadigs_api_v3/student_data.php');
+                const apiUrl = targetUserId ? `sadigs_api_v3/student_data.php?id=${targetUserId}` : 'sadigs_api_v3/student_data.php';
+                const res = await fetch(apiUrl);
+
+                if (!res.ok) {
+                    const errorResult = await res.json();
+                    alert(`Error: ${errorResult.message}`);
+                    window.location.href = 'dashboard.html';
+                    return;
+                }
+
                 const result = await res.json();
                 if (result.success && result.data) {
                     const d = result.data;
@@ -328,6 +373,8 @@
                     updateFileStatus('birth_cert_status', d.birth_cert_photo_path, 'Akte Kelahiran');
                     updateFileStatus('ijazah_status', d.ijazah_photo_path, 'Ijazah');
                 }
+                // Setelah data dimuat, set form ke mode read-only
+                setFormReadOnly(true);
             } catch (e) { console.error(e); }
         }
 
@@ -351,21 +398,53 @@
             }
         });
 
+        function setFormReadOnly(isReadOnly) {
+            const form = document.getElementById('studentForm');
+            const inputs = form.querySelectorAll('input, select, textarea');
+            
+            inputs.forEach(input => {
+                input.disabled = isReadOnly;
+            });
+
+            document.getElementById('editBtn').classList.toggle('hidden', !isReadOnly);
+            document.getElementById('cancelBtn').classList.toggle('hidden', isReadOnly);
+            document.getElementById('saveBtn').classList.toggle('hidden', isReadOnly);
+        }
+
+        document.getElementById('editBtn').addEventListener('click', () => {
+            setFormReadOnly(false);
+        });
+
+        document.getElementById('cancelBtn').addEventListener('click', () => {
+            if (confirm('Anda yakin ingin membatalkan perubahan?')) {
+                window.location.reload();
+            }
+        });
+
         document.getElementById('studentForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('saveBtn');
             const originalText = btn.innerHTML;
             btn.disabled = true; btn.innerHTML = 'Menyimpan...';
 
-            // Gunakan FormData langsung karena ada file
             const formData = new FormData(e.target);
+
+            // Tambahkan target_user_id ke FormData jika ada (untuk POST request)
+            if (targetUserId) {
+                formData.append('target_user_id', targetUserId);
+            }
 
             try {
                 const res = await fetch('sadigs_api_v3/student_data.php', {
                     method: 'POST',
-                    // Hapus header Content-Type, browser akan set otomatis untuk FormData
                     body: formData
                 });
+
+                if (!res.ok) {
+                    const errorResult = await res.json();
+                    throw new Error(errorResult.message);
+                }
+
                 const result = await res.json();
                 if (result.success) alert('Biodata berhasil disimpan!');
                 else alert('Gagal: ' + result.message);
