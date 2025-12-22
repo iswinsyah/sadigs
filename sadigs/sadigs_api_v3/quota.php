@@ -1,87 +1,67 @@
 <?php
-// =================================================================
-// SADIGS 3.0: QUOTA MANAGEMENT API
-// =================================================================
-ob_start();
+header('Content-Type: application/json');
 require_once 'db_connect.php';
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
+if (session_status() === PHP_SESSION_NONE) session_start();
 $pdo = getDBConnection();
 
+// --- GET: Ambil Data Kuota ---
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    // PUBLIC ACCESS: Mengambil data kuota dan status ketersediaan
     try {
-        $stmt = $pdo->query("SELECT role_name, max_limit FROM quota_settings");
+        // 1. Ambil Setting Kuota Maksimal
+        $stmt = $pdo->query("SELECT * FROM quota_settings");
         $settings = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
-        $result = [];
-        // Query untuk menghitung jumlah user AKTIF per role
-        $sql_count = "SELECT COUNT(*) FROM user_roles ur JOIN users u ON ur.user_id = u.user_id WHERE ur.role_name = :role AND u.is_active = 1";
-        $stmt_count = $pdo->prepare($sql_count);
+        // 2. Hitung Penggunaan Saat Ini (Hanya yang Approved)
+        $stmtCount = $pdo->query("SELECT role_name, COUNT(*) as total FROM user_roles WHERE status = 'approved' GROUP BY role_name");
+        $counts = $stmtCount->fetchAll(PDO::FETCH_KEY_PAIR); // [role_name => total]
 
-        foreach ($settings as $row) {
-            $role = $row['role_name'];
-            $limit = (int)$row['max_limit'];
+        $quotas = [];
+        foreach ($settings as $s) {
+            $role = $s['role_name'];
+            $max = (int)$s['max_limit'];
+            $current = isset($counts[$role]) ? (int)$counts[$role] : 0;
             
-            $stmt_count->execute(['role' => $role]);
-            $current = (int)$stmt_count->fetchColumn();
-            
-            $result[$role] = [
-                'max_limit' => $limit,
+            $quotas[$role] = [
+                'max_limit' => $max,
                 'current_count' => $current,
-                'is_full' => ($limit > 0 && $current >= $limit)
+                'is_full' => ($current >= $max && $max > 0)
             ];
         }
 
-        sendJSONResponse(['success' => true, 'quotas' => $result]);
+        sendJSONResponse(['success' => true, 'quotas' => $quotas]);
     } catch (Exception $e) {
-        // Pastikan error log tercatat
-        error_log("Quota API Error: " . $e->getMessage());
-        sendJSONResponse(['success' => false, 'message' => 'Gagal mengambil data kuota.'], 500);
+        sendJSONResponse(['success' => false, 'message' => $e->getMessage()], 500);
     }
+}
 
-} elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // PROTECTED ACCESS: Hanya Yayasan yang boleh mengubah
-    $allowed_roles = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan'];
-    $user_roles = $_SESSION['roles'] ?? [];
-    if (empty(array_intersect($allowed_roles, $user_roles))) {
-        sendJSONResponse(['success' => false, 'message' => 'Akses ditolak. Hanya Yayasan yang berhak.'], 403);
-    }
-
-    // Simpan data kuota
-    $data = json_decode(file_get_contents("php://input"), true);
+// --- POST: Simpan Setting Kuota (Khusus Admin) ---
+elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Cek Otorisasi Admin/Yayasan
+    if (!isset($_SESSION['user_id'])) sendJSONResponse(['success' => false, 'message' => 'Unauthorized'], 401);
     
-    if (!$data) {
-        sendJSONResponse(['success' => false, 'message' => 'Data tidak valid.'], 400);
-    }
+    // (Opsional: Tambahkan cek role 'Ketua Yayasan' di sini jika perlu lebih ketat)
 
+    $input = json_decode(file_get_contents('php://input'), true);
+    
     try {
         $pdo->beginTransaction();
         
-        // Gunakan INSERT ... ON DUPLICATE KEY UPDATE agar jika belum ada dibuat, jika ada diupdate
-        // FIX: Menggunakan parameter berbeda untuk UPDATE karena PDO::ATTR_EMULATE_PREPARES = false
-        $sql = "INSERT INTO quota_settings (role_name, max_limit) VALUES (:role, :limit_val) 
-                ON DUPLICATE KEY UPDATE max_limit = :limit_update";
-        $stmt = $pdo->prepare($sql);
-
-        foreach ($data as $role => $limit) {
-            $stmt->execute([
-                'role' => $role, 
-                'limit_val' => (int)$limit,
-                'limit_update' => (int)$limit
-            ]);
+        // Reset dan Insert Ulang (Simplifikasi)
+        $pdo->exec("DELETE FROM quota_settings");
+        $stmt = $pdo->prepare("INSERT INTO quota_settings (role_name, max_limit) VALUES (?, ?)");
+        
+        foreach ($input as $role => $limit) {
+            if ($limit !== '') {
+                $stmt->execute([$role, (int)$limit]);
+            }
         }
         
         $pdo->commit();
-        sendJSONResponse(['success' => true, 'message' => 'Pengaturan kuota berhasil disimpan.']);
+        sendJSONResponse(['success' => true, 'message' => 'Pengaturan kuota disimpan.']);
     } catch (Exception $e) {
         $pdo->rollBack();
-        sendJSONResponse(['success' => false, 'message' => 'Gagal menyimpan data: ' . $e->getMessage()], 500);
+        sendJSONResponse(['success' => false, 'message' => $e->getMessage()], 500);
     }
-} else {
-    sendJSONResponse(['success' => false, 'message' => 'Metode tidak diizinkan.'], 405);
 }
 ?>

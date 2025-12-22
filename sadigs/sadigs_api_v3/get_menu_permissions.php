@@ -1,32 +1,38 @@
 <?php
+header('Content-Type: application/json');
 require_once 'db_connect.php';
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
+if (session_status() === PHP_SESSION_NONE) session_start();
 if (!isset($_SESSION['user_id'])) {
     sendJSONResponse(['success' => false, 'message' => 'Unauthorized'], 401);
 }
 
-$user_roles = $_SESSION['roles'] ?? [];
-
-if (empty($user_roles)) {
-    sendJSONResponse(['success' => true, 'permissions' => []]); // Kirim array kosong jika tidak punya peran
-}
+$pdo = getDBConnection();
+$user_id = $_SESSION['user_id'];
 
 try {
-    $pdo = getDBConnection();
+    // 1. Ambil Role User yang APPROVED
+    $stmtRoles = $pdo->prepare("SELECT role_name FROM user_roles WHERE user_id = ? AND status = 'approved'");
+    $stmtRoles->execute([$user_id]);
+    $roles = $stmtRoles->fetchAll(PDO::FETCH_COLUMN);
+
+    if (empty($roles)) {
+        // Jika tidak ada role approved, tidak ada menu khusus yang tampil
+        sendJSONResponse(['success' => true, 'permissions' => []]);
+        exit;
+    }
+
+    // 2. Ambil Menu ID yang boleh dilihat oleh role-role tersebut
+    // Menggunakan IN clause
+    $placeholders = implode(',', array_fill(0, count($roles), '?'));
+    $sql = "SELECT DISTINCT menu_id FROM menu_permissions WHERE role_name IN ($placeholders) AND can_view = 1";
     
-    // Buat placeholder sebanyak jumlah peran
-    $placeholders = implode(',', array_fill(0, count($user_roles), '?'));
-    
-    $sql = "SELECT menu_id FROM menu_permissions WHERE role_name IN ($placeholders) AND can_view = TRUE";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute($user_roles);
-    $permissions = $stmt->fetchAll(PDO::FETCH_COLUMN, 0); // Ambil hanya kolom menu_id
-    
-    sendJSONResponse(['success' => true, 'permissions' => array_unique($permissions)]);
+    $stmtMenu = $pdo->prepare($sql);
+    $stmtMenu->execute($roles);
+    $allowedMenus = $stmtMenu->fetchAll(PDO::FETCH_COLUMN);
+
+    sendJSONResponse(['success' => true, 'permissions' => $allowedMenus]);
+
 } catch (Exception $e) {
     sendJSONResponse(['success' => false, 'message' => $e->getMessage()], 500);
 }

@@ -1,52 +1,44 @@
 <?php
+header('Content-Type: application/json');
 require_once 'db_connect.php';
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
+if (session_status() === PHP_SESSION_NONE) session_start();
 if (!isset($_SESSION['user_id'])) {
-    sendJSONResponse(['success' => false, 'message' => 'Sesi tidak valid.'], 401);
-    exit;
+    sendJSONResponse(['success' => false, 'message' => 'Unauthorized'], 401);
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $input = json_decode(file_get_contents('php://input'), true);
-    $selected_roles = $input['roles'] ?? [];
-    $user_id = $_SESSION['user_id'];
+$pdo = getDBConnection();
+$user_id = $_SESSION['user_id'];
+$input = json_decode(file_get_contents('php://input'), true);
+$roles = $input['roles'] ?? [];
 
-    if (empty($selected_roles)) {
-        sendJSONResponse(['success' => false, 'message' => 'Pilih setidaknya satu peran.'], 400);
-        exit;
-    }
+if (empty($roles)) {
+    sendJSONResponse(['success' => false, 'message' => 'Pilih minimal satu peran.'], 400);
+}
 
-    try {
-        $pdo = getDBConnection();
-        $pdo->beginTransaction();
+try {
+    $pdo->beginTransaction();
 
-        // 1. Hapus peran lama jika ada (untuk kasus pengajuan ulang)
-        $stmt = $pdo->prepare("DELETE FROM user_roles WHERE user_id = ?");
-        $stmt->execute([$user_id]);
+    $stmt = $pdo->prepare("INSERT INTO user_roles (user_id, role_name, status) VALUES (?, ?, ?)");
 
-        // 2. Masukkan peran baru yang diajukan
-        $sql = "INSERT INTO user_roles (user_id, role_name, status) VALUES (?, ?, 'pending')";
-        $stmt = $pdo->prepare($sql);
-        foreach ($selected_roles as $role) {
-            $stmt->execute([$user_id, $role]);
+    foreach ($roles as $role) {
+        // Cek duplikasi
+        $check = $pdo->prepare("SELECT id FROM user_roles WHERE user_id = ? AND role_name = ?");
+        $check->execute([$user_id, $role]);
+        
+        if ($check->rowCount() == 0) {
+            // Default status: PENDING
+            // Kecuali Santri/Walisantri jika Anda ingin auto-approve, ubah di sini.
+            // Sesuai request: "menunggu akunnya aktifasi oleh admin", jadi semua PENDING.
+            $stmt->execute([$user_id, $role, 'pending']);
         }
-
-        // 3. **PENTING**: Jangan non-aktifkan akunnya. Biarkan is_active = 1
-        // agar user bisa login kembali dan melihat status "pending" di profilnya.
-        // Cukup hancurkan sesi agar mereka harus login ulang.
-
-        $pdo->commit();
-
-        session_destroy(); // Hancurkan sesi agar user harus login ulang
-        sendJSONResponse(['success' => true, 'message' => 'Peran berhasil diajukan. Silakan login kembali. Akun Anda sedang menunggu verifikasi.']);
-
-    } catch (Exception $e) {
-        $pdo->rollBack();
-        sendJSONResponse(['success' => false, 'message' => 'Terjadi kesalahan server: ' . $e->getMessage()], 500);
     }
+
+    $pdo->commit();
+    sendJSONResponse(['success' => true, 'message' => 'Peran berhasil diajukan. Mohon tunggu verifikasi admin.']);
+
+} catch (Exception $e) {
+    $pdo->rollBack();
+    sendJSONResponse(['success' => false, 'message' => 'Gagal menyimpan: ' . $e->getMessage()], 500);
 }
 ?>

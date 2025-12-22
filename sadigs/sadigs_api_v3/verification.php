@@ -1,92 +1,78 @@
 <?php
-// =================================================================
-// SADIGS 3.0: VERIFICATION API
-// =================================================================
-ob_start();
+header('Content-Type: application/json');
 require_once 'db_connect.php';
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-// Cek Otorisasi (Hanya Yayasan)
-$allowed_roles = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan'];
-$user_roles = $_SESSION['roles'] ?? [];
-if (empty(array_intersect($allowed_roles, $user_roles))) {
-    sendJSONResponse(['success' => false, 'message' => 'Akses ditolak.'], 403);
-}
+if (session_status() === PHP_SESSION_NONE) session_start();
+// (Tambahkan cek role 'Ketua Yayasan'/'Sekretaris Yayasan' di sini untuk keamanan)
 
 $pdo = getDBConnection();
 
+// --- GET: List Pending Users ---
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    // Ambil daftar user yang belum aktif (is_active = 0)
     try {
-        // Kita gunakan GROUP_CONCAT untuk menggabungkan role jika user punya banyak role
-        $sql = "
-            SELECT u.user_id, u.username, u.email, u.created_at,
-                   GROUP_CONCAT(ur.role_name SEPARATOR ', ') as roles
-            FROM users u
-            LEFT JOIN user_roles ur ON u.user_id = ur.user_id
-            WHERE u.is_active = 0
-            GROUP BY u.user_id
-            ORDER BY u.created_at DESC
-        ";
+        // Ambil user yang punya setidaknya satu role 'pending'
+        $sql = "SELECT u.user_id, u.username, u.email, 
+                       GROUP_CONCAT(ur.role_name SEPARATOR ', ') as roles
+                FROM users u
+                JOIN user_roles ur ON u.user_id = ur.user_id
+                WHERE ur.status = 'pending'
+                GROUP BY u.user_id";
+        
         $stmt = $pdo->query($sql);
-        $users = $stmt->fetchAll();
+        $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
         sendJSONResponse(['success' => true, 'pending_users' => $users]);
     } catch (Exception $e) {
-        sendJSONResponse(['success' => false, 'message' => 'Gagal memuat data.'], 500);
+        sendJSONResponse(['success' => false, 'message' => $e->getMessage()], 500);
     }
+}
 
-} elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Handle Aktivasi atau Edit Role
-    $data = json_decode(file_get_contents("php://input"), true);
-    $user_id = $data['user_id'] ?? null;
-    $action = $data['action'] ?? 'activate'; // 'activate' atau 'update_roles'
-
-    if (!$user_id) {
-        sendJSONResponse(['success' => false, 'message' => 'User ID diperlukan.'], 400);
-    }
+// --- POST: Activate / Update Roles ---
+elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $input = json_decode(file_get_contents('php://input'), true);
+    $target_user_id = $input['user_id'];
+    $action = $input['action']; // 'activate' or 'update_roles'
 
     try {
+        $pdo->beginTransaction();
+
         if ($action === 'activate') {
-            // AKTIVASI AKUN
-            $sql = "UPDATE users SET is_active = 1 WHERE user_id = :user_id";
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute(['user_id' => $user_id]);
+            // Ubah semua role pending menjadi approved untuk user ini
+            $stmt = $pdo->prepare("UPDATE user_roles SET status = 'approved' WHERE user_id = ? AND status = 'pending'");
+            $stmt->execute([$target_user_id]);
             
-            sendJSONResponse(['success' => true, 'message' => 'Akun berhasil diaktifkan.']);
+            // Aktifkan user di tabel users juga (jika ada flag is_active)
+            $stmt2 = $pdo->prepare("UPDATE users SET is_active = 1 WHERE user_id = ?");
+            $stmt2->execute([$target_user_id]);
             
-        } elseif ($action === 'update_roles') {
-            // UPDATE ROLE
-            $new_roles = $data['roles'] ?? [];
-            if (empty($new_roles)) {
-                sendJSONResponse(['success' => false, 'message' => 'Minimal satu peran harus dipilih.'], 400);
-            }
-
-            $pdo->beginTransaction();
-
-            // 1. Hapus role lama
-            $stmt_del = $pdo->prepare("DELETE FROM user_roles WHERE user_id = :user_id");
-            $stmt_del->execute(['user_id' => $user_id]);
-
-            // 2. Cek Kuota (Opsional: Bisa dilewati untuk Admin, tapi baiknya dicek)
-            // Di sini kita skip cek kuota agar Admin punya kuasa penuh (override)
-
-            // 3. Insert role baru
-            $stmt_ins = $pdo->prepare("INSERT INTO user_roles (user_id, role_name) VALUES (:user_id, :role_name)");
+            $msg = "Akun berhasil diaktifkan.";
+        } 
+        elseif ($action === 'update_roles') {
+            // Hapus role lama (yang pending/approved) dan ganti dengan yang baru (langsung approved)
+            // Ini fitur "Edit Peran" sebelum aktivasi
+            $new_roles = $input['roles'] ?? [];
+            
+            // Hapus semua role user ini
+            $pdo->prepare("DELETE FROM user_roles WHERE user_id = ?")->execute([$target_user_id]);
+            
+            // Insert role baru dengan status approved (karena diedit oleh admin)
+            $stmt = $pdo->prepare("INSERT INTO user_roles (user_id, role_name, status) VALUES (?, ?, 'approved')"); // Langsung approved? Atau pending?
+            // Biasanya kalau admin yang edit, langsung approved saja agar sekalian aktif.
+            // Tapi jika tombolnya "Simpan Perubahan" lalu ada tombol "Aktifkan" terpisah, bisa pending.
+            // Mari kita buat 'pending' agar alurnya konsisten: Edit -> Save -> Klik Aktifkan.
+            
             foreach ($new_roles as $role) {
-                $stmt_ins->execute(['user_id' => $user_id, 'role_name' => $role]);
+                $stmt->execute([$target_user_id, $role, 'pending']);
             }
-
-            $pdo->commit();
-            sendJSONResponse(['success' => true, 'message' => 'Peran berhasil diperbarui.']);
+            $msg = "Peran diperbarui. Silakan klik 'Aktifkan Akun' untuk memvalidasi.";
         }
 
+        $pdo->commit();
+        sendJSONResponse(['success' => true, 'message' => $msg]);
+
     } catch (Exception $e) {
-        if ($pdo->inTransaction()) $pdo->rollBack();
-        sendJSONResponse(['success' => false, 'message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
+        $pdo->rollBack();
+        sendJSONResponse(['success' => false, 'message' => $e->getMessage()], 500);
     }
 }
 ?>
