@@ -49,7 +49,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['roles'] = $approved_roles;
 
             // Tentukan halaman redirect
-            $redirect_path = ($has_pending_roles || empty($approved_roles)) ? 'profile.html' : 'dashboard.html';
+            // UPDATE: Selalu arahkan ke dashboard.html karena di sana sudah ada logika pemilihan peran
+            $redirect_path = 'dashboard.html';
 
             sendJSONResponse(['success' => true, 'message' => 'Login berhasil!', 'redirect_path' => $redirect_path]);
 

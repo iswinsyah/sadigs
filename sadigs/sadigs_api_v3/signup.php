@@ -35,7 +35,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // 2. Hash Password & Simpan Data
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
         
-        $sql = "INSERT INTO users (username, email, gender, password_hash, created_at) VALUES (?, ?, ?, ?, NOW())";
+        // UPDATE: Set is_active = 1 agar user bisa login untuk memilih peran
+        $sql = "INSERT INTO users (username, email, gender, password_hash, is_active, created_at) VALUES (?, ?, ?, ?, 1, NOW())";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$username, $email, $gender, $hashed_password]);
 
