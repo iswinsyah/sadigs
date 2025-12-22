@@ -164,7 +164,12 @@
                 const res = await fetch('sadigs_api_v3/get_mentoring_groups.php');
                 const result = await res.json();
 
-                if (result.success && result.data.length > 0) {
+                if (!result.success) {
+                    tbody.innerHTML = `<tr><td colspan="3" class="px-6 py-10 text-center text-red-500">Gagal memuat data: ${result.message}</td></tr>`;
+                    return;
+                }
+
+                if (result.data.length > 0) {
                     tbody.innerHTML = '';
                     result.data.forEach((row, index) => {
                         const tr = document.createElement('tr');
@@ -201,7 +206,7 @@
                         tbody.appendChild(tr);
                     });
                 } else {
-                    tbody.innerHTML = '<tr><td colspan="3" class="px-6 py-10 text-center text-gray-500">Belum ada data santri.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="3" class="px-6 py-10 text-center text-gray-500">Belum ada data santri yang aktif (approved). Pastikan santri sudah diverifikasi.</td></tr>';
                 }
             } catch (e) {
                 console.error(e);
