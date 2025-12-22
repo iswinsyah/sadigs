@@ -71,6 +71,14 @@
                         <a id="navCalendarSettings" href="calendar_settings.html" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="calendar-cog" class="w-5 h-5"></i> Atur Kalender</a>
                     </div>
                 </div>
+
+                <!-- Div 4: KESANTRIAN -->
+                <div id="groupSantri" class="hidden bg-gray-50 rounded-lg p-2 mt-2">
+                    <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KESANTRIAN</h3>
+                    <a id="navBiodataSantri" href="student_data.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="book-user" class="w-5 h-5"></i> Biodata Santri</a>
+                    <a id="navIbadahHarian" href="daily_worship_form.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="notebook-pen" class="w-5 h-5"></i> Ibadah Harian</a>
+                    <a id="navMentoring" href="mentoring_groups.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="users-round" class="w-5 h-5"></i> Kelompok Mentoring</a>
+                </div>
                 
                 <!-- Tombol Logout -->
                 <div class="pt-2">
@@ -183,6 +191,7 @@
                     window.location.href = 'dashboard.html';
                     return;
                 }
+                document.getElementById('groupSantri').classList.remove('hidden');
                 
                 // Menu Jadwal Rapat (Semua yang bisa diundang)
                 const viewMeetingRoles = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan', 'Kepala Sekolah', 'Kepala Asrama', 'Sekretaris Sekolah', 'Bendahara Sekolah', 'Musyrif', 'Ustadz'];

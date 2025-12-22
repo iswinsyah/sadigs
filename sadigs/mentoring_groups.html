@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelompok Mentoring | SADIGS 3.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Oswald:wght@700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'utama': '#4FB7B3',
+                        'kedua': '#26667F',
+                        'tombol-utama': '#3674B5',
+                        'tombol-kedua': '#F93827',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-white text-gray-800 font-sans antialiased">
+
+    <!-- HEADER MOBILE -->
+    <div class="lg:hidden flex items-center gap-4 bg-kedua text-white p-4 shadow-md sticky top-0 z-50">
+        <button id="mobileMenuBtn" class="focus:outline-none p-1 rounded hover:bg-kedua/80 transition"><i data-lucide="menu" class="w-7 h-7"></i></button>
+        <div class="font-bold text-xl flex items-center gap-2">
+            <img src="https://raw.githubusercontent.com/villaqurankotabatu-commits/gambarvqbm/f44bf009884af11aba2c967a2401026225f7b02b/vila%20quran.png" alt="Logo" class="h-8">
+        </div>
+    </div>
+
+    <div class="flex h-screen overflow-hidden">
+        <!-- SIDEBAR (Placeholder, akan di-load via JS jika menggunakan komponen terpisah, tapi disini kita hardcode sesuai template) -->
+        <aside id="sidebar" class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col hidden lg:flex">
+            <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-kedua text-white">
+                <img src="https://raw.githubusercontent.com/villaqurankotabatu-commits/gambarvqbm/f44bf009884af11aba2c967a2401026225f7b02b/vila%20quran.png" alt="Logo" class="h-9">
+            </div>
+            <div class="p-6">
+                <a href="dashboard.html" class="flex items-center gap-2 text-gray-600 hover:text-utama transition">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i> Kembali ke Dashboard
+                </a>
+            </div>
+        </aside>
+
+        <!-- KONTEN UTAMA -->
+        <main class="flex-1 overflow-y-auto bg-white p-4 lg:p-8 w-full relative">
+            <header class="mb-8">
+                <h2 class="text-2xl lg:text-3xl font-bold text-gray-800">Pembagian Kelompok Mentoring</h2>
+                <p class="text-gray-500 text-sm mt-1">Daftar pembagian kelompok mentoring santri dan musyrif.</p>
+            </header>
+
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">No</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Username Santri</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Nama Santri</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Username Musyrif</th>
+                            </tr>
+                        </thead>
+                        <tbody id="mentoringTableBody" class="bg-white divide-y divide-gray-200">
+                            <tr>
+                                <td colspan="4" class="px-6 py-10 text-center text-gray-500">Memuat data...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // Mobile Menu Logic
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const sidebar = document.getElementById('sidebar');
+        if(mobileMenuBtn && sidebar) {
+            mobileMenuBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('hidden');
+                sidebar.classList.toggle('flex');
+                sidebar.classList.toggle('absolute');
+                sidebar.classList.toggle('z-50');
+                sidebar.classList.toggle('h-full');
+            });
+        }
+
+        async function initPage() {
+            const sessionRes = await fetch('sadigs_api_v3/session_check.php');
+            const sessionData = await sessionRes.json();
+            if (!sessionData.success) { window.location.href = 'index.html'; return; }
+
+            loadMentoringData();
+        }
+
+        async function loadMentoringData() {
+            const tbody = document.getElementById('mentoringTableBody');
+            try {
+                const res = await fetch('sadigs_api_v3/get_mentoring_groups.php');
+                const result = await res.json();
+
+                if (result.success && result.data.length > 0) {
+                    tbody.innerHTML = '';
+                    result.data.forEach((row, index) => {
+                        const tr = document.createElement('tr');
+                        tr.className = "hover:bg-gray-50 transition";
+                        tr.innerHTML = `
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${index + 1}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${row.student_username}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${row.student_name || '-'}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                ${row.musyrif_username ? `<span class="px-2 py-1 bg-blue-50 text-blue-700 rounded-md font-medium text-xs">${row.musyrif_username}</span>` : '<span class="text-gray-400 italic">Belum ditentukan</span>'}
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-10 text-center text-gray-500">Belum ada data santri.</td></tr>';
+                }
+            } catch (e) {
+                console.error(e);
+                tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-10 text-center text-red-500">Gagal memuat data.</td></tr>';
+            }
+        }
+
+        initPage();
+    </script>
+</body>
+</html>

@@ -40,6 +40,9 @@ try {
         // --- MENU SANTRI ---
         'navBiodataSantri' => ['Santri', 'Walisantri'], // Walisantri juga bisa akses
         'navIbadahHarian' => ['Santri'], // Hanya santri yang bisa mengisi
+
+        // --- MENU MENTORING (BARU) ---
+        'navMentoring' => ['Ketua Yayasan', 'Kepala Sekolah', 'Kepala Asrama', 'Musyrif', 'Ustadz', 'Santri'],
     ];
 
     // 3. Eksekusi Insert
