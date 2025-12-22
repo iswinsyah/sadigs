@@ -32,34 +32,33 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     try {
         $sql = "INSERT INTO ibadah_harian (
-                    user_id, report_date, shalat_subuh, shalat_dzuhur, shalat_ashar, shalat_maghrib, shalat_isya,
-                    shalat_tahajud, shalat_dhuha, baca_quran, juz_quran, surat_quran, ayat_quran, infaq, notes
+                    user_id, report_date, shalat_subuh, shalat_dzuhur, shalat_ashar, shalat_maghrib, shalat_isya, shalat_tahajud, shalat_dhuha, 
+                    infaq, puasa_senin, puasa_kamis, quran_last_page, notes
                 ) VALUES (
-                    :uid, :r_date, :s_subuh, :s_dzuhur, :s_ashar, :s_maghrib, :s_isya,
-                    :s_tahajud, :s_dhuha, :b_quran, :j_quran, :surat_quran, :ayat_quran, :infaq, :notes
+                    :uid, :r_date, :s_subuh, :s_dzuhur, :s_ashar, :s_maghrib, :s_isya, :s_tahajud, :s_dhuha, 
+                    :infaq, :p_senin, :p_kamis, :q_page, :notes
                 )
                 ON DUPLICATE KEY UPDATE
                     shalat_subuh = VALUES(shalat_subuh), shalat_dzuhur = VALUES(shalat_dzuhur), shalat_ashar = VALUES(shalat_ashar),
                     shalat_maghrib = VALUES(shalat_maghrib), shalat_isya = VALUES(shalat_isya), shalat_tahajud = VALUES(shalat_tahajud),
-                    shalat_dhuha = VALUES(shalat_dhuha), baca_quran = VALUES(baca_quran), juz_quran = VALUES(juz_quran),
-                    surat_quran = VALUES(surat_quran), ayat_quran = VALUES(ayat_quran), infaq = VALUES(infaq), notes = VALUES(notes)";
+                    shalat_dhuha = VALUES(shalat_dhuha), infaq = VALUES(infaq), puasa_senin = VALUES(puasa_senin), puasa_kamis = VALUES(puasa_kamis), 
+                    quran_last_page = VALUES(quran_last_page), notes = VALUES(notes)";
         
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             'uid' => $user_id,
             'r_date' => $input['report_date'],
-            's_subuh' => $input['shalat_subuh'] ?? 0,
-            's_dzuhur' => $input['shalat_dzuhur'] ?? 0,
-            's_ashar' => $input['shalat_ashar'] ?? 0,
-            's_maghrib' => $input['shalat_maghrib'] ?? 0,
-            's_isya' => $input['shalat_isya'] ?? 0,
+            's_subuh' => !empty($input['shalat_subuh']) ? $input['shalat_subuh'] : null,
+            's_dzuhur' => !empty($input['shalat_dzuhur']) ? $input['shalat_dzuhur'] : null,
+            's_ashar' => !empty($input['shalat_ashar']) ? $input['shalat_ashar'] : null,
+            's_maghrib' => !empty($input['shalat_maghrib']) ? $input['shalat_maghrib'] : null,
+            's_isya' => !empty($input['shalat_isya']) ? $input['shalat_isya'] : null,
             's_tahajud' => $input['shalat_tahajud'] ?? 0,
             's_dhuha' => $input['shalat_dhuha'] ?? 0,
-            'b_quran' => $input['baca_quran'] ?? 0,
-            'j_quran' => !empty($input['juz_quran']) ? $input['juz_quran'] : null,
-            'surat_quran' => $input['surat_quran'] ?? null,
-            'ayat_quran' => $input['ayat_quran'] ?? null,
             'infaq' => $input['infaq'] ?? 0,
+            'p_senin' => $input['puasa_senin'] ?? 0,
+            'p_kamis' => $input['puasa_kamis'] ?? 0,
+            'q_page' => !empty($input['quran_last_page']) ? (int)$input['quran_last_page'] : 0,
             'notes' => $input['notes'] ?? null
         ]);
 
