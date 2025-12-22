@@ -74,6 +74,7 @@
                     <div class="bg-gray-50 rounded-lg p-2">
                         <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KEPEGAWAIAN</h3>
                         <a id="navAbsensi" href="attendance.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="map-pin" class="w-5 h-5"></i> Absensi Pegawai</a>
+                        <a id="navBiodataPegawai" href="employee_data.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="file-badge" class="w-5 h-5"></i> Biodata Pegawai</a>
                         <a id="navRapat" href="meeting_invitation.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="mail" class="w-5 h-5"></i> Formulir Undang Rapat</a>
                         <a id="navJadwalRapat" href="meeting_schedule.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="calendar-clock" class="w-5 h-5"></i> Jadwal Rapat</a>
                     </div>
@@ -92,6 +93,9 @@
                 <div id="groupSantri" class="hidden bg-gray-50 rounded-lg p-2 mt-2">
                     <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KESANTRIAN</h3>
                     <a id="navBiodataSantri" href="student_data.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="book-user" class="w-5 h-5"></i> Biodata Santri</a>
+                    <a id="navIbadahHarian" href="daily_worship_form.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm">
+                        <i data-lucide="notebook-pen" class="w-5 h-5"></i> Ibadah Harian
+                    </a>
                 </div>
                 
                 <!-- Tombol Logout -->
@@ -212,16 +216,43 @@
                     document.getElementById('sidebarUsername').textContent = data.username;
                     document.getElementById('userInitial').textContent = data.username.charAt(0).toUpperCase();
                     const roles = data.roles || [];
+                    const rawRoles = data.raw_roles || [];
 
                     // LOGIKA BARU: Jika belum punya peran
-                    if (roles.length === 0) {
+                    // Cek rawRoles (semua peran termasuk pending)
+                    if (rawRoles.length === 0) {
                         document.getElementById('mainContent').classList.add('hidden');
                         document.getElementById('roleSelectionContainer').classList.remove('hidden');
                         loadAvailableRoles(); // Muat daftar peran
                     } else {
-                        const mainRole = roles[0];
-                        document.getElementById('sidebarRole').textContent = mainRole;
-                        document.getElementById('mainRoleDisplay').textContent = mainRole;
+                        // Jika punya peran tapi belum ada yang 'approved' (roles kosong)
+                        if (roles.length === 0) {
+                            const pendingRole = rawRoles[0].role_name;
+                            document.getElementById('sidebarRole').textContent = pendingRole + ' (Pending)';
+                            document.getElementById('mainRoleDisplay').textContent = pendingRole + ' (Menunggu Validasi)';
+                            
+                            // Tampilkan Banner Pending
+                            const banner = document.createElement('div');
+                            banner.className = 'bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 rounded-r-lg';
+                            banner.innerHTML = `
+                                <div class="flex">
+                                    <div class="flex-shrink-0"><i data-lucide="clock" class="h-5 w-5 text-yellow-400"></i></div>
+                                    <div class="ml-3"><p class="text-sm text-yellow-700 font-medium">Akun Anda sedang menunggu aktivasi admin. Akses menu terbatas.</p></div>
+                                </div>`;
+                            const header = document.querySelector('header');
+                            header.parentNode.insertBefore(banner, header.nextSibling);
+
+                            // Paksa Tampil Menu UMUM (Dashboard, Kalender, Profil)
+                            ['navDashboard', 'navKalender', 'navProfil'].forEach(id => {
+                                const el = document.getElementById(id);
+                                if(el) el.classList.remove('hidden');
+                            });
+                        } else {
+                            // User Aktif / Approved
+                            const mainRole = roles[0];
+                            document.getElementById('sidebarRole').textContent = mainRole;
+                            document.getElementById('mainRoleDisplay').textContent = mainRole;
+                        }
                     }
 
                     // --- LOGIKA MENU DINAMIS (DATABASE) ---
@@ -328,7 +359,7 @@
             
             alert(result.message);
             if (result.success) {
-                window.location.href = 'index.html';
+                window.location.reload();
             }
         });
 

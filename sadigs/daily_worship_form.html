@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ibadah Harian | SADIGS 3.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+
+    <div class="flex h-screen overflow-hidden">
+        <aside id="sidebar" class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col hidden lg:flex">
+            <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-teal-600 text-white">
+                <h1 class="text-2xl font-extrabold tracking-wider">SADIGS</h1>
+            </div>
+            <div class="p-6">
+                <a href="dashboard.html" class="flex items-center gap-2 text-gray-600 hover:text-teal-600 transition">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i> Kembali ke Dashboard
+                </a>
+            </div>
+        </aside>
+
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative">
+            <header class="mb-8">
+                <h2 class="text-2xl lg:text-3xl font-bold text-gray-800">Laporan Ibadah Harian</h2>
+                <p class="text-gray-500 text-sm mt-1">Isi laporan ibadah harianmu dengan jujur.</p>
+            </header>
+
+            <div class="max-w-3xl bg-white p-8 rounded-xl shadow-sm border border-gray-100">
+                <form id="worshipForm" class="space-y-8">
+                    
+                    <div>
+                        <label for="report_date" class="block text-sm font-medium text-gray-700 mb-1">Tanggal Laporan</label>
+                        <input type="date" id="report_date" name="report_date" class="w-full md:w-1/2 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none">
+                    </div>
+
+                    <!-- Shalat Fardhu -->
+                    <div class="border-t pt-6">
+                        <h3 class="text-lg font-bold text-teal-800 mb-4">Shalat Fardhu (Berjamaah)</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                            <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50"><input type="checkbox" name="shalat_subuh" class="w-5 h-5 text-teal-600 rounded mr-2"> Subuh</label>
+                            <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50"><input type="checkbox" name="shalat_dzuhur" class="w-5 h-5 text-teal-600 rounded mr-2"> Dzuhur</label>
+                            <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50"><input type="checkbox" name="shalat_ashar" class="w-5 h-5 text-teal-600 rounded mr-2"> Ashar</label>
+                            <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50"><input type="checkbox" name="shalat_maghrib" class="w-5 h-5 text-teal-600 rounded mr-2"> Maghrib</label>
+                            <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50"><input type="checkbox" name="shalat_isya" class="w-5 h-5 text-teal-600 rounded mr-2"> Isya</label>
+                        </div>
+                    </div>
+
+                    <!-- Shalat Sunnah & Infaq -->
+                    <div class="border-t pt-6">
+                        <h3 class="text-lg font-bold text-teal-800 mb-4">Amalan Sunnah</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                            <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50"><input type="checkbox" name="shalat_tahajud" class="w-5 h-5 text-teal-600 rounded mr-2"> Tahajud</label>
+                            <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50"><input type="checkbox" name="shalat_dhuha" class="w-5 h-5 text-teal-600 rounded mr-2"> Dhuha</label>
+                            <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50"><input type="checkbox" name="infaq" class="w-5 h-5 text-teal-600 rounded mr-2"> Infaq</label>
+                        </div>
+                    </div>
+
+                    <!-- Tilawah Al-Qur'an -->
+                    <div class="border-t pt-6">
+                        <h3 class="text-lg font-bold text-teal-800 mb-4">Tilawah Al-Qur'an</h3>
+                        <div class="flex items-center mb-4">
+                            <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50 w-full"><input type="checkbox" id="baca_quran" name="baca_quran" class="w-5 h-5 text-teal-600 rounded mr-3"> Saya membaca Al-Qur'an hari ini</label>
+                        </div>
+                        <div id="quran_details" class="hidden grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Juz</label>
+                                <input type="number" name="juz_quran" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Surat</label>
+                                <input type="text" name="surat_quran" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Ayat</label>
+                                <input type="text" name="ayat_quran" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none" placeholder="Contoh: 1-7">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Catatan -->
+                    <div class="border-t pt-6">
+                        <h3 class="text-lg font-bold text-teal-800 mb-4">Catatan Tambahan</h3>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Catatan (Opsional)</label>
+                            <textarea name="notes" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none" placeholder="Misal: Mengikuti kajian, membantu teman, dll."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end pt-4">
+                        <button type="submit" id="saveBtn" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-8 rounded-lg transition shadow-md flex items-center gap-2">
+                            <i data-lucide="save" class="w-5 h-5"></i> Simpan Laporan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        async function initPage() {
+            const sessionRes = await fetch('sadigs_api_v3/session_check.php');
+            const sessionData = await sessionRes.json();
+            if (!sessionData.success) { window.location.href = 'index.html'; return; }
+            if (!sessionData.roles.includes('Santri')) {
+                alert('Halaman ini khusus untuk Santri.');
+                window.location.href = 'dashboard.html';
+                return;
+            }
+
+            // Set tanggal hari ini
+            const dateInput = document.getElementById('report_date');
+            dateInput.value = new Date().toISOString().split('T')[0];
+            
+            loadReportData(dateInput.value);
+
+            dateInput.addEventListener('change', () => {
+                loadReportData(dateInput.value);
+            });
+        }
+
+        async function loadReportData(date) {
+            try {
+                const res = await fetch(`sadigs_api_v3/daily_worship.php?date=${date}`);
+                const result = await res.json();
+                const form = document.getElementById('worshipForm');
+                
+                // Reset form dulu
+                form.reset();
+                document.getElementById('report_date').value = date;
+                document.getElementById('quran_details').classList.add('hidden');
+
+                if (result.success && result.data) {
+                    const data = result.data;
+                    for (const key in data) {
+                        const el = form.elements[key];
+                        if (el) {
+                            if (el.type === 'checkbox') {
+                                el.checked = (data[key] == 1);
+                            } else {
+                                el.value = data[key];
+                            }
+                        }
+                    }
+                    if (form.elements['baca_quran'].checked) {
+                        document.getElementById('quran_details').classList.remove('hidden');
+                    }
+                }
+            } catch (e) {
+                console.error("Gagal memuat data laporan:", e);
+            }
+        }
+
+        document.getElementById('baca_quran').addEventListener('change', function() {
+            document.getElementById('quran_details').classList.toggle('hidden', !this.checked);
+        });
+
+        document.getElementById('worshipForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('saveBtn');
+            const originalText = btn.innerHTML;
+            btn.disabled = true; btn.innerHTML = 'Menyimpan...';
+
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            
+            // Konversi checkbox ke boolean (0 atau 1)
+            const checkboxes = e.target.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(cb => {
+                data[cb.name] = cb.checked ? 1 : 0;
+            });
+
+            try {
+                const res = await fetch('sadigs_api_v3/daily_worship.php', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+                alert(result.message);
+            } catch (error) {
+                alert('Terjadi kesalahan koneksi.');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        });
+
+        initPage();
+    </script>
+</body>
+</html>
