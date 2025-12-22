@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biodata Pegawai | SADIGS 3.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+
+    <div class="flex h-screen overflow-hidden">
+        <!-- SIDEBAR (Akan diisi oleh JS yang sama dengan dashboard) -->
+        <aside id="sidebar" class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col hidden lg:flex">
+            <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-teal-600 text-white">
+                <h1 class="text-2xl font-extrabold tracking-wider">SADIGS</h1>
+            </div>
+            <div class="p-6">
+                <a href="dashboard.html" class="flex items-center gap-2 text-gray-600 hover:text-teal-600 transition">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i> Kembali ke Dashboard
+                </a>
+            </div>
+        </aside>
+
+        <!-- KONTEN UTAMA -->
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative">
+            <header class="mb-8">
+                <h2 class="text-2xl lg:text-3xl font-bold text-gray-800">Biodata Pegawai</h2>
+                <p class="text-gray-500 text-sm mt-1">Lengkapi data kepegawaian untuk keperluan arsip yayasan.</p>
+            </header>
+
+            <div class="max-w-3xl bg-white p-10 rounded-xl shadow-sm border border-gray-100 text-center">
+                <div class="bg-teal-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i data-lucide="file-text" class="w-8 h-8 text-teal-600"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800">Formulir Belum Tersedia</h3>
+                <p class="text-gray-500 mt-2">Admin sedang menyiapkan formulir data lengkap untuk pegawai. Silakan kembali lagi nanti.</p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        async function initPage() {
+            // Cek Sesi
+            const sessionRes = await fetch('sadigs_api_v3/session_check.php');
+            const sessionData = await sessionRes.json();
+            if (!sessionData.success) { window.location.href = 'index.html'; return; }
+
+            // Cek apakah Pegawai (Bukan Santri/Walisantri)
+            const pegawaiRoles = ['Kepala Sekolah', 'Kepala Asrama', 'Sekretaris Sekolah', 'Bendahara Sekolah', 'Musyrif', 'Ustadz', 'Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan'];
+            if (!sessionData.roles.some(r => pegawaiRoles.includes(r))) {
+                alert('Halaman ini khusus untuk Pegawai.');
+                window.location.href = 'dashboard.html';
+                return;
+            }
+        }
+        initPage();
+    </script>
+</body>
+</html>
