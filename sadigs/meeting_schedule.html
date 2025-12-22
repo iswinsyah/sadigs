@@ -132,6 +132,14 @@
                 const sessionData = await sessionRes.json();
                 if (!sessionData.success) { window.location.href = 'index.html'; return; }
 
+                // FIX: Arahkan Walisantri langsung ke halaman pemilihan anak
+                if (sessionData.roles.includes('Walisantri')) {
+                    const biodataLink = document.getElementById('navBiodataSantri');
+                    if (biodataLink) {
+                        biodataLink.href = 'select_student.html';
+                    }
+                }
+
                 document.getElementById('sidebarUsername').textContent = sessionData.username;
                 document.getElementById('userInitial').textContent = sessionData.username.charAt(0).toUpperCase();
                 document.getElementById('sidebarRole').textContent = sessionData.roles[0] || 'User';

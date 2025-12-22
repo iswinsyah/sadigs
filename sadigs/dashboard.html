@@ -238,6 +238,14 @@
                     const roles = data.roles || [];
                     const rawRoles = data.raw_roles || [];
 
+                    // FIX: Arahkan Walisantri langsung ke halaman pemilihan anak
+                    if (roles.includes('Walisantri')) {
+                        const biodataLink = document.getElementById('navBiodataSantri');
+                        if (biodataLink) {
+                            biodataLink.href = 'select_student.html';
+                        }
+                    }
+
                     // LOGIKA BARU: Jika belum punya peran
                     // Cek rawRoles (semua peran termasuk pending)
                     if (rawRoles.length === 0) {

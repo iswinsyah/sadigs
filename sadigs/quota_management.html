@@ -175,6 +175,14 @@
                     return;
                 }
 
+                // FIX: Arahkan Walisantri langsung ke halaman pemilihan anak
+                if (sessionData.roles.includes('Walisantri')) {
+                    const biodataLink = document.getElementById('navBiodataSantri');
+                    if (biodataLink) {
+                        biodataLink.href = 'select_student.html';
+                    }
+                }
+
                 // Update Sidebar Info
                 document.getElementById('sidebarUsername').textContent = sessionData.username;
                 document.getElementById('userInitial').textContent = sessionData.username.charAt(0).toUpperCase();
