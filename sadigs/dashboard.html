@@ -3,27 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard | SADIGS 3.0</title>
+    <title>Dashboard | Villa Quran</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Oswald:wght@700&display=swap" rel="stylesheet">
     <!-- Menggunakan Lucide Icons untuk ikon yang ringan dan modern -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'utama': '#4FB7B3',
+                        'kedua': '#26667F',
+                        'tombol-utama': '#3674B5',
+                        'tombol-kedua': '#F93827',
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         body { font-family: 'Inter', sans-serif; }
         /* Sembunyikan scrollbar sidebar agar lebih rapi */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .font-marlin { font-family: 'Oswald', sans-serif; /* Placeholder for Marlin Condensed */ }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+<body class="bg-white text-gray-800 font-sans antialiased">
 
     <!-- HEADER MOBILE (Hanya muncul di layar kecil) -->
-    <div class="lg:hidden flex items-center gap-4 bg-teal-600 text-white p-4 shadow-md sticky top-0 z-50">
-        <button id="mobileMenuBtn" class="focus:outline-none p-1 rounded hover:bg-teal-700 transition">
+    <div class="lg:hidden flex items-center gap-4 bg-kedua text-white p-4 shadow-md sticky top-0 z-50">
+        <button id="mobileMenuBtn" class="focus:outline-none p-1 rounded hover:bg-kedua/80 transition">
             <i data-lucide="menu" class="w-7 h-7"></i>
         </button>
         <div class="font-bold text-xl flex items-center gap-2">
-            <span>SADIGS 3.0</span>
+            <img src="https://raw.githubusercontent.com/villaqurankotabatu-commits/gambarvqbm/f44bf009884af11aba2c967a2401026225f7b02b/vila%20quran.png" alt="Logo" class="h-8">
         </div>
     </div>
 
@@ -34,14 +51,14 @@
         <aside id="sidebar" class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col transition-transform transform -translate-x-full lg:translate-x-0 fixed lg:static h-full z-40 shadow-2xl lg:shadow-none">
             
             <!-- Sidebar Header -->
-            <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-teal-600 text-white">
-                <h1 class="text-2xl font-extrabold tracking-wider">SADIGS</h1>
+            <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-kedua text-white">
+                <img src="https://raw.githubusercontent.com/villaqurankotabatu-commits/gambarvqbm/f44bf009884af11aba2c967a2401026225f7b02b/vila%20quran.png" alt="Logo Villa Quran" class="h-9">
             </div>
 
             <!-- User Profile Summary -->
-            <div class="p-6 border-b border-gray-100 bg-teal-50">
+            <div class="p-6 border-b border-gray-100 bg-utama/10">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-teal-200 flex items-center justify-center text-teal-800 font-bold text-lg shadow-sm">
+                    <div class="w-10 h-10 rounded-full bg-utama/20 flex items-center justify-center text-kedua font-bold text-lg shadow-sm">
                         <span id="userInitial">U</span>
                     </div>
                     <div class="overflow-hidden">
@@ -57,13 +74,13 @@
                 <!-- Div 1: UMUM -->
                 <div class="bg-gray-50 rounded-lg p-2">
                     <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">UMUM</h3>
-                    <a id="navDashboard" href="dashboard.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-teal-700 bg-white rounded-md transition font-semibold text-sm shadow-sm">
+                    <a id="navDashboard" href="dashboard.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-utama bg-white rounded-md transition font-semibold text-sm shadow-sm">
                         <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard
                     </a>
-                    <a id="navKalender" href="calendar_view.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm">
+                    <a id="navKalender" href="calendar_view.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm">
                         <i data-lucide="table" class="w-5 h-5"></i> Tabel Kalender
                     </a>
-                    <a id="navProfil" href="profile.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm">
+                    <a id="navProfil" href="profile.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm">
                         <i data-lucide="user" class="w-5 h-5"></i> Profil Saya
                     </a>
                 </div>
@@ -73,34 +90,34 @@
                     <!-- Div 2: KEPEGAWAIAN -->
                     <div class="bg-gray-50 rounded-lg p-2">
                         <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KEPEGAWAIAN</h3>
-                        <a id="navAbsensi" href="attendance.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="map-pin" class="w-5 h-5"></i> Absensi Pegawai</a>
-                        <a id="navBiodataPegawai" href="employee_data.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="file-badge" class="w-5 h-5"></i> Biodata Pegawai</a>
-                        <a id="navRapat" href="meeting_invitation.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="mail" class="w-5 h-5"></i> Formulir Undang Rapat</a>
-                        <a id="navJadwalRapat" href="meeting_schedule.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="calendar-clock" class="w-5 h-5"></i> Jadwal Rapat</a>
+                        <a id="navAbsensi" href="attendance.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="map-pin" class="w-5 h-5"></i> Absensi Pegawai</a>
+                        <a id="navBiodataPegawai" href="employee_data.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="file-badge" class="w-5 h-5"></i> Biodata Pegawai</a>
+                        <a id="navRapat" href="meeting_invitation.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="mail" class="w-5 h-5"></i> Formulir Undang Rapat</a>
+                        <a id="navJadwalRapat" href="meeting_schedule.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="calendar-clock" class="w-5 h-5"></i> Jadwal Rapat</a>
                     </div>
 
                     <!-- Div 3: KHUSUS -->
                     <div id="groupKhusus" class="hidden bg-gray-50 rounded-lg p-2">
                         <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KHUSUS</h3>
-                        <a id="navVerifikasi" href="verification_management.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="users" class="w-5 h-5"></i> Verifikasi Pegawai</a>
-                        <a id="navQuota" href="quota_management.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="user-cog" class="w-5 h-5"></i> Atur Kuota</a>
-                        <a id="navCalendarSettings" href="calendar_settings.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="calendar-cog" class="w-5 h-5"></i> Atur Kalender</a>
-                        <a id="navMenuManagement" href="menu_management.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="lock" class="w-5 h-5"></i> Manajemen Akses</a>
+                        <a id="navVerifikasi" href="verification_management.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="users" class="w-5 h-5"></i> Verifikasi Pegawai</a>
+                        <a id="navQuota" href="quota_management.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="user-cog" class="w-5 h-5"></i> Atur Kuota</a>
+                        <a id="navCalendarSettings" href="calendar_settings.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="calendar-cog" class="w-5 h-5"></i> Atur Kalender</a>
+                        <a id="navMenuManagement" href="menu_management.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="lock" class="w-5 h-5"></i> Manajemen Akses</a>
                     </div>
                 </div>
 
                 <!-- Div 4: KESANTRIAN (Khusus Santri) -->
                 <div id="groupSantri" class="hidden bg-gray-50 rounded-lg p-2 mt-2">
                     <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KESANTRIAN</h3>
-                    <a id="navBiodataSantri" href="student_data.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="book-user" class="w-5 h-5"></i> Biodata Santri</a>
-                    <a id="navIbadahHarian" href="daily_worship_form.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm">
+                    <a id="navBiodataSantri" href="student_data.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="book-user" class="w-5 h-5"></i> Biodata Santri</a>
+                    <a id="navIbadahHarian" href="daily_worship_form.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm">
                         <i data-lucide="notebook-pen" class="w-5 h-5"></i> Ibadah Harian
                     </a>
                 </div>
                 
                 <!-- Tombol Logout -->
                 <div class="pt-2">
-                    <button id="logoutBtn" class="w-full flex items-center gap-3 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition font-medium"><i data-lucide="log-out" class="w-5 h-5"></i> Keluar</button>
+                    <button id="logoutBtn" class="w-full flex items-center gap-3 px-4 py-2 text-tombol-kedua hover:bg-tombol-kedua/10 rounded-lg transition font-medium"><i data-lucide="log-out" class="w-5 h-5"></i> Keluar</button>
                 </div>
             </nav>
         </aside>
@@ -109,12 +126,12 @@
         <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden lg:hidden backdrop-blur-sm"></div>
 
         <!-- KONTEN UTAMA -->
-        <main id="mainContent" class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative">
+        <main id="mainContent" class="flex-1 overflow-y-auto bg-white p-4 lg:p-8 w-full relative">
             <!-- Header Halaman -->
             <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                 <div>
                     <h2 class="text-2xl lg:text-3xl font-bold text-gray-800">Dashboard</h2>
-                    <p class="text-gray-500 text-sm mt-1">Selamat datang kembali di SADIGS 3.0</p>
+                    <p class="text-gray-500 text-sm mt-1">Selamat datang kembali di Sistem Administrasi Digital Sekolah</p>
                 </div>
                 <div class="hidden md:block bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-100">
                     <span class="text-sm text-gray-500 font-medium" id="currentDate"></span>
@@ -151,24 +168,24 @@
 
             <!-- Area Konten Kosong (Placeholder) -->
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-10 flex flex-col items-center justify-center text-center min-h-[300px]">
-                <div class="bg-teal-50 p-4 rounded-full mb-4">
-                    <i data-lucide="layout" class="w-10 h-10 text-teal-600"></i>
+                <div class="bg-utama/10 p-4 rounded-full mb-4">
+                    <i data-lucide="layout" class="w-10 h-10 text-utama"></i>
                 </div>
                 <h3 class="text-lg font-bold text-gray-800">Area Kerja Utama</h3>
                 <p class="text-gray-500 max-w-md mt-2 text-sm">Pilih menu di sebelah kiri untuk mulai mengelola data akademik, administrasi, atau pengaturan yayasan.</p>
             </div>
             
             <footer class="mt-10 text-center text-xs text-gray-400 pb-4">
-                &copy; 2025 SADIGS 3.0 - Sistem Administrasi Digital Sekolah
+                &copy; 2025 Villa Quran Baron Malang - Sistem Administrasi Digital Sekolah
             </footer>
         </main>
 
         <!-- FORMULIR PEMILIHAN PERAN (Muncul jika user belum punya peran) -->
-        <div id="roleSelectionContainer" class="hidden flex-1 bg-gray-50 p-8 flex items-center justify-center h-full">
-            <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-lg border-t-4 border-teal-600">
+        <div id="roleSelectionContainer" class="hidden flex-1 bg-white p-8 flex items-center justify-center h-full">
+            <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-lg border-t-4 border-kedua">
                 <div class="text-center mb-6">
-                    <div class="bg-teal-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i data-lucide="user-plus" class="w-8 h-8 text-teal-600"></i>
+                    <div class="bg-utama/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i data-lucide="user-plus" class="w-8 h-8 text-utama"></i>
                     </div>
                     <h2 class="text-2xl font-bold text-gray-800">Pilih Peran Anda</h2>
                     <p class="text-gray-500 mt-2">Silakan pilih posisi atau peran Anda di sekolah untuk melanjutkan.</p>
@@ -176,7 +193,7 @@
                 <div id="roleSelectionList" class="space-y-3 mb-6 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
                     <!-- Daftar peran akan dimuat di sini -->
                 </div>
-                <button id="submitRoleBtn" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 rounded-lg transition shadow-md disabled:opacity-50">Simpan & Ajukan Validasi</button>
+                <button id="submitRoleBtn" class="w-full bg-tombol-utama hover:bg-tombol-utama/90 text-white font-bold py-3 rounded-lg transition shadow-md disabled:opacity-50">Simpan & Ajukan Validasi</button>
             </div>
         </div>
     </div>
@@ -326,11 +343,11 @@
 
         function addRoleOption(container, role, info) {
             const div = document.createElement('div');
-            const quotaText = info ? `<span class="text-xs text-teal-600 font-medium bg-teal-50 px-2 py-1 rounded-full ml-auto">Sisa: ${info.max_limit - info.current_count}</span>` : '';
+            const quotaText = info ? `<span class="text-xs text-utama font-medium bg-utama/10 px-2 py-1 rounded-full ml-auto">Sisa: ${info.max_limit - info.current_count}</span>` : '';
             
             div.innerHTML = `
                 <label class="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition">
-                    <input type="checkbox" name="selected_roles" value="${role}" class="w-5 h-5 text-teal-600 border-gray-300 focus:ring-teal-500 rounded">
+                    <input type="checkbox" name="selected_roles" value="${role}" class="w-5 h-5 text-utama border-gray-300 focus:ring-utama rounded">
                     <span class="ml-3 font-medium text-gray-700">${role}</span>
                     ${quotaText}
                 </label>
