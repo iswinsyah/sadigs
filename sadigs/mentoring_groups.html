@@ -232,9 +232,12 @@
                             });
                             
                             musyrifCellContent = `
-                                <select onchange="assignMusyrif(${row.student_id}, this.value)" class="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-utama outline-none bg-white">
-                                    ${options}
-                                </select>
+                                <div class="flex items-center">
+                                    <select onchange="assignMusyrif(${row.student_id}, this.value)" class="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-utama outline-none bg-white">
+                                        ${options}
+                                    </select>
+                                    <span id="status-${row.student_id}" class="ml-2 text-sm w-24 flex-shrink-0"></span>
+                                </div>
                             `;
                         } else {
                             musyrifCellContent = row.musyrif_username 
@@ -264,6 +267,11 @@
         async function assignMusyrif(studentId, musyrifId) {
             if (!musyrifId) return; // Jangan proses jika memilih opsi kosong
 
+            const statusEl = document.getElementById(`status-${studentId}`);
+            if (statusEl) {
+                statusEl.innerHTML = `<span class="text-gray-500 animate-pulse">Menyimpan...</span>`;
+            }
+
             try {
                 const res = await fetch('sadigs_api_v3/assign_mentor.php', {
                     method: 'POST',
@@ -271,15 +279,23 @@
                     body: JSON.stringify({ student_id: studentId, musyrif_id: musyrifId })
                 });
                 const result = await res.json();
-                
+
                 if (result.success) {
-                    // Opsional: Tampilkan notifikasi kecil (toast)
-                    // alert('Berhasil disimpan'); 
+                    if (statusEl) {
+                        statusEl.innerHTML = `<span class="text-green-600 font-medium flex items-center gap-1"><i data-lucide="check-circle" class="w-4 h-4"></i>Tersimpan</span>`;
+                        lucide.createIcons();
+                    }
                 } else {
                     alert('Gagal menyimpan: ' + result.message);
+                    if (statusEl) {
+                        statusEl.innerHTML = `<span class="text-red-600 font-medium">Gagal</span>`;
+                    }
                 }
             } catch (e) {
                 alert('Terjadi kesalahan koneksi.');
+            } finally {
+                // Hapus pesan status setelah 3 detik
+                setTimeout(() => { if (statusEl) statusEl.innerHTML = ''; }, 3000);
             }
         }
 
