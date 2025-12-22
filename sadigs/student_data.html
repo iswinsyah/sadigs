@@ -34,45 +34,200 @@
             <div class="max-w-3xl bg-white p-8 rounded-xl shadow-sm border border-gray-100">
                 <form id="studentForm" class="space-y-6">
                     
-                    <!-- Data Pribadi -->
+                    <!-- 1. DATA DIRI SANTRI -->
                     <div class="border-b pb-4">
-                        <h3 class="text-lg font-bold text-teal-800 mb-4">Data Pribadi</h3>
+                        <h3 class="text-lg font-bold text-teal-800 mb-4 flex items-center gap-2"><i data-lucide="user" class="w-5 h-5"></i> Data Diri Santri</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- 1. Username -->
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">NISN (Jika ada)</label>
-                                <input type="text" name="nisn" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">1. Username Santri</label>
+                                <input type="text" name="username" class="w-full px-4 py-2 border border-gray-200 bg-gray-100 rounded-lg text-gray-500 cursor-not-allowed" readonly>
                             </div>
+                            <!-- 2. Nama Lengkap -->
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Asal Sekolah</label>
-                                <input type="text" name="previous_school" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">2. Nama Lengkap (Sesuai Ijazah)</label>
+                                <input type="text" name="full_name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none" required>
                             </div>
+                            <!-- 3. Jenis Kelamin -->
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Tempat Lahir</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">3. Jenis Kelamin</label>
+                                <select name="gender" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none bg-white">
+                                    <option value="Laki-laki">Laki-laki</option>
+                                    <option value="Perempuan">Perempuan</option>
+                                </select>
+                            </div>
+                            <!-- 4. Tempat Lahir -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">4. Tempat Lahir</label>
                                 <input type="text" name="birth_place" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none">
                             </div>
+                            <!-- 5. Tanggal Lahir -->
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Lahir</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">5. Tanggal Lahir</label>
                                 <input type="date" name="birth_date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none">
+                            </div>
+                            <!-- 6. NIK -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">6. NIK (Sesuai KK)</label>
+                                <input type="text" name="nik" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none" placeholder="16 digit angka">
+                            </div>
+                            <!-- 7. NISN -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">7. NISN</label>
+                                <input type="text" name="nisn" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none">
+                            </div>
+                            <!-- 8. Email -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">8. Email Aktif Santri</label>
+                                <input type="email" name="email" class="w-full px-4 py-2 border border-gray-200 bg-gray-100 rounded-lg text-gray-500 cursor-not-allowed" readonly>
+                            </div>
+                            <!-- 9. No HP -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">9. No HP/WA Aktif Santri</label>
+                                <input type="text" name="student_phone" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none">
                             </div>
                         </div>
                         <div class="mt-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Alamat Lengkap</label>
-                            <textarea name="address" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none"></textarea>
+                            <!-- 10. Alamat -->
+                            <label class="block text-sm font-medium text-gray-700 mb-1">10. Alamat Tinggal (Domisili)</label>
+                            <textarea name="address" rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none"></textarea>
                         </div>
                     </div>
 
-                    <!-- Data Wali -->
-                    <div>
-                        <h3 class="text-lg font-bold text-teal-800 mb-4">Data Wali / Orang Tua</h3>
+                    <!-- 2. DATA SEKOLAH & KELUARGA -->
+                    <div class="border-b pb-4">
+                        <h3 class="text-lg font-bold text-teal-800 mb-4 flex items-center gap-2"><i data-lucide="school" class="w-5 h-5"></i> Data Sekolah & Keluarga</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- 11. Sekolah Asal -->
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Nama Wali</label>
-                                <input type="text" name="parent_name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none" required>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">11. Sekolah Asal</label>
+                                <input type="text" name="previous_school" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none">
                             </div>
+                            <!-- 12. Alamat Sekolah Asal -->
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">No. HP Wali (WhatsApp)</label>
-                                <input type="text" name="parent_phone" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none" placeholder="08xxxxxxxxxx" required>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">12. Alamat Sekolah Asal</label>
+                                <input type="text" name="previous_school_address" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none">
                             </div>
+                            <!-- 13. Anak ke -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">13. Anak ke-</label>
+                                <input type="number" name="child_order" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none">
+                            </div>
+                            <!-- 14. Jml Saudara Kandung -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">14. Jml Saudara Kandung</label>
+                                <input type="number" name="siblings_count" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none">
+                            </div>
+                            <!-- 15. Jml Saudara Tiri -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">15. Jml Saudara Tiri</label>
+                                <input type="number" name="step_siblings_count" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none">
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <!-- 16. Riwayat Penyakit -->
+                            <label class="block text-sm font-medium text-gray-700 mb-1">16. Riwayat Penyakit Berat</label>
+                            <textarea name="medical_history" rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none" placeholder="Tulis '-' jika tidak ada"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- 3. DATA ORANG TUA (AYAH) -->
+                    <div class="border-b pb-4">
+                        <h3 class="text-lg font-bold text-teal-800 mb-4 flex items-center gap-2"><i data-lucide="user-check" class="w-5 h-5"></i> Data Ayah</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- 19. Nama Ayah -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">19. Nama Ayah</label>
+                                <input type="text" name="father_name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none">
+                            </div>
+                            <!-- 20. No HP Ayah -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">20. No HP/WA Ayah</label>
+                                <input type="text" name="father_phone" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none">
+                            </div>
+                            <!-- 21. Pekerjaan Ayah -->
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">21. Pekerjaan Ayah</label>
+                                <input type="text" name="father_job" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none">
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <!-- 22. Alamat Ayah -->
+                            <label class="block text-sm font-medium text-gray-700 mb-1">22. Alamat Ayah</label>
+                            <textarea name="father_address" rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- 4. DATA ORANG TUA (IBU) -->
+                    <div class="border-b pb-4">
+                        <h3 class="text-lg font-bold text-teal-800 mb-4 flex items-center gap-2"><i data-lucide="user-check" class="w-5 h-5"></i> Data Ibu</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- 23. Nama Ibu -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">23. Nama Ibu</label>
+                                <input type="text" name="mother_name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none">
+                            </div>
+                            <!-- 24. No HP Ibu -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">24. No HP/WA Ibu</label>
+                                <input type="text" name="mother_phone" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none">
+                            </div>
+                            <!-- 25. Pekerjaan Ibu -->
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">25. Pekerjaan Ibu</label>
+                                <input type="text" name="mother_job" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none">
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <!-- 26. Alamat Ibu -->
+                            <label class="block text-sm font-medium text-gray-700 mb-1">26. Alamat Ibu</label>
+                            <textarea name="mother_address" rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- 5. DATA WALISANTRI & PENANGGUNGJAWAB -->
+                    <div>
+                        <h3 class="text-lg font-bold text-teal-800 mb-4 flex items-center gap-2"><i data-lucide="users" class="w-5 h-5"></i> Data Walisantri & Penanggungjawab</h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                            <!-- 17. Penanggungjawab -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">17. Penanggungjawab Santri</label>
+                                <select name="responsible_party" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none bg-white">
+                                    <option value="">- Pilih -</option>
+                                    <option value="Ayah">Ayah</option>
+                                    <option value="Ibu">Ibu</option>
+                                    <option value="Wali">Wali</option>
+                                </select>
+                            </div>
+                            <!-- 18. Username Wali -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">18. Username (Akun Wali)</label>
+                                <input type="text" name="parent_username" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none" placeholder="Jika ada">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- 27. Nama Walisantri -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">27. Nama Walisantri</label>
+                                <input type="text" name="parent_name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none">
+                            </div>
+                            <!-- 28. No HP Walisantri -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">28. No HP/WA Walisantri</label>
+                                <input type="text" name="parent_phone" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none">
+                            </div>
+                            <!-- 29. Pekerjaan Walisantri -->
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">29. Pekerjaan Walisantri</label>
+                                <input type="text" name="guardian_job" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none">
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <!-- 30. Alamat Walisantri -->
+                            <label class="block text-sm font-medium text-gray-700 mb-1">30. Alamat Walisantri</label>
+                            <textarea name="guardian_address" rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none"></textarea>
                         </div>
                     </div>
 
@@ -95,13 +250,6 @@
             const sessionData = await sessionRes.json();
             if (!sessionData.success) { window.location.href = 'index.html'; return; }
 
-            // Cek apakah Santri
-            if (!sessionData.roles.includes('Santri')) {
-                alert('Halaman ini khusus untuk Santri.');
-                window.location.href = 'dashboard.html';
-                return;
-            }
-
             // Load Data
             try {
                 const res = await fetch('sadigs_api_v3/student_data.php');
@@ -109,13 +257,42 @@
                 if (result.success && result.data) {
                     const d = result.data;
                     const form = document.getElementById('studentForm');
-                    if(d.nisn) form.querySelector('[name="nisn"]').value = d.nisn;
-                    if(d.previous_school) form.querySelector('[name="previous_school"]').value = d.previous_school;
+                    
+                    // 1-10
+                    if(d.username) form.querySelector('[name="username"]').value = d.username;
+                    if(d.full_name) form.querySelector('[name="full_name"]').value = d.full_name;
+                    if(d.gender) form.querySelector('[name="gender"]').value = d.gender;
                     if(d.birth_place) form.querySelector('[name="birth_place"]').value = d.birth_place;
                     if(d.birth_date) form.querySelector('[name="birth_date"]').value = d.birth_date;
+                    if(d.nik) form.querySelector('[name="nik"]').value = d.nik;
+                    if(d.nisn) form.querySelector('[name="nisn"]').value = d.nisn;
+                    if(d.email) form.querySelector('[name="email"]').value = d.email;
+                    if(d.student_phone) form.querySelector('[name="student_phone"]').value = d.student_phone;
                     if(d.address) form.querySelector('[name="address"]').value = d.address;
+                    
+                    // 11-16
+                    if(d.previous_school) form.querySelector('[name="previous_school"]').value = d.previous_school;
+                    if(d.previous_school_address) form.querySelector('[name="previous_school_address"]').value = d.previous_school_address;
+                    if(d.child_order) form.querySelector('[name="child_order"]').value = d.child_order;
+                    if(d.siblings_count) form.querySelector('[name="siblings_count"]').value = d.siblings_count;
+                    if(d.step_siblings_count) form.querySelector('[name="step_siblings_count"]').value = d.step_siblings_count;
+                    if(d.medical_history) form.querySelector('[name="medical_history"]').value = d.medical_history;
+                    
+                    // 17-30
+                    if(d.responsible_party) form.querySelector('[name="responsible_party"]').value = d.responsible_party;
+                    if(d.parent_username) form.querySelector('[name="parent_username"]').value = d.parent_username;
+                    if(d.father_name) form.querySelector('[name="father_name"]').value = d.father_name;
+                    if(d.father_phone) form.querySelector('[name="father_phone"]').value = d.father_phone;
+                    if(d.father_job) form.querySelector('[name="father_job"]').value = d.father_job;
+                    if(d.father_address) form.querySelector('[name="father_address"]').value = d.father_address;
+                    if(d.mother_name) form.querySelector('[name="mother_name"]').value = d.mother_name;
+                    if(d.mother_phone) form.querySelector('[name="mother_phone"]').value = d.mother_phone;
+                    if(d.mother_job) form.querySelector('[name="mother_job"]').value = d.mother_job;
+                    if(d.mother_address) form.querySelector('[name="mother_address"]').value = d.mother_address;
                     if(d.parent_name) form.querySelector('[name="parent_name"]').value = d.parent_name;
                     if(d.parent_phone) form.querySelector('[name="parent_phone"]').value = d.parent_phone;
+                    if(d.guardian_job) form.querySelector('[name="guardian_job"]').value = d.guardian_job;
+                    if(d.guardian_address) form.querySelector('[name="guardian_address"]').value = d.guardian_address;
                 }
             } catch (e) { console.error(e); }
         }
