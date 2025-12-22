@@ -7,9 +7,9 @@ try {
     // Daftar kolom baru untuk path file
     $columns = [
         "student_photo_path VARCHAR(255) AFTER user_id",
+        "ijazah_photo_path VARCHAR(255) AFTER student_photo_path",
         "kk_photo_path VARCHAR(255) AFTER ijazah_photo_path",
-        "birth_cert_photo_path VARCHAR(255) AFTER kk_photo_path",
-        "ijazah_photo_path VARCHAR(255) AFTER student_photo_path"
+        "birth_cert_photo_path VARCHAR(255) AFTER kk_photo_path"
     ];
 
     foreach ($columns as $col) {
