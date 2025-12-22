@@ -3,7 +3,7 @@ require_once 'db_connect.php';
 
 try {
     $pdo = getDBConnection();
-    echo "<h1>Diagnosa Data Mentoring (Lanjutan)</h1>";
+    echo "<h1>Diagnosa Data Mentoring (Final)</h1>";
     echo "<style>body{font-family:sans-serif; padding:20px;} table{border-collapse:collapse; width:100%; margin-top:10px;} th,td{border:1px solid #ddd; padding:8px; text-align:left;} th{background-color:#f2f2f2;}</style>";
 
     // 1. Cek Koneksi & Tabel
@@ -62,34 +62,42 @@ try {
         echo "<p style='color:green'>✅ Tidak ada data role yang orphaned (semua role punya user).</p>";
     }
 
-    // 5. Simulasi Query API
-    echo "<h3>5. Simulasi Query API (Hasil Akhir)</h3>";
+    // 5. Simulasi Query API LENGKAP (Dengan JOIN Mentoring)
+    echo "<h3>5. Simulasi Query API Lengkap (Real App Query)</h3>";
+    echo "<p>Mencoba menjalankan query persis seperti di aplikasi...</p>";
+    
     $sqlApi = "SELECT 
-                s.user_id,
-                s.username,
-                s.full_name,
-                ur.role_name,
-                ur.status
+                s.user_id AS student_id,
+                s.username AS student_username,
+                s.full_name AS student_name,
+                ma.musyrif_id,
+                m.username AS musyrif_username
             FROM users s
             JOIN user_roles ur ON s.user_id = ur.user_id
+            LEFT JOIN mentoring_assignments ma ON s.user_id = ma.student_id
+            LEFT JOIN users m ON ma.musyrif_id = m.user_id
             WHERE ur.role_name = 'Santri' AND ur.status = 'approved'
-            LIMIT 5";
+            ORDER BY s.full_name ASC";
+            
     $stmt = $pdo->query($sqlApi);
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     if (count($results) > 0) {
-        echo "<p style='color:green'>✅ Query API berhasil mengambil data (" . count($results) . " sampel ditampilkan):</p>";
-        echo "<table><thead><tr><th>User ID</th><th>Username</th><th>Full Name</th><th>Role</th><th>Status</th></tr></thead><tbody>";
+        echo "<p style='color:green'>✅ Query API BERHASIL! Ditemukan " . count($results) . " data.</p>";
+        echo "<table><thead><tr><th>Student ID</th><th>Username</th><th>Full Name</th><th>Musyrif ID</th><th>Musyrif Username</th></tr></thead><tbody>";
         foreach ($results as $row) {
-            echo "<tr><td>{$row['user_id']}</td><td>{$row['username']}</td><td>{$row['full_name']}</td><td>{$row['role_name']}</td><td>{$row['status']}</td></tr>";
+            echo "<tr><td>{$row['student_id']}</td><td>{$row['student_username']}</td><td>{$row['student_name']}</td><td>{$row['musyrif_id']}</td><td>{$row['musyrif_username']}</td></tr>";
         }
         echo "</tbody></table>";
+        echo "<p><strong>Kesimpulan:</strong> Jika tabel ini muncul datanya, berarti Backend AMAN. Masalah ada di Frontend (Browser Cache atau JavaScript).</p>";
     } else {
-        echo "<p style='color:red'>❌ Query API mengembalikan 0 baris. Padahal di langkah 2 terdeteksi ada data approved.</p>";
-        echo "<p><strong>Kesimpulan:</strong> Masalah ada pada ketidakcocokan ID antara tabel <code>users</code> dan <code>user_roles</code>.</p>";
+        echo "<p style='color:red'>❌ Query API mengembalikan 0 baris.</p>";
+        echo "<p>Kemungkinan penyebab: JOIN ke tabel mentoring bermasalah atau struktur tabel tidak sesuai.</p>";
     }
 
 } catch (Exception $e) {
-    echo "<h1>Error Sistem</h1><p>" . $e->getMessage() . "</p>";
+    echo "<h1 style='color:red'>CRITICAL ERROR PADA QUERY</h1>";
+    echo "<p>Pesan Error SQL: <strong>" . $e->getMessage() . "</strong></p>";
+    echo "<p>Ini adalah penyebab utama kenapa tabel di aplikasi kosong/error.</p>";
 }
 ?>
