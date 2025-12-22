@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validasi Ibadah Santri | SADIGS 3.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Oswald:wght@700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'utama': '#4FB7B3',
+                        'kedua': '#26667F',
+                        'tombol-utama': '#3674B5',
+                        'tombol-kedua': '#F93827',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-white text-gray-800 font-sans antialiased">
+
+    <!-- HEADER MOBILE -->
+    <div class="lg:hidden flex items-center gap-4 bg-kedua text-white p-4 shadow-md sticky top-0 z-50">
+        <button id="mobileMenuBtn" class="focus:outline-none p-1 rounded hover:bg-kedua/80 transition"><i data-lucide="menu" class="w-7 h-7"></i></button>
+        <div class="font-bold text-xl flex items-center gap-2">
+            <img src="https://raw.githubusercontent.com/villaqurankotabatu-commits/gambarvqbm/f44bf009884af11aba2c967a2401026225f7b02b/vila%20quran.png" alt="Logo" class="h-8">
+        </div>
+    </div>
+
+    <div class="flex h-screen overflow-hidden">
+        <!-- SIDEBAR STANDAR -->
+        <aside id="sidebar" class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col transition-transform transform -translate-x-full lg:translate-x-0 fixed lg:static h-full z-40 shadow-2xl lg:shadow-none">
+            <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-kedua text-white">
+                <img src="https://raw.githubusercontent.com/villaqurankotabatu-commits/gambarvqbm/f44bf009884af11aba2c967a2401026225f7b02b/vila%20quran.png" alt="Logo" class="h-9">
+            </div>
+            <div class="p-6 border-b border-gray-100 bg-utama/10">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-utama/20 flex items-center justify-center text-kedua font-bold text-lg shadow-sm"><span id="userInitial">U</span></div>
+                    <div class="overflow-hidden">
+                        <p id="sidebarUsername" class="font-bold text-gray-800 text-sm truncate">Memuat...</p>
+                        <p id="sidebarRole" class="text-xs text-gray-500 truncate font-medium">Role...</p>
+                    </div>
+                </div>
+            </div>
+            <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-2 no-scrollbar">
+                <!-- Div 1: UMUM -->
+                <div class="bg-gray-50 rounded-lg p-2">
+                    <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">UMUM</h3>
+                    <a id="navDashboard" href="dashboard.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard</a>
+                    <a id="navKalender" href="calendar_view.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="table" class="w-5 h-5"></i> Tabel Kalender</a>
+                    <a id="navProfil" href="profile.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="user" class="w-5 h-5"></i> Profil Saya</a>
+                </div>
+                <!-- Div 4: KESANTRIAN -->
+                <div id="groupSantri" class="hidden bg-gray-50 rounded-lg p-2 mt-2">
+                    <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KESANTRIAN</h3>
+                    <a id="navBiodataSantri" href="student_data.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="book-user" class="w-5 h-5"></i> Biodata Santri</a>
+                    <a id="navIbadahHarian" href="daily_worship_form.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="notebook-pen" class="w-5 h-5"></i> Ibadah Harian</a>
+                    <a id="navMentoring" href="mentoring_groups.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="users-round" class="w-5 h-5"></i> Kelompok Mentoring</a>
+                    <a id="navValidasiIbadah" href="daily_worship_validation.html" class="flex items-center gap-3 px-3 py-2.5 text-utama bg-white rounded-md transition font-semibold text-sm shadow-sm"><i data-lucide="check-square" class="w-5 h-5"></i> Validasi Ibadah</a>
+                </div>
+                <div class="pt-2">
+                    <button id="logoutBtn" class="w-full flex items-center gap-3 px-4 py-2 text-tombol-kedua hover:bg-tombol-kedua/10 rounded-lg transition font-medium"><i data-lucide="log-out" class="w-5 h-5"></i> Keluar</button>
+                </div>
+            </nav>
+        </aside>
+        <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden lg:hidden backdrop-blur-sm"></div>
+
+        <!-- KONTEN UTAMA -->
+        <main class="flex-1 overflow-y-auto bg-white p-4 lg:p-8 w-full relative">
+            <header class="mb-8">
+                <h2 class="text-2xl lg:text-3xl font-bold text-gray-800">Validasi Ibadah Harian</h2>
+                <p class="text-gray-500 text-sm mt-1">Validasi laporan ibadah santri bimbingan Anda.</p>
+            </header>
+
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Tanggal</th>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Nama Santri</th>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Ringkasan Shalat</th>
+                                <th class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase">Status</th>
+                                <th class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="validationTableBody" class="bg-white divide-y divide-gray-200">
+                            <tr><td colspan="5" class="px-6 py-10 text-center text-gray-500">Memuat data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        function toggleSidebar() { sidebar.classList.toggle('-translate-x-full'); sidebarOverlay.classList.toggle('hidden'); }
+        if(mobileMenuBtn) mobileMenuBtn.addEventListener('click', toggleSidebar);
+        if(sidebarOverlay) sidebarOverlay.addEventListener('click', toggleSidebar);
+
+        async function initPage() {
+            const sessionRes = await fetch('sadigs_api_v3/session_check.php');
+            const sessionData = await sessionRes.json();
+            if (!sessionData.success) { window.location.href = 'index.html'; return; }
+
+            document.getElementById('sidebarUsername').textContent = sessionData.username;
+            document.getElementById('userInitial').textContent = sessionData.username.charAt(0).toUpperCase();
+            document.getElementById('sidebarRole').textContent = sessionData.roles[0] || 'User';
+
+            // Cek Izin Menu
+            try {
+                const permRes = await fetch('sadigs_api_v3/get_menu_permissions.php');
+                const permData = await permRes.json();
+                if (permData.success) {
+                    const allowedMenus = permData.permissions || [];
+                    if (!allowedMenus.includes('navValidasiIbadah')) {
+                        alert('Akses Ditolak.'); window.location.href = 'dashboard.html'; return;
+                    }
+                    allowedMenus.forEach(id => { const el = document.getElementById(id); if(el) el.classList.remove('hidden'); });
+                    document.getElementById('groupSantri').classList.remove('hidden');
+                }
+            } catch (e) { console.error(e); }
+
+            loadData();
+        }
+
+        async function loadData() {
+            const tbody = document.getElementById('validationTableBody');
+            try {
+                const res = await fetch('sadigs_api_v3/get_musyrif_validation_data.php?t=' + new Date().getTime());
+                const result = await res.json();
+                
+                if (result.success && result.data.length > 0) {
+                    tbody.innerHTML = '';
+                    result.data.forEach(row => {
+                        const statusColor = row.validation_status === 'approved' ? 'bg-green-100 text-green-800' : (row.validation_status === 'rejected' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800');
+                        const statusLabel = row.validation_status === 'approved' ? 'Disetujui' : (row.validation_status === 'rejected' ? 'Ditolak' : 'Menunggu');
+                        
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${row.report_date}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-800">${row.student_name}</td>
+                            <td class="px-6 py-4 text-sm text-gray-600">
+                                <div class="text-xs">Subuh: ${row.shalat_subuh || '-'}</div>
+                                <div class="text-xs">Isya: ${row.shalat_isya || '-'}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center"><span class="px-2 py-1 rounded-full text-xs font-bold ${statusColor}">${statusLabel}</span></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                                ${row.validation_status === 'pending' ? `
+                                <button onclick="validate(${row.id}, 'approved')" class="text-green-600 hover:text-green-900 mr-3 font-bold">Setujui</button>
+                                <button onclick="validate(${row.id}, 'rejected')" class="text-red-600 hover:text-red-900 font-bold">Tolak</button>
+                                ` : '<span class="text-gray-400 text-xs">Selesai</span>'}
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-10 text-center text-gray-500">Belum ada laporan ibadah dari santri bimbingan Anda.</td></tr>';
+                }
+            } catch (e) { tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-10 text-center text-red-500">Gagal memuat data.</td></tr>'; }
+        }
+
+        window.validate = async function(id, status) {
+            if(!confirm('Anda yakin?')) return;
+            await fetch('sadigs_api_v3/validate_worship.php', { method: 'POST', body: JSON.stringify({id, status}) });
+            loadData();
+        }
+
+        document.getElementById('logoutBtn').addEventListener('click', () => { if(confirm('Keluar?')) window.location.href = 'sadigs_api_v3/logout.php'; });
+        initPage();
+    </script>
+</body>
+</html>

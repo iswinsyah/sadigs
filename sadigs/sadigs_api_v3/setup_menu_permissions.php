@@ -43,6 +43,9 @@ try {
 
         // --- MENU MENTORING (BARU) ---
         'navMentoring' => ['Ketua Yayasan', 'Kepala Sekolah', 'Kepala Asrama', 'Musyrif', 'Ustadz', 'Santri'],
+
+        // --- MENU VALIDASI IBADAH (BARU) ---
+        'navValidasiIbadah' => ['Musyrif', 'Kepala Asrama', 'Kepala Sekolah'],
     ];
 
     // 3. Eksekusi Insert
