@@ -40,6 +40,11 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         function handle_upload($file_key, $user_id, $doc_type, $pdo) {
             if (isset($_FILES[$file_key]) && $_FILES[$file_key]['error'] === UPLOAD_ERR_OK) {
+                // Validasi Ukuran File (Maksimal 2MB = 2 * 1024 * 1024 bytes)
+                if ($_FILES[$file_key]['size'] > 2 * 1024 * 1024) {
+                    throw new Exception("Ukuran file '{$_FILES[$file_key]['name']}' terlalu besar. Maksimal 2MB.");
+                }
+
                 // Hapus file lama jika ada
                 $stmt_old = $pdo->prepare("SELECT {$doc_type}_path FROM student_details WHERE user_id = ?");
                 $stmt_old->execute([$user_id]);
