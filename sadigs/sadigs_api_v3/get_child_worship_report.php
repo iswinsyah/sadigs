@@ -24,7 +24,12 @@ try {
     $walisantri_username = $stmtWali->fetchColumn();
 
     // 2. Dapatkan data santri dan pastikan ia adalah anak dari walisantri ini
-    $stmtStudent = $pdo->prepare("SELECT parent_username, full_name, username FROM users WHERE user_id = ? AND user_id IN (SELECT user_id FROM user_roles WHERE role_name = 'Santri')");
+    $stmtStudent = $pdo->prepare("
+        SELECT sd.parent_username, u.full_name, u.username 
+        FROM users u
+        LEFT JOIN student_details sd ON u.user_id = sd.user_id
+        WHERE u.user_id = ? AND u.user_id IN (SELECT user_id FROM user_roles WHERE role_name = 'Santri')
+    ");
     $stmtStudent->execute([$student_id]);
     $student = $stmtStudent->fetch(PDO::FETCH_ASSOC);
 

@@ -28,9 +28,10 @@ try {
 
     // 2. Cek Santri dan Kolom parent_username
     echo "<h3>2. Daftar Santri & Link ke Wali</h3>";
-    $sqlSantri = "SELECT u.user_id, u.username, u.full_name, u.parent_username 
+    $sqlSantri = "SELECT u.user_id, u.username, u.full_name, sd.parent_username 
                   FROM users u 
                   JOIN user_roles ur ON u.user_id = ur.user_id 
+                  LEFT JOIN student_details sd ON u.user_id = sd.user_id
                   WHERE ur.role_name = 'Santri'";
     $santris = $pdo->query($sqlSantri)->fetchAll(PDO::FETCH_ASSOC);
 

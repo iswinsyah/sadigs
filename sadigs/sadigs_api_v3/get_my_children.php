@@ -22,10 +22,11 @@ try {
 
     // 2. Cari Santri yang kolom 'parent_username'-nya SAMA PERSIS dengan username Walisantri ini
     // Ini adalah kunci privasinya. Hanya data yang cocok yang diambil.
-    $sql = "SELECT user_id, full_name, username 
-            FROM users 
-            WHERE parent_username = ? 
-            AND user_id IN (SELECT user_id FROM user_roles WHERE role_name = 'Santri')";
+    $sql = "SELECT u.user_id, u.full_name, u.username 
+            FROM users u
+            JOIN student_details sd ON u.user_id = sd.user_id
+            WHERE sd.parent_username = ? 
+            AND u.user_id IN (SELECT user_id FROM user_roles WHERE role_name = 'Santri')";
             
     $stmtChildren = $pdo->prepare($sql);
     $stmtChildren->execute([$wali_username]);
