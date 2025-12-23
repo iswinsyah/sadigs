@@ -143,7 +143,13 @@
                         // 7. Pengaturan Sistem
                         'navKalender',          // Tab
                         'navCalendarSettings',  // Form
-                        'navMenuManagement'     // Form
+                        'navMenuManagement',    // Form
+
+                        // 8. Keuangan (BARU)
+                        'navFormulirPembayaran', // Form
+                        'navValidasiPembayaran', // Val
+                        'navTabelPembayaran',    // Tab
+                        'navRekapPembayaran'     // Tab
                     ];
 
                     menuList.sort((a, b) => {
@@ -198,9 +204,10 @@
                 const formMenus = [
                     'navAbsensi', 'navBiodataPegawai', 'navBiodataSantri', 
                     'navCalendarSettings', 'navIbadahHarian', 'navInputTahfizh', 
-                    'navMenuManagement', 'navProfil', 'navQuota', 'navRapat'
+                    'navMenuManagement', 'navProfil', 'navQuota', 'navRapat',
+                    'navFormulirPembayaran'
                 ];
-                const valMenus = ['navValidasiIbadah', 'navVerifikasi'];
+                const valMenus = ['navValidasiIbadah', 'navVerifikasi', 'navValidasiPembayaran'];
 
                 if (formMenus.includes(menuId)) prefix = "Form";
                 else if (valMenus.includes(menuId)) prefix = "Val";
