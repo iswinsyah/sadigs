@@ -153,7 +153,7 @@
                         const tr = document.createElement('tr');
                         tr.innerHTML = `
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${row.report_date}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-800">${row.student_name}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-800">${row.student_name || row.student_username}</td>
                             <td class="px-6 py-4 text-sm text-gray-600">
                                 <div class="text-xs">Subuh: ${row.shalat_subuh || '-'}</div>
                                 <div class="text-xs">Isya: ${row.shalat_isya || '-'}</div>
