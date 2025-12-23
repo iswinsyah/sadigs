@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validasi Pembayaran | SADIGS 3.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+
+    <div class="flex h-screen overflow-hidden">
+        <!-- SIDEBAR -->
+        <aside id="sidebar" class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col hidden lg:flex">
+            <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-teal-600 text-white">
+                <h1 class="text-2xl font-extrabold tracking-wider">SADIGS</h1>
+            </div>
+            <div class="p-6">
+                <a href="dashboard.html" class="flex items-center gap-2 text-gray-600 hover:text-teal-600 transition">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i> Kembali ke Dashboard
+                </a>
+            </div>
+            <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-2 no-scrollbar">
+                <div id="groupKeuangan" class="bg-gray-50 rounded-lg p-2 mt-2">
+                    <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KEUANGAN</h3>
+                    <a id="navFormulirPembayaran" href="payment_form.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="credit-card" class="w-5 h-5"></i> Formulir Pembayaran</a>
+                    <a id="navValidasiPembayaran" href="payment_validation.html" class="flex items-center gap-3 px-3 py-2.5 text-teal-700 bg-white rounded-md transition font-semibold text-sm shadow-sm"><i data-lucide="check-circle-2" class="w-5 h-5"></i> Validasi Pembayaran</a>
+                    <a id="navTabelPembayaran" href="payment_list.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="banknote" class="w-5 h-5"></i> Data Pembayaran</a>
+                    <a id="navRekapPembayaran" href="payment_recap.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="pie-chart" class="w-5 h-5"></i> Rekap Keuangan</a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- KONTEN UTAMA -->
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative">
+            <header class="mb-8">
+                <h2 class="text-2xl lg:text-3xl font-bold text-gray-800">Validasi Pembayaran</h2>
+                <p class="text-gray-500 text-sm mt-1">Daftar pembayaran masuk yang menunggu konfirmasi.</p>
+            </header>
+
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Tanggal</th>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Santri</th>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Jenis</th>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Nominal</th>
+                                <th class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase">Bukti</th>
+                                <th class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="validationTableBody" class="bg-white divide-y divide-gray-200">
+                            <tr><td colspan="6" class="px-6 py-10 text-center text-gray-500">Memuat data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        async function initPage() {
+            const sessionRes = await fetch('sadigs_api_v3/session_check.php');
+            const sessionData = await sessionRes.json();
+            if (!sessionData.success) { window.location.href = 'index.html'; return; }
+
+            // Cek Izin Menu
+            try {
+                const permRes = await fetch('sadigs_api_v3/get_menu_permissions.php');
+                const permData = await permRes.json();
+                if (permData.success) {
+                    const allowedMenus = permData.permissions || [];
+                    allowedMenus.forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) el.classList.remove('hidden');
+                    });
+                }
+            } catch (e) { console.error(e); }
+
+            loadData();
+        }
+
+        async function loadData() {
+            const tbody = document.getElementById('validationTableBody');
+            try {
+                // Hanya ambil yang statusnya 'pending'
+                const res = await fetch('sadigs_api_v3/get_payments.php?status=pending');
+                const result = await res.json();
+                
+                if (result.success && result.data.length > 0) {
+                    tbody.innerHTML = '';
+                    result.data.forEach(row => {
+                        const tr = document.createElement('tr');
+                        const proofLink = row.proof_file ? `<a href="${row.proof_file}" target="_blank" class="text-teal-600 hover:underline text-xs font-bold">Lihat Bukti</a>` : '<span class="text-gray-400 text-xs">Tidak ada</span>';
+                        
+                        tr.innerHTML = `
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${row.payment_date}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-800">${row.student_name}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${row.payment_type}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-800">Rp ${parseInt(row.amount).toLocaleString('id-ID')}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center">${proofLink}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                                <button onclick="validate(${row.id}, 'approved')" class="text-green-600 hover:text-green-900 mr-3 font-bold bg-green-50 px-3 py-1 rounded border border-green-200">Terima</button>
+                                <button onclick="validate(${row.id}, 'rejected')" class="text-red-600 hover:text-red-900 font-bold bg-red-50 px-3 py-1 rounded border border-red-200">Tolak</button>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-10 text-center text-gray-500">Tidak ada pembayaran pending.</td></tr>';
+                }
+            } catch (e) { tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-10 text-center text-red-500">Gagal memuat data.</td></tr>'; }
+        }
+
+        window.validate = async function(id, status) {
+            if(!confirm('Anda yakin ingin mengubah status pembayaran ini?')) return;
+            try {
+                const res = await fetch('sadigs_api_v3/validate_payment.php', { 
+                    method: 'POST', 
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({id, status}) 
+                });
+                const result = await res.json();
+                if(result.success) {
+                    alert(result.message);
+                    loadData();
+                } else {
+                    alert('Gagal: ' + result.message);
+                }
+            } catch(e) { alert('Koneksi error'); }
+        }
+
+        initPage();
+    </script>
+</body>
+</html>
