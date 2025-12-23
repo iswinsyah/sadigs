@@ -60,6 +60,28 @@
                 window.location.href = 'dashboard.html';
                 return;
             }
+
+            // --- LOGIKA MENU DINAMIS (DATABASE) ---
+            try {
+                const permRes = await fetch('sadigs_api_v3/get_menu_permissions.php');
+                const permData = await permRes.json();
+                if (permData.success) {
+                    const allowedMenus = permData.permissions || [];
+                    
+                    // 1. Tampilkan menu yang diizinkan
+                    allowedMenus.forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) el.classList.remove('hidden');
+                    });
+
+                    // 2. Logika Tampilan Grup Keuangan
+                    const groupKeuangan = document.getElementById('groupKeuangan');
+                    if (groupKeuangan && groupKeuangan.querySelectorAll('a:not(.hidden)').length > 0) {
+                        groupKeuangan.classList.remove('hidden');
+                    }
+                }
+            } catch (e) { console.error("Gagal memuat izin menu:", e); }
+
             loadChildren();
         }
         async function loadChildren() {
