@@ -154,7 +154,7 @@
             const formData = new FormData(e.target);
 
             try {
-                const res = await fetch('sadigs_api_v3/submit_payment.php', {
+                const res = await fetch('sadigs_api_v3/submit_payment_api.php', {
                     method: 'POST',
                     body: formData
                 });
