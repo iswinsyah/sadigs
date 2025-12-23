@@ -1,5 +1,8 @@
 <?php
 ob_start();
+// Matikan display_errors agar warning PHP tidak merusak format JSON
+ini_set('display_errors', 0);
+error_reporting(E_ALL);
 header('Content-Type: application/json');
 require_once 'db_connect.php';
 
@@ -23,6 +26,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['id'])) {
     $target_user_id = $_GET['id'];
 } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['target_user_id'])) {
     $target_user_id = $_POST['target_user_id'];
+}
+
+// --- CEK POST MAX SIZE (PENTING UNTUK UPLOAD) ---
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($_POST) && (isset($_SERVER['CONTENT_LENGTH']) && $_SERVER['CONTENT_LENGTH'] > 0)) {
+    sendJSONResponse(['success' => false, 'message' => 'Ukuran file/data terlalu besar melebihi batas server (post_max_size).'], 413);
+    exit;
 }
 
 // --- SECURITY CHECK ---
@@ -63,7 +72,7 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     try {
         // --- LOGIKA UPLOAD FILE ---
-        define('UPLOAD_DIR', __DIR__ . '/uploads/student_docs/');
+        if (!defined('UPLOAD_DIR')) define('UPLOAD_DIR', __DIR__ . '/uploads/student_docs/');
         if (!is_dir(UPLOAD_DIR)) mkdir(UPLOAD_DIR, 0777, true);
 
         function handle_upload($file_key, $target_user_id, $doc_type, $pdo) {

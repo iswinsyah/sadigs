@@ -449,16 +449,26 @@
                     body: formData
                 });
 
-                if (!res.ok) {
-                    const errorResult = await res.json();
-                    throw new Error(errorResult.message);
+                // Cek apakah respon adalah JSON valid
+                const contentType = res.headers.get("content-type");
+                if (contentType && contentType.indexOf("application/json") !== -1) {
+                    const result = await res.json();
+                    
+                    if (!result.success) {
+                        throw new Error(result.message || 'Gagal menyimpan data.');
+                    }
+                    
+                    alert('Biodata berhasil disimpan!');
+                    window.location.reload();
+                } else {
+                    // Jika respon bukan JSON (misalnya error PHP Fatal atau HTML)
+                    const text = await res.text();
+                    console.error("Server Error Response:", text); // Cek Console F12 untuk detail
+                    throw new Error("Terjadi kesalahan di server (Respon tidak valid). Cek Console browser.");
                 }
-
-                const result = await res.json();
-                if (result.success) alert('Biodata berhasil disimpan!');
-                else alert('Gagal: ' + result.message);
-                window.location.reload(); // Reload halaman untuk lihat perubahan
-            } catch (error) { alert('Terjadi kesalahan koneksi.'); }
+            } catch (error) { 
+                alert('Gagal: ' + error.message); 
+            }
             finally { btn.disabled = false; btn.innerHTML = originalText; }
         });
 

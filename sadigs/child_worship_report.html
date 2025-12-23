@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rekap Ibadah Santri | SADIGS 3.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Oswald:wght@700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'utama': '#4FB7B3',
+                        'kedua': '#26667F',
+                        'tombol-utama': '#3674B5',
+                        'tombol-kedua': '#F93827',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-white text-gray-800 font-sans antialiased">
+
+    <div class="flex h-screen overflow-hidden">
+        <!-- SIDEBAR STANDAR -->
+        <aside id="sidebar" class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col hidden lg:flex">
+            <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-kedua text-white">
+                <img src="https://raw.githubusercontent.com/villaqurankotabatu-commits/gambarvqbm/f44bf009884af11aba2c967a2401026225f7b02b/vila%20quran.png" alt="Logo" class="h-9">
+            </div>
+            <div class="p-6">
+                <a href="select_student.html" class="flex items-center gap-2 text-gray-600 hover:text-utama transition">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i> Kembali ke Pilih Santri
+                </a>
+            </div>
+        </aside>
+
+        <!-- KONTEN UTAMA -->
+        <main class="flex-1 overflow-y-auto bg-white p-4 lg:p-8 w-full relative">
+            <header class="mb-8">
+                <h2 class="text-2xl lg:text-3xl font-bold text-gray-800">Rekap Ibadah Harian</h2>
+                <p id="studentNameHeader" class="text-gray-500 text-sm mt-1">Laporan untuk santri: Memuat...</p>
+            </header>
+
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Tanggal</th>
+                                <th class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Divalidasi Oleh</th>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Waktu Validasi</th>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Detail</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reportTableBody" class="bg-white divide-y divide-gray-200">
+                            <tr><td colspan="5" class="px-6 py-10 text-center text-gray-500">Memuat data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        async function initPage() {
+            const sessionRes = await fetch('sadigs_api_v3/session_check.php');
+            const sessionData = await sessionRes.json();
+            if (!sessionData.success) { window.location.href = 'index.html'; return; }
+
+            // Cek Izin Menu
+            try {
+                const permRes = await fetch('sadigs_api_v3/get_menu_permissions.php');
+                const permData = await permRes.json();
+                if (permData.success) {
+                    const allowedMenus = permData.permissions || [];
+                    if (!allowedMenus.includes('navRekapIbadahAnak')) {
+                        alert('Akses Ditolak.'); window.location.href = 'dashboard.html'; return;
+                    }
+                }
+            } catch (e) { console.error(e); }
+
+            loadData();
+        }
+
+        async function loadData() {
+            const tbody = document.getElementById('reportTableBody');
+            const urlParams = new URLSearchParams(window.location.search);
+            const studentId = urlParams.get('id');
+
+            if (!studentId) {
+                tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-10 text-center text-red-500">ID Santri tidak ditemukan di URL.</td></tr>';
+                return;
+            }
+
+            try {
+                const res = await fetch(`sadigs_api_v3/get_child_worship_report.php?id=${studentId}&t=${new Date().getTime()}`);
+                const result = await res.json();
+                
+                if (result.success) {
+                    document.getElementById('studentNameHeader').textContent = `Laporan untuk santri: ${result.student_name}`;
+
+                    if (result.data.length > 0) {
+                        tbody.innerHTML = '';
+                        result.data.forEach(row => {
+                            const statusColor = row.validation_status === 'approved' ? 'bg-green-100 text-green-800' : (row.validation_status === 'rejected' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800');
+                            const statusLabel = row.validation_status === 'approved' ? 'Disetujui' : (row.validation_status === 'rejected' ? 'Ditolak' : 'Menunggu');
+                            
+                            const tr = document.createElement('tr');
+                            tr.innerHTML = `
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-800">${row.report_date}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center"><span class="px-2 py-1 rounded-full text-xs font-bold ${statusColor}">${statusLabel}</span></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${row.validator_name || (row.validation_status !== 'pending' ? 'Sistem' : '-')}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${row.validated_at ? new Date(row.validated_at).toLocaleString('id-ID') : '-'}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                    <div class="text-xs">Subuh: ${row.shalat_subuh || '-'}</div>
+                                    <div class="text-xs">Isya: ${row.shalat_isya || '-'}</div>
+                                    <div class="text-xs">Quran: Hal. ${row.quran_last_page || '0'}</div>
+                                </td>
+                            `;
+                            tbody.appendChild(tr);
+                        });
+                    } else {
+                        tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-10 text-center text-gray-500">Santri ini belum pernah mengisi laporan ibadah.</td></tr>';
+                    }
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-10 text-center text-red-500">Gagal memuat data: ${result.message}</td></tr>`;
+                }
+            } catch (e) { 
+                tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-10 text-center text-red-500">Terjadi kesalahan koneksi.</td></tr>'; 
+            }
+        }
+
+        initPage();
+    </script>
+</body>
+</html>
