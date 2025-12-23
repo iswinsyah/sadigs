@@ -147,7 +147,19 @@
                 // Hilangkan awalan 'nav' dan ubah formatnya (e.g., navRekapTahfizh -> Rekap Tahfizh)
                 const displayName = menuId.replace(/^nav/, '').replace(/([A-Z])/g, ' $1').trim();
 
-                tdName.innerHTML = `<span class="text-base">${displayName}</span>`;
+                // --- LOGIKA KATEGORI (Form, Val, Tab) ---
+                let prefix = "Tab"; // Default kategori
+                const formMenus = [
+                    'navAbsensi', 'navBiodataPegawai', 'navBiodataSantri', 
+                    'navCalendarSettings', 'navIbadahHarian', 'navInputTahfizh', 
+                    'navMenuManagement', 'navProfil', 'navQuota', 'navRapat'
+                ];
+                const valMenus = ['navValidasiIbadah', 'navVerifikasi'];
+
+                if (formMenus.includes(menuId)) prefix = "Form";
+                else if (valMenus.includes(menuId)) prefix = "Val";
+
+                tdName.innerHTML = `<span class="text-base"><span class="font-mono font-bold text-teal-600 mr-1">${prefix}</span> ${displayName}</span>`;
                 tr.appendChild(tdName);
 
                 // Kolom Checkbox per Role
