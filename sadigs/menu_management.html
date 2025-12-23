@@ -109,6 +109,52 @@
                     roleList = data.roles;
                     menuList = data.menus;
                     currentMatrix = data.matrix;
+
+                    // --- SORTING BERDASARKAN ALUR KERJA (Form -> Val -> Tab) ---
+                    const customOrder = [
+                        // 1. Dashboard & Profil
+                        'navDashboard',
+                        'navProfil',
+                        
+                        // 2. Alur Ibadah Harian
+                        'navIbadahHarian',      // Form
+                        'navValidasiIbadah',    // Val
+                        'navRekapIbadahAnak',   // Tab
+
+                        // 3. Alur Tahfizh
+                        'navInputTahfizh',      // Form
+                        'navViewTahfizh',       // Tab (Wali)
+                        'navRekapTahfizh',      // Tab (Yayasan)
+
+                        // 4. Alur Santri & Mentoring
+                        'navBiodataSantri',     // Form
+                        'navMentoring',         // Tab
+
+                        // 5. Alur Kepegawaian
+                        'navBiodataPegawai',    // Form
+                        'navVerifikasi',        // Val
+                        'navQuota',             // Form
+                        'navAbsensi',           // Form
+
+                        // 6. Alur Rapat
+                        'navRapat',             // Form
+                        'navJadwalRapat',       // Tab
+
+                        // 7. Pengaturan Sistem
+                        'navKalender',          // Tab
+                        'navCalendarSettings',  // Form
+                        'navMenuManagement'     // Form
+                    ];
+
+                    menuList.sort((a, b) => {
+                        let indexA = customOrder.indexOf(a);
+                        let indexB = customOrder.indexOf(b);
+                        // Jika menu tidak ada di list, taruh di paling bawah
+                        if (indexA === -1) indexA = 999;
+                        if (indexB === -1) indexB = 999;
+                        return indexA - indexB || a.localeCompare(b);
+                    });
+
                     renderTable();
                 } else {
                     alert('Gagal memuat data: ' + data.message);
