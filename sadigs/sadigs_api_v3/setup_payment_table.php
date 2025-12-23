@@ -1,4 +1,5 @@
 <?php
+// Setup Payment Table - Force Update
 require_once 'db_connect.php';
 
 try {
