@@ -50,6 +50,11 @@ try {
 
         // --- MENU WALISANTRI (BARU) ---
         'navRekapIbadahAnak' => ['Walisantri'],
+
+        // --- MENU LAPORAN TAHFIZH (BARU) ---
+        'navInputTahfizh' => ['Musyrif'], // Form input untuk Musyrif
+        'navViewTahfizh' => ['Walisantri'], // Laporan untuk Walisantri
+        'navRekapTahfizh' => ['Ketua Yayasan', 'Kepala Sekolah', 'Kepala Asrama'], // Rekap untuk Pimpinan
     ];
 
     // 3. Eksekusi Insert
