@@ -46,6 +46,10 @@ try {
 
         // --- MENU VALIDASI IBADAH (BARU) ---
         'navValidasiIbadah' => ['Musyrif', 'Kepala Asrama', 'Kepala Sekolah'],
+        // Pastikan menu ini ada untuk Musyrif
+
+        // --- MENU WALISANTRI (BARU) ---
+        'navRekapIbadahAnak' => ['Walisantri'],
     ];
 
     // 3. Eksekusi Insert
@@ -70,9 +74,9 @@ try {
     echo "<p>Tabel 'menu_permissions' berhasil di-reset dan diisi.</p>";
     echo "<p>Total aturan yang ditambahkan: <strong>$count</strong></p>";
     echo "<hr>";
-    echo "<h3>Daftar Menu ID yang diatur:</h3><ul>";
-    foreach (array_keys($permissions) as $menu) {
-        echo "<li>$menu</li>";
+    echo "<h3>Daftar Menu ID yang diatur:</h3><ul style='font-family:monospace'>";
+    foreach ($permissions as $menu => $roles) {
+        echo "<li><strong>$menu</strong>: " . implode(", ", $roles) . "</li>";
     }
     echo "</ul>";
 
