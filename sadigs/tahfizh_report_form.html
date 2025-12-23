@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
-    <style>body { font-family: 'Inter', sans-serif; }</style>
+    <style>body { font-family: 'Inter', sans-serif; } input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { opacity: 1; }</style>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans antialiased">
     <div class="flex h-screen overflow-hidden">
@@ -16,21 +16,29 @@
                 <img src="https://raw.githubusercontent.com/villaqurankotabatu-commits/gambarvqbm/f44bf009884af11aba2c967a2401026225f7b02b/vila%20quran.png" alt="Logo" class="h-9">
             </div>
             <div class="p-6">
-                <a href="tahfizh_student_select.html" class="flex items-center gap-2 text-gray-600 hover:text-utama transition">
-                    <i data-lucide="arrow-left" class="w-5 h-5"></i> Kembali ke Pilih Santri
+                <a href="dashboard.html" class="flex items-center gap-2 text-gray-600 hover:text-utama transition">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i> Kembali ke Dashboard
                 </a>
             </div>
         </aside>
         <main class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative">
             <header class="mb-8">
                 <h2 class="text-2xl lg:text-3xl font-bold text-gray-800">Form Laporan Tahfizh</h2>
-                <p id="studentNameHeader" class="text-gray-500 text-sm mt-1">Mengisi laporan untuk santri...</p>
+                <p class="text-gray-500 text-sm mt-1">Isi laporan capaian hafalan untuk santri binaan Anda.</p>
             </header>
             <div class="max-w-3xl bg-white p-8 rounded-xl shadow-sm border border-gray-100">
                 <form id="reportForm" class="space-y-8">
-                    <div>
-                        <label for="report_date" class="block text-sm font-medium text-gray-700 mb-1">Tanggal Laporan</label>
-                        <input type="date" id="report_date" name="report_date" class="w-full md:w-1/2 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-utama outline-none">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="student_id_selector" class="block text-sm font-medium text-gray-700 mb-1">Pilih Santri</label>
+                            <select id="student_id_selector" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-utama outline-none bg-white">
+                                <option value="">Memuat santri...</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="report_date" class="block text-sm font-medium text-gray-700 mb-1">Tanggal Laporan</label>
+                            <input type="date" id="report_date" name="report_date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-utama outline-none">
+                        </div>
                     </div>
 
                     <!-- Capaian Kuantitatif -->
@@ -38,8 +46,10 @@
                         <h3 class="text-lg font-bold text-kedua mb-4">Capaian Setoran Baru</h3>
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Surat</label>
-                                <input type="text" name="last_surah_name" class="w-full px-3 py-2 border border-gray-300 rounded-lg" placeholder="An-Naba">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Nama Surat</label>
+                                <select name="last_surah_name" id="last_surah_name" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white">
+                                    <option value="">- Pilih Surat -</option>
+                                </select>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Ayat</label>
@@ -102,6 +112,22 @@
 
     <script>
         lucide.createIcons();
+
+        const surahList = [
+            "1. Al-Fatihah", "2. Al-Baqarah", "3. Ali 'Imran", "4. An-Nisa", "5. Al-Ma'idah", "6. Al-An'am", "7. Al-A'raf", "8. Al-Anfal", "9. At-Tawbah", "10. Yunus",
+            "11. Hud", "12. Yusuf", "13. Ar-Ra'd", "14. Ibrahim", "15. Al-Hijr", "16. An-Nahl", "17. Al-Isra'", "18. Al-Kahf", "19. Maryam", "20. Taha",
+            "21. Al-Anbiya'", "22. Al-Hajj", "23. Al-Mu'minun", "24. An-Nur", "25. Al-Furqan", "26. Asy-Syu'ara'", "27. An-Naml", "28. Al-Qasas", "29. Al-'Ankabut", "30. Ar-Rum",
+            "31. Luqman", "32. As-Sajdah", "33. Al-Ahzab", "34. Saba'", "35. Fatir", "36. Ya-Sin", "37. As-Saffat", "38. Sad", "39. Az-Zumar", "40. Ghafir",
+            "41. Fussilat", "42. Asy-Syura", "43. Az-Zukhruf", "44. Ad-Dukhan", "45. Al-Jasiyah", "46. Al-Ahqaf", "47. Muhammad", "48. Al-Fath", "49. Al-Hujurat", "50. Qaf",
+            "51. Az-Zariyat", "52. At-Tur", "53. An-Najm", "54. Al-Qamar", "55. Ar-Rahman", "56. Al-Waqi'ah", "57. Al-Hadid", "58. Al-Mujadilah", "59. Al-Hasyr", "60. Al-Mumtahanah",
+            "61. As-Saff", "62. Al-Jumu'ah", "63. Al-Munafiqun", "64. At-Tagabun", "65. At-Talaq", "66. At-Tahrim", "67. Al-Mulk", "68. Al-Qalam", "69. Al-Haqqah", "70. Al-Ma'arij",
+            "71. Nuh", "72. Al-Jinn", "73. Al-Muzzammil", "74. Al-Muddassir", "75. Al-Qiyamah", "76. Al-Insan", "77. Al-Mursalat", "78. An-Naba'", "79. An-Nazi'at", "80. 'Abasa",
+            "81. At-Takwir", "82. Al-Infitar", "83. Al-Mutaffifin", "84. Al-Insyiqaq", "85. Al-Buruj", "86. At-Tariq", "87. Al-A'la", "88. Al-Gasyiyah", "89. Al-Fajr", "90. Al-Balad",
+            "91. Asy-Syams", "92. Al-Lail", "93. Ad-Duha", "94. Asy-Syarh", "95. At-Tin", "96. Al-'Alaq", "97. Al-Qadr", "98. Al-Bayyinah", "99. Az-Zalzalah", "100. Al-'Adiyat",
+            "101. Al-Qari'ah", "102. At-Takasur", "103. Al-'Asr", "104. Al-Humazah", "105. Al-Fil", "106. Quraisy", "107. Al-Ma'un", "108. Al-Kausar", "109. Al-Kafirun", "110. An-Nasr",
+            "111. Al-Masad", "112. Al-Ikhlas", "113. Al-Falaq", "114. An-Nas"
+        ];
+
         const gradeOptions = `
             <option value="">- Pilih Nilai -</option>
             <option value="A">A (Mumtaz)</option>
@@ -111,48 +137,53 @@
         `;
         document.querySelectorAll('.grade-dropdown').forEach(select => select.innerHTML = gradeOptions);
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const studentId = urlParams.get('student_id');
+        const surahSelect = document.getElementById('last_surah_name');
+        surahList.forEach(surah => {
+            surahSelect.innerHTML += `<option value="${surah}">${surah}</option>`;
+        });
+
+        const studentSelector = document.getElementById('student_id_selector');
         const dateInput = document.getElementById('report_date');
         const form = document.getElementById('reportForm');
 
         async function initPage() {
-            if (!studentId) {
-                alert('ID Santri tidak ditemukan.');
-                window.location.href = 'tahfizh_student_select.html';
-                return;
-            }
-            
-            // Ambil nama santri untuk header
             try {
-                // Kita bisa buat API khusus, atau "curi" dari API lain.
-                // Untuk efisiensi, kita ambil dari API get_musyrif_students
                 const studentsRes = await fetch('sadigs_api_v3/get_musyrif_students.php');
                 const studentsResult = await studentsRes.json();
-                if(studentsResult.success) {
-                    const student = studentsResult.data.find(s => s.user_id == studentId);
-                    if(student) {
-                        document.getElementById('studentNameHeader').textContent = `Mengisi laporan untuk: ${student.full_name || student.username}`;
-                    }
+                if (studentsResult.success && studentsResult.data.length > 0) {
+                    studentSelector.innerHTML = '<option value="">- Pilih Santri -</option>';
+                    studentsResult.data.forEach(student => {
+                        studentSelector.innerHTML += `<option value="${student.user_id}">${student.full_name || student.username}</option>`;
+                    });
+                } else {
+                    studentSelector.innerHTML = '<option value="">Tidak ada santri binaan</option>';
+                    studentSelector.disabled = true;
                 }
-            } catch(e) { /* Biarkan default jika gagal */ }
+            } catch(e) {
+                studentSelector.innerHTML = '<option value="">Gagal memuat santri</option>';
+                studentSelector.disabled = true;
+            }
 
             dateInput.value = new Date().toISOString().split('T')[0];
-            loadReportData(dateInput.value);
-
-            dateInput.addEventListener('change', () => {
-                loadReportData(dateInput.value);
-            });
+            
+            studentSelector.addEventListener('change', () => loadReportData());
+            dateInput.addEventListener('change', () => loadReportData());
         }
 
-        async function loadReportData(date) {
+        async function loadReportData() {
+            const studentId = studentSelector.value;
+            const date = dateInput.value;
+            
+            form.reset(); // Selalu reset form saat ganti
+            dateInput.value = date; // Kembalikan tanggal
+            studentSelector.value = studentId; // Kembalikan pilihan santri
+
+            if (!studentId || !date) return;
+
             try {
                 const res = await fetch(`sadigs_api_v3/tahfizh_report_api.php?student_id=${studentId}&date=${date}`);
                 const result = await res.json();
                 
-                form.reset();
-                dateInput.value = date;
-
                 if (result.success && result.data) {
                     const data = result.data;
                     for (const key in data) {
@@ -169,6 +200,12 @@
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
+            const studentId = studentSelector.value;
+            if (!studentId) {
+                alert('Silakan pilih santri terlebih dahulu.');
+                return;
+            }
+
             const btn = document.getElementById('saveBtn');
             const originalText = btn.innerHTML;
             btn.disabled = true; btn.innerHTML = 'Menyimpan...';
