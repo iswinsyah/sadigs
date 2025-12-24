@@ -154,6 +154,12 @@
                         'navRekapPembayaran'     // Tab
                     ];
 
+                    // FIX: Pastikan semua menu di customOrder muncul di tabel, 
+                    // meskipun belum ada di database (agar bisa disetting pertama kali)
+                    customOrder.forEach(m => {
+                        if (!menuList.includes(m)) menuList.push(m);
+                    });
+
                     menuList.sort((a, b) => {
                         let indexA = customOrder.indexOf(a);
                         let indexB = customOrder.indexOf(b);
