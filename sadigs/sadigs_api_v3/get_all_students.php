@@ -12,9 +12,7 @@ $pdo = getDBConnection();
 try {
     // Ambil data user yang memiliki role Santri
     $sql = "SELECT u.user_id, u.username, u.full_name, u.gender,
-                   sd.nisn, sd.nik, sd.birth_place, sd.birth_date, sd.address, 
-                   sd.entry_date, sd.father_name, sd.mother_name, sd.student_phone,
-                   sd.previous_school
+                   sd.*
             FROM users u
             JOIN user_roles ur ON u.user_id = ur.user_id
             LEFT JOIN student_details sd ON u.user_id = sd.user_id
