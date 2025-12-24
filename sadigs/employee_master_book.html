@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buku Induk Pegawai | SADIGS 3.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>body { font-family: 'Inter', sans-serif; } .no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }</style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+
+    <div class="flex h-screen overflow-hidden">
+        <!-- SIDEBAR -->
+        <aside id="sidebar" class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col hidden lg:flex">
+            <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-teal-600 text-white">
+                <h1 class="text-2xl font-extrabold tracking-wider">SADIGS</h1>
+            </div>
+            <div class="p-6">
+                <a href="dashboard.html" class="flex items-center gap-2 text-gray-600 hover:text-teal-600 transition">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i> Kembali ke Dashboard
+                </a>
+            </div>
+            <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-2 no-scrollbar">
+                <!-- Div 1: UMUM -->
+                <div class="bg-gray-50 rounded-lg p-2">
+                    <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">UMUM</h3>
+                    <a id="navDashboard" href="dashboard.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard</a>
+                    <a id="navKalender" href="calendar_view.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="table" class="w-5 h-5"></i> Tabel Kalender</a>
+                    <a id="navProfil" href="profile.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="user" class="w-5 h-5"></i> Profil Saya</a>
+                </div>
+
+                <!-- Container untuk menu Yayasan -->
+                <div id="menuYayasan" class="hidden space-y-2">
+                    <div class="bg-gray-50 rounded-lg p-2">
+                        <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KEPEGAWAIAN</h3>
+                        <a id="navAbsensi" href="attendance.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="map-pin" class="w-5 h-5"></i> Absensi Pegawai</a>
+                        <a id="navBiodataPegawai" href="employee_data.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="file-badge" class="w-5 h-5"></i> Biodata Pegawai</a>
+                        <a id="navBukuIndukPegawai" href="employee_master_book.html" class="flex items-center gap-3 px-3 py-2.5 text-teal-700 bg-white rounded-md transition font-semibold text-sm shadow-sm"><i data-lucide="book-open" class="w-5 h-5"></i> Buku Induk Pegawai</a>
+                        <a id="navRapat" href="meeting_invitation.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="mail" class="w-5 h-5"></i> Formulir Undang Rapat</a>
+                        <a id="navJadwalRapat" href="meeting_schedule.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="calendar-clock" class="w-5 h-5"></i> Jadwal Rapat</a>
+                    </div>
+                    <div id="groupKhusus" class="hidden bg-gray-50 rounded-lg p-2">
+                        <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KHUSUS</h3>
+                        <a id="navVerifikasi" href="verification_management.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="users" class="w-5 h-5"></i> Verifikasi Pegawai</a>
+                        <a id="navQuota" href="quota_management.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="user-cog" class="w-5 h-5"></i> Atur Kuota</a>
+                        <a id="navCalendarSettings" href="calendar_settings.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="calendar-cog" class="w-5 h-5"></i> Atur Kalender</a>
+                        <a id="navMenuManagement" href="menu_management.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="lock" class="w-5 h-5"></i> Manajemen Akses</a>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- KONTEN UTAMA -->
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative">
+            <header class="mb-8 flex justify-between items-center">
+                <div>
+                    <h2 class="text-2xl lg:text-3xl font-bold text-gray-800">Buku Induk Pegawai</h2>
+                    <p class="text-gray-500 text-sm mt-1">Data lengkap seluruh pegawai yayasan.</p>
+                </div>
+                <button onclick="window.print()" class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 flex items-center gap-2 text-sm font-medium">
+                    <i data-lucide="printer" class="w-4 h-4"></i> Cetak
+                </button>
+            </header>
+
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 text-sm">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Nama & Jabatan</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">NIK / Kontak</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">TTL & Alamat</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Pendidikan</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Tgl Masuk</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody" class="bg-white divide-y divide-gray-200">
+                            <tr><td colspan="5" class="px-6 py-10 text-center text-gray-500">Memuat data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        async function initPage() {
+            // Cek Sesi
+            const sessionRes = await fetch('sadigs_api_v3/session_check.php');
+            const sessionData = await sessionRes.json();
+            if (!sessionData.success) { window.location.href = 'index.html'; return; }
+
+            // --- LOGIKA MENU DINAMIS (DATABASE) ---
+            try {
+                const permRes = await fetch('sadigs_api_v3/get_menu_permissions.php');
+                const permData = await permRes.json();
+                if (permData.success) {
+                    const allowedMenus = permData.permissions || [];
+                    allowedMenus.forEach(id => { const el = document.getElementById(id); if(el) el.classList.remove('hidden'); });
+                    if (document.querySelector('#menuYayasan a:not(.hidden)')) document.getElementById('menuYayasan').classList.remove('hidden');
+                    if (document.querySelector('#groupKhusus a:not(.hidden)')) document.getElementById('groupKhusus').classList.remove('hidden');
+                }
+            } catch (e) { console.error(e); }
+
+            loadData();
+        }
+
+        async function loadData() {
+            try {
+                const res = await fetch('sadigs_api_v3/get_all_employees.php');
+                const result = await res.json();
+                
+                const tbody = document.getElementById('tableBody');
+                if (result.success && result.data.length > 0) {
+                    tbody.innerHTML = '';
+                    result.data.forEach(row => {
+                        const tr = document.createElement('tr');
+                        tr.className = "hover:bg-gray-50";
+                        tr.innerHTML = `
+                            <td class="px-4 py-3 align-top">
+                                <div class="font-bold text-gray-900">${row.full_name}</div>
+                                <div class="text-xs text-teal-600 font-medium">${row.roles}</div>
+                                <div class="text-xs text-gray-400 mt-1">${row.username}</div>
+                            </td>
+                            <td class="px-4 py-3 align-top">
+                                <div class="text-gray-700">NIK: ${row.nik || '-'}</div>
+                                <div class="text-gray-500 text-xs mt-1">${row.phone || '-'}</div>
+                                <div class="text-gray-500 text-xs">${row.email || '-'}</div>
+                            </td>
+                            <td class="px-4 py-3 align-top">
+                                <div>${row.birth_place || ''}, ${row.birth_date || ''}</div>
+                                <div class="text-xs text-gray-500 mt-1 max-w-xs truncate">${row.address || '-'}</div>
+                            </td>
+                            <td class="px-4 py-3 align-top">
+                                <div>${row.last_education || '-'}</div>
+                            </td>
+                            <td class="px-4 py-3 align-top">
+                                <div>${row.entry_date || '-'}</div>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-10 text-center text-gray-500">Tidak ada data pegawai.</td></tr>';
+                }
+            } catch (e) {
+                console.error(e);
+                document.getElementById('tableBody').innerHTML = '<tr><td colspan="5" class="px-6 py-10 text-center text-red-500">Gagal memuat data.</td></tr>';
+            }
+        }
+        initPage();
+    </script>
+</body>
+</html>
