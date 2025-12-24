@@ -61,16 +61,21 @@
                     <table class="min-w-full divide-y divide-gray-200 text-sm">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Nama Santri</th>
-                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Data Diri</th>
-                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Akademik</th>
-                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Keluarga</th>
-                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Wali & Kontak</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Nama Lengkap</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">NISN</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">NIK</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Tempat Lahir</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Tgl Lahir</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Alamat</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Tgl Masuk</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Nama Ayah</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Nama Ibu</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Nama Wali</th>
                                 <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Dokumen</th>
                             </tr>
                         </thead>
                         <tbody id="tableBody" class="bg-white divide-y divide-gray-200">
-                            <tr><td colspan="6" class="px-6 py-10 text-center text-gray-500">Memuat data...</td></tr>
+                            <tr><td colspan="11" class="px-6 py-10 text-center text-gray-500">Memuat data...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -130,27 +135,16 @@
                             <td class="px-4 py-3 align-top">
                                 <div class="font-bold text-gray-900">${row.full_name || '-'}</div>
                                 <div class="text-xs text-gray-500">${row.username || '-'}</div>
-                                <div class="text-xs text-teal-600 mt-1">${row.gender || '-'}</div>
                             </td>
-                            <td class="px-4 py-3 align-top">
-                                <div class="text-gray-700"><strong>NISN:</strong> ${row.nisn || '-'}</div>
-                                <div class="text-gray-700"><strong>NIK:</strong> ${row.nik || '-'}</div>
-                                <div class="text-gray-700"><strong>TTL:</strong> ${row.birth_place || ''}, ${row.birth_date || ''}</div>
-                            </td>
-                            <td class="px-4 py-3 align-top">
-                                <div class="text-gray-700"><strong>Tgl Masuk:</strong> ${row.entry_date || '-'}</div>
-                                <div class="text-gray-700"><strong>Sekolah Asal:</strong> ${row.previous_school || '-'}</div>
-                            </td>
-                            <td class="px-4 py-3 align-top text-xs">
-                                <div><strong>Ayah:</strong> ${row.father_name || '-'}</div>
-                                <div><strong>Ibu:</strong> ${row.mother_name || '-'}</div>
-                                <div><strong>Anak ke:</strong> ${row.child_order || '-'} dari ${row.siblings_count || '?'} bersaudara</div>
-                            </td>
-                            <td class="px-4 py-3 align-top">
-                                <div class="text-gray-700"><strong>HP Santri:</strong> ${row.student_phone || '-'}</div>
-                                <div class="text-gray-700"><strong>Wali:</strong> ${row.parent_name || '-'} (${row.responsible_party || '...'})</div>
-                                <div class="text-xs text-gray-500 mt-1 max-w-xs">${row.address || '-'}</div>
-                            </td>
+                            <td class="px-4 py-3 align-top">${row.nisn || '-'}</td>
+                            <td class="px-4 py-3 align-top">${row.nik || '-'}</td>
+                            <td class="px-4 py-3 align-top">${row.birth_place || '-'}</td>
+                            <td class="px-4 py-3 align-top">${row.birth_date || '-'}</td>
+                            <td class="px-4 py-3 align-top text-xs max-w-xs">${row.address || '-'}</td>
+                            <td class="px-4 py-3 align-top">${row.entry_date || '-'}</td>
+                            <td class="px-4 py-3 align-top">${row.father_name || '-'}</td>
+                            <td class="px-4 py-3 align-top">${row.mother_name || '-'}</td>
+                            <td class="px-4 py-3 align-top">${row.parent_name || '-'}</td>
                             <td class="px-4 py-3 align-top text-xs space-y-1">
                                 ${docLinks || '<span class="text-gray-400">Belum ada</span>'}
                             </td>
@@ -159,11 +153,11 @@
                     });
                     lucide.createIcons(); // Re-initialize icons
                 } else {
-                    tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-10 text-center text-gray-500">Tidak ada data santri.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="11" class="px-6 py-10 text-center text-gray-500">Tidak ada data santri.</td></tr>';
                 }
             } catch (e) {
                 console.error(e);
-                document.getElementById('tableBody').innerHTML = '<tr><td colspan="6" class="px-6 py-10 text-center text-red-500">Gagal memuat data.</td></tr>';
+                document.getElementById('tableBody').innerHTML = '<tr><td colspan="11" class="px-6 py-10 text-center text-red-500">Gagal memuat data.</td></tr>';
             }
         }
         initPage();
