@@ -12,7 +12,6 @@
 <body class="bg-gray-50 text-gray-800 font-sans antialiased">
 
     <div class="flex h-screen overflow-hidden">
-        <!-- SIDEBAR (Akan diisi oleh JS yang sama dengan dashboard) -->
         <!-- SIDEBAR -->
         <aside id="sidebar" class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col hidden lg:flex">
             <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-teal-600 text-white">
@@ -24,11 +23,6 @@
                 </a>
             </div>
             <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-2 no-scrollbar">
-                <!-- Div 4: KESANTRIAN -->
-                <div id="groupSantri" class="bg-gray-50 rounded-lg p-2 mt-2">
-                    <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KESANTRIAN</h3>
-                    <a id="navMentoring" href="mentoring_groups.html" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="users-round" class="w-5 h-5"></i> Kelompok Mentoring</a>
-                    <a id="navValidasiIbadah" href="daily_worship_validation.html" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="check-square" class="w-5 h-5"></i> Validasi Ibadah</a>
                 <div class="bg-gray-50 rounded-lg p-2">
                     <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KEPEGAWAIAN</h3>
                     <a href="attendance.html" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="map-pin" class="w-5 h-5"></i> Absensi Pegawai</a>
@@ -41,7 +35,7 @@
         <main class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative">
             <header class="mb-8">
                 <h2 class="text-2xl lg:text-3xl font-bold text-gray-800">Biodata Pegawai</h2>
-                <p class="text-gray-500 text-sm mt-1">Lengkapi data kepegawaian untuk keperluan arsip yayasan.</p>
+                <p class="text-gray-500 text-sm mt-1">Lengkapi data diri dan dokumen kepegawaian Anda.</p>
             </header>
 
             <form id="employeeForm" class="space-y-8" enctype="multipart/form-data">
@@ -196,7 +190,13 @@
                 </div>
 
                 <div class="flex justify-end pt-4">
-                    <button type="submit" id="saveBtn" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-8 rounded-lg transition shadow-md flex items-center gap-2">
+                    <button type="button" id="editBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition shadow-md flex items-center gap-2">
+                        <i data-lucide="edit" class="w-5 h-5"></i> Edit Data
+                    </button>
+                    <button type="button" id="cancelBtn" class="hidden ml-2 bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-8 rounded-lg transition shadow-md flex items-center gap-2">
+                        <i data-lucide="x" class="w-5 h-5"></i> Batal
+                    </button>
+                    <button type="submit" id="saveBtn" class="hidden ml-2 bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-8 rounded-lg transition shadow-md flex items-center gap-2">
                         <i data-lucide="save" class="w-5 h-5"></i> Simpan Biodata
                     </button>
                 </div>
@@ -207,19 +207,35 @@
     <script>
         lucide.createIcons();
 
+        function setFormReadOnly(isReadOnly) {
+            const form = document.getElementById('employeeForm');
+            const inputs = form.querySelectorAll('input, select, textarea');
+            
+            inputs.forEach(input => {
+                // Jangan disable username field karena sudah readonly
+                if (input.name !== 'username') {
+                    input.disabled = isReadOnly;
+                }
+            });
+
+            document.getElementById('editBtn').classList.toggle('hidden', !isReadOnly);
+            document.getElementById('cancelBtn').classList.toggle('hidden', isReadOnly);
+            document.getElementById('saveBtn').classList.toggle('hidden', isReadOnly);
+        }
+
         async function initPage() {
-            // Cek Sesi
             const sessionRes = await fetch('sadigs_api_v3/session_check.php');
             const sessionData = await sessionRes.json();
             if (!sessionData.success) { window.location.href = 'index.html'; return; }
 
-            // Cek apakah Pegawai (Bukan Santri/Walisantri)
+            // Otorisasi: Hanya Pegawai yang bisa akses
             const pegawaiRoles = ['Kepala Sekolah', 'Kepala Asrama', 'Sekretaris Sekolah', 'Bendahara Sekolah', 'Musyrif', 'Ustadz', 'Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan'];
             if (!sessionData.roles.some(r => pegawaiRoles.includes(r))) {
                 alert('Halaman ini khusus untuk Pegawai.');
                 window.location.href = 'dashboard.html';
                 return;
             }
+
             // Cek Izin Menu
             try {
                 const permRes = await fetch('sadigs_api_v3/get_menu_permissions.php');
@@ -263,7 +279,11 @@
                     });
                     lucide.createIcons();
                 }
-            } catch (e) { console.error("Gagal memuat data", e); }
+            } catch (e) { 
+                console.error("Gagal memuat data", e); 
+            } finally {
+                setFormReadOnly(true); // Kunci form setelah data dimuat
+            }
         }
 
         document.getElementById('employeeForm').addEventListener('submit', async (e) => {
@@ -284,6 +304,16 @@
                 if(result.success) loadData(); // Reload untuk update status file
             } catch (error) { alert('Terjadi kesalahan koneksi.'); }
             finally { btn.disabled = false; btn.innerHTML = originalText; }
+        });
+
+        document.getElementById('editBtn').addEventListener('click', () => {
+            setFormReadOnly(false);
+        });
+
+        document.getElementById('cancelBtn').addEventListener('click', () => {
+            if (confirm('Anda yakin ingin membatalkan perubahan? Data yang belum disimpan akan hilang.')) {
+                window.location.reload();
+            }
         });
 
         initPage();

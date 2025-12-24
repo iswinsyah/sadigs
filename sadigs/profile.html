@@ -153,8 +153,14 @@
                             </div>
                         </div>
 
-                        <div class="flex justify-end pt-4">
-                            <button type="submit" id="saveBtn" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-md flex items-center gap-2">
+                        <div class="flex justify-end pt-4 border-t">
+                            <button type="button" id="editBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-md flex items-center gap-2">
+                                <i data-lucide="edit" class="w-4 h-4"></i> Edit Profil
+                            </button>
+                            <button type="button" id="cancelBtn" class="hidden ml-2 bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-lg transition shadow-md">
+                                Batal
+                            </button>
+                            <button type="submit" id="saveBtn" class="hidden ml-2 bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-md flex items-center gap-2">
                                 <i data-lucide="save" class="w-4 h-4"></i> Simpan Perubahan
                             </button>
                         </div>
@@ -211,6 +217,19 @@
         }
         mobileMenuBtn.addEventListener('click', toggleSidebar);
         sidebarOverlay.addEventListener('click', toggleSidebar);
+
+        function setFormReadOnly(isReadOnly) {
+            const form = document.getElementById('profileForm');
+            // Username & email selalu readonly
+            form.querySelector('#fullName').disabled = isReadOnly;
+            form.querySelector('#gender').disabled = isReadOnly;
+            form.querySelector('#bio').disabled = isReadOnly;
+            form.querySelector('#newPassword').disabled = isReadOnly;
+
+            document.getElementById('editBtn').classList.toggle('hidden', !isReadOnly);
+            document.getElementById('cancelBtn').classList.toggle('hidden', isReadOnly);
+            document.getElementById('saveBtn').classList.toggle('hidden', isReadOnly);
+        }
 
         // Load Data
         async function loadProfile() {
@@ -322,10 +341,14 @@
                     document.getElementById('fullName').value = u.full_name || '';
                     document.getElementById('bio').value = u.bio || '';
                     document.getElementById('gender').value = u.gender || 'Laki-laki';
+                } else {
+                    alert('Gagal memuat detail profil: ' + profileData.message);
                 }
 
             } catch (error) {
                 console.error(error);
+            } finally {
+                setFormReadOnly(true); // Kunci form setelah data dimuat
             }
         }
 
@@ -437,6 +460,16 @@
             if (result.success) {
                 // Redirect ke login karena sesi dihancurkan
                 window.location.href = 'index.html';
+            }
+        });
+
+        document.getElementById('editBtn').addEventListener('click', () => {
+            setFormReadOnly(false);
+        });
+
+        document.getElementById('cancelBtn').addEventListener('click', () => {
+            if (confirm('Anda yakin ingin membatalkan perubahan?')) {
+                window.location.reload();
             }
         });
 
