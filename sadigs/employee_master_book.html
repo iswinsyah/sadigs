@@ -70,15 +70,32 @@
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Nama & Jabatan</th>
-                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Data Diri</th>
-                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Kontak & Alamat</th>
-                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Akademik</th>
-                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Media Sosial</th>
-                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Dokumen</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">NIK</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Tempat Lahir</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Tgl Lahir</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Status</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Tgl Masuk</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">No. HP</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Email</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Alamat</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Pendidikan</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Thn Lulus</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Instagram</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Tiktok</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Facebook</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Threads</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Youtube</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Lamaran</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">CV</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Ijazah</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">KK</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">KTP</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Sertifikat</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Piagam</th>
                             </tr>
                         </thead>
                         <tbody id="tableBody" class="bg-white divide-y divide-gray-200">
-                            <tr><td colspan="6" class="px-6 py-10 text-center text-gray-500">Memuat data...</td></tr>
+                            <tr><td colspan="23" class="px-6 py-10 text-center text-gray-500">Memuat data...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -125,26 +142,14 @@
                         // Helper untuk membuat link dokumen
                         const createDocLink = (path, label) => {
                             if (!path) return '';
-                            return `<a href="sadigs_api_v3/${path}" target="_blank" class="flex items-center gap-1 text-blue-600 hover:underline"><i data-lucide="file-text" class="w-3 h-3"></i>${label}</a>`;
+                            return `<a href="sadigs_api_v3/${path}" target="_blank" class="text-blue-600 hover:underline">${label}</a>`;
                         };
                         
                         // Helper untuk membuat link medsos
                         const createSocialLink = (url, label) => {
                             if (!url) return '';
-                            return `<a href="${url}" target="_blank" class="flex items-center gap-1 text-blue-600 hover:underline"><i data-lucide="link" class="w-3 h-3"></i>${label}</a>`;
+                            return `<a href="${url}" target="_blank" class="text-blue-600 hover:underline">${label}</a>`;
                         };
-
-                        const docLinks = [
-                            createDocLink(row.ktp_path, 'KTP'),
-                            createDocLink(row.kk_path, 'KK'),
-                            createDocLink(row.ijazah_path, 'Ijazah'),
-                            createDocLink(row.cv_path, 'CV'),
-                        ].filter(Boolean).join('<br>');
-
-                        const socialLinks = [
-                            createSocialLink(row.instagram_url, 'Instagram'),
-                            createSocialLink(row.tiktok_url, 'TikTok'),
-                        ].filter(Boolean).join('<br>');
 
                         tr.innerHTML = `
                             <td class="px-4 py-3 align-top">
@@ -152,36 +157,38 @@
                                 <div class="text-xs text-gray-500">${row.username || '-'}</div>
                                 <div class="text-xs text-teal-600 font-medium mt-1">${row.roles || '-'}</div>
                             </td>
-                            <td class="px-4 py-3 align-top">
-                                <div class="text-gray-700"><strong>NIK:</strong> ${row.nik || '-'}</div>
-                                <div class="text-gray-700"><strong>TTL:</strong> ${row.birth_place || ''}, ${row.birth_date || ''}</div>
-                                <div class="text-gray-700"><strong>Status:</strong> ${row.marital_status || '-'}</div>
-                            </td>
-                            <td class="px-4 py-3 align-top">
-                                <div class="text-gray-700"><strong>HP:</strong> ${row.phone || '-'}</div>
-                                <div class="text-gray-700"><strong>Email:</strong> ${row.email || '-'}</div>
-                                <div class="text-xs text-gray-500 mt-1 max-w-xs">${row.address || '-'}</div>
-                            </td>
-                            <td class="px-4 py-3 align-top">
-                                <div class="text-gray-700"><strong>Tgl Masuk:</strong> ${row.entry_date || '-'}</div>
-                                <div class="text-gray-700"><strong>Pendidikan:</strong> ${row.last_education || '-'} (${row.graduation_year || '...'})</div>
-                            </td>
-                            <td class="px-4 py-3 align-top text-xs space-y-1">
-                                ${socialLinks || '<span class="text-gray-400">Belum ada</span>'}
-                            </td>
-                            <td class="px-4 py-3 align-top text-xs space-y-1">
-                                ${docLinks || '<span class="text-gray-400">Belum ada</span>'}
-                            </td>
+                            <td class="px-4 py-3 align-top">${row.nik || '-'}</td>
+                            <td class="px-4 py-3 align-top">${row.birth_place || '-'}</td>
+                            <td class="px-4 py-3 align-top">${row.birth_date || '-'}</td>
+                            <td class="px-4 py-3 align-top">${row.marital_status || '-'}</td>
+                            <td class="px-4 py-3 align-top">${row.entry_date || '-'}</td>
+                            <td class="px-4 py-3 align-top">${row.phone || '-'}</td>
+                            <td class="px-4 py-3 align-top">${row.email || '-'}</td>
+                            <td class="px-4 py-3 align-top text-xs max-w-xs">${row.address || '-'}</td>
+                            <td class="px-4 py-3 align-top">${row.last_education || '-'}</td>
+                            <td class="px-4 py-3 align-top">${row.graduation_year || '-'}</td>
+                            <td class="px-4 py-3 align-top text-xs">${createSocialLink(row.instagram_url, 'Lihat') || '-'}</td>
+                            <td class="px-4 py-3 align-top text-xs">${createSocialLink(row.tiktok_url, 'Lihat') || '-'}</td>
+                            <td class="px-4 py-3 align-top text-xs">${createSocialLink(row.facebook_url, 'Lihat') || '-'}</td>
+                            <td class="px-4 py-3 align-top text-xs">${createSocialLink(row.threads_url, 'Lihat') || '-'}</td>
+                            <td class="px-4 py-3 align-top text-xs">${createSocialLink(row.youtube_url, 'Lihat') || '-'}</td>
+                            <td class="px-4 py-3 align-top text-xs">${createDocLink(row.application_letter_path, 'Lihat') || '-'}</td>
+                            <td class="px-4 py-3 align-top text-xs">${createDocLink(row.cv_path, 'Lihat') || '-'}</td>
+                            <td class="px-4 py-3 align-top text-xs">${createDocLink(row.ijazah_path, 'Lihat') || '-'}</td>
+                            <td class="px-4 py-3 align-top text-xs">${createDocLink(row.kk_path, 'Lihat') || '-'}</td>
+                            <td class="px-4 py-3 align-top text-xs">${createDocLink(row.ktp_path, 'Lihat') || '-'}</td>
+                            <td class="px-4 py-3 align-top text-xs">${createDocLink(row.certificate_skill_path, 'Lihat') || '-'}</td>
+                            <td class="px-4 py-3 align-top text-xs">${createDocLink(row.certificate_award_path, 'Lihat') || '-'}</td>
                         `;
                         tbody.appendChild(tr);
                     });
                     lucide.createIcons(); // Re-initialize icons after adding them to DOM
                 } else {
-                    tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-10 text-center text-gray-500">Tidak ada data pegawai.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="23" class="px-6 py-10 text-center text-gray-500">Tidak ada data pegawai.</td></tr>';
                 }
             } catch (e) {
                 console.error(e);
-                document.getElementById('tableBody').innerHTML = '<tr><td colspan="6" class="px-6 py-10 text-center text-red-500">Gagal memuat data.</td></tr>';
+                document.getElementById('tableBody').innerHTML = '<tr><td colspan="23" class="px-6 py-10 text-center text-red-500">Gagal memuat data.</td></tr>';
             }
         }
         initPage();
