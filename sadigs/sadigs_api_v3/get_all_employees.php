@@ -12,8 +12,7 @@ $pdo = getDBConnection();
 try {
     // Ambil data user yang memiliki role pegawai
     $sql = "SELECT u.user_id, u.username, u.full_name, u.email, u.gender,
-                   ed.nik, ed.birth_place, ed.birth_date, ed.phone, ed.address, 
-                   ed.last_education, ed.entry_date, ed.marital_status,
+                   ed.*,
                    GROUP_CONCAT(DISTINCT ur.role_name SEPARATOR ', ') as roles
             FROM users u
             JOIN user_roles ur ON u.user_id = ur.user_id
