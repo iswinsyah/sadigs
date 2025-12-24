@@ -69,14 +69,16 @@
                     <table class="min-w-full divide-y divide-gray-200 text-sm">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Data Pribadi</th>
-                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">NIK / Kontak</th>
-                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Pendidikan & Alamat</th>
-                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Dokumen & Medsos</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Nama & Jabatan</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Data Diri</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Kontak & Alamat</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Akademik</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Media Sosial</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Dokumen</th>
                             </tr>
                         </thead>
                         <tbody id="tableBody" class="bg-white divide-y divide-gray-200">
-                            <tr><td colspan="4" class="px-6 py-10 text-center text-gray-500">Memuat data...</td></tr>
+                            <tr><td colspan="6" class="px-6 py-10 text-center text-gray-500">Memuat data...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -147,36 +149,39 @@
                         tr.innerHTML = `
                             <td class="px-4 py-3 align-top">
                                 <div class="font-bold text-gray-900">${row.full_name || '-'}</div>
-                                <div class="text-xs text-gray-500">${row.username}</div>
+                                <div class="text-xs text-gray-500">${row.username || '-'}</div>
                                 <div class="text-xs text-teal-600 font-medium mt-1">${row.roles || '-'}</div>
                             </td>
                             <td class="px-4 py-3 align-top">
                                 <div class="text-gray-700"><strong>NIK:</strong> ${row.nik || '-'}</div>
                                 <div class="text-gray-700"><strong>TTL:</strong> ${row.birth_place || ''}, ${row.birth_date || ''}</div>
                                 <div class="text-gray-700"><strong>Status:</strong> ${row.marital_status || '-'}</div>
-                                <div class="text-gray-500 text-xs mt-1"><strong>HP:</strong> ${row.phone || '-'}</div>
-                                <div class="text-gray-500 text-xs"><strong>Email:</strong> ${row.email || '-'}</div>
+                            </td>
+                            <td class="px-4 py-3 align-top">
+                                <div class="text-gray-700"><strong>HP:</strong> ${row.phone || '-'}</div>
+                                <div class="text-gray-700"><strong>Email:</strong> ${row.email || '-'}</div>
+                                <div class="text-xs text-gray-500 mt-1 max-w-xs">${row.address || '-'}</div>
                             </td>
                             <td class="px-4 py-3 align-top">
                                 <div class="text-gray-700"><strong>Tgl Masuk:</strong> ${row.entry_date || '-'}</div>
                                 <div class="text-gray-700"><strong>Pendidikan:</strong> ${row.last_education || '-'} (${row.graduation_year || '...'})</div>
-                                <div class="text-xs text-gray-500 mt-1 max-w-xs">${row.address || '-'}</div>
                             </td>
                             <td class="px-4 py-3 align-top text-xs space-y-1">
-                                ${docLinks || '<span class="text-gray-400">Dokumen belum ada</span>'}
-                                <hr class="my-1">
-                                ${socialLinks || '<span class="text-gray-400">Medsos belum ada</span>'}
+                                ${socialLinks || '<span class="text-gray-400">Belum ada</span>'}
+                            </td>
+                            <td class="px-4 py-3 align-top text-xs space-y-1">
+                                ${docLinks || '<span class="text-gray-400">Belum ada</span>'}
                             </td>
                         `;
                         tbody.appendChild(tr);
                     });
                     lucide.createIcons(); // Re-initialize icons after adding them to DOM
                 } else {
-                    tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-10 text-center text-gray-500">Tidak ada data pegawai.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-10 text-center text-gray-500">Tidak ada data pegawai.</td></tr>';
                 }
             } catch (e) {
                 console.error(e);
-                document.getElementById('tableBody').innerHTML = '<tr><td colspan="4" class="px-6 py-10 text-center text-red-500">Gagal memuat data.</td></tr>';
+                document.getElementById('tableBody').innerHTML = '<tr><td colspan="6" class="px-6 py-10 text-center text-red-500">Gagal memuat data.</td></tr>';
             }
         }
         initPage();
