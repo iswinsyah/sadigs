@@ -162,8 +162,8 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // 2. Update Detail Santri (Student Details Table)
         // Gunakan INSERT ... ON DUPLICATE KEY UPDATE
         $sql = "INSERT INTO student_details 
-                (user_id, student_photo_path, ijazah_photo_path, kk_photo_path, birth_cert_photo_path, nik, nisn, birth_place, birth_date, student_phone, address, previous_school, previous_school_address, child_order, siblings_count, step_siblings_count, medical_history, responsible_party, parent_username, father_name, father_phone, father_job, father_address, mother_name, mother_phone, mother_job, mother_address, parent_name, parent_phone, guardian_job, guardian_address) 
-                VALUES (:uid, :s_photo, :ijazah_photo, :kk_photo, :akte_photo, :nik, :nisn, :bplace, :bdate, :sphone, :addr, :pschool, :pschool_addr, :corder, :sib_cnt, :step_sib_cnt, :med_hist, :resp_party, :p_username, :fname, :fphone, :fjob, :faddr, :mname, :mphone, :mjob, :maddr, :pname, :pphone, :gjob, :gaddr)
+                (user_id, student_photo_path, ijazah_photo_path, kk_photo_path, birth_cert_photo_path, nik, nisn, birth_place, birth_date, student_phone, address, previous_school, previous_school_address, entry_date, child_order, siblings_count, step_siblings_count, medical_history, responsible_party, parent_username, father_name, father_phone, father_job, father_address, mother_name, mother_phone, mother_job, mother_address, parent_name, parent_phone, guardian_job, guardian_address) 
+                VALUES (:uid, :s_photo, :ijazah_photo, :kk_photo, :akte_photo, :nik, :nisn, :bplace, :bdate, :sphone, :addr, :pschool, :pschool_addr, :entry_date, :corder, :sib_cnt, :step_sib_cnt, :med_hist, :resp_party, :p_username, :fname, :fphone, :fjob, :faddr, :mname, :mphone, :mjob, :maddr, :pname, :pphone, :gjob, :gaddr)
                 ON DUPLICATE KEY UPDATE 
                 student_photo_path = VALUES(student_photo_path),
                 ijazah_photo_path = VALUES(ijazah_photo_path),
@@ -177,6 +177,7 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 address = VALUES(address),
                 previous_school = VALUES(previous_school),
                 previous_school_address = VALUES(previous_school_address),
+                entry_date = VALUES(entry_date),
                 child_order = VALUES(child_order),
                 siblings_count = VALUES(siblings_count),
                 step_siblings_count = VALUES(step_siblings_count),
@@ -211,6 +212,7 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'addr' => $input['address'] ?? '',
             'pschool' => $input['previous_school'] ?? '',
             'pschool_addr' => $input['previous_school_address'] ?? '',
+            'entry_date' => !empty($input['entry_date']) ? $input['entry_date'] : null,
             'corder' => $input['child_order'] ?? 0,
             'sib_cnt' => $input['siblings_count'] ?? 0,
             'step_sib_cnt' => $input['step_siblings_count'] ?? 0,

@@ -81,13 +81,14 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // 3. Update/Insert Tabel Employee Details
         $sql = "INSERT INTO employee_details (
-                    user_id, nik, birth_place, birth_date, marital_status, phone, address, 
+                    user_id, nik, birth_place, birth_date, marital_status, phone, address,
                     last_education, graduation_year,
+                    entry_date,
                     facebook_url, instagram_url, tiktok_url, threads_url, youtube_url,
                     application_letter_path, cv_path, ijazah_path, kk_path, ktp_path, certificate_skill_path, certificate_award_path
                 ) VALUES (
-                    :uid, :nik, :bplace, :bdate, :mstatus, :phone, :addr, 
-                    :edu, :grad_year,
+                    :uid, :nik, :bplace, :bdate, :mstatus, :phone, :addr,
+                    :edu, :grad_year, :entry_date,
                     :fb, :ig, :tt, :th, :yt,
                     :path1, :path2, :path3, :path4, :path5, :path6, :path7
                 )
@@ -95,6 +96,7 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     nik = VALUES(nik), birth_place = VALUES(birth_place), birth_date = VALUES(birth_date),
                     marital_status = VALUES(marital_status), phone = VALUES(phone), address = VALUES(address),
                     last_education = VALUES(last_education), graduation_year = VALUES(graduation_year),
+                    entry_date = VALUES(entry_date),
                     facebook_url = VALUES(facebook_url), instagram_url = VALUES(instagram_url), tiktok_url = VALUES(tiktok_url),
                     threads_url = VALUES(threads_url), youtube_url = VALUES(youtube_url),
                     application_letter_path = VALUES(application_letter_path), cv_path = VALUES(cv_path),
@@ -112,6 +114,7 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'addr' => $_POST['address'] ?? '',
             'edu' => $_POST['last_education'] ?? '',
             'grad_year' => !empty($_POST['graduation_year']) ? $_POST['graduation_year'] : null,
+            'entry_date' => !empty($_POST['entry_date']) ? $_POST['entry_date'] : null,
             'fb' => $_POST['facebook_url'] ?? null,
             'ig' => $_POST['instagram_url'] ?? null,
             'tt' => $_POST['tiktok_url'] ?? null,
