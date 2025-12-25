@@ -15,9 +15,7 @@ $stmtRole = $pdo->prepare("SELECT role_name FROM user_roles WHERE user_id = ? AN
 $stmtRole->execute([$user_id]);
 $roles = $stmtRole->fetchAll(PDO::FETCH_COLUMN);
 
-$isBendahara = in_array('Bendahara Sekolah', $roles) || in_array('Bendahara Yayasan', $roles) || in_array('Ketua Yayasan', $roles);
 $isWalisantri = in_array('Walisantri', $roles);
-
 try {
     $sql = "SELECT p.*, u.full_name as student_name, u.username as student_username, w.username as walisantri_username 
             FROM payments p 
@@ -34,10 +32,8 @@ try {
     }
 
     // Filter Hak Akses
-    if ($isBendahara) {
-        // Bendahara lihat semua (tidak ada filter tambahan user)
-    } elseif ($isWalisantri) {
-        // Walisantri hanya lihat anak-anaknya
+    // Jika yang login adalah Walisantri, filter data hanya untuk anak-anaknya.
+    if ($isWalisantri) {
         // Cari ID anak-anak walisantri ini
         $stmtChildren = $pdo->prepare("SELECT u.user_id FROM users u JOIN student_details sd ON u.user_id = sd.user_id WHERE sd.parent_username = (SELECT username FROM users WHERE user_id = ?)");
         $stmtChildren->execute([$user_id]);
