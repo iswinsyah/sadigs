@@ -193,13 +193,13 @@
                         // 7. Pengaturan Sistem
                         'navKalender',          // Tab
                         'navCalendarSettings',  // Form
-                        'navMenuManagement',    // Form,
+                        'navMenuManagement',    // Form
 
                         // 8. Keuangan (BARU)
                         'navFormulirPembayaran', // Form
                         'navValidasiPembayaran', // Val
-                        'navTabelPembayaran',    // Tab,
-                        'navRekapPembayaran'     // Tab,
+                        'navTabelPembayaran',    // Tab
+                        'navRekapPembayaran',    // Tab
                         'navDaftarIzin'          // Tab
                     ];
 
@@ -258,12 +258,7 @@
 
                 // --- LOGIKA KATEGORI (Form, Val, Tab) ---
                 let prefix = "Tab"; // Default kategori
-                const formMenus = [
-                    'navAbsensi', 'navBiodataPegawai', 'navBiodataSantri', 
-                    'navCalendarSettings', 'navIbadahHarian', 'navInputTahfizh', 
-                    'navMenuManagement', 'navProfil', 'navQuota', 'navRapat', 'navIzinPegawai', 'navDaftarIzin',
-                    'navFormulirPembayaran'
-                ];
+                const formMenus = ['navAbsensi', 'navBiodataPegawai', 'navBiodataSantri', 'navCalendarSettings', 'navIbadahHarian', 'navInputTahfizh', 'navMenuManagement', 'navProfil', 'navQuota', 'navRapat', 'navIzinPegawai', 'navDaftarIzin', 'navFormulirPembayaran'];
                 const valMenus = ['navValidasiIbadah', 'navVerifikasi', 'navValidasiPembayaran', 'navValidasiIzin'];
 
                 if (formMenus.includes(menuId)) prefix = "Form";
