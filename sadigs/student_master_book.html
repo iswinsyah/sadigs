@@ -62,20 +62,42 @@
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Nama Lengkap</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Gender</th>
                                 <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">NISN</th>
                                 <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">NIK</th>
                                 <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Tempat Lahir</th>
                                 <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Tgl Lahir</th>
                                 <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Alamat</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">HP Santri</th>
                                 <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Tgl Masuk</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Sekolah Asal</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Alamat Sekolah Asal</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Anak ke</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Jml Sdr Kandung</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Jml Sdr Tiri</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Riwayat Penyakit</th>
                                 <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Nama Ayah</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">HP Ayah</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Pekerjaan Ayah</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Alamat Ayah</th>
                                 <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Nama Ibu</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">HP Ibu</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Pekerjaan Ibu</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Alamat Ibu</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Penanggung Jawab</th>
                                 <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Nama Wali</th>
-                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Dokumen</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Username Wali</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">HP Wali</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Pekerjaan Wali</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Alamat Wali</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Foto</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">KK</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Akte</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Ijazah</th>
                             </tr>
                         </thead>
                         <tbody id="tableBody" class="bg-white divide-y divide-gray-200">
-                            <tr><td colspan="11" class="px-6 py-10 text-center text-gray-500">Memuat data...</td></tr>
+                            <tr><td colspan="33" class="px-6 py-10 text-center text-gray-500">Memuat data...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -120,44 +142,57 @@
 
                         // Helper untuk membuat link dokumen
                         const createDocLink = (path, label) => {
-                            if (!path) return '';
-                            return `<a href="sadigs_api_v3/${path}" target="_blank" class="flex items-center gap-1 text-blue-600 hover:underline"><i data-lucide="file-text" class="w-3 h-3"></i>${label}</a>`;
+                            if (!path) return '-';
+                            return `<a href="sadigs_api_v3/${path}" target="_blank" class="text-blue-600 hover:underline">${label}</a>`;
                         };
-
-                        const docLinks = [
-                            createDocLink(row.student_photo_path, 'Foto'),
-                            createDocLink(row.kk_photo_path, 'KK'),
-                            createDocLink(row.birth_cert_photo_path, 'Akte'),
-                            createDocLink(row.ijazah_photo_path, 'Ijazah'),
-                        ].filter(Boolean).join('<br>');
 
                         tr.innerHTML = `
                             <td class="px-4 py-3 align-top">
                                 <div class="font-bold text-gray-900">${row.full_name || '-'}</div>
                                 <div class="text-xs text-gray-500">${row.username || '-'}</div>
                             </td>
+                            <td class="px-4 py-3 align-top">${row.gender || '-'}</td>
                             <td class="px-4 py-3 align-top">${row.nisn || '-'}</td>
                             <td class="px-4 py-3 align-top">${row.nik || '-'}</td>
                             <td class="px-4 py-3 align-top">${row.birth_place || '-'}</td>
                             <td class="px-4 py-3 align-top">${row.birth_date || '-'}</td>
                             <td class="px-4 py-3 align-top text-xs max-w-xs">${row.address || '-'}</td>
+                            <td class="px-4 py-3 align-top">${row.student_phone || '-'}</td>
                             <td class="px-4 py-3 align-top">${row.entry_date || '-'}</td>
+                            <td class="px-4 py-3 align-top">${row.previous_school || '-'}</td>
+                            <td class="px-4 py-3 align-top text-xs max-w-xs">${row.previous_school_address || '-'}</td>
+                            <td class="px-4 py-3 align-top">${row.child_order || '-'}</td>
+                            <td class="px-4 py-3 align-top">${row.siblings_count || '-'}</td>
+                            <td class="px-4 py-3 align-top">${row.step_siblings_count || '-'}</td>
+                            <td class="px-4 py-3 align-top text-xs max-w-xs">${row.medical_history || '-'}</td>
                             <td class="px-4 py-3 align-top">${row.father_name || '-'}</td>
+                            <td class="px-4 py-3 align-top">${row.father_phone || '-'}</td>
+                            <td class="px-4 py-3 align-top">${row.father_job || '-'}</td>
+                            <td class="px-4 py-3 align-top text-xs max-w-xs">${row.father_address || '-'}</td>
                             <td class="px-4 py-3 align-top">${row.mother_name || '-'}</td>
+                            <td class="px-4 py-3 align-top">${row.mother_phone || '-'}</td>
+                            <td class="px-4 py-3 align-top">${row.mother_job || '-'}</td>
+                            <td class="px-4 py-3 align-top text-xs max-w-xs">${row.mother_address || '-'}</td>
+                            <td class="px-4 py-3 align-top">${row.responsible_party || '-'}</td>
                             <td class="px-4 py-3 align-top">${row.parent_name || '-'}</td>
-                            <td class="px-4 py-3 align-top text-xs space-y-1">
-                                ${docLinks || '<span class="text-gray-400">Belum ada</span>'}
-                            </td>
+                            <td class="px-4 py-3 align-top">${row.parent_username || '-'}</td>
+                            <td class="px-4 py-3 align-top">${row.parent_phone || '-'}</td>
+                            <td class="px-4 py-3 align-top">${row.guardian_job || '-'}</td>
+                            <td class="px-4 py-3 align-top text-xs max-w-xs">${row.guardian_address || '-'}</td>
+                            <td class="px-4 py-3 align-top text-xs">${createDocLink(row.student_photo_path, 'Lihat')}</td>
+                            <td class="px-4 py-3 align-top text-xs">${createDocLink(row.kk_photo_path, 'Lihat')}</td>
+                            <td class="px-4 py-3 align-top text-xs">${createDocLink(row.birth_cert_photo_path, 'Lihat')}</td>
+                            <td class="px-4 py-3 align-top text-xs">${createDocLink(row.ijazah_photo_path, 'Lihat')}</td>
                         `;
                         tbody.appendChild(tr);
                     });
                     lucide.createIcons(); // Re-initialize icons
                 } else {
-                    tbody.innerHTML = '<tr><td colspan="11" class="px-6 py-10 text-center text-gray-500">Tidak ada data santri.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="33" class="px-6 py-10 text-center text-gray-500">Tidak ada data santri.</td></tr>';
                 }
             } catch (e) {
                 console.error(e);
-                document.getElementById('tableBody').innerHTML = '<tr><td colspan="11" class="px-6 py-10 text-center text-red-500">Gagal memuat data.</td></tr>';
+                document.getElementById('tableBody').innerHTML = '<tr><td colspan="33" class="px-6 py-10 text-center text-red-500">Gagal memuat data.</td></tr>';
             }
         }
         initPage();
