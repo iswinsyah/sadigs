@@ -87,7 +87,7 @@
                     <table class="min-w-full border-collapse text-sm">
                         <thead class="bg-gray-100">
                             <tr id="tableHeader">
-                                <th class="p-4 text-left font-bold text-gray-700 border-b border-r border-gray-200 sticky left-0 bg-gray-100 min-w-[200px]">
+                                <th class="p-4 text-left font-bold text-gray-700 border-b border-r border-gray-200 sticky left-0 top-0 bg-gray-100 z-20 min-w-[200px]">
                                     Nama Menu
                                 </th>
                                 <!-- Kolom Role akan diisi JS -->
@@ -237,7 +237,7 @@
             
             roleList.forEach(role => {
                 const th = document.createElement('th');
-                th.className = "p-4 text-center font-bold text-gray-700 border-b border-gray-200 min-w-[100px]";
+                th.className = "p-4 text-center font-bold text-gray-700 border-b border-gray-200 min-w-[100px] sticky top-0 bg-gray-100 z-10";
                 th.textContent = role;
                 thead.appendChild(th);
             });
@@ -250,7 +250,7 @@
 
                 // Kolom Nama Menu
                 const tdName = document.createElement('td');
-                tdName.className = "p-4 font-semibold text-gray-800 border-r border-gray-200 sticky left-0 bg-white";
+                tdName.className = "p-4 font-semibold text-gray-800 border-r border-gray-200 sticky left-0 bg-white z-10";
 
                 // Hilangkan awalan 'nav' dan ubah formatnya (e.g., navRekapTahfizh -> Rekap Tahfizh)
                 const displayName = menuId.replace(/^nav/, '').replace(/([A-Z])/g, ' $1').trim();
