@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validasi Izin Pegawai | SADIGS 3.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+
+    <div class="flex h-screen overflow-hidden">
+        <!-- SIDEBAR -->
+        <aside id="sidebar" class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col hidden lg:flex">
+            <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-teal-600 text-white">
+                <h1 class="text-2xl font-extrabold tracking-wider">SADIGS</h1>
+            </div>
+            <div class="p-6">
+                <a href="dashboard.html" class="flex items-center gap-2 text-gray-600 hover:text-teal-600 transition">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i> Kembali ke Dashboard
+                </a>
+            </div>
+            <nav id="sidebarNav" class="flex-1 overflow-y-auto py-4 px-3 space-y-2 no-scrollbar">
+                <!-- Menu akan dimuat oleh JS -->
+            </nav>
+        </aside>
+
+        <!-- KONTEN UTAMA -->
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative">
+            <header class="mb-8">
+                <h2 class="text-2xl lg:text-3xl font-bold text-gray-800">Validasi Perizinan Pegawai</h2>
+                <p class="text-gray-500 text-sm mt-1">Setujui atau tolak permohonan izin yang masuk.</p>
+            </header>
+
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 text-sm">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Pemohon</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Jenis Izin</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Keterangan</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Tanggal</th>
+                                <th class="px-4 py-3 text-center font-bold text-gray-500 uppercase">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody" class="bg-white divide-y divide-gray-200">
+                            <tr><td colspan="5" class="px-6 py-10 text-center text-gray-500">Memuat data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // Dummy sidebar rendering function
+        function renderSidebar(allowedMenus = []) {
+            const sidebarNav = document.getElementById('sidebarNav');
+            sidebarNav.innerHTML = `
+                <div id="menuYayasan" class="space-y-2">
+                    <div class="bg-gray-50 rounded-lg p-2">
+                        <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KEPEGAWAIAN</h3>
+                        <a id="navIzinPegawai" href="leave_request.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="file-edit" class="w-5 h-5"></i> Izin Pegawai</a>
+                        <a id="navValidasiIzin" href="leave_validation.html" class="flex items-center gap-3 px-3 py-2.5 text-teal-700 bg-white rounded-md transition font-semibold text-sm shadow-sm"><i data-lucide="check-square" class="w-5 h-5"></i> Validasi Izin</a>
+                        <a id="navDaftarIzin" href="leave_list.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="list-checks" class="w-5 h-5"></i> Daftar Izin</a>
+                    </div>
+                </div>`;
+            allowedMenus.forEach(id => { const el = document.getElementById(id); if(el) el.classList.remove('hidden'); });
+            if (document.querySelector('#menuYayasan a:not(.hidden)')) document.getElementById('menuYayasan').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        async function initPage() {
+            const sessionRes = await fetch('sadigs_api_v3/session_check.php');
+            const sessionData = await sessionRes.json();
+            if (!sessionData.success) { window.location.href = 'index.html'; return; }
+
+            const validationRoles = ['Kepala Sekolah', 'Kepala Asrama Putra', 'Kepala Asrama Putri', 'Ketua Yayasan'];
+            if (!sessionData.roles.some(r => validationRoles.includes(r))) {
+                alert('Halaman ini khusus untuk Atasan.');
+                window.location.href = 'dashboard.html';
+                return;
+            }
+
+            try {
+                const permRes = await fetch('sadigs_api_v3/get_menu_permissions.php');
+                const permData = await permRes.json();
+                renderSidebar(permData.success ? permData.permissions : []);
+            } catch (e) { renderSidebar([]); }
+
+            loadData();
+        }
+
+        async function loadData() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-10 text-center text-gray-500">Memuat data...</td></tr>';
+            try {
+                const res = await fetch('sadigs_api_v3/get_leave_requests.php?context=validation');
+                const result = await res.json();
+                
+                if (result.success && result.data.length > 0) {
+                    tbody.innerHTML = '';
+                    result.data.forEach(row => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td class="px-4 py-3 align-top"><div class="font-bold">${row.full_name}</div><div class="text-xs text-gray-500">${row.username}</div></td>
+                            <td class="px-4 py-3 align-top">${row.leave_type}</td>
+                            <td class="px-4 py-3 align-top text-xs max-w-sm">${row.description || '-'}</td>
+                            <td class="px-4 py-3 align-top">${row.start_date} s/d ${row.end_date}</td>
+                            <td class="px-4 py-3 align-top text-center space-x-2">
+                                <button onclick="validate(${row.id}, 'approved')" class="bg-green-100 text-green-700 px-3 py-1 rounded-md font-semibold hover:bg-green-200 transition">Setujui</button>
+                                <button onclick="validate(${row.id}, 'rejected')" class="bg-red-100 text-red-700 px-3 py-1 rounded-md font-semibold hover:bg-red-200 transition">Tolak</button>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-10 text-center text-gray-500">Tidak ada permohonan izin yang perlu divalidasi.</td></tr>';
+                }
+            } catch (e) {
+                tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-10 text-center text-red-500">Gagal memuat data.</td></tr>';
+            }
+        }
+
+        window.validate = async function(requestId, action) {
+            if (!confirm(`Anda yakin ingin ${action === 'approved' ? 'menyetujui' : 'menolak'} izin ini?`)) return;
+            try {
+                const res = await fetch('sadigs_api_v3/validate_leave_request.php', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ request_id: requestId, action: action })
+                });
+                const result = await res.json();
+                alert(result.message);
+                if (result.success) loadData();
+            } catch (e) {
+                alert('Terjadi kesalahan koneksi.');
+            }
+        }
+
+        initPage();
+    </script>
+</body>
+</html>

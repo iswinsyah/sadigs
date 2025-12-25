@@ -19,11 +19,13 @@ foreach ($required_fields as $field) {
     }
 }
 
-// 'recipient' sekarang adalah array, ubah menjadi string JSON untuk disimpan di DB
-$recipient_json = json_encode($data['recipient']);
-if ($recipient_json === false) {
-    sendJSONResponse(['success' => false, 'message' => 'Format data penerima tidak valid.'], 400);
+// 'recipient' sekarang adalah array, ubah menjadi JSON object untuk kolom 'approvals'
+$recipients = $data['recipient'];
+$approvals = [];
+foreach ($recipients as $recipient_role) {
+    $approvals[$recipient_role] = 'pending'; // status awal
 }
+$approvals_json = json_encode($approvals);
 
 $leave_type = $data['leave_type'];
 $description = isset($data['description']) ? $data['description'] : null;
@@ -32,10 +34,10 @@ $end_date = $data['end_date'];
 
 try {
     $pdo = getDBConnection();
-    $sql = "INSERT INTO leave_requests (user_id, recipient, leave_type, description, start_date, end_date) 
+    $sql = "INSERT INTO leave_requests (user_id, approvals, leave_type, description, start_date, end_date) 
             VALUES (?, ?, ?, ?, ?, ?)";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute([$user_id, $recipient_json, $leave_type, $description, $start_date, $end_date]);
+    $stmt->execute([$user_id, $approvals_json, $leave_type, $description, $start_date, $end_date]);
 
     sendJSONResponse(['success' => true, 'message' => 'Permohonan izin berhasil diajukan.']);
 
