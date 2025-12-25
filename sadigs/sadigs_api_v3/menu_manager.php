@@ -2,52 +2,55 @@
 header('Content-Type: application/json');
 require_once 'db_connect.php';
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-// 1. Cek Login & Otorisasi (Hanya Ketua Yayasan)
+if (session_status() === PHP_SESSION_NONE) session_start();
 if (!isset($_SESSION['user_id'])) {
     sendJSONResponse(['success' => false, 'message' => 'Unauthorized'], 401);
-}
-
-$allowed_roles = ['Ketua Yayasan'];
-$user_roles = $_SESSION['roles'] ?? [];
-if (empty(array_intersect($allowed_roles, $user_roles))) {
-    sendJSONResponse(['success' => false, 'message' => 'Akses ditolak. Hanya Ketua Yayasan.'], 403);
 }
 
 $pdo = getDBConnection();
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     try {
-        // Ambil semua data permissions
-        $stmt = $pdo->query("SELECT * FROM menu_permissions ORDER BY menu_id, role_name");
-        $permissions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        // 1. Ambil Daftar Menu dari tabel 'menus'
+        $stmt = $pdo->query("SELECT menu_id FROM menus ORDER BY menu_name ASC");
+        $menus = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-        // Ambil daftar Role unik dan Menu unik untuk header tabel
-        $roles = array_unique(array_column($permissions, 'role_name'));
-        $menus = array_unique(array_column($permissions, 'menu_id'));
+        // 2. Ambil Daftar Role (Gabungan dari permissions dan user_roles agar lengkap)
+        $roles = [];
+        $stmt = $pdo->query("SELECT DISTINCT role_name FROM menu_permissions UNION SELECT DISTINCT role_name FROM user_roles");
+        while ($row = $stmt->fetch(PDO::FETCH_COLUMN)) {
+            if ($row) $roles[] = $row;
+        }
+        
+        // Tambahkan role standar jika database masih kosong/baru
+        $standard_roles = ['Ketua Yayasan', 'Kepala Sekolah', 'Kepala Asrama', 'Sekretaris Sekolah', 'Bendahara Sekolah', 'Musyrif', 'Ustadz', 'Santri', 'Walisantri'];
+        $roles = array_unique(array_merge($roles, $standard_roles));
         sort($roles);
-        sort($menus);
 
-        // Format data agar mudah dibaca frontend (Matrix)
+        // 3. Ambil Matrix Permission
         $matrix = [];
-        foreach ($permissions as $p) {
-            $matrix[$p['menu_id']][$p['role_name']] = (int)$p['can_view'];
+        $stmt = $pdo->query("SELECT menu_id, role_name, can_view FROM menu_permissions");
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $mid = $row['menu_id'];
+            $rname = $row['role_name'];
+            $val = (int)$row['can_view'];
+            
+            if (!isset($matrix[$mid])) $matrix[$mid] = [];
+            $matrix[$mid][$rname] = $val;
         }
 
         sendJSONResponse([
             'success' => true,
+            'menus' => $menus,
             'roles' => array_values($roles),
-            'menus' => array_values($menus),
             'matrix' => $matrix
         ]);
-    } catch (Exception $e) {
-        sendJSONResponse(['success' => false, 'message' => $e->getMessage()], 500);
-    }
 
-} elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    } catch (Exception $e) {
+        sendJSONResponse(['success' => false, 'message' => 'Database error: ' . $e->getMessage()], 500);
+    }
+} 
+elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $input = json_decode(file_get_contents('php://input'), true);
     $updates = $input['updates'] ?? [];
 
@@ -58,23 +61,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     try {
         $pdo->beginTransaction();
         
-        $sql = "INSERT INTO menu_permissions (role_name, menu_id, can_view) VALUES (:role, :menu, :view)
-                ON DUPLICATE KEY UPDATE can_view = :view_update";
-        $stmt = $pdo->prepare($sql);
+        // Prepare statement untuk update permission
+        $stmt = $pdo->prepare("INSERT INTO menu_permissions (menu_id, role_name, can_view) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE can_view = VALUES(can_view)");
+        
+        // Prepare statement untuk auto-insert menu jika belum ada (untuk menghindari error FK)
+        $stmtCheckMenu = $pdo->prepare("SELECT COUNT(*) FROM menus WHERE menu_id = ?");
+        $stmtInsertMenu = $pdo->prepare("INSERT INTO menus (menu_id, menu_name) VALUES (?, ?)");
 
-        foreach ($updates as $item) {
-            $stmt->execute([
-                'role' => $item['role'],
-                'menu' => $item['menu'],
-                'view' => $item['state'],
-                'view_update' => $item['state']
-            ]);
+        foreach ($updates as $u) {
+            $menuId = $u['menu'];
+            $roleName = $u['role'];
+            $state = $u['state'];
+
+            // Cek apakah menu ada di tabel master 'menus', jika tidak, tambahkan otomatis
+            $stmtCheckMenu->execute([$menuId]);
+            if ($stmtCheckMenu->fetchColumn() == 0) {
+                // Buat nama menu dari ID (misal: navDashboard -> Dashboard)
+                $menuName = trim(preg_replace('/(?<!\ )[A-Z]/', ' $0', str_replace('nav', '', $menuId)));
+                $stmtInsertMenu->execute([$menuId, $menuName]);
+            }
+
+            $stmt->execute([$menuId, $roleName, $state]);
         }
 
         $pdo->commit();
-        sendJSONResponse(['success' => true, 'message' => 'Izin menu berhasil diperbarui.']);
+        sendJSONResponse(['success' => true, 'message' => 'Pengaturan hak akses berhasil disimpan.']);
     } catch (Exception $e) {
-        $pdo->rollBack();
+        if ($pdo->inTransaction()) $pdo->rollBack();
         sendJSONResponse(['success' => false, 'message' => 'Gagal menyimpan: ' . $e->getMessage()], 500);
     }
 }
