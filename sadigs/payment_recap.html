@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>body { font-family: 'Inter', sans-serif; }</style>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans antialiased">
@@ -22,50 +23,138 @@
                     <i data-lucide="arrow-left" class="w-5 h-5"></i> Kembali ke Dashboard
                 </a>
             </div>
-            <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-2 no-scrollbar">
-                <div id="groupKeuangan" class="bg-gray-50 rounded-lg p-2 mt-2">
-                    <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KEUANGAN</h3>
-                    <a id="navFormulirPembayaran" href="payment_form.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="credit-card" class="w-5 h-5"></i> Formulir Pembayaran</a>
-                    <a id="navValidasiPembayaran" href="payment_validation.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="check-circle-2" class="w-5 h-5"></i> Validasi Pembayaran</a>
-                    <a id="navTabelPembayaran" href="payment_list.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="banknote" class="w-5 h-5"></i> Data Pembayaran</a>
-                    <a id="navRekapPembayaran" href="payment_recap.html" class="flex items-center gap-3 px-3 py-2.5 text-teal-700 bg-white rounded-md transition font-semibold text-sm shadow-sm"><i data-lucide="pie-chart" class="w-5 h-5"></i> Rekap Keuangan</a>
-                </div>
+            <nav id="sidebarNav" class="flex-1 overflow-y-auto py-4 px-3 space-y-2 no-scrollbar">
+                <!-- Menu akan dimuat oleh JS -->
             </nav>
         </aside>
 
         <!-- KONTEN UTAMA -->
         <main class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative">
             <header class="mb-8">
-                <h2 class="text-2xl lg:text-3xl font-bold text-gray-800">Rekap Keuangan</h2>
-                <p class="text-gray-500 text-sm mt-1">Ringkasan pemasukan sekolah.</p>
+                <h2 class="text-2xl lg:text-3xl font-bold text-gray-800">Rekapitulasi Keuangan</h2>
+                <p class="text-gray-500 text-sm mt-1">Grafik dan ringkasan total pembayaran yang telah divalidasi.</p>
             </header>
 
-            <div class="bg-white p-10 rounded-xl shadow-sm border border-gray-100 text-center">
-                <div class="bg-teal-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i data-lucide="bar-chart-3" class="w-8 h-8 text-teal-600"></i>
+            <!-- Ringkasan Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <p class="text-sm font-bold text-gray-400 uppercase">Total Diterima (Bulan Ini)</p>
+                    <p id="monthlyTotal" class="text-3xl font-extrabold text-teal-600 mt-2">Rp 0</p>
                 </div>
-                <h3 class="text-lg font-bold text-gray-800">Fitur Segera Hadir</h3>
-                <p class="text-gray-500 mt-2">Halaman rekapitulasi keuangan sedang dalam pengembangan.</p>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <p class="text-sm font-bold text-gray-400 uppercase">Total Menunggu Validasi</p>
+                    <p id="totalPending" class="text-3xl font-extrabold text-yellow-600 mt-2">Rp 0</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <p class="text-sm font-bold text-gray-400 uppercase">Total Diterima (Semua)</p>
+                    <p id="totalApproved" class="text-3xl font-extrabold text-green-600 mt-2">Rp 0</p>
+                </div>
+            </div>
+
+            <!-- Grafik -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">Grafik Pemasukan Harian (30 Hari Terakhir)</h3>
+                <div class="h-80">
+                    <canvas id="paymentChart"></canvas>
+                </div>
             </div>
         </main>
     </div>
 
     <script>
         lucide.createIcons();
+
+        function renderSidebar(allowedMenus = []) {
+            const sidebarNav = document.getElementById('sidebarNav');
+            sidebarNav.innerHTML = `
+                <div id="groupKeuangan" class="bg-gray-50 rounded-lg p-2 mt-2">
+                    <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KEUANGAN</h3>
+                    <a id="navFormulirPembayaran" href="payment_form.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="credit-card" class="w-5 h-5"></i> Formulir Pembayaran</a>
+                    <a id="navValidasiPembayaran" href="payment_validation.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="check-circle-2" class="w-5 h-5"></i> Validasi Pembayaran</a>
+                    <a id="navTabelPembayaran" href="payment_list.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="banknote" class="w-5 h-5"></i> Data Pembayaran</a>
+                    <a id="navRekapPembayaran" href="payment_recap.html" class="flex items-center gap-3 px-3 py-2.5 text-teal-700 bg-white rounded-md transition font-semibold text-sm shadow-sm"><i data-lucide="pie-chart" class="w-5 h-5"></i> Rekap Keuangan</a>
+                </div>`;
+            allowedMenus.forEach(id => { const el = document.getElementById(id); if(el) el.classList.remove('hidden'); });
+            lucide.createIcons();
+        }
+
         async function initPage() {
             const sessionRes = await fetch('sadigs_api_v3/session_check.php');
             const sessionData = await sessionRes.json();
             if (!sessionData.success) { window.location.href = 'index.html'; return; }
 
+            const allowedRoles = ['Bendahara Yayasan', 'Ketua Yayasan', 'Bendahara Sekolah'];
+            if (!sessionData.roles.some(r => allowedRoles.includes(r))) {
+                alert('Halaman ini khusus untuk Pimpinan atau Bendahara.');
+                window.location.href = 'dashboard.html';
+                return;
+            }
+
             try {
                 const permRes = await fetch('sadigs_api_v3/get_menu_permissions.php');
                 const permData = await permRes.json();
-                if (permData.success) {
-                    const allowedMenus = permData.permissions || [];
-                    allowedMenus.forEach(id => { const el = document.getElementById(id); if(el) el.classList.remove('hidden'); });
-                }
-            } catch (e) { console.error(e); }
+                renderSidebar(permData.success ? permData.permissions : []);
+            } catch (e) { renderSidebar([]); }
+
+            loadChartData();
         }
+
+        function formatCurrency(amount) {
+            return 'Rp ' + parseFloat(amount).toLocaleString('id-ID');
+        }
+
+        async function loadChartData() {
+            try {
+                const res = await fetch('sadigs_api_v3/get_payment_summary.php');
+                const result = await res.json();
+
+                if (result.success) {
+                    const summary = result.summary;
+                    
+                    document.getElementById('monthlyTotal').textContent = formatCurrency(summary.monthly_total);
+                    document.getElementById('totalPending').textContent = formatCurrency(summary.total_pending);
+                    document.getElementById('totalApproved').textContent = formatCurrency(summary.total_approved_all_time);
+
+                    const labels = summary.daily_summary.map(d => d.date);
+                    const data = summary.daily_summary.map(d => d.total);
+
+                    renderChart(labels, data);
+                } else {
+                    alert('Gagal memuat data rekap: ' + result.message);
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Gagal terhubung ke server untuk memuat data rekap.');
+            }
+        }
+
+        function renderChart(labels, data) {
+            const ctx = document.getElementById('paymentChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Total Pemasukan',
+                        data: data,
+                        backgroundColor: 'rgba(79, 183, 179, 0.1)',
+                        borderColor: 'rgba(79, 183, 179, 1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true,
+                        pointBackgroundColor: 'rgba(79, 183, 179, 1)',
+                        pointRadius: 4,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true, ticks: { callback: (value) => 'Rp ' + value.toLocaleString('id-ID') } } },
+                    plugins: { tooltip: { callbacks: { label: (context) => 'Total: ' + formatCurrency(context.parsed.y) } } }
+                }
+            });
+        }
+
         initPage();
     </script>
 </body>
