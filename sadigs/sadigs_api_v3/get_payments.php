@@ -21,7 +21,7 @@ $isWalisantri = in_array('Walisantri', $roles);
 try {
     $sql = "SELECT p.*, u.full_name as student_name, u.username as student_username, w.username as walisantri_username 
             FROM payments p 
-            JOIN users u ON p.student_id = u.user_id 
+            JOIN users u ON p.student_user_id = u.user_id 
             JOIN users w ON p.walisantri_user_id = w.user_id ";
     
     $params = [];
@@ -48,7 +48,7 @@ try {
             exit;
         }
         $placeholders = implode(',', array_fill(0, count($childIds), '?'));
-        $conditions[] = "p.student_id IN ($placeholders)";
+        $conditions[] = "p.student_user_id IN ($placeholders)";
         $params = array_merge($params, $childIds);
     }
 

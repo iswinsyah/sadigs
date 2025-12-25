@@ -19,7 +19,7 @@ if (!in_array($status, ['approved', 'rejected'])) {
 $pdo = getDBConnection();
 
 try {
-    $stmt = $pdo->prepare("UPDATE payments SET status = ?, validated_by = ?, validated_at = NOW() WHERE id = ?");
+    $stmt = $pdo->prepare("UPDATE payments SET status = ?, validator_user_id = ?, validated_at = NOW() WHERE id = ?");
     $stmt->execute([$status, $validator_id, $payment_id]);
 
     if ($stmt->rowCount() > 0) {
