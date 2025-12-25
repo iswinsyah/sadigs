@@ -233,7 +233,7 @@
             if (!sessionData.success) { window.location.href = 'index.html'; return; }
 
             // Otorisasi: Hanya Pegawai yang bisa akses
-            const pegawaiRoles = ['Kepala Sekolah', 'Kepala Asrama', 'Sekretaris Sekolah', 'Bendahara Sekolah', 'Musyrif', 'Ustadz', 'Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan'];
+            const pegawaiRoles = ['Kepala Sekolah', 'Kepala Asrama', 'Sekretaris Sekolah', 'Bendahara Sekolah', 'Musyrif', 'Ustadz'];
             if (!sessionData.roles.some(r => pegawaiRoles.includes(r))) {
                 alert('Halaman ini khusus untuk Pegawai.');
                 window.location.href = 'dashboard.html';
