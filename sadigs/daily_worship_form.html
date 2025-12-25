@@ -129,10 +129,21 @@
             const sessionRes = await fetch('sadigs_api_v3/session_check.php');
             const sessionData = await sessionRes.json();
             if (!sessionData.success) { window.location.href = 'index.html'; return; }
-            if (!sessionData.roles.includes('Santri')) {
-                alert('Halaman ini khusus untuk Santri.');
+
+            try {
+                const permRes = await fetch('sadigs_api_v3/get_menu_permissions.php');
+                const permData = await permRes.json();
+                const allowedMenus = permData.success ? permData.permissions : [];
+
+                const thisMenuId = 'navIbadahHarian';
+                if (!allowedMenus.includes(thisMenuId)) {
+                    alert('Anda tidak memiliki izin untuk mengakses halaman ini.');
+                    window.location.href = 'dashboard.html';
+                    return;
+                }
+            } catch (e) { 
+                alert('Gagal memuat izin akses. Silakan coba lagi.');
                 window.location.href = 'dashboard.html';
-                return;
             }
 
             // Set tanggal hari ini

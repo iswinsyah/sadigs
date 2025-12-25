@@ -7,11 +7,6 @@ if (!isset($_SESSION['user_id'])) {
     sendJSONResponse(['success' => false, 'message' => 'Unauthorized'], 401);
 }
 
-$allowed = ['Bendahara Sekolah', 'Bendahara Yayasan', 'Ketua Yayasan'];
-if (empty(array_intersect($allowed, $_SESSION['roles'] ?? []))) {
-    sendJSONResponse(['success' => false, 'message' => 'Akses ditolak.'], 403);
-}
-
 $pdo = getDBConnection();
 
 try {

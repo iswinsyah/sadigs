@@ -7,11 +7,6 @@ if (!isset($_SESSION['user_id'])) {
     sendJSONResponse(['success' => false, 'message' => 'Unauthorized'], 401);
 }
 
-// Hanya Bendahara Sekolah yang boleh input (sesuai request)
-if (!in_array('Bendahara Sekolah', $_SESSION['roles'] ?? [])) {
-    sendJSONResponse(['success' => false, 'message' => 'Akses ditolak. Hanya Bendahara Sekolah yang dapat menginput transaksi harian.'], 403);
-}
-
 $user_id = $_SESSION['user_id'];
 $transaction_date = $_POST['transaction_date'] ?? null;
 $type = $_POST['type'] ?? null;

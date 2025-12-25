@@ -7,10 +7,6 @@ if (!isset($_SESSION['user_id'])) {
     sendJSONResponse(['success' => false, 'message' => 'Unauthorized'], 401);
 }
 
-if (!in_array('Walisantri', $_SESSION['roles'] ?? [])) {
-    sendJSONResponse(['success' => false, 'message' => 'Hanya Walisantri yang dapat mengakses fitur ini.'], 403);
-}
-
 $walisantri_user_id = $_SESSION['user_id'];
 $student_username = trim($_POST['student_username'] ?? '');
 $payment_date = $_POST['payment_date'] ?? null;

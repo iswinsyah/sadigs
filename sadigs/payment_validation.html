@@ -77,18 +77,22 @@
             const sessionData = await sessionRes.json();
             if (!sessionData.success) { window.location.href = 'index.html'; return; }
 
-            const allowedRoles = ['Bendahara Yayasan', 'Bendahara Sekolah', 'Ketua Yayasan'];
-            if (!sessionData.roles.some(r => allowedRoles.includes(r))) {
-                alert('Halaman ini khusus untuk Bendahara.');
-                window.location.href = 'dashboard.html';
-                return;
-            }
-
             try {
                 const permRes = await fetch('sadigs_api_v3/get_menu_permissions.php');
                 const permData = await permRes.json();
-                renderSidebar(permData.success ? permData.permissions : []);
-            } catch (e) { renderSidebar([]); }
+                const allowedMenus = permData.success ? permData.permissions : [];
+
+                const thisMenuId = 'navValidasiPembayaran';
+                if (!allowedMenus.includes(thisMenuId)) {
+                    alert('Anda tidak memiliki izin untuk mengakses halaman ini.');
+                    window.location.href = 'dashboard.html';
+                    return;
+                }
+                renderSidebar(allowedMenus);
+            } catch (e) { 
+                alert('Gagal memuat izin akses. Silakan coba lagi.');
+                window.location.href = 'dashboard.html';
+            }
 
             loadData();
         }

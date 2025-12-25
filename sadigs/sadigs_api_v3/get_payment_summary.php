@@ -7,12 +7,6 @@ if (!isset($_SESSION['user_id'])) {
     sendJSONResponse(['success' => false, 'message' => 'Unauthorized'], 401);
 }
 
-// Otorisasi: Hanya Bendahara atau Pimpinan yang boleh akses
-$allowed_roles = ['Bendahara Yayasan', 'Ketua Yayasan', 'Bendahara Sekolah'];
-if (empty(array_intersect($allowed_roles, $_SESSION['roles'] ?? []))) {
-    sendJSONResponse(['success' => false, 'message' => 'Akses ditolak.'], 403);
-}
-
 $pdo = getDBConnection();
 
 try {
