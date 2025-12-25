@@ -12,13 +12,13 @@ if (!in_array('Walisantri', $_SESSION['roles'] ?? [])) {
 }
 
 $walisantri_user_id = $_SESSION['user_id'];
-$student_user_id = $_POST['student_user_id'] ?? null;
+$student_username = trim($_POST['student_username'] ?? '');
 $payment_date = $_POST['payment_date'] ?? null;
 $details_json = $_POST['details'] ?? '[]';
 $notes = $_POST['notes'] ?? null;
 $proof_file = $_FILES['proof_file'] ?? null;
 
-if (!$student_user_id || !$payment_date || !$proof_file || $details_json === '[]') {
+if (!$student_username || !$payment_date || !$proof_file || $details_json === '[]') {
     sendJSONResponse(['success' => false, 'message' => 'Semua kolom wajib diisi, termasuk rincian dan bukti transfer.'], 400);
 }
 
@@ -55,6 +55,17 @@ if (!move_uploaded_file($proof_file['tmp_name'], $target_file)) {
 
 try {
     $pdo = getDBConnection();
+
+    // Cari student_user_id berdasarkan username (case-sensitive)
+    // Menggunakan BINARY untuk perbandingan case-sensitive
+    $stmt_user = $pdo->prepare("SELECT user_id FROM users WHERE username = BINARY ?");
+    $stmt_user->execute([$student_username]);
+    $student_user_id = $stmt_user->fetchColumn();
+
+    if (!$student_user_id) {
+        sendJSONResponse(['success' => false, 'message' => "Username santri '$student_username' tidak ditemukan. Pastikan penulisan sudah benar (termasuk besar kecilnya huruf)."], 404);
+    }
+
     $sql = "INSERT INTO payments (walisantri_user_id, student_user_id, payment_date, details, total_amount, proof_file, notes) 
             VALUES (?, ?, ?, ?, ?, ?, ?)";
     $stmt = $pdo->prepare($sql);

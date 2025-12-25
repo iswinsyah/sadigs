@@ -19,9 +19,10 @@ $isBendahara = in_array('Bendahara Sekolah', $roles) || in_array('Bendahara Yaya
 $isWalisantri = in_array('Walisantri', $roles);
 
 try {
-    $sql = "SELECT p.*, u.full_name as student_name, u.username as student_username 
+    $sql = "SELECT p.*, u.full_name as student_name, u.username as student_username, w.username as walisantri_username 
             FROM payments p 
-            JOIN users u ON p.student_id = u.user_id ";
+            JOIN users u ON p.student_id = u.user_id 
+            JOIN users w ON p.walisantri_user_id = w.user_id ";
     
     $params = [];
     $conditions = [];

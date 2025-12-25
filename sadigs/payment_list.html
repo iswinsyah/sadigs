@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Riwayat Pembayaran | SADIGS 3.0</title>
+    <title>Data Pembayaran | SADIGS 3.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -22,38 +22,37 @@
                     <i data-lucide="arrow-left" class="w-5 h-5"></i> Kembali ke Dashboard
                 </a>
             </div>
-            <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-2 no-scrollbar">
-                <div id="groupKeuangan" class="bg-gray-50 rounded-lg p-2 mt-2">
-                    <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KEUANGAN</h3>
-                    <a id="navFormulirPembayaran" href="payment_form.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="credit-card" class="w-5 h-5"></i> Formulir Pembayaran</a>
-                    <a id="navValidasiPembayaran" href="payment_validation.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="check-circle-2" class="w-5 h-5"></i> Validasi Pembayaran</a>
-                    <a id="navTabelPembayaran" href="payment_list.html" class="flex items-center gap-3 px-3 py-2.5 text-teal-700 bg-white rounded-md transition font-semibold text-sm shadow-sm"><i data-lucide="banknote" class="w-5 h-5"></i> Data Pembayaran</a>
-                    <a id="navRekapPembayaran" href="payment_recap.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="pie-chart" class="w-5 h-5"></i> Rekap Keuangan</a>
-                </div>
+            <nav id="sidebarNav" class="flex-1 overflow-y-auto py-4 px-3 space-y-2 no-scrollbar">
+                <!-- Menu akan dimuat oleh JS -->
             </nav>
         </aside>
 
         <!-- KONTEN UTAMA -->
         <main class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative">
-            <header class="mb-8">
-                <h2 class="text-2xl lg:text-3xl font-bold text-gray-800">Riwayat Pembayaran</h2>
-                <p class="text-gray-500 text-sm mt-1">Daftar semua transaksi pembayaran yang tercatat.</p>
+            <header class="mb-8 flex justify-between items-center">
+                <div>
+                    <h2 class="text-2xl lg:text-3xl font-bold text-gray-800">Data Pembayaran</h2>
+                    <p class="text-gray-500 text-sm mt-1">Riwayat transaksi pembayaran santri.</p>
+                </div>
+                <button onclick="window.print()" class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 flex items-center gap-2 text-sm font-medium">
+                    <i data-lucide="printer" class="w-4 h-4"></i> Cetak
+                </button>
             </header>
 
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                 <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
+                    <table class="min-w-full divide-y divide-gray-200 text-sm">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Tanggal</th>
-                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Santri</th>
-                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Jenis</th>
-                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Nominal</th>
-                                <th class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase">Status</th>
-                                <th class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase">Bukti</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Walisantri</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Santri</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Tanggal</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Total</th>
+                                <th class="px-4 py-3 text-center font-bold text-gray-500 uppercase">Status</th>
+                                <th class="px-4 py-3 text-center font-bold text-gray-500 uppercase">Bukti</th>
                             </tr>
                         </thead>
-                        <tbody id="listTableBody" class="bg-white divide-y divide-gray-200">
+                        <tbody id="tableBody" class="bg-white divide-y divide-gray-200">
                             <tr><td colspan="6" class="px-6 py-10 text-center text-gray-500">Memuat data...</td></tr>
                         </tbody>
                     </table>
@@ -65,29 +64,42 @@
     <script>
         lucide.createIcons();
 
+        function renderSidebar(allowedMenus = []) {
+            const sidebarNav = document.getElementById('sidebarNav');
+            sidebarNav.innerHTML = `
+                <div id="groupKeuangan" class="bg-gray-50 rounded-lg p-2 mt-2">
+                    <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KEUANGAN</h3>
+                    <a id="navFormulirPembayaran" href="payment_form.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="credit-card" class="w-5 h-5"></i> Formulir Pembayaran</a>
+                    <a id="navValidasiPembayaran" href="payment_validation.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="check-circle-2" class="w-5 h-5"></i> Validasi Pembayaran</a>
+                    <a id="navTabelPembayaran" href="payment_list.html" class="flex items-center gap-3 px-3 py-2.5 text-teal-700 bg-white rounded-md transition font-semibold text-sm shadow-sm"><i data-lucide="banknote" class="w-5 h-5"></i> Data Pembayaran</a>
+                </div>`;
+            allowedMenus.forEach(id => { const el = document.getElementById(id); if(el) el.classList.remove('hidden'); });
+            lucide.createIcons();
+        }
+
         async function initPage() {
             const sessionRes = await fetch('sadigs_api_v3/session_check.php');
             const sessionData = await sessionRes.json();
             if (!sessionData.success) { window.location.href = 'index.html'; return; }
 
-            // Cek Izin Menu
             try {
                 const permRes = await fetch('sadigs_api_v3/get_menu_permissions.php');
                 const permData = await permRes.json();
-                if (permData.success) {
-                    const allowedMenus = permData.permissions || [];
-                    allowedMenus.forEach(id => {
-                        const el = document.getElementById(id);
-                        if (el) el.classList.remove('hidden');
-                    });
-                }
-            } catch (e) { console.error(e); }
+                renderSidebar(permData.success ? permData.permissions : []);
+            } catch (e) { renderSidebar([]); }
 
             loadData();
         }
 
+        function getStatusBadge(status) {
+            if (status === 'approved') return `<span class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-bold">Diterima</span>`;
+            if (status === 'rejected') return `<span class="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-bold">Ditolak</span>`;
+            return `<span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full text-xs font-bold">Menunggu</span>`;
+        }
+
         async function loadData() {
-            const tbody = document.getElementById('listTableBody');
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-10 text-center text-gray-500">Memuat data...</td></tr>';
             try {
                 const res = await fetch('sadigs_api_v3/get_payments.php');
                 const result = await res.json();
@@ -96,28 +108,27 @@
                     tbody.innerHTML = '';
                     result.data.forEach(row => {
                         const tr = document.createElement('tr');
-                        
-                        let statusBadge = '';
-                        if(row.status === 'approved') statusBadge = '<span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-bold">Lunas</span>';
-                        else if(row.status === 'rejected') statusBadge = '<span class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-bold">Ditolak</span>';
-                        else statusBadge = '<span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-bold">Menunggu</span>';
-
-                        const proofLink = row.proof_file ? `<a href="${row.proof_file}" target="_blank" class="text-teal-600 hover:underline text-xs font-bold">Lihat</a>` : '-';
-                        
                         tr.innerHTML = `
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${row.payment_date}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-800">${row.student_name}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${row.payment_type}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-800">Rp ${parseInt(row.amount).toLocaleString('id-ID')}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-center">${statusBadge}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-center">${proofLink}</td>
+                            <td class="px-4 py-3 align-top font-medium text-gray-900">${row.walisantri_username}</td>
+                            <td class="px-4 py-3 align-top"><div class="font-bold">${row.student_name}</div><div class="text-xs text-gray-500">${row.student_username}</div></td>
+                            <td class="px-4 py-3 align-top">${row.payment_date}</td>
+                            <td class="px-4 py-3 align-top font-bold text-teal-700">Rp ${parseInt(row.total_amount).toLocaleString('id-ID')}</td>
+                            <td class="px-4 py-3 align-top text-center">${getStatusBadge(row.status)}</td>
+                            <td class="px-4 py-3 align-top text-center">
+                                <a href="sadigs_api_v3/${row.proof_file}" target="_blank" class="inline-flex items-center gap-1 text-blue-600 hover:underline text-xs font-medium">
+                                    <i data-lucide="file-text" class="w-4 h-4"></i> Lihat
+                                </a>
+                            </td>
                         `;
                         tbody.appendChild(tr);
                     });
+                    lucide.createIcons();
                 } else {
-                    tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-10 text-center text-gray-500">Belum ada riwayat pembayaran.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-10 text-center text-gray-500">Belum ada data pembayaran.</td></tr>';
                 }
-            } catch (e) { tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-10 text-center text-red-500">Gagal memuat data.</td></tr>'; }
+            } catch (e) {
+                tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-10 text-center text-red-500">Gagal memuat data.</td></tr>';
+            }
         }
 
         initPage();
