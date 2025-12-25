@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulir Pembayaran | SADIGS 3.0</title>
+    <title>Formulir Pembayaran Keuangan | SADIGS 3.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -22,76 +22,80 @@
                     <i data-lucide="arrow-left" class="w-5 h-5"></i> Kembali ke Dashboard
                 </a>
             </div>
-            <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-2 no-scrollbar">
-                <!-- Div 5: KEUANGAN -->
-                <div id="groupKeuangan" class="bg-gray-50 rounded-lg p-2 mt-2">
-                    <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KEUANGAN</h3>
-                    <a id="navFormulirPembayaran" href="payment_form.html" class="flex items-center gap-3 px-3 py-2.5 text-teal-700 bg-white rounded-md transition font-semibold text-sm shadow-sm"><i data-lucide="credit-card" class="w-5 h-5"></i> Formulir Pembayaran</a>
-                    <a id="navValidasiPembayaran" href="payment_validation.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="check-circle-2" class="w-5 h-5"></i> Validasi Pembayaran</a>
-                    <a id="navTabelPembayaran" href="payment_list.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="banknote" class="w-5 h-5"></i> Data Pembayaran</a>
-                    <a id="navRekapPembayaran" href="payment_recap.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="pie-chart" class="w-5 h-5"></i> Rekap Keuangan</a>
-                </div>
+            <nav id="sidebarNav" class="flex-1 overflow-y-auto py-4 px-3 space-y-2 no-scrollbar">
+                <!-- Menu akan dimuat oleh JS -->
             </nav>
         </aside>
 
         <!-- KONTEN UTAMA -->
         <main class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative">
             <header class="mb-8">
-                <h2 class="text-2xl lg:text-3xl font-bold text-gray-800">Formulir Pembayaran</h2>
-                <p class="text-gray-500 text-sm mt-1">Konfirmasi pembayaran SPP atau tagihan lainnya.</p>
+                <h2 class="text-2xl lg:text-3xl font-bold text-gray-800">Formulir Pembayaran Keuangan</h2>
+                <p class="text-gray-500 text-sm mt-1">Konfirmasi pembayaran SPP atau tagihan lainnya untuk putra/putri Anda.</p>
             </header>
 
-            <div class="max-w-2xl bg-white p-8 rounded-xl shadow-sm border border-gray-100">
+            <div class="max-w-4xl bg-white p-8 rounded-xl shadow-sm border border-gray-100">
                 <form id="paymentForm" class="space-y-6" enctype="multipart/form-data">
                     
-                    <!-- Pilih Anak (Otomatis terisi jika Walisantri) -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Pembayaran Untuk Santri</label>
-                        <select id="studentSelect" name="student_id" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none bg-white" required>
-                            <option value="">Memuat data anak...</option>
-                        </select>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Pilih Anak -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">1. Pembayaran Untuk Santri</label>
+                            <select id="studentSelect" name="student_user_id" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none bg-white" required>
+                                <option value="">Memuat data anak...</option>
+                            </select>
+                        </div>
+
+                        <!-- Tanggal Transfer -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">2. Tanggal Transaksi</label>
+                            <input type="date" name="payment_date" id="paymentDate" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none" required>
+                        </div>
                     </div>
 
-                    <!-- Jenis Pembayaran -->
+                    <!-- Rincian Pembayaran -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Jenis Pembayaran</label>
-                        <select name="payment_type" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none bg-white" required>
-                            <option value="SPP Bulanan">SPP Bulanan</option>
-                            <option value="Uang Gedung">Uang Gedung</option>
-                            <option value="Daftar Ulang">Daftar Ulang</option>
-                            <option value="Donasi">Donasi</option>
-                            <option value="Lainnya">Lainnya</option>
-                        </select>
-                    </div>
-
-                    <!-- Nominal -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Nominal Transfer (Rp)</label>
-                        <input type="number" name="amount" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none" placeholder="Contoh: 500000" required>
-                    </div>
-
-                    <!-- Tanggal Transfer -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Transfer</label>
-                        <input type="date" name="payment_date" id="paymentDate" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none" required>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">3. Rincian Pembayaran</glabel>
+                        <div class="overflow-x-auto border border-gray-200 rounded-lg">
+                            <table class="min-w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-2 py-2 text-center text-xs font-bold text-gray-500 uppercase w-12">No</th>
+                                        <th class="px-4 py-2 text-left text-xs font-bold text-gray-500 uppercase">Uraian</th>
+                                        <th class="px-4 py-2 text-left text-xs font-bold text-gray-500 uppercase w-48">Jumlah Nominal (Rp)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="paymentDetailsBody" class="divide-y divide-gray-200">
+                                    <!-- Rows will be generated by JS -->
+                                </tbody>
+                                <tfoot>
+                                    <tr class="bg-gray-100 font-bold">
+                                        <td colspan="2" class="px-4 py-2 text-right text-sm text-gray-800">Total</td>
+                                        <td class="px-4 py-2 text-right text-sm text-gray-800">
+                                            <span id="totalAmount">Rp 0</span>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
                     </div>
 
                     <!-- Bukti Transfer -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Bukti Transfer (Foto/Screenshot)</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">4. Bukti Transfer (Foto/Screenshot)</label>
                         <input type="file" name="proof_file" accept="image/*,application/pdf" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100" required>
                         <p class="text-xs text-gray-400 mt-1">Format: JPG, PNG, atau PDF. Maksimal 2MB.</p>
                     </div>
 
                     <!-- Catatan -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Catatan Tambahan (Opsional)</label>
-                        <textarea name="notes" rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none" placeholder="Keterangan bulan atau detail lainnya"></textarea>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">5. Catatan Tambahan (Opsional)</label>
+                        <textarea name="notes" rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none" placeholder="Keterangan bulan, nama pengirim, atau detail lainnya"></textarea>
                     </div>
 
-                    <div class="pt-4">
+                    <div class="pt-4 border-t">
                         <button type="submit" id="submitBtn" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 rounded-lg transition shadow-md flex justify-center items-center gap-2">
-                            <i data-lucide="send" class="w-5 h-5"></i> Kirim Konfirmasi
+                            <i data-lucide="send" class="w-5 h-5"></i> Kirim Konfirmasi Pembayaran
                         </button>
                     </div>
                 </form>
@@ -103,27 +107,68 @@
         lucide.createIcons();
         document.getElementById('paymentDate').value = new Date().toISOString().split('T')[0];
 
+        function renderSidebar(allowedMenus = []) {
+            const sidebarNav = document.getElementById('sidebarNav');
+            sidebarNav.innerHTML = `
+                <div id="groupKeuangan" class="bg-gray-50 rounded-lg p-2 mt-2">
+                    <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KEUANGAN</h3>
+                    <a id="navFormulirPembayaran" href="payment_form.html" class="flex items-center gap-3 px-3 py-2.5 text-teal-700 bg-white rounded-md transition font-semibold text-sm shadow-sm"><i data-lucide="credit-card" class="w-5 h-5"></i> Formulir Pembayaran</a>
+                    <a id="navValidasiPembayaran" href="payment_validation.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="check-circle-2" class="w-5 h-5"></i> Validasi Pembayaran</a>
+                    <a id="navTabelPembayaran" href="payment_list.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="banknote" class="w-5 h-5"></i> Data Pembayaran</a>
+                </div>`;
+            
+            allowedMenus.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.remove('hidden');
+            });
+            lucide.createIcons();
+        }
+
         async function initPage() {
-            // 1. Cek Sesi
             const sessionRes = await fetch('sadigs_api_v3/session_check.php');
             const sessionData = await sessionRes.json();
             if (!sessionData.success) { window.location.href = 'index.html'; return; }
 
-            // 2. Cek Izin Menu (Agar menu lain muncul jika user punya akses)
+            if (!sessionData.roles.includes('Walisantri')) {
+                alert('Halaman ini khusus untuk Walisantri.');
+                window.location.href = 'dashboard.html';
+                return;
+            }
+
             try {
                 const permRes = await fetch('sadigs_api_v3/get_menu_permissions.php');
                 const permData = await permRes.json();
-                if (permData.success) {
-                    const allowedMenus = permData.permissions || [];
-                    allowedMenus.forEach(id => {
-                        const el = document.getElementById(id);
-                        if (el) el.classList.remove('hidden');
-                    });
-                }
-            } catch (e) { console.error("Gagal memuat izin menu:", e); }
+                renderSidebar(permData.success ? permData.permissions : []);
+            } catch (e) { renderSidebar([]); }
 
-            // 3. Muat Data Anak (Jika Walisantri)
             loadChildren();
+            generatePaymentRows();
+        }
+
+        function generatePaymentRows() {
+            const tbody = document.getElementById('paymentDetailsBody');
+            tbody.innerHTML = '';
+            for (let i = 1; i <= 10; i++) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="px-2 py-1 text-center text-sm text-gray-500">${i}</td>
+                    <td class="px-4 py-1">
+                        <input type="text" name="details[${i-1}][description]" class="w-full border-0 focus:ring-0 bg-transparent text-sm" placeholder="Contoh: SPP Bulan Juli">
+                    </td>
+                    <td class="px-4 py-1">
+                        <input type="number" name="details[${i-1}][amount]" class="w-full border-0 focus:ring-0 bg-transparent text-sm text-right amount-input" placeholder="0" oninput="calculateTotal()">
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            }
+        }
+
+        window.calculateTotal = function() {
+            let total = 0;
+            document.querySelectorAll('.amount-input').forEach(input => {
+                total += Number(input.value) || 0;
+            });
+            document.getElementById('totalAmount').textContent = 'Rp ' + total.toLocaleString('id-ID');
         }
 
         async function loadChildren() {
@@ -133,15 +178,17 @@
                 const result = await res.json();
                 
                 if (result.success && result.children.length > 0) {
-                    select.innerHTML = '<option value="">- Pilih Santri -</option>';
+                    select.innerHTML = '<option value="">- Pilih Putra/Putri Anda -</option>';
                     result.children.forEach(child => {
                         select.innerHTML += `<option value="${child.user_id}">${child.full_name || child.username}</option>`;
                     });
                 } else {
                     select.innerHTML = '<option value="">Data anak tidak ditemukan</option>';
+                    select.disabled = true;
                 }
             } catch (e) {
                 select.innerHTML = '<option value="">Gagal memuat data</option>';
+                select.disabled = true;
             }
         }
 
@@ -152,17 +199,50 @@
             btn.disabled = true; btn.innerHTML = 'Mengirim...';
 
             const formData = new FormData(e.target);
+            
+            // Filter out empty detail rows before sending
+            const details = [];
+            for (let i = 0; i < 10; i++) {
+                const description = formData.get(`details[${i}][description]`);
+                const amount = formData.get(`details[${i}][amount]`);
+                if (description && amount && Number(amount) > 0) {
+                    details.push({ description, amount });
+                }
+            }
+
+            if (details.length === 0) {
+                alert('Harap isi setidaknya satu baris rincian pembayaran dengan uraian dan jumlah nominal.');
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+                return;
+            }
+
+            // Create a new FormData to send clean data
+            const finalFormData = new FormData();
+            finalFormData.append('student_user_id', formData.get('student_user_id'));
+            finalFormData.append('payment_date', formData.get('payment_date'));
+            finalFormData.append('proof_file', formData.get('proof_file'));
+            finalFormData.append('notes', formData.get('notes'));
+            finalFormData.append('details', JSON.stringify(details)); // Send details as JSON string
 
             try {
-                const res = await fetch('sadigs_api_v3/submit_payment_api.php', {
+                const res = await fetch('sadigs_api_v3/submit_payment.php', {
                     method: 'POST',
-                    body: formData
+                    body: finalFormData // Send as FormData for file upload
                 });
                 const result = await res.json();
                 alert(result.message);
-                if(result.success) window.location.href = 'payment_list.html';
-            } catch (error) { alert('Terjadi kesalahan koneksi.'); }
-            finally { btn.disabled = false; btn.innerHTML = originalText; }
+                if(result.success) {
+                    window.location.href = 'payment_list.html';
+                }
+            } catch (error) { 
+                console.error(error);
+                alert('Terjadi kesalahan koneksi.'); 
+            }
+            finally { 
+                btn.disabled = false; 
+                btn.innerHTML = originalText; 
+            }
         });
 
         initPage();
