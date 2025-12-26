@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulir Rencana Anggaran | SADIGS 3.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+
+    <div class="flex h-screen overflow-hidden">
+        <aside id="sidebar" class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col hidden lg:flex">
+            <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-teal-600 text-white">
+                <h1 class="text-2xl font-extrabold tracking-wider">SADIGS</h1>
+            </div>
+            <div class="p-6">
+                <a href="dashboard.html" class="flex items-center gap-2 text-gray-600 hover:text-teal-600 transition">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i> Kembali ke Dashboard
+                </a>
+            </div>
+            <nav id="sidebarNav" class="flex-1 overflow-y-auto py-4 px-3 space-y-2 no-scrollbar"></nav>
+        </aside>
+
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative">
+            <header class="mb-8">
+                <h2 class="text-2xl lg:text-3xl font-bold text-gray-800">Formulir Rencana Anggaran</h2>
+                <p class="text-gray-500 text-sm mt-1">Ajukan rencana anggaran operasional untuk periode mendatang.</p>
+            </header>
+
+            <div class="max-w-4xl bg-white p-8 rounded-xl shadow-sm border border-gray-100">
+                <form id="budgetForm" class="space-y-6">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                            <input type="text" id="usernameDisplay" class="w-full px-4 py-2 border border-gray-200 bg-gray-100 rounded-lg text-gray-500" readonly>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Peran Pengaju</label>
+                            <select name="role_sender" id="roleSelect" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none bg-white" required>
+                                <option value="">- Pilih Peran -</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Periode</label>
+                            <select name="period_type" id="periodType" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none bg-white" required>
+                                <option value="">- Pilih Periode -</option>
+                                <option value="Bulanan">Bulanan</option>
+                                <option value="Semester">Semester</option>
+                                <option value="Tahun Ajaran">Tahun Ajaran</option>
+                            </select>
+                        </div>
+                        <div id="periodNameContainer" class="hidden">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nama Periode</label>
+                            <select name="period_name" id="periodName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none bg-white">
+                                <!-- Options populated by JS -->
+                            </select>
+                        </div>
+                        <div id="yearContainer">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tahun</label>
+                            <div id="singleYearInput">
+                                <select name="year" id="yearSelect" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none bg-white"></select>
+                            </div>
+                            <div id="academicYearInput" class="hidden flex items-center gap-2">
+                                <input type="number" id="yearStart" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="2024">
+                                <span>/</span>
+                                <input type="number" id="yearEnd" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="2025">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Rincian Anggaran</label>
+                        <div class="overflow-x-auto border border-gray-200 rounded-lg">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-2 text-center text-xs font-bold text-gray-500 uppercase w-12">No</th>
+                                        <th class="px-4 py-2 text-left text-xs font-bold text-gray-500 uppercase">Uraian</th>
+                                        <th class="px-4 py-2 text-right text-xs font-bold text-gray-500 uppercase w-48">Jumlah Nominal (Rp)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="detailsBody" class="bg-white divide-y divide-gray-200">
+                                    <!-- Rows generated by JS -->
+                                </tbody>
+                                <tfoot>
+                                    <tr class="bg-gray-100 font-bold">
+                                        <td colspan="2" class="px-4 py-2 text-right text-sm">Total</td>
+                                        <td class="px-4 py-2 text-right text-sm" id="totalAmount">Rp 0</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                        <button type="button" onclick="addRow()" class="mt-2 text-sm text-teal-600 font-bold hover:underline">+ Tambah Baris</button>
+                    </div>
+
+                    <div class="pt-4 border-t">
+                        <button type="submit" id="submitBtn" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 rounded-lg transition shadow-md flex justify-center items-center gap-2">
+                            <i data-lucide="send" class="w-5 h-5"></i> Ajukan Rencana Anggaran
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // --- Logic Form Dinamis ---
+        const periodType = document.getElementById('periodType');
+        const periodNameContainer = document.getElementById('periodNameContainer');
+        const periodName = document.getElementById('periodName');
+        const singleYearInput = document.getElementById('singleYearInput');
+        const academicYearInput = document.getElementById('academicYearInput');
+
+        // Populate Years
+        const currentYear = new Date().getFullYear();
+        const yearSelect = document.getElementById('yearSelect');
+        for(let i = currentYear - 1; i <= currentYear + 5; i++) {
+            const opt = document.createElement('option'); opt.value = i; opt.text = i;
+            if(i === currentYear) opt.selected = true;
+            yearSelect.appendChild(opt);
+        }
+
+        periodType.addEventListener('change', () => {
+            const val = periodType.value;
+            periodNameContainer.classList.add('hidden');
+            singleYearInput.classList.remove('hidden');
+            academicYearInput.classList.add('hidden');
+            periodName.innerHTML = '';
+
+            if (val === 'Bulanan') {
+                periodNameContainer.classList.remove('hidden');
+                const months = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+                months.forEach(m => {
+                    const opt = document.createElement('option'); opt.value = m; opt.text = m; periodName.appendChild(opt);
+                });
+            } else if (val === 'Semester') {
+                periodNameContainer.classList.remove('hidden');
+                ['Ganjil', 'Genap'].forEach(s => {
+                    const opt = document.createElement('option'); opt.value = s; opt.text = s; periodName.appendChild(opt);
+                });
+            } else if (val === 'Tahun Ajaran') {
+                singleYearInput.classList.add('hidden');
+                academicYearInput.classList.remove('hidden');
+            }
+        });
+
+        // Table Logic
+        let rowCount = 5;
+        function renderRows() {
+            const tbody = document.getElementById('detailsBody');
+            tbody.innerHTML = '';
+            for(let i=1; i<=rowCount; i++) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="px-2 py-1 text-center text-sm text-gray-500">${i}</td>
+                    <td class="px-2 py-1"><input type="text" class="w-full border-0 focus:ring-0 text-sm desc-input" placeholder="Uraian..."></td>
+                    <td class="px-2 py-1"><input type="number" class="w-full border-0 focus:ring-0 text-sm text-right amount-input" placeholder="0" oninput="calcTotal()"></td>
+                `;
+                tbody.appendChild(tr);
+            }
+        }
+        function addRow() { rowCount++; renderRows(); }
+        function calcTotal() {
+            let total = 0;
+            document.querySelectorAll('.amount-input').forEach(inp => total += Number(inp.value) || 0);
+            document.getElementById('totalAmount').textContent = 'Rp ' + total.toLocaleString('id-ID');
+        }
+        renderRows();
+
+        // Init Page
+        async function initPage() {
+            const sessionRes = await fetch('sadigs_api_v3/session_check.php');
+            const sessionData = await sessionRes.json();
+            if (!sessionData.success) { window.location.href = 'index.html'; return; }
+
+            document.getElementById('usernameDisplay').value = sessionData.username;
+            
+            const roleSelect = document.getElementById('roleSelect');
+            sessionData.roles.forEach(r => {
+                const opt = document.createElement('option'); opt.value = r; opt.text = r; roleSelect.appendChild(opt);
+            });
+
+            // Render Sidebar (Simplified)
+            const nav = document.getElementById('sidebarNav');
+            nav.innerHTML = `<div class="bg-gray-50 rounded-lg p-2 mt-2"><h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase">KEUANGAN</h3><a href="budget_plan_form.html" class="flex items-center gap-3 px-3 py-2.5 text-teal-700 bg-white rounded-md transition font-semibold text-sm shadow-sm"><i data-lucide="file-plus" class="w-5 h-5"></i> Form Anggaran</a><a href="budget_plan_validation.html" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="check-square" class="w-5 h-5"></i> Validasi Anggaran</a></div>`;
+            lucide.createIcons();
+        }
+
+        document.getElementById('budgetForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true; btn.innerHTML = 'Mengirim...';
+
+            const details = [];
+            const rows = document.getElementById('detailsBody').querySelectorAll('tr');
+            rows.forEach(row => {
+                const desc = row.querySelector('.desc-input').value;
+                const amt = row.querySelector('.amount-input').value;
+                if(desc && amt) details.push({description: desc, amount: amt});
+            });
+
+            if(details.length === 0) { alert('Isi minimal satu rincian.'); btn.disabled = false; return; }
+
+            let yearVal = document.getElementById('yearSelect').value;
+            if(periodType.value === 'Tahun Ajaran') {
+                yearVal = document.getElementById('yearStart').value + '/' + document.getElementById('yearEnd').value;
+            }
+
+            const formData = new FormData(e.target);
+            formData.append('year', yearVal);
+            formData.append('details', JSON.stringify(details));
+
+            try {
+                const res = await fetch('sadigs_api_v3/submit_budget_plan.php', { method: 'POST', body: formData });
+                const result = await res.json();
+                alert(result.message);
+                if(result.success) window.location.reload();
+            } catch(err) { alert('Error koneksi'); }
+            finally { btn.disabled = false; btn.innerHTML = 'Ajukan'; }
+        });
+
+        initPage();
+    </script>
+</body>
+</html>

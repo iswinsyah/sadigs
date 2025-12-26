@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validasi Rencana Anggaran | SADIGS 3.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+
+    <div class="flex h-screen overflow-hidden">
+        <aside id="sidebar" class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col hidden lg:flex">
+            <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-teal-600 text-white">
+                <h1 class="text-2xl font-extrabold tracking-wider">SADIGS</h1>
+            </div>
+            <div class="p-6">
+                <a href="dashboard.html" class="flex items-center gap-2 text-gray-600 hover:text-teal-600 transition">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i> Kembali ke Dashboard
+                </a>
+            </div>
+            <nav id="sidebarNav" class="flex-1 overflow-y-auto py-4 px-3 space-y-2 no-scrollbar"></nav>
+        </aside>
+
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative">
+            <header class="mb-8">
+                <h2 class="text-2xl lg:text-3xl font-bold text-gray-800">Validasi Rencana Anggaran</h2>
+                <p class="text-gray-500 text-sm mt-1">Persetujuan anggaran oleh Kepala Sekolah dan Kepala Asrama.</p>
+            </header>
+
+            <!-- Tabel 1: Sekolah -->
+            <div class="mb-8">
+                <h3 class="text-lg font-bold text-teal-800 mb-2 flex items-center gap-2"><i data-lucide="building" class="w-5 h-5"></i> Tabel Rencana Anggaran Sekolah</h3>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <table class="min-w-full divide-y divide-gray-200 text-sm" id="tableSekolah">
+                        <thead class="bg-gray-50"><tr><th class="px-4 py-3 text-left">Periode</th><th class="px-4 py-3 text-left">Pengaju</th><th class="px-4 py-3 text-right">Total</th><th class="px-4 py-3 text-center">Status</th><th class="px-4 py-3 text-center">Aksi</th></tr></thead>
+                        <tbody class="divide-y divide-gray-200"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tabel 2: Asrama Putra -->
+            <div class="mb-8">
+                <h3 class="text-lg font-bold text-blue-800 mb-2 flex items-center gap-2"><i data-lucide="home" class="w-5 h-5"></i> Tabel Rencana Anggaran Asrama Putra</h3>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <table class="min-w-full divide-y divide-gray-200 text-sm" id="tablePutra">
+                        <thead class="bg-gray-50"><tr><th class="px-4 py-3 text-left">Periode</th><th class="px-4 py-3 text-left">Pengaju</th><th class="px-4 py-3 text-right">Total</th><th class="px-4 py-3 text-center">Status</th><th class="px-4 py-3 text-center">Aksi</th></tr></thead>
+                        <tbody class="divide-y divide-gray-200"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tabel 3: Asrama Putri -->
+            <div class="mb-8">
+                <h3 class="text-lg font-bold text-pink-800 mb-2 flex items-center gap-2"><i data-lucide="home" class="w-5 h-5"></i> Tabel Rencana Anggaran Asrama Putri</h3>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <table class="min-w-full divide-y divide-gray-200 text-sm" id="tablePutri">
+                        <thead class="bg-gray-50"><tr><th class="px-4 py-3 text-left">Periode</th><th class="px-4 py-3 text-left">Pengaju</th><th class="px-4 py-3 text-right">Total</th><th class="px-4 py-3 text-center">Status</th><th class="px-4 py-3 text-center">Aksi</th></tr></thead>
+                        <tbody class="divide-y divide-gray-200"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Edit -->
+    <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+        <div class="bg-white p-6 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <h3 class="text-xl font-bold mb-4">Edit Rincian Anggaran</h3>
+            <input type="hidden" id="editId">
+            <table class="w-full mb-4">
+                <thead><tr><th class="text-left">Uraian</th><th class="text-right">Nominal</th></tr></thead>
+                <tbody id="editBody"></tbody>
+            </table>
+            <div class="flex justify-end gap-2">
+                <button onclick="document.getElementById('editModal').classList.add('hidden')" class="px-4 py-2 bg-gray-200 rounded">Batal</button>
+                <button onclick="saveEdit()" class="px-4 py-2 bg-teal-600 text-white rounded">Simpan Perubahan</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        let userRoles = [];
+
+        async function initPage() {
+            const sessionRes = await fetch('sadigs_api_v3/session_check.php');
+            const sessionData = await sessionRes.json();
+            if (!sessionData.success) { window.location.href = 'index.html'; return; }
+            userRoles = sessionData.roles;
+
+            // Render Sidebar
+            const nav = document.getElementById('sidebarNav');
+            nav.innerHTML = `<div class="bg-gray-50 rounded-lg p-2 mt-2"><h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase">KEUANGAN</h3><a href="budget_plan_form.html" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="file-plus" class="w-5 h-5"></i> Form Anggaran</a><a href="budget_plan_validation.html" class="flex items-center gap-3 px-3 py-2.5 text-teal-700 bg-white rounded-md transition font-semibold text-sm shadow-sm"><i data-lucide="check-square" class="w-5 h-5"></i> Validasi Anggaran</a></div>`;
+            lucide.createIcons();
+
+            loadData();
+        }
+
+        async function loadData() {
+            const res = await fetch('sadigs_api_v3/get_budget_plans.php?context=unit');
+            const result = await res.json();
+            if(result.success) {
+                renderTable('tableSekolah', result.data.filter(d => d.category === 'Sekolah'), 'Kepala Sekolah');
+                renderTable('tablePutra', result.data.filter(d => d.category === 'Asrama Putra'), 'Kepala Asrama Putra');
+                renderTable('tablePutri', result.data.filter(d => d.category === 'Asrama Putri'), 'Kepala Asrama Putri');
+            }
+        }
+
+        function renderTable(tableId, data, requiredRole) {
+            const tbody = document.querySelector(`#${tableId} tbody`);
+            tbody.innerHTML = '';
+            const canEdit = userRoles.includes(requiredRole);
+
+            data.forEach(row => {
+                const tr = document.createElement('tr');
+                const statusColor = row.status_unit === 'approved' ? 'text-green-600' : (row.status_unit === 'rejected' ? 'text-red-600' : 'text-yellow-600');
+                
+                let buttons = '';
+                if (canEdit && row.status_unit === 'pending') {
+                    buttons = `
+                        <button onclick="openEdit(${row.id}, '${encodeURIComponent(JSON.stringify(row.details))}')" class="text-blue-600 hover:underline text-xs mr-2">Edit</button>
+                        <button onclick="validate(${row.id}, 'approve_unit')" class="text-green-600 hover:underline text-xs mr-2">Setujui</button>
+                        <button onclick="validate(${row.id}, 'reject_unit')" class="text-red-600 hover:underline text-xs">Tolak</button>
+                    `;
+                } else {
+                    buttons = `<span class="text-gray-400 text-xs">-</span>`;
+                }
+
+                tr.innerHTML = `
+                    <td class="px-4 py-3">${row.period_type} ${row.period_name || ''} ${row.year}</td>
+                    <td class="px-4 py-3"><div class="font-bold">${row.sender_name}</div><div class="text-xs text-gray-500">${row.role_sender}</div></td>
+                    <td class="px-4 py-3 text-right font-bold">Rp ${parseInt(row.total_amount).toLocaleString('id-ID')}</td>
+                    <td class="px-4 py-3 text-center font-bold ${statusColor}">${row.status_unit}</td>
+                    <td class="px-4 py-3 text-center">${buttons}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        window.openEdit = function(id, detailsStr) {
+            const details = JSON.parse(decodeURIComponent(detailsStr));
+            document.getElementById('editId').value = id;
+            const tbody = document.getElementById('editBody');
+            tbody.innerHTML = '';
+            details.forEach((d, idx) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="p-1"><input type="text" class="w-full border p-1 edit-desc" value="${d.description}"></td>
+                        <td class="p-1"><input type="number" class="w-full border p-1 edit-amt text-right" value="${d.amount}"></td>
+                    </tr>
+                `;
+            });
+            document.getElementById('editModal').classList.remove('hidden');
+        }
+
+        window.saveEdit = async function() {
+            const id = document.getElementById('editId').value;
+            const details = [];
+            document.querySelectorAll('#editBody tr').forEach(tr => {
+                details.push({
+                    description: tr.querySelector('.edit-desc').value,
+                    amount: tr.querySelector('.edit-amt').value
+                });
+            });
+
+            await fetch('sadigs_api_v3/validate_budget_plan.php', {
+                method: 'POST',
+                body: JSON.stringify({ id, action: 'update', details })
+            });
+            document.getElementById('editModal').classList.add('hidden');
+            loadData();
+        }
+
+        window.validate = async function(id, action) {
+            if(!confirm('Anda yakin?')) return;
+            await fetch('sadigs_api_v3/validate_budget_plan.php', {
+                method: 'POST',
+                body: JSON.stringify({ id, action })
+            });
+            loadData();
+        }
+
+        initPage();
+    </script>
+</body>
+</html>

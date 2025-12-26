@@ -202,7 +202,10 @@
                         'navRekapPembayaran',    // Tab
                         'navDaftarIzin',         // Tab
                         'navFormulirTransaksi',  // Form (BARU)
-                        'navTabelTransaksi'      // Tab (BARU)
+                        'navTabelTransaksi',     // Tab (BARU)
+                        'navFormAnggaran',       // Form (BARU)
+                        'navValidasiAnggaran',   // Val (BARU)
+                        'navRekapAnggaran'       // Tab (BARU)
                     ];
 
                     // FIX: Pastikan semua menu di customOrder muncul di tabel, 
@@ -260,8 +263,8 @@
 
                 // --- LOGIKA KATEGORI (Form, Val, Tab) ---
                 let prefix = "Tab"; // Default kategori
-                const formMenus = ['navAbsensi', 'navBiodataPegawai', 'navBiodataSantri', 'navCalendarSettings', 'navIbadahHarian', 'navInputTahfizh', 'navMenuManagement', 'navProfil', 'navQuota', 'navRapat', 'navIzinPegawai', 'navDaftarIzin', 'navFormulirPembayaran', 'navFormulirTransaksi'];
-                const valMenus = ['navValidasiIbadah', 'navVerifikasi', 'navValidasiPembayaran', 'navValidasiIzin'];
+                const formMenus = ['navAbsensi', 'navBiodataPegawai', 'navBiodataSantri', 'navCalendarSettings', 'navIbadahHarian', 'navInputTahfizh', 'navMenuManagement', 'navProfil', 'navQuota', 'navRapat', 'navIzinPegawai', 'navDaftarIzin', 'navFormulirPembayaran', 'navFormulirTransaksi', 'navFormAnggaran'];
+                const valMenus = ['navValidasiIbadah', 'navVerifikasi', 'navValidasiPembayaran', 'navValidasiIzin', 'navValidasiAnggaran'];
 
                 if (formMenus.includes(menuId)) prefix = "Form";
                 else if (valMenus.includes(menuId)) prefix = "Val";
