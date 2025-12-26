@@ -380,6 +380,24 @@
                 }
             });
 
+            // Auto-select category based on sender role
+            const roleSelect = document.getElementById('roleSelect');
+            const categorySelect = document.getElementById('category');
+            roleSelect.addEventListener('change', () => {
+                const selectedRole = roleSelect.value;
+                const sekolahRoles = ['Kepala Sekolah', 'Sekretaris Sekolah', 'Bendahara Sekolah', 'Ustadz', 'Ustadzah'];
+                const asramaPutraRoles = ['Kepala Asrama Putra', 'Musyrif'];
+                const asramaPutriRoles = ['Kepala Asrama Putri', 'Musyrifah'];
+
+                if (sekolahRoles.includes(selectedRole)) {
+                    categorySelect.value = 'Sekolah';
+                } else if (asramaPutraRoles.includes(selectedRole)) {
+                    categorySelect.value = 'Asrama Putra';
+                } else if (asramaPutriRoles.includes(selectedRole)) {
+                    categorySelect.value = 'Asrama Putri';
+                }
+            });
+
             lucide.createIcons();
         }
 
