@@ -185,7 +185,7 @@
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition">
                     <div class="flex justify-between items-start">
                         <div>
-                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wide">Peran Utama</p>
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wide">Peran Anda</p>
                             <h3 id="mainRoleDisplay" class="text-xl font-bold text-gray-800 mt-1">-</h3>
                         </div>
                         <div class="p-2 bg-blue-50 rounded-lg text-blue-600">
@@ -264,14 +264,6 @@
                     const roles = data.roles || [];
                     const rawRoles = data.raw_roles || [];
 
-                    // FIX: Arahkan Walisantri langsung ke halaman pemilihan anak
-                    if (roles.includes('Walisantri')) {
-                        const biodataLink = document.getElementById('navBiodataSantri');
-                        if (biodataLink) {
-                            biodataLink.href = 'select_student.html';
-                        }
-                    }
-
                     // LOGIKA BARU: Jika belum punya peran
                     // Cek rawRoles (semua peran termasuk pending)
                     if (rawRoles.length === 0) {
@@ -279,6 +271,9 @@
                         document.getElementById('roleSelectionContainer').classList.remove('hidden');
                         loadAvailableRoles(); // Muat daftar peran
                     } else {
+                        // Hapus konsep "Peran Utama", tampilkan semua peran beserta statusnya.
+                        const allRolesText = rawRoles.map(r => r.status === 'approved' ? r.role_name : `${r.role_name} (Pending)`).join(', ');
+
                         // Jika punya peran tapi belum ada yang 'approved' (roles kosong)
                         if (roles.length === 0) {
                             const pendingRole = rawRoles[0].role_name;
@@ -296,16 +291,10 @@
                             const header = document.querySelector('header');
                             header.parentNode.insertBefore(banner, header.nextSibling);
 
-                            // Paksa Tampil Menu UMUM (Dashboard, Kalender, Profil)
-                            ['navDashboard', 'navKalender', 'navProfil'].forEach(id => {
-                                const el = document.getElementById(id);
-                                if(el) el.classList.remove('hidden');
-                            });
                         } else {
                             // User Aktif / Approved
-                            const mainRole = roles[0];
-                            document.getElementById('sidebarRole').textContent = mainRole;
-                            document.getElementById('mainRoleDisplay').textContent = mainRole;
+                            document.getElementById('sidebarRole').textContent = allRolesText;
+                            document.getElementById('mainRoleDisplay').textContent = allRolesText;
                         }
                     }
 
