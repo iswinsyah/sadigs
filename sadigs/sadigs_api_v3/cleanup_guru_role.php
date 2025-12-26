@@ -18,9 +18,14 @@ try {
     echo "<p style='color:green;'>✅ Dihapus $count2 entri dari `user_roles` untuk peran 'Guru'.</p>";
     
     // 3. Hapus dari quotas (jika ada)
-    $stmt3 = $pdo->prepare("DELETE FROM quotas WHERE role_name = 'Guru'");
-    $count3 = $stmt3->execute() ? $stmt3->rowCount() : 0;
-    echo "<p style='color:green;'>✅ Dihapus $count3 entri dari `quotas` untuk peran 'Guru'.</p>";
+    $tableCheck = $pdo->query("SHOW TABLES LIKE 'quota_settings'");
+    if ($tableCheck->rowCount() > 0) {
+        $stmt3 = $pdo->prepare("DELETE FROM quota_settings WHERE role_name = 'Guru'");
+        $count3 = $stmt3->execute() ? $stmt3->rowCount() : 0;
+        echo "<p style='color:green;'>✅ Dihapus $count3 entri dari `quota_settings` untuk peran 'Guru'.</p>";
+    } else {
+        echo "<p style='color:blue;'>ℹ️ Tabel `quota_settings` tidak ditemukan, langkah ini dilewati.</p>";
+    }
 
     echo "<h3>Pembersihan Selesai. Role 'Guru' telah dihapus dari sistem. Silakan refresh halaman Manajemen Akses.</h3>";
 
