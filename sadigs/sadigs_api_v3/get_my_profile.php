@@ -1,28 +1,37 @@
 <?php
+header('Content-Type: application/json');
 require_once 'db_connect.php';
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+if (session_status() === PHP_SESSION_NONE) session_start();
+if (!isset($_SESSION['user_id'])) {
+    sendJSONResponse(['success' => false, 'message' => 'Unauthorized'], 401);
 }
 
-if (!isset($_SESSION['user_id'])) {
-    sendJSONResponse(['success' => false, 'message' => 'Sesi tidak valid.'], 401);
-    exit;
-}
+$user_id = $_SESSION['user_id'];
+$pdo = getDBConnection();
 
 try {
-    $pdo = getDBConnection();
-    $stmt = $pdo->prepare("SELECT username, email, gender, full_name, bio FROM users WHERE user_id = ?");
-    $stmt->execute([$_SESSION['user_id']]);
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    // Ambil data dari tabel users
+    $stmt = $pdo->prepare("
+        SELECT 
+            u.username, 
+            u.email, 
+            u.full_name, 
+            u.gender, 
+            u.bio
+        FROM users u
+        WHERE u.user_id = ?
+    ");
+    $stmt->execute([$user_id]);
+    $data = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($user) {
-        sendJSONResponse(['success' => true, 'data' => $user]);
+    if ($data) {
+        sendJSONResponse(['success' => true, 'data' => $data]);
     } else {
-        sendJSONResponse(['success' => false, 'message' => 'Pengguna tidak ditemukan.'], 404);
+        sendJSONResponse(['success' => false, 'message' => 'Profil tidak ditemukan.'], 404);
     }
 
 } catch (Exception $e) {
-    sendJSONResponse(['success' => false, 'message' => 'Terjadi kesalahan server: ' . $e->getMessage()], 500);
+    sendJSONResponse(['success' => false, 'message' => 'Database error: ' . $e->getMessage()], 500);
 }
 ?>
