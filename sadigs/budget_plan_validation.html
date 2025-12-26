@@ -41,11 +41,22 @@
                 </div>
             </div>
 
-            <!-- Tabel 2: Asrama / Ma'had -->
+            <!-- Tabel 2: Asrama Putra -->
             <div class="mb-8">
-                <h3 class="text-lg font-bold text-blue-800 mb-2 flex items-center gap-2"><i data-lucide="home" class="w-5 h-5"></i> Tabel Rencana Anggaran Asrama / Ma'had</h3>
+                <h3 class="text-lg font-bold text-blue-800 mb-2 flex items-center gap-2"><i data-lucide="home" class="w-5 h-5"></i> Tabel Rencana Anggaran Asrama Putra</h3>
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                    <table class="min-w-full divide-y divide-gray-200 text-sm" id="tableMahad">
+                    <table class="min-w-full divide-y divide-gray-200 text-sm" id="tablePutra">
+                        <thead class="bg-gray-50"><tr><th class="px-4 py-3 text-left">Periode</th><th class="px-4 py-3 text-left">Pengaju</th><th class="px-4 py-3 text-right">Total</th><th class="px-4 py-3 text-center">Status</th><th class="px-4 py-3 text-center">Aksi</th></tr></thead>
+                        <tbody class="divide-y divide-gray-200"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tabel 3: Asrama Putri -->
+            <div class="mb-8">
+                <h3 class="text-lg font-bold text-pink-800 mb-2 flex items-center gap-2"><i data-lucide="home" class="w-5 h-5"></i> Tabel Rencana Anggaran Asrama Putri</h3>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <table class="min-w-full divide-y divide-gray-200 text-sm" id="tablePutri">
                         <thead class="bg-gray-50"><tr><th class="px-4 py-3 text-left">Periode</th><th class="px-4 py-3 text-left">Pengaju</th><th class="px-4 py-3 text-right">Total</th><th class="px-4 py-3 text-center">Status</th><th class="px-4 py-3 text-center">Aksi</th></tr></thead>
                         <tbody class="divide-y divide-gray-200"></tbody>
                     </table>
@@ -93,7 +104,8 @@
             const result = await res.json();
             if(result.success) {
                 renderTable('tableSekolah', result.data.filter(d => d.category === 'Sekolah'), ['Kepala Sekolah']);
-                renderTable('tableMahad', result.data.filter(d => d.category === 'Asrama Putra' || d.category === 'Asrama Putri'), ['Kepala Ma\'had']);
+                renderTable('tablePutra', result.data.filter(d => d.category === 'Asrama Putra'), ['Kepala Asrama Putra']);
+                renderTable('tablePutri', result.data.filter(d => d.category === 'Asrama Putri'), ['Kepala Asrama Putri']);
             }
         }
 

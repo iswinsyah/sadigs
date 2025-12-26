@@ -172,7 +172,8 @@
                                     <option value="" disabled selected>Pilih Pengundang</option>
                                     <option value="Ketua Yayasan">Ketua Yayasan</option>
                                     <option value="Kepala Sekolah">Kepala Sekolah</option>
-                                    <option value="Kepala Ma'had">Kepala Ma'had</option>
+                                    <option value="Kepala Asrama Putra">Kepala Asrama Putra</option>
+                                    <option value="Kepala Asrama Putri">Kepala Asrama Putri</option>
                                 </select>
                                 <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none"><i data-lucide="chevron-down" class="w-4 h-4 text-gray-400"></i></div>
                             </div>
@@ -199,8 +200,12 @@
                                     <span class="text-sm text-gray-700">Kepala Sekolah</span>
                                 </label>
                                 <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-100 p-2 rounded transition">
-                                    <input type="checkbox" name="invited_roles" value="Kepala Ma'had" class="w-4 h-4 text-teal-600 rounded focus:ring-teal-500 border-gray-300">
-                                    <span class="text-sm text-gray-700">Kepala Ma'had</span>
+                                    <input type="checkbox" name="invited_roles" value="Kepala Asrama Putra" class="w-4 h-4 text-teal-600 rounded focus:ring-teal-500 border-gray-300">
+                                    <span class="text-sm text-gray-700">Kepala Asrama Putra</span>
+                                </label>
+                                <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-100 p-2 rounded transition">
+                                    <input type="checkbox" name="invited_roles" value="Kepala Asrama Putri" class="w-4 h-4 text-teal-600 rounded focus:ring-teal-500 border-gray-300">
+                                    <span class="text-sm text-gray-700">Kepala Asrama Putri</span>
                                 </label>
                                 <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-100 p-2 rounded transition">
                                     <input type="checkbox" name="invited_roles" value="Sekretaris Sekolah" class="w-4 h-4 text-teal-600 rounded focus:ring-teal-500 border-gray-300">
@@ -296,10 +301,10 @@
                 document.getElementById('sidebarRole').textContent = rolesText;
                 
                 // Cek Akses
-                const allowedRoles = ['Ketua Yayasan', 'Kepala Sekolah', 'Kepala Ma\'had'];
+                const allowedRoles = ['Ketua Yayasan', 'Kepala Sekolah', 'Kepala Asrama Putra', 'Kepala Asrama Putri'];
                 const hasAccess = sessionData.roles.some(r => allowedRoles.includes(r));
                 if (!hasAccess) {
-                    alert('Akses ditolak. Halaman ini hanya untuk Ketua Yayasan, Kepala Sekolah, dan Kepala Ma\'had.');
+                    alert('Akses ditolak. Halaman ini hanya untuk Ketua Yayasan, Kepala Sekolah, dan Kepala Asrama.');
                     window.location.href = 'dashboard.html';
                     return;
                 }
@@ -322,7 +327,7 @@
                 document.getElementById('groupSantri').classList.remove('hidden');
                 
                 // Menu Jadwal Rapat (Semua yang bisa diundang)
-                const viewMeetingRoles = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan', 'Kepala Sekolah', 'Kepala Ma\'had', 'Sekretaris Sekolah', 'Bendahara Sekolah', 'Musyrif', 'Ustadz', 'Musyrifah', 'Ustadzah'];
+                const viewMeetingRoles = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan', 'Kepala Sekolah', 'Kepala Asrama Putra', 'Kepala Asrama Putri', 'Sekretaris Sekolah', 'Bendahara Sekolah', 'Musyrif', 'Ustadz', 'Musyrifah', 'Ustadzah'];
                 if (sessionData.roles.some(r => viewMeetingRoles.includes(r))) {
                     document.getElementById('navJadwalRapat').classList.remove('hidden');
                 }

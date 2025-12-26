@@ -197,7 +197,7 @@
             } catch (e) { console.error("Gagal memuat izin menu:", e); }
 
             // Cek hak akses edit (Hanya Yayasan, Kepala Sekolah, Kepala Asrama)
-            const editRoles = ['Ketua Yayasan', 'Kepala Sekolah', 'Kepala Ma\'had'];
+            const editRoles = ['Ketua Yayasan', 'Kepala Sekolah', 'Kepala Asrama Putra', 'Kepala Asrama Putri'];
             canEdit = sessionData.roles.some(r => editRoles.includes(r));
 
             if (canEdit) {
