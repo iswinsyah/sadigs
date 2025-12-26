@@ -315,8 +315,8 @@
             const renderRoles = (quotas = {}) => {
                 container.innerHTML = '';
                 
-                // 1. Tambahkan opsi Default (Tanpa Kuota) - Selalu muncul
-                const defaultRoles = ['Santri', 'Walisantri'];
+                // 1. Tambahkan opsi Default (Tanpa Kuota) - Selalu muncul (UPDATED)
+                const defaultRoles = ['Santri Rijal', 'Santri Nisa\'', 'Walisantri'];
                 defaultRoles.forEach(role => {
                     addRoleOption(container, role, null);
                 });

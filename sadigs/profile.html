@@ -361,7 +361,7 @@
                 .then(data => {
                     container.innerHTML = '';
                     const protectedRoles = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan'];
-                    let allAvailableRoles = ['Santri', 'Walisantri']; // Default roles
+                    let allAvailableRoles = ['Santri Rijal', 'Santri Nisa\'', 'Walisantri']; // Default roles (UPDATED)
 
                     if (data.success && data.quotas) {
                         allAvailableRoles = allAvailableRoles.concat(Object.keys(data.quotas));

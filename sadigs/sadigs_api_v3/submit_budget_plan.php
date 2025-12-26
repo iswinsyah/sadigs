@@ -9,21 +9,14 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 $role_sender = $_POST['role_sender'] ?? '';
+$category = $_POST['category'] ?? ''; // Ambil dari form
 $period_type = $_POST['period_type'] ?? '';
 $period_name = $_POST['period_name'] ?? '';
 $year = $_POST['year'] ?? '';
 $details_json = $_POST['details'] ?? '[]';
 
-if (!$role_sender || !$period_type || !$year) {
+if (!$role_sender || !$category || !$period_type || !$year) {
     sendJSONResponse(['success' => false, 'message' => 'Data tidak lengkap.'], 400);
-}
-
-// Tentukan Kategori Anggaran berdasarkan Role Pengirim
-$category = 'Sekolah'; // Default
-if (stripos($role_sender, 'Putra') !== false) {
-    $category = 'Asrama Putra';
-} elseif (stripos($role_sender, 'Putri') !== false) {
-    $category = 'Asrama Putri';
 }
 
 $details = json_decode($details_json, true);

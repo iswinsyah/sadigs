@@ -308,10 +308,10 @@
                     window.location.href = 'select_student.html';
                     return;
                 }
-                targetUserId = idFromUrl;
-            } else if (sessionData.roles.includes('Santri')) {
+                targetUserId = idFromUrl; // Walisantri harus punya ID di URL
+            } else if (sessionData.roles.includes('Santri Rijal') || sessionData.roles.includes('Santri Nisa\'')) {
                 // Santri hanya bisa edit data diri sendiri, abaikan ID di URL
-                targetUserId = sessionData.user_id; // Mengasumsikan session_check.php mengembalikan user_id
+                targetUserId = null; // Backend akan menggunakan ID dari sesi
             } else {
                 // Role lain (misal admin) yang mungkin diberi akses
                 if (!idFromUrl) {
@@ -322,11 +322,6 @@
                 targetUserId = idFromUrl;
             }
             
-            // Jika user_id tidak ada di session_check untuk Santri, biarkan backend yang menentukan dari sesi
-            if (sessionData.roles.includes('Santri')) {
-                targetUserId = null; 
-            }
-
             // Load Data
             try {
                 const apiUrl = targetUserId ? `sadigs_api_v3/student_data.php?id=${targetUserId}` : 'sadigs_api_v3/student_data.php';
