@@ -123,25 +123,29 @@
             const sessionData = await sessionRes.json();
             if (!sessionData.success) { window.location.href = 'index.html'; return; }
 
-            // Cek Otorisasi (Hanya Ketua Yayasan)
-            if (!sessionData.roles.includes('Ketua Yayasan')) {
-                alert('Akses Ditolak. Halaman ini hanya untuk Ketua Yayasan.');
-                window.location.href = 'dashboard.html';
-                return;
-            }
-
             // --- LOGIKA MENU DINAMIS (DATABASE) ---
             try {
                 const permRes = await fetch('sadigs_api_v3/get_menu_permissions.php');
                 const permData = await permRes.json();
-                if (permData.success) {
-                    const allowedMenus = permData.permissions || [];
-                    allowedMenus.forEach(id => { const el = document.getElementById(id); if(el) el.classList.remove('hidden'); });
-                    if (document.querySelector('#menuYayasan a:not(.hidden)')) document.getElementById('menuYayasan').classList.remove('hidden');
-                    if (document.querySelector('#groupKhusus a:not(.hidden)')) document.getElementById('groupKhusus').classList.remove('hidden');
-                    if (document.querySelector('#groupSantri a:not(.hidden)')) document.getElementById('groupSantri').classList.remove('hidden');
+                const allowedMenus = permData.success ? permData.permissions : [];
+
+                // Cek Otorisasi Halaman ini
+                if (!allowedMenus.includes('navMenuManagement')) {
+                    alert('Akses Ditolak. Anda tidak memiliki izin untuk mengakses halaman ini.');
+                    window.location.href = 'dashboard.html';
+                    return;
                 }
-            } catch (e) { console.error(e); }
+
+                // Render Sidebar
+                allowedMenus.forEach(id => { const el = document.getElementById(id); if(el) el.classList.remove('hidden'); });
+                if (document.querySelector('#menuYayasan a:not(.hidden)')) document.getElementById('menuYayasan').classList.remove('hidden');
+                if (document.querySelector('#groupKhusus a:not(.hidden)')) document.getElementById('groupKhusus').classList.remove('hidden');
+                if (document.querySelector('#groupSantri a:not(.hidden)')) document.getElementById('groupSantri').classList.remove('hidden');
+            } catch (e) { 
+                console.error(e); 
+                alert('Gagal memuat izin akses. Silakan coba lagi.');
+                window.location.href = 'dashboard.html';
+            }
 
             loadData();
         }
