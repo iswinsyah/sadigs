@@ -234,6 +234,10 @@
         mobileMenuBtn.addEventListener('click', toggleSidebar);
         sidebarOverlay.addEventListener('click', toggleSidebar);
 
+        // Reset sidebar state on page load to prevent UI lock
+        sidebar.classList.add('-translate-x-full');
+        sidebarOverlay.classList.add('hidden');
+
         // Tampilkan Tanggal Hari Ini
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         document.getElementById('currentDate').textContent = new Date().toLocaleDateString('id-ID', options);

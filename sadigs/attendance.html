@@ -243,6 +243,12 @@
 
         // --- INIT PAGE ---
         async function initPage() {
+            // Reset sidebar state on page load to prevent UI lock
+            const sidebar = document.getElementById('sidebar');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+            if (sidebar) sidebar.classList.add('-translate-x-full');
+            if (sidebarOverlay) sidebarOverlay.classList.add('hidden');
+
             try {
                 const sessionRes = await fetch('sadigs_api_v3/session_check.php');
                 const sessionData = await sessionRes.json();

@@ -215,6 +215,11 @@
         mobileMenuBtn.addEventListener('click', toggleSidebar);
         sidebarOverlay.addEventListener('click', toggleSidebar);
 
+        // Reset sidebar state on page load to prevent UI lock
+        const sidebarEl = document.getElementById('sidebar');
+        if (sidebarEl) sidebarEl.classList.add('-translate-x-full');
+        if (sidebarOverlay) sidebarOverlay.classList.add('hidden');
+
         function setFormReadOnly(isReadOnly) {
             const form = document.getElementById('profileForm');
             // Username & email selalu readonly
