@@ -11,16 +11,28 @@ $student_id = $_SESSION['user_id'];
 $pdo = getDBConnection();
 
 try {
-    $stmt = $pdo->prepare("
+    // 1. Ambil semua riwayat laporan untuk tabel
+    $stmt_history = $pdo->prepare("
         SELECT * 
         FROM tahfizh_reports 
         WHERE student_id = ? 
         ORDER BY report_date DESC
     ");
-    $stmt->execute([$student_id]);
-    $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $stmt_history->execute([$student_id]);
+    $history_data = $stmt_history->fetchAll(PDO::FETCH_ASSOC);
 
-    sendJSONResponse(['success' => true, 'data' => $data]);
+    // 2. Ambil data capaian terakhir untuk progress bar
+    $stmt_summary = $pdo->prepare("
+        SELECT last_juz_number 
+        FROM tahfizh_reports 
+        WHERE student_id = ? AND last_juz_number IS NOT NULL
+        ORDER BY report_date DESC, id DESC 
+        LIMIT 1
+    ");
+    $stmt_summary->execute([$student_id]);
+    $summary_data = $stmt_summary->fetch(PDO::FETCH_ASSOC);
+
+    sendJSONResponse(['success' => true, 'data' => $history_data, 'summary' => $summary_data]);
 
 } catch (Exception $e) {
     sendJSONResponse(['success' => false, 'message' => 'Database error: ' . $e->getMessage()], 500);

@@ -32,6 +32,18 @@
                 <p class="text-gray-500 text-sm mt-1">Rekapitulasi perkembangan hafalan Al-Qur'an Anda.</p>
             </header>
 
+            <!-- Progress Bar Section -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mb-8">
+                <h3 class="text-lg font-bold text-gray-800 mb-2">Progres Hafalan Saat Ini</h3>
+                <div class="flex items-center gap-4">
+                    <div class="flex-grow bg-gray-200 rounded-full h-4">
+                        <div id="progressBar" class="bg-teal-500 h-4 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                    <div class="font-bold text-teal-600 text-lg w-24 text-right" id="progressText">0%</div>
+                </div>
+                <p id="progressSubtext" class="text-sm text-gray-500 mt-2">Memuat progres...</p>
+            </div>
+
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200 text-sm">
@@ -113,6 +125,22 @@
                 const res = await fetch('sadigs_api_v3/get_my_tahfizh_reports.php');
                 const result = await res.json();
                 
+                // Handle Progress Bar
+                const progressBar = document.getElementById('progressBar');
+                const progressText = document.getElementById('progressText');
+                const progressSubtext = document.getElementById('progressSubtext');
+
+                if (result.success && result.summary && result.summary.last_juz_number) {
+                    const lastJuz = parseInt(result.summary.last_juz_number);
+                    const percentage = Math.min(100, (lastJuz / 30) * 100);
+                    progressBar.style.width = percentage + '%';
+                    progressText.textContent = Math.round(percentage) + '%';
+                    progressSubtext.textContent = `Capaian terakhir pada Juz ${lastJuz} dari 30 Juz.`;
+                } else {
+                    progressSubtext.textContent = 'Belum ada data capaian Juz yang tercatat.';
+                }
+
+                // Handle Table
                 if (result.success && result.data.length > 0) {
                     tbody.innerHTML = '';
                     result.data.forEach(row => {
