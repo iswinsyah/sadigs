@@ -97,15 +97,15 @@
                     // Cek hak akses yayasan
                     const isYayasan = userRoles.some(r => ['Ketua Yayasan', 'Bendahara Yayasan', 'Sekretaris Yayasan'].includes(r));
                     
-                    let buttons = '';
+                    let buttons = `<button onclick="toggleDetails(${row.id})" class="text-gray-600 hover:underline text-xs mr-2 font-semibold flex items-center gap-1"><i data-lucide="list" class="w-3 h-3"></i>Rincian</button>`;
                     if (isYayasan && row.status_foundation === 'pending') {
-                        buttons = `
+                        buttons += `
                             <button onclick="openEdit(${row.id}, '${encodeURIComponent(JSON.stringify(row.details))}')" class="text-blue-600 hover:underline text-xs mr-2 font-bold">Edit</button>
                             <button onclick="validate(${row.id}, 'approve_foundation')" class="text-green-600 hover:underline text-xs mr-2 font-bold">Tetapkan</button>
                             <button onclick="validate(${row.id}, 'reject_foundation')" class="text-red-600 hover:underline text-xs font-bold">Tolak</button>
                         `;
                     } else {
-                        buttons = `<span class="text-gray-400 text-xs">Selesai</span>`;
+                        buttons += `<span class="text-gray-400 text-xs">Selesai</span>`;
                     }
 
                     const tr = document.createElement('tr');
@@ -117,7 +117,22 @@
                         <td class="px-6 py-4 text-center">${buttons}</td>
                     `;
                     tbody.appendChild(tr);
+
+                    // Buat dan tambahkan baris rincian yang tersembunyi
+                    const detailsTr = document.createElement('tr');
+                    detailsTr.id = `details-${row.id}`;
+                    detailsTr.className = "hidden";
+
+                    const details = JSON.parse(row.details);
+                    let detailsHtml = '<td colspan="5" class="p-4 bg-gray-50/70"><div class="max-w-2xl mx-auto"><h4 class="font-bold text-xs uppercase text-gray-600 mb-2">Rincian Pengajuan:</h4><table class="min-w-full bg-white text-xs rounded-lg shadow-sm overflow-hidden"><thead class="bg-gray-100"><tr><th class="px-3 py-2 text-left">Uraian</th><th class="px-3 py-2 text-right w-40">Jumlah</th></tr></thead><tbody>';
+                    details.forEach(item => {
+                        detailsHtml += `<tr class="border-b last:border-0"><td class="px-3 py-2">${item.description}</td><td class="px-3 py-2 text-right font-mono">Rp ${parseInt(item.amount).toLocaleString('id-ID')}</td></tr>`;
+                    });
+                    detailsHtml += '</tbody></table></div></td>';
+                    detailsTr.innerHTML = detailsHtml;
+                    tbody.appendChild(detailsTr);
                 });
+                lucide.createIcons();
             } else {
                 tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-10 text-center text-gray-500">Belum ada anggaran yang divalidasi unit.</td></tr>';
             }
@@ -149,6 +164,11 @@
             if(!confirm('Anda yakin?')) return;
             await fetch('sadigs_api_v3/validate_budget_plan.php', { method: 'POST', body: JSON.stringify({ id, action }) });
             loadData();
+        }
+
+        window.toggleDetails = function(rowId) {
+            const detailsRow = document.getElementById(`details-${rowId}`);
+            detailsRow.classList.toggle('hidden');
         }
 
         initPage();
