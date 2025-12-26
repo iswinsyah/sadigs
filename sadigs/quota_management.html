@@ -177,18 +177,15 @@
                     return;
                 }
 
-                // FIX: Arahkan Walisantri langsung ke halaman pemilihan anak
-                if (sessionData.roles.includes('Walisantri')) {
-                    const biodataLink = document.getElementById('navBiodataSantri');
-                    if (biodataLink) {
-                        biodataLink.href = 'select_student.html';
-                    }
-                }
-
                 // Update Sidebar Info
                 document.getElementById('sidebarUsername').textContent = sessionData.username;
                 document.getElementById('userInitial').textContent = sessionData.username.charAt(0).toUpperCase();
-                document.getElementById('sidebarRole').textContent = sessionData.roles[0] || 'User';
+                const rawRoles = sessionData.raw_roles || [];
+                let rolesText = 'User';
+                if (rawRoles.length > 0) {
+                    rolesText = rawRoles.map(r => r.status === 'approved' ? r.role_name : `${r.role_name} (Pending)`).join(', ');
+                }
+                document.getElementById('sidebarRole').textContent = rolesText;
                 
                 // Cek Akses Yayasan
                 const yayasanRoles = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan'];
