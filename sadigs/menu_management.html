@@ -156,6 +156,14 @@
                     menuList = data.menus;
                     currentMatrix = data.matrix;
 
+                    // --- INJECT NEW ROLES IF NOT PRESENT ---
+                    // Memastikan kolom untuk peran baru selalu muncul meskipun belum ada user dengan peran tsb.
+                    const newRoles = ['Musyrifah', 'Ustadzah'];
+                    newRoles.forEach(nr => {
+                        if (!roleList.includes(nr)) {
+                            roleList.push(nr);
+                        }
+                    });
                     // --- SORTING BERDASARKAN ALUR KERJA (Form -> Val -> Tab) ---
                     const customOrder = [
                         // 1. Dashboard & Profil

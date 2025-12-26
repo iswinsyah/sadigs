@@ -14,7 +14,7 @@ try {
     ];
 
     $perms = [
-        'navFormAnggaran' => ['Kepala Sekolah', 'Kepala Asrama Putra', 'Kepala Asrama Putri', 'Bendahara Sekolah', 'Ustadz', 'Musyrif'], // Semua pegawai bisa mengajukan
+        'navFormAnggaran' => ['Kepala Sekolah', 'Kepala Asrama Putra', 'Kepala Asrama Putri', 'Bendahara Sekolah', 'Ustadz', 'Musyrif', 'Ustadzah', 'Musyrifah'], // Semua pegawai bisa mengajukan
         'navValidasiAnggaran' => ['Kepala Sekolah', 'Kepala Asrama Putra', 'Kepala Asrama Putri'],
         'navRekapAnggaran' => ['Ketua Yayasan', 'Bendahara Yayasan', 'Sekretaris Yayasan']
     ];

@@ -158,7 +158,7 @@
             const sessionData = await sessionRes.json();
             if (!sessionData.success) { window.location.href = 'index.html'; return; }
 
-            const pegawaiRoles = ['Kepala Sekolah', 'Kepala Asrama', 'Sekretaris Sekolah', 'Bendahara Sekolah', 'Musyrif', 'Ustadz'];
+            const pegawaiRoles = ['Kepala Sekolah', 'Kepala Asrama', 'Sekretaris Sekolah', 'Bendahara Sekolah', 'Musyrif', 'Ustadz', 'Musyrifah', 'Ustadzah'];
             if (!sessionData.roles.some(r => pegawaiRoles.includes(r))) {
                 alert('Halaman ini khusus untuk Pegawai.');
                 window.location.href = 'dashboard.html';
