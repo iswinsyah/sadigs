@@ -22,13 +22,28 @@
                     <i data-lucide="arrow-left" class="w-5 h-5"></i> Kembali ke Dashboard
                 </a>
             </div>
-            <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-2 no-scrollbar">
+            <nav id="sidebarNav" class="flex-1 overflow-y-auto py-4 px-3 space-y-2 no-scrollbar">
+                <!-- Div 1: UMUM -->
+                <div class="bg-gray-50 rounded-lg p-2">
+                    <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">UMUM</h3>
+                    <a id="navDashboard" href="dashboard.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard</a>
+                    <a id="navProfil" href="profile.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="user" class="w-5 h-5"></i> Profil Saya</a>
+                </div>
+
                 <!-- Div 4: KESANTRIAN -->
                 <div id="groupSantri" class="bg-gray-50 rounded-lg p-2 mt-2">
                     <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KESANTRIAN</h3>
-                    <a id="navIbadahHarian" href="daily_worship_form.html" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="notebook-pen" class="w-5 h-5"></i> Ibadah Harian</a>
-                    <a id="navMentoring" href="mentoring_groups.html" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="users-round" class="w-5 h-5"></i> Kelompok Mentoring</a>
-                    <a id="navValidasiIbadah" href="daily_worship_validation.html" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="check-square" class="w-5 h-5"></i> Validasi Ibadah</a>
+                    <a id="navBiodataSantri" href="student_data.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-teal-700 bg-white rounded-md transition font-semibold text-sm shadow-sm"><i data-lucide="book-user" class="w-5 h-5"></i> Biodata Santri</a>
+                    <a id="navIbadahHarian" href="daily_worship_form.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="notebook-pen" class="w-5 h-5"></i> Laporan Ibadah Harian</a>
+                    <a id="navViewTahfizh" href="tahfizh_student_view.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="book-open-check" class="w-5 h-5"></i> Laporan Tahfizh</a>
+                    <a id="navMentoring" href="mentoring_groups.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="users-round" class="w-5 h-5"></i> Kelompok Mentoring</a>
+                </div>
+
+                <!-- Div 5: KEUANGAN (Walisantri) -->
+                <div id="groupKeuangan" class="hidden bg-gray-50 rounded-lg p-2 mt-2">
+                    <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KEUANGAN</h3>
+                    <a id="navFormulirPembayaran" href="payment_form.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="credit-card" class="w-5 h-5"></i> Formulir Pembayaran</a>
+                    <a id="navTabelPembayaran" href="payment_list.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="banknote" class="w-5 h-5"></i> Data Pembayaran</a>
                 </div>
             </nav>
         </aside>
@@ -297,6 +312,28 @@
             const sessionRes = await fetch('sadigs_api_v3/session_check.php');
             const sessionData = await sessionRes.json();
             if (!sessionData.success) { window.location.href = 'index.html'; return; }
+
+            // --- LOGIKA MENU DINAMIS (DATABASE) ---
+            try {
+                const permRes = await fetch('sadigs_api_v3/get_menu_permissions.php');
+                const permData = await permRes.json();
+                if (permData.success) {
+                    const allowedMenus = permData.permissions || [];
+                    
+                    // 1. Tampilkan menu yang diizinkan
+                    allowedMenus.forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) el.classList.remove('hidden');
+                    });
+
+                    // 2. Tampilkan grup menu jika memiliki item yang terlihat
+                    const menuGroups = ['groupSantri', 'groupKeuangan'];
+                    menuGroups.forEach(groupId => {
+                        const group = document.getElementById(groupId);
+                        if (group && group.querySelector('a:not(.hidden)')) group.classList.remove('hidden');
+                    });
+                }
+            } catch (e) { console.error("Gagal memuat izin menu:", e); }
 
             const urlParams = new URLSearchParams(window.location.search);
             const idFromUrl = urlParams.get('id');
