@@ -285,7 +285,6 @@
                 rolesDisplay.innerHTML = '';
                 
                 // Cek apakah ada peran yang pending dari data mentah
-                const rawRoles = sessionData.raw_roles || [];
                 const hasPending = rawRoles.some(r => r.status === 'pending');
 
                 if (hasPending) {
