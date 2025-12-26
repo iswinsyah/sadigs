@@ -263,6 +263,12 @@
             // 2. Render Body (Menus)
             tbody.innerHTML = '';
             menuList.forEach(menuId => {
+                // TAMBAHAN: Jangan tampilkan baris untuk Manajemen Akses itu sendiri
+                // untuk mencegah admin mengunci dirinya sendiri.
+                if (menuId === 'navMenuManagement') {
+                    return; // Lewati iterasi ini, jangan render barisnya
+                }
+
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-gray-50";
 
