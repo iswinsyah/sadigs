@@ -44,9 +44,9 @@ if (in_array('Walisantri', $roles) && $target_user_id != $logged_in_user_id) {
         sendJSONResponse(['success' => false, 'message' => 'Akses ditolak. Anda tidak berhak mengubah data santri ini.'], 403);
         exit;
     }
-} 
+}
 // Jika user yang login adalah Santri, dia hanya boleh akses datanya sendiri.
-elseif (in_array('Santri', $roles) && $target_user_id != $logged_in_user_id) {
+elseif ((in_array('Santri Rijal', $roles) || in_array('Santri Nisa\'', $roles)) && $target_user_id != $logged_in_user_id) {
     sendJSONResponse(['success' => false, 'message' => 'Akses ditolak. Anda hanya bisa mengubah data diri sendiri.'], 403);
     exit;
 }

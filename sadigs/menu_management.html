@@ -161,7 +161,7 @@
                     currentMatrix = data.matrix;
 
                     // 1. Hapus kolom yang tidak diinginkan dan pastikan peran baru ada
-                    let tempRoleList = data.roles.filter(role => role !== 'Kepala Asrama');
+                    let tempRoleList = data.roles.filter(role => !['Kepala Asrama', 'Santri'].includes(role));
                     const requiredRoles = ['Musyrifah', 'Ustadzah', 'Kepala Asrama Putra', 'Kepala Asrama Putri', 'Santri Rijal', 'Santri Nisa\''];
                     requiredRoles.forEach(rr => {
                         if (!tempRoleList.includes(rr)) {
