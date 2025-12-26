@@ -160,14 +160,46 @@
                     menuList = data.menus;
                     currentMatrix = data.matrix;
 
-                    // --- INJECT NEW ROLES IF NOT PRESENT ---
-                    // Memastikan kolom untuk peran baru selalu muncul meskipun belum ada user dengan peran tsb.
-                    const newRoles = ['Musyrifah', 'Ustadzah'];
-                    newRoles.forEach(nr => {
-                        if (!roleList.includes(nr)) {
-                            roleList.push(nr);
+                    // 1. Hapus kolom yang tidak diinginkan dan pastikan peran baru ada
+                    let tempRoleList = data.roles.filter(role => role !== 'Kepala Asrama');
+                    const requiredRoles = ['Musyrifah', 'Ustadzah', 'Kepala Asrama Putra', 'Kepala Asrama Putri', 'Santri Rijal', 'Santri Nisa\''];
+                    requiredRoles.forEach(rr => {
+                        if (!tempRoleList.includes(rr)) {
+                            tempRoleList.push(rr);
                         }
                     });
+                    
+                    // 2. Definisikan urutan peran dari kanan ke kiri
+                    const roleOrder = [
+                        'Ketua Yayasan',
+                        'Sekretaris Yayasan',
+                        'Bendahara Yayasan',
+                        'Kepala Sekolah',
+                        'Sekretaris Sekolah',
+                        'Bendahara Sekolah',
+                        'Kepala Ma\'had',
+                        'Kepala Asrama Putra',
+                        'Kepala Asrama Putri',
+                        'Musyrif',
+                        'Musyrifah',
+                        'Ustadz',
+                        'Ustadzah',
+                        'Santri Rijal',
+                        'Santri Nisa\'',
+                        'Walisantri'
+                    ];
+
+                    // 3. Urutkan roleList berdasarkan roleOrder
+                    tempRoleList.sort((a, b) => {
+                        let indexA = roleOrder.indexOf(a);
+                        let indexB = roleOrder.indexOf(b);
+                        if (indexA === -1) indexA = 999; // Taruh yang tidak ada di list ke paling belakang
+                        if (indexB === -1) indexB = 999;
+                        return indexA - indexB;
+                    });
+
+                    roleList = tempRoleList; // Gunakan list yang sudah diurutkan
+
                     // --- SORTING BERDASARKAN ALUR KERJA (Form -> Val -> Tab) ---
                     const customOrder = [
                         // 1. Dashboard & Profil
@@ -272,20 +304,26 @@
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-gray-50";
 
-                // Kolom Nama Menu
                 const tdName = document.createElement('td');
                 tdName.className = "p-4 font-semibold text-gray-800 border-r border-gray-200 sticky left-0 bg-white z-10";
 
                 // Hilangkan awalan 'nav' dan ubah formatnya (e.g., navRekapTahfizh -> Rekap Tahfizh)
-                const displayName = menuId.replace(/^nav/, '').replace(/([A-Z])/g, ' $1').trim();
+                let displayName = menuId.replace(/^nav/, '').replace(/([A-Z])/g, ' $1').trim();
 
-                // --- LOGIKA KATEGORI (Form, Val, Tab) ---
+                // --- LOGIKA KATEGORI (Form, Val, Tab) & PEMBERSIHAN LABEL ---
                 let prefix = "Tab"; // Default kategori
                 const formMenus = ['navAbsensi', 'navBiodataPegawai', 'navBiodataSantri', 'navCalendarSettings', 'navIbadahHarian', 'navInputTahfizh', 'navMenuManagement', 'navProfil', 'navQuota', 'navRapat', 'navIzinPegawai', 'navDaftarIzin', 'navFormulirPembayaran', 'navFormulirTransaksi', 'navFormAnggaran'];
                 const valMenus = ['navValidasiIbadah', 'navVerifikasi', 'navValidasiPembayaran', 'navValidasiIzin', 'navValidasiAnggaran'];
 
-                if (formMenus.includes(menuId)) prefix = "Form";
-                else if (valMenus.includes(menuId)) prefix = "Val";
+                if (formMenus.includes(menuId)) {
+                    prefix = "Form";
+                    displayName = displayName.replace(/^Formulir\s*/i, ''); // Hapus "Formulir "
+                } else if (valMenus.includes(menuId)) {
+                    prefix = "Val";
+                    displayName = displayName.replace(/^Validasi\s*/i, ''); // Hapus "Validasi "
+                } else { // It's a Tab
+                    displayName = displayName.replace(/^Tabel\s*/i, ''); // Hapus "Tabel "
+                }
 
                 tdName.innerHTML = `<span class="text-base"><span class="font-mono font-bold text-teal-600 mr-1">${prefix}</span> ${displayName}</span>`;
                 tr.appendChild(tdName);
