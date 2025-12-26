@@ -7,6 +7,20 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'utama': '#4FB7B3',
+                        'kedua': '#26667F',
+                        'tombol-utama': '#3674B5',
+                        'tombol-kedua': '#F93827',
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         body { font-family: 'Inter', sans-serif; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -155,54 +169,36 @@
     </div>
 
     <script>
-        lucide.createIcons();
+        // --- Global Variables ---
+        let rowCount = 5;
 
-        // --- Logic Form Dinamis ---
+        // --- UI Element References ---
         const periodType = document.getElementById('periodType');
         const periodNameContainer = document.getElementById('periodNameContainer');
         const periodName = document.getElementById('periodName');
         const singleYearInput = document.getElementById('singleYearInput');
         const academicYearInput = document.getElementById('academicYearInput');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
 
-        // Populate Years
-        const currentYear = new Date().getFullYear();
-        const yearSelect = document.getElementById('yearSelect');
-        for(let i = currentYear - 1; i <= currentYear + 5; i++) {
-            const opt = document.createElement('option'); opt.value = i; opt.text = i;
-            if(i === currentYear) opt.selected = true;
-            yearSelect.appendChild(opt);
+        // --- Function Definitions ---
+
+        function toggleSidebar() {
+            const isClosed = sidebar.classList.contains('-translate-x-full');
+            if (isClosed) {
+                sidebar.classList.remove('-translate-x-full');
+                sidebarOverlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                sidebarOverlay.classList.add('hidden');
+            }
         }
 
-        periodType.addEventListener('change', () => {
-            const val = periodType.value;
-            periodNameContainer.classList.add('hidden');
-            singleYearInput.classList.remove('hidden');
-            academicYearInput.classList.add('hidden');
-            periodName.innerHTML = '';
-
-            if (val === 'Bulanan') {
-                periodNameContainer.classList.remove('hidden');
-                const months = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-                months.forEach(m => {
-                    const opt = document.createElement('option'); opt.value = m; opt.text = m; periodName.appendChild(opt);
-                });
-            } else if (val === 'Semester') {
-                periodNameContainer.classList.remove('hidden');
-                ['Ganjil', 'Genap'].forEach(s => {
-                    const opt = document.createElement('option'); opt.value = s; opt.text = s; periodName.appendChild(opt);
-                });
-            } else if (val === 'Tahun Ajaran') {
-                singleYearInput.classList.add('hidden');
-                academicYearInput.classList.remove('hidden');
-            }
-        });
-
-        // Table Logic
-        let rowCount = 5;
         function renderRows() {
             const tbody = document.getElementById('detailsBody');
             tbody.innerHTML = '';
-            for(let i=1; i<=rowCount; i++) {
+            for (let i = 1; i <= rowCount; i++) {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td class="px-2 py-1 text-center text-sm text-gray-500">${i}</td>
@@ -212,66 +208,182 @@
                 tbody.appendChild(tr);
             }
         }
-        function addRow() { rowCount++; renderRows(); }
+
+        function addRow() {
+            rowCount++;
+            renderRows();
+        }
+
         function calcTotal() {
             let total = 0;
             document.querySelectorAll('.amount-input').forEach(inp => total += Number(inp.value) || 0);
             document.getElementById('totalAmount').textContent = 'Rp ' + total.toLocaleString('id-ID');
         }
-        renderRows();
 
-        // Init Page
-        async function initPage() {
-            const sessionRes = await fetch('sadigs_api_v3/session_check.php');
-            const sessionData = await sessionRes.json();
-            if (!sessionData.success) { window.location.href = 'index.html'; return; }
-
-            document.getElementById('usernameDisplay').value = sessionData.username;
-            
-            const roleSelect = document.getElementById('roleSelect');
-            sessionData.roles.forEach(r => {
-                const opt = document.createElement('option'); opt.value = r; opt.text = r; roleSelect.appendChild(opt);
-            });
-
-            // Render Sidebar (Simplified)
-            const nav = document.getElementById('sidebarNav');
-            nav.innerHTML = `<div class="bg-gray-50 rounded-lg p-2 mt-2"><h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase">KEUANGAN</h3><a href="budget_plan_form.html" class="flex items-center gap-3 px-3 py-2.5 text-teal-700 bg-white rounded-md transition font-semibold text-sm shadow-sm"><i data-lucide="file-plus" class="w-5 h-5"></i> Form Anggaran</a><a href="budget_plan_validation.html" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="check-square" class="w-5 h-5"></i> Validasi Anggaran</a></div>`;
-            lucide.createIcons();
+        function populateYears() {
+            const currentYear = new Date().getFullYear();
+            const yearSelect = document.getElementById('yearSelect');
+            for (let i = currentYear - 1; i <= currentYear + 5; i++) {
+                const opt = document.createElement('option');
+                opt.value = i;
+                opt.text = i;
+                if (i === currentYear) opt.selected = true;
+                yearSelect.appendChild(opt);
+            }
         }
 
-        document.getElementById('budgetForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
+        function handlePeriodChange() {
+            const val = periodType.value;
+            periodNameContainer.classList.add('hidden');
+            singleYearInput.classList.remove('hidden');
+            academicYearInput.classList.add('hidden');
+            periodName.innerHTML = '';
+
+            if (val === 'Bulanan') {
+                periodNameContainer.classList.remove('hidden');
+                const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+                months.forEach(m => {
+                    const opt = document.createElement('option');
+                    opt.value = m;
+                    opt.text = m;
+                    periodName.appendChild(opt);
+                });
+            } else if (val === 'Semester') {
+                periodNameContainer.classList.remove('hidden');
+                ['Ganjil', 'Genap'].forEach(s => {
+                    const opt = document.createElement('option');
+                    opt.value = s;
+                    opt.text = s;
+                    periodName.appendChild(opt);
+                });
+            } else if (val === 'Tahun Ajaran') {
+                singleYearInput.classList.add('hidden');
+                academicYearInput.classList.remove('hidden');
+            }
+        }
+
+        function setSubmitButtonState(isSubmitting) {
             const btn = document.getElementById('submitBtn');
-            btn.disabled = true; btn.innerHTML = 'Mengirim...';
+            if (isSubmitting) {
+                btn.disabled = true;
+                btn.innerHTML = 'Mengirim...';
+            } else {
+                btn.disabled = false;
+                btn.innerHTML = '<i data-lucide="send" class="w-5 h-5"></i> Ajukan Rencana Anggaran';
+                lucide.createIcons();
+            }
+        }
+
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            setSubmitButtonState(true);
 
             const details = [];
             const rows = document.getElementById('detailsBody').querySelectorAll('tr');
             rows.forEach(row => {
                 const desc = row.querySelector('.desc-input').value;
                 const amt = row.querySelector('.amount-input').value;
-                if(desc && amt) details.push({description: desc, amount: amt});
+                if (desc && amt) details.push({ description: desc, amount: amt });
             });
 
-            if(details.length === 0) { alert('Isi minimal satu rincian.'); btn.disabled = false; return; }
+            if (details.length === 0) {
+                alert('Isi minimal satu rincian.');
+                setSubmitButtonState(false);
+                return;
+            }
 
             let yearVal = document.getElementById('yearSelect').value;
-            if(periodType.value === 'Tahun Ajaran') {
+            if (periodType.value === 'Tahun Ajaran') {
                 yearVal = document.getElementById('yearStart').value + '/' + document.getElementById('yearEnd').value;
             }
 
             const formData = new FormData(e.target);
-            formData.append('year', yearVal);
+            formData.set('year', yearVal); // Use set to overwrite if exists
             formData.append('details', JSON.stringify(details));
 
             try {
                 const res = await fetch('sadigs_api_v3/submit_budget_plan.php', { method: 'POST', body: formData });
                 const result = await res.json();
                 alert(result.message);
-                if(result.success) window.location.reload();
-            } catch(err) { alert('Error koneksi'); }
-            finally { btn.disabled = false; btn.innerHTML = 'Ajukan'; }
-        });
+                if (result.success) window.location.reload();
+            } catch (err) {
+                alert('Error koneksi');
+            } finally {
+                setSubmitButtonState(false);
+            }
+        }
 
+        function renderSidebar(allowedMenus, sessionData) {
+            document.getElementById('sidebarUsername').textContent = sessionData.username;
+            document.getElementById('userInitial').textContent = sessionData.username.charAt(0).toUpperCase();
+            const rawRoles = sessionData.raw_roles || [];
+            document.getElementById('sidebarRole').textContent = rawRoles.map(r => r.status === 'approved' ? r.role_name : `${r.role_name} (Pending)`).join(', ') || 'User';
+
+            const currentMenuEl = document.getElementById('navFormAnggaran');
+            if (currentMenuEl) {
+                currentMenuEl.classList.remove('text-gray-600', 'hover:bg-white', 'hover:text-utama', 'font-medium');
+                currentMenuEl.classList.add('text-utama', 'bg-white', 'font-semibold', 'shadow-sm');
+            }
+
+            allowedMenus.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.remove('hidden');
+            });
+
+            const menuGroups = ['groupKeuangan'];
+            menuGroups.forEach(groupId => {
+                const group = document.getElementById(groupId);
+                if (group && group.querySelector('a:not(.hidden)')) {
+                    group.classList.remove('hidden');
+                }
+            });
+        }
+
+        async function initPage() {
+            if (sidebar) sidebar.classList.add('-translate-x-full');
+            if (sidebarOverlay) sidebarOverlay.classList.add('hidden');
+
+            const sessionRes = await fetch('sadigs_api_v3/session_check.php');
+            const sessionData = await sessionRes.json();
+            if (!sessionData.success) { window.location.href = 'index.html'; return; }
+
+            const permRes = await fetch('sadigs_api_v3/get_menu_permissions.php');
+            const permData = await permRes.json();
+            const allowedMenus = permData.success ? permData.permissions : [];
+
+            if (!allowedMenus.includes('navFormAnggaran')) {
+                alert('Akses Ditolak. Anda tidak memiliki izin untuk mengakses halaman ini.');
+                window.location.href = 'dashboard.html';
+                return;
+            }
+
+            document.getElementById('usernameDisplay').value = sessionData.username;
+            const roleSelect = document.getElementById('roleSelect');
+            sessionData.roles.forEach(r => {
+                const opt = document.createElement('option');
+                opt.value = r;
+                opt.text = r;
+                roleSelect.appendChild(opt);
+            });
+            populateYears();
+            renderRows();
+
+            renderSidebar(allowedMenus, sessionData);
+
+            periodType.addEventListener('change', handlePeriodChange);
+            document.getElementById('budgetForm').addEventListener('submit', handleFormSubmit);
+            mobileMenuBtn.addEventListener('click', toggleSidebar);
+            sidebarOverlay.addEventListener('click', toggleSidebar);
+            document.getElementById('logoutBtn').addEventListener('click', () => {
+                if (confirm('Apakah Anda yakin ingin keluar?')) {
+                    window.location.href = 'sadigs_api_v3/logout.php';
+                }
+            });
+
+            lucide.createIcons();
+        }
+
+        // --- Start Application ---
         initPage();
     </script>
 </body>
