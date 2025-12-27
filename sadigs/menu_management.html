@@ -157,7 +157,8 @@
 
                 if (data.success) {
                     roleList = data.roles;
-                    menuList = data.menus;
+                    // Sembunyikan menu lama yang sudah tidak terpakai untuk menghindari kebingungan
+                    menuList = data.menus.filter(menuId => menuId !== 'navRekapAnggaran');
                     currentMatrix = data.matrix;
 
                     renderTable();
