@@ -67,11 +67,11 @@
 
     <!-- Modal Edit -->
     <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
-        <div class="bg-white p-6 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div class="bg-white p-6 rounded-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <h3 class="text-xl font-bold mb-4">Edit Rincian Anggaran</h3>
             <input type="hidden" id="editId">
             <table class="w-full mb-4">
-                <thead><tr><th class="text-left">Uraian</th><th class="text-right">Nominal</th></tr></thead>
+                <thead><tr><th class="text-left">Uraian</th><th class="text-center w-20">Jml</th><th class="text-center w-24">Satuan</th><th class="text-right w-32">Harga</th><th class="text-right w-40">Total</th></tr></thead>
                 <tbody id="editBody"></tbody>
             </table>
             <div class="flex justify-end gap-2">
@@ -148,9 +148,9 @@
                 detailsTr.className = "hidden";
 
                 const details = JSON.parse(row.details);
-                let detailsHtml = '<td colspan="5" class="p-4 bg-gray-50/70"><div class="max-w-2xl mx-auto"><h4 class="font-bold text-xs uppercase text-gray-600 mb-2">Rincian Pengajuan:</h4><table class="min-w-full bg-white text-xs rounded-lg shadow-sm overflow-hidden"><thead class="bg-gray-100"><tr><th class="px-3 py-2 text-left">Uraian</th><th class="px-3 py-2 text-right w-40">Jumlah</th></tr></thead><tbody>';
+                let detailsHtml = '<td colspan="5" class="p-4 bg-gray-50/70"><div class="max-w-4xl mx-auto"><h4 class="font-bold text-xs uppercase text-gray-600 mb-2">Rincian Pengajuan:</h4><table class="min-w-full bg-white text-xs rounded-lg shadow-sm overflow-hidden"><thead class="bg-gray-100"><tr><th class="px-3 py-2 text-left">Uraian</th><th class="px-3 py-2 text-center w-16">Jml</th><th class="px-3 py-2 text-center w-20">Satuan</th><th class="px-3 py-2 text-right w-28">Harga</th><th class="px-3 py-2 text-right w-32">Total</th></tr></thead><tbody>';
                 details.forEach(item => {
-                    detailsHtml += `<tr class="border-b last:border-0"><td class="px-3 py-2">${item.description}</td><td class="px-3 py-2 text-right font-mono">Rp ${parseInt(item.amount).toLocaleString('id-ID')}</td></tr>`;
+                    detailsHtml += `<tr class="border-b last:border-0"><td class="px-3 py-2">${item.description}</td><td class="px-3 py-2 text-center">${item.qty || '-'}</td><td class="px-3 py-2 text-center">${item.unit || '-'}</td><td class="px-3 py-2 text-right">${item.price ? parseInt(item.price).toLocaleString('id-ID') : '-'}</td><td class="px-3 py-2 text-right font-mono">Rp ${parseInt(item.amount).toLocaleString('id-ID')}</td></tr>`;
                 });
                 detailsHtml += '</tbody></table></div></td>';
                 detailsTr.innerHTML = detailsHtml;
@@ -168,11 +168,21 @@
                 tbody.innerHTML += `
                     <tr>
                         <td class="p-1"><input type="text" class="w-full border p-1 edit-desc" value="${d.description}"></td>
-                        <td class="p-1"><input type="number" class="w-full border p-1 edit-amt text-right" value="${d.amount}"></td>
+                        <td class="p-1"><input type="number" class="w-full border p-1 edit-qty text-center" value="${d.qty || 0}" oninput="calcEditRow(this)"></td>
+                        <td class="p-1"><input type="text" class="w-full border p-1 edit-unit text-center" value="${d.unit || ''}"></td>
+                        <td class="p-1"><input type="number" class="w-full border p-1 edit-price text-right" value="${d.price || 0}" oninput="calcEditRow(this)"></td>
+                        <td class="p-1"><input type="number" class="w-full border p-1 edit-amt text-right bg-gray-50" value="${d.amount}" readonly></td>
                     </tr>
                 `;
             });
             document.getElementById('editModal').classList.remove('hidden');
+        }
+
+        window.calcEditRow = function(el) {
+            const row = el.closest('tr');
+            const qty = parseFloat(row.querySelector('.edit-qty').value) || 0;
+            const price = parseFloat(row.querySelector('.edit-price').value) || 0;
+            row.querySelector('.edit-amt').value = qty * price;
         }
 
         window.saveEdit = async function() {
@@ -181,6 +191,9 @@
             document.querySelectorAll('#editBody tr').forEach(tr => {
                 details.push({
                     description: tr.querySelector('.edit-desc').value,
+                    qty: tr.querySelector('.edit-qty').value,
+                    unit: tr.querySelector('.edit-unit').value,
+                    price: tr.querySelector('.edit-price').value,
                     amount: tr.querySelector('.edit-amt').value
                 });
             });

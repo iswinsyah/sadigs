@@ -141,7 +141,10 @@
                                     <tr>
                                         <th class="px-4 py-2 text-center text-xs font-bold text-gray-500 uppercase w-12">No</th>
                                         <th class="px-4 py-2 text-left text-xs font-bold text-gray-500 uppercase">Uraian</th>
-                                        <th class="px-4 py-2 text-right text-xs font-bold text-gray-500 uppercase w-48">Jumlah Nominal (Rp)</th>
+                                        <th class="px-4 py-2 text-center text-xs font-bold text-gray-500 uppercase w-20">Jumlah</th>
+                                        <th class="px-4 py-2 text-center text-xs font-bold text-gray-500 uppercase w-24">Satuan</th>
+                                        <th class="px-4 py-2 text-right text-xs font-bold text-gray-500 uppercase w-32">Harga (Rp)</th>
+                                        <th class="px-4 py-2 text-right text-xs font-bold text-gray-500 uppercase w-40">Total (Rp)</th>
                                     </tr>
                                 </thead>
                                 <tbody id="detailsBody" class="bg-white divide-y divide-gray-200">
@@ -149,7 +152,7 @@
                                 </tbody>
                                 <tfoot>
                                     <tr class="bg-gray-100 font-bold">
-                                        <td colspan="2" class="px-4 py-2 text-right text-sm">Total</td>
+                                        <td colspan="5" class="px-4 py-2 text-right text-sm">Total</td>
                                         <td class="px-4 py-2 text-right text-sm" id="totalAmount">Rp 0</td>
                                     </tr>
                                 </tfoot>
@@ -204,7 +207,10 @@
                 tr.innerHTML = `
                     <td class="px-2 py-1 text-center text-sm text-gray-500">${i}</td>
                     <td class="px-2 py-1"><input type="text" class="w-full border-0 focus:ring-0 text-sm desc-input" placeholder="Uraian..."></td>
-                    <td class="px-2 py-1"><input type="number" class="w-full border-0 focus:ring-0 text-sm text-right amount-input" placeholder="0" oninput="calcTotal()"></td>
+                    <td class="px-2 py-1"><input type="number" class="w-full border-0 focus:ring-0 text-sm text-center qty-input" placeholder="0" oninput="calcRowTotal(this)"></td>
+                    <td class="px-2 py-1"><input type="text" class="w-full border-0 focus:ring-0 text-sm text-center unit-input" placeholder="Satuan"></td>
+                    <td class="px-2 py-1"><input type="number" class="w-full border-0 focus:ring-0 text-sm text-right price-input" placeholder="0" oninput="calcRowTotal(this)"></td>
+                    <td class="px-2 py-1"><input type="text" class="w-full border-0 focus:ring-0 text-sm text-right font-bold bg-gray-50 amount-input" placeholder="0" readonly></td>
                 `;
                 tbody.appendChild(tr);
             }
@@ -213,6 +219,15 @@
         function addRow() {
             rowCount++;
             renderRows();
+        }
+
+        function calcRowTotal(el) {
+            const row = el.closest('tr');
+            const qty = parseFloat(row.querySelector('.qty-input').value) || 0;
+            const price = parseFloat(row.querySelector('.price-input').value) || 0;
+            const total = qty * price;
+            row.querySelector('.amount-input').value = total;
+            calcTotal();
         }
 
         function calcTotal() {
@@ -283,8 +298,11 @@
             const rows = document.getElementById('detailsBody').querySelectorAll('tr');
             rows.forEach(row => {
                 const desc = row.querySelector('.desc-input').value;
+                const qty = row.querySelector('.qty-input').value;
+                const unit = row.querySelector('.unit-input').value;
+                const price = row.querySelector('.price-input').value;
                 const amt = row.querySelector('.amount-input').value;
-                if (desc && amt) details.push({ description: desc, amount: amt });
+                if (desc && amt) details.push({ description: desc, qty, unit, price, amount: amt });
             });
 
             if (details.length === 0) {
