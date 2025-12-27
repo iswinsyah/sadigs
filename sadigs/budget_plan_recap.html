@@ -175,23 +175,39 @@
                     amount: tr.querySelector('.edit-amt').value 
                 });
             });
-            await fetch('sadigs_api_v3/validate_budget_plan.php', { 
-                method: 'POST', 
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ id, action: 'update', details }) 
-            });
-            document.getElementById('editModal').classList.add('hidden');
-            loadData();
+            try {
+                const res = await fetch('sadigs_api_v3/validate_budget_plan.php', { 
+                    method: 'POST', 
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ id, action: 'update', details }) 
+                });
+                const result = await res.json();
+                alert(result.message);
+                if (result.success) {
+                    document.getElementById('editModal').classList.add('hidden');
+                    loadData();
+                }
+            } catch (error) {
+                console.error('Save Edit Error:', error);
+                alert('Terjadi kesalahan koneksi saat menyimpan perubahan.');
+            }
         }
 
         window.validate = async function(id, action) {
             if(!confirm('Anda yakin?')) return;
-            await fetch('sadigs_api_v3/validate_budget_plan.php', { 
-                method: 'POST', 
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ id, action }) 
-            });
-            loadData();
+            try {
+                const res = await fetch('sadigs_api_v3/validate_budget_plan.php', { 
+                    method: 'POST', 
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ id, action }) 
+                });
+                const result = await res.json();
+                alert(result.message);
+                if (result.success) loadData();
+            } catch (error) {
+                console.error('Validation Error:', error);
+                alert('Terjadi kesalahan koneksi saat validasi.');
+            }
         }
 
         window.toggleDetails = function(rowId) {
