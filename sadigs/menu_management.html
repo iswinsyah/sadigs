@@ -160,113 +160,6 @@
                     menuList = data.menus;
                     currentMatrix = data.matrix;
 
-                    // 1. Hapus kolom yang tidak diinginkan dan pastikan peran baru ada
-                    let tempRoleList = data.roles.filter(role => !['Kepala Asrama', 'Santri'].includes(role));
-                    const requiredRoles = ['Musyrifah', 'Ustadzah', 'Kepala Asrama Putra', 'Kepala Asrama Putri', 'Santri Rijal', 'Santri Nisa\''];
-                    requiredRoles.forEach(rr => {
-                        if (!tempRoleList.includes(rr)) {
-                            tempRoleList.push(rr);
-                        }
-                    });
-                    
-                    // 2. Definisikan urutan peran dari kanan ke kiri
-                    const roleOrder = [
-                        'Ketua Yayasan',
-                        'Sekretaris Yayasan',
-                        'Bendahara Yayasan',
-                        'Kepala Sekolah',
-                        'Sekretaris Sekolah',
-                        'Bendahara Sekolah',
-                        'Kepala Ma\'had',
-                        'Kepala Asrama Putra',
-                        'Kepala Asrama Putri',
-                        'Musyrif',
-                        'Musyrifah',
-                        'Ustadz',
-                        'Ustadzah',
-                        'Santri Rijal',
-                        'Santri Nisa\'',
-                        'Walisantri'
-                    ];
-
-                    // 3. Urutkan roleList berdasarkan roleOrder
-                    tempRoleList.sort((a, b) => {
-                        let indexA = roleOrder.indexOf(a);
-                        let indexB = roleOrder.indexOf(b);
-                        if (indexA === -1) indexA = 999; // Taruh yang tidak ada di list ke paling belakang
-                        if (indexB === -1) indexB = 999;
-                        return indexA - indexB;
-                    });
-
-                    roleList = tempRoleList; // Gunakan list yang sudah diurutkan
-
-                    // --- SORTING BERDASARKAN ALUR KERJA (Form -> Val -> Tab) ---
-                    const customOrder = [
-                        // 1. Dashboard & Profil
-                        'navDashboard',
-                        'navProfil',
-                        
-                        // 2. Alur Ibadah Harian
-                        'navIbadahHarian',      // Form
-                        'navValidasiIbadah',    // Val
-                        'navRekapIbadahAnak',   // Tab
-
-                        // 3. Alur Tahfizh
-                        'navInputTahfizh',      // Form
-                        'navViewTahfizh',       // Tab (Wali)
-                        'navRekapTahfizh',      // Tab (Yayasan)
-
-                        // 4. Alur Santri & Mentoring
-                        'navBiodataSantri',     // Form
-                        'navBukuIndukSantri',   // Tab (Master)
-                        'navMentoring',         // Tab
-
-                        // 5. Alur Kepegawaian
-                        'navBiodataPegawai',    // Form
-                        'navBukuIndukPegawai',  // Tab (Master)
-                        'navIzinPegawai',       // Form
-                        'navValidasiIzin',      // Val
-                        'navVerifikasi',        // Val
-                        'navQuota',             // Form
-                        'navAbsensi',           // Form
-
-                        // 6. Alur Rapat
-                        'navRapat',             // Form
-                        'navJadwalRapat',       // Tab
-
-                        // 7. Pengaturan Sistem
-                        'navKalender',          // Tab
-                        'navCalendarSettings',  // Form
-                        'navMenuManagement',    // Form
-
-                        // 8. Keuangan (BARU)
-                        'navFormulirPembayaran', // Form
-                        'navValidasiPembayaran', // Val
-                        'navTabelPembayaran',    // Tab
-                        'navRekapPembayaran',    // Tab
-                        'navDaftarIzin',         // Tab
-                        'navFormulirTransaksi',  // Form (BARU)
-                        'navTabelTransaksi',     // Tab (BARU)
-                        'navFormAnggaran',       // Form (BARU)
-                        'navValidasiAnggaran',   // Val (BARU)
-                        'navRekapAnggaran'       // Tab (BARU)
-                    ];
-
-                    // FIX: Pastikan semua menu di customOrder muncul di tabel, 
-                    // meskipun belum ada di database (agar bisa disetting pertama kali)
-                    customOrder.forEach(m => {
-                        if (!menuList.includes(m)) menuList.push(m);
-                    });
-
-                    menuList.sort((a, b) => {
-                        let indexA = customOrder.indexOf(a);
-                        let indexB = customOrder.indexOf(b);
-                        // Jika menu tidak ada di list, taruh di paling bawah
-                        if (indexA === -1) indexA = 999;
-                        if (indexB === -1) indexB = 999;
-                        return indexA - indexB || a.localeCompare(b);
-                    });
-
                     renderTable();
                 } else {
                     alert('Gagal memuat data: ' + data.message);
@@ -282,59 +175,59 @@
             const tbody = document.getElementById('tableBody');
 
             // 1. Render Header (Roles)
-            // Reset header tapi sisakan kolom pertama
             while (thead.children.length > 1) { thead.removeChild(thead.lastChild); }
-            
             roleList.forEach(role => {
                 const th = document.createElement('th');
-                th.className = "p-4 text-center font-bold text-gray-700 border-b border-gray-200 min-w-[100px] sticky top-0 bg-gray-100 z-10";
+                th.className = "p-4 text-center font-bold text-gray-700 border-b border-gray-200 min-w-[120px] sticky top-0 bg-gray-100 z-10";
                 th.textContent = role;
                 thead.appendChild(th);
             });
 
-            // 2. Render Body (Menus)
+            // 2. Render Body (Menus) with grouping
             tbody.innerHTML = '';
-            menuList.forEach(menuId => {
-                // TAMBAHAN: Jangan tampilkan baris untuk Manajemen Akses itu sendiri
-                // untuk mencegah admin mengunci dirinya sendiri.
-                if (menuId === 'navMenuManagement') {
-                    return; // Lewati iterasi ini, jangan render barisnya
+
+            // Define categories and their menus
+            const categories = {
+                Form: {
+                    label: 'Formulir',
+                    menus: ['navAbsensi', 'navBiodataPegawai', 'navBiodataSantri', 'navCalendarSettings', 'navIbadahHarian', 'navInputTahfizh', 'navMenuManagement', 'navProfil', 'navQuota', 'navRapat', 'navIzinPegawai', 'navFormulirPembayaran', 'navFormulirTransaksi', 'navFormAnggaran'],
+                    icon: 'file-pen-line'
+                },
+                Val: {
+                    label: 'Validasi',
+                    menus: ['navValidasiIbadah', 'navVerifikasi', 'navValidasiPembayaran', 'navValidasiIzin', 'navValidasiAnggaran'],
+                    icon: 'check-square'
+                },
+                Tab: {
+                    label: 'Tabel Data',
+                    menus: ['navDashboard', 'navKalender', 'navJadwalRapat', 'navDaftarIzin', 'navBukuIndukPegawai', 'navBukuIndukSantri', 'navMentoring', 'navTabelPembayaran', 'navTabelTransaksi', 'navRekapAnggaran', 'navRkas', 'navRekapIbadahAnak', 'navViewTahfizh'],
+                    icon: 'table'
+                },
+                Grf: {
+                    label: 'Grafik',
+                    menus: ['navRekapPembayaran'],
+                    icon: 'bar-chart-2'
                 }
+            };
+
+            // Helper function to render a single menu row
+            const renderMenuRow = (menuId) => {
+                if (menuId === 'navMenuManagement') return; // Skip self
 
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-gray-50";
 
                 const tdName = document.createElement('td');
                 tdName.className = "p-4 font-semibold text-gray-800 border-r border-gray-200 sticky left-0 bg-white z-10";
-
-                // Hilangkan awalan 'nav' dan ubah formatnya (e.g., navRekapTahfizh -> Rekap Tahfizh)
                 let displayName = menuId.replace(/^nav/, '').replace(/([A-Z])/g, ' $1').trim();
-
-                // --- LOGIKA KATEGORI (Form, Val, Tab) & PEMBERSIHAN LABEL ---
-                let prefix = "Tab"; // Default kategori
-                const formMenus = ['navAbsensi', 'navBiodataPegawai', 'navBiodataSantri', 'navCalendarSettings', 'navIbadahHarian', 'navInputTahfizh', 'navMenuManagement', 'navProfil', 'navQuota', 'navRapat', 'navIzinPegawai', 'navDaftarIzin', 'navFormulirPembayaran', 'navFormulirTransaksi', 'navFormAnggaran'];
-                const valMenus = ['navValidasiIbadah', 'navVerifikasi', 'navValidasiPembayaran', 'navValidasiIzin', 'navValidasiAnggaran'];
-
-                if (formMenus.includes(menuId)) {
-                    prefix = "Form";
-                    displayName = displayName.replace(/^Formulir\s*/i, ''); // Hapus "Formulir "
-                } else if (valMenus.includes(menuId)) {
-                    prefix = "Val";
-                    displayName = displayName.replace(/^Validasi\s*/i, ''); // Hapus "Validasi "
-                } else { // It's a Tab
-                    displayName = displayName.replace(/^Tabel\s*/i, ''); // Hapus "Tabel "
-                }
-
-                tdName.innerHTML = `<span class="text-base"><span class="font-mono font-bold text-teal-600 mr-1">${prefix}</span> ${displayName}</span>`;
+                displayName = displayName.replace(/^(Formulir|Validasi|Tabel)\s*/i, '');
+                tdName.innerHTML = `<span class="text-base">${displayName}</span>`;
                 tr.appendChild(tdName);
 
-                // Kolom Checkbox per Role
                 roleList.forEach(role => {
                     const td = document.createElement('td');
                     td.className = "p-3 text-center border-r border-gray-100 last:border-r-0";
-                    
                     const isChecked = (currentMatrix[menuId] && currentMatrix[menuId][role] === 1);
-                    
                     td.innerHTML = `
                         <input type="checkbox" 
                             class="w-5 h-5 text-teal-600 rounded border-gray-300 focus:ring-teal-500 cursor-pointer"
@@ -345,7 +238,41 @@
                     tr.appendChild(td);
                 });
                 tbody.appendChild(tr);
+            };
+
+            // Iterate through categories in the desired order
+            ['Form', 'Val', 'Tab', 'Grf'].forEach(catKey => {
+                const category = categories[catKey];
+                const categoryMenus = menuList
+                    .filter(menuId => category.menus.includes(menuId))
+                    .sort((a, b) => a.localeCompare(b));
+
+                if (categoryMenus.length > 0) {
+                    const groupTr = document.createElement('tr');
+                    groupTr.className = 'bg-gray-200';
+                    groupTr.innerHTML = `<td colspan="${roleList.length + 1}" class="p-2 font-bold text-gray-600 text-sm sticky left-0 z-10"><i data-lucide="${category.icon}" class="w-4 h-4 inline-block mr-2"></i>${category.label}</td>`;
+                    tbody.appendChild(groupTr);
+                    categoryMenus.forEach(renderMenuRow);
+                }
             });
+
+            // Render any menus not in a category at the end
+            const uncategorizedMenus = menuList.filter(menuId => 
+                !categories.Form.menus.includes(menuId) &&
+                !categories.Val.menus.includes(menuId) &&
+                !categories.Tab.menus.includes(menuId) &&
+                !categories.Grf.menus.includes(menuId)
+            ).sort((a, b) => a.localeCompare(b));
+
+            if (uncategorizedMenus.length > 0) {
+                const groupTr = document.createElement('tr');
+                groupTr.className = 'bg-gray-200';
+                groupTr.innerHTML = `<td colspan="${roleList.length + 1}" class="p-2 font-bold text-gray-600 text-sm sticky left-0 z-10"><i data-lucide="folder-question" class="w-4 h-4 inline-block mr-2"></i>Lain-lain</td>`;
+                tbody.appendChild(groupTr);
+                uncategorizedMenus.forEach(renderMenuRow);
+            }
+
+            lucide.createIcons();
         }
 
         async function saveChanges() {
