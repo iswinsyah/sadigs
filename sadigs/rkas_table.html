@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabel RKAS & KAS | SADIGS 3.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+
+    <div class="flex h-screen overflow-hidden">
+        <aside id="sidebar" class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col hidden lg:flex">
+            <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-teal-600 text-white">
+                <h1 class="text-2xl font-extrabold tracking-wider">SADIGS</h1>
+            </div>
+            <div class="p-6">
+                <a href="dashboard.html" class="flex items-center gap-2 text-gray-600 hover:text-teal-600 transition">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i> Kembali ke Dashboard
+                </a>
+            </div>
+            <nav id="sidebarNav" class="flex-1 overflow-y-auto py-4 px-3 space-y-2 no-scrollbar"></nav>
+        </aside>
+
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative">
+            <header class="mb-8">
+                <h2 class="text-2xl lg:text-3xl font-bold text-gray-800">Tabel RKAS & KAS</h2>
+                <p class="text-gray-500 text-sm mt-1">Penetapan Rencana (RKAS) dan rekapitulasi Anggaran yang sudah berjalan (KAS).</p>
+            </header>
+
+            <!-- Tab Buttons -->
+            <div class="mb-6 border-b border-gray-200">
+                <nav class="flex -mb-px space-x-6" aria-label="Tabs">
+                    <button id="tab-rkas" onclick="switchTab('rkas')" class="whitespace-nowrap py-3 px-1 border-b-2 font-bold text-sm text-teal-600 border-teal-500">
+                        Menunggu Penetapan (RKAS)
+                    </button>
+                    <button id="tab-kas" onclick="switchTab('kas')" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 border-transparent">
+                        Anggaran Ditetapkan (KAS)
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Tab Content -->
+            <div>
+                <!-- RKAS Table -->
+                <div id="content-rkas">
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                        <table class="min-w-full divide-y divide-gray-200 text-sm">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left font-bold text-gray-500 uppercase">Kategori</th>
+                                    <th class="px-6 py-3 text-left font-bold text-gray-500 uppercase">Periode</th>
+                                    <th class="px-6 py-3 text-right font-bold text-gray-500 uppercase">Total</th>
+                                    <th class="px-6 py-3 text-center font-bold text-gray-500 uppercase">Status Unit</th>
+                                    <th class="px-6 py-3 text-center font-bold text-gray-500 uppercase">Aksi Yayasan</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rkasBody" class="bg-white divide-y divide-gray-200"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- KAS Table -->
+                <div id="content-kas" class="hidden">
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                        <table class="min-w-full divide-y divide-gray-200 text-sm">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left font-bold text-gray-500 uppercase">Kategori</th>
+                                    <th class="px-6 py-3 text-left font-bold text-gray-500 uppercase">Periode</th>
+                                    <th class="px-6 py-3 text-right font-bold text-gray-500 uppercase">Total Ditetapkan</th>
+                                    <th class="px-6 py-3 text-center font-bold text-gray-500 uppercase">Status Akhir</th>
+                                    <th class="px-6 py-3 text-center font-bold text-gray-500 uppercase">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="kasBody" class="bg-white divide-y divide-gray-200"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Edit -->
+    <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+        <div class="bg-white p-6 rounded-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <h3 class="text-xl font-bold mb-4">Edit & Tetapkan Anggaran</h3>
+            <input type="hidden" id="editId">
+            <table class="w-full mb-4">
+                <thead><tr><th class="text-left">Uraian</th><th class="text-center w-20">Jml</th><th class="text-center w-24">Satuan</th><th class="text-right w-32">Harga</th><th class="text-right w-40">Total</th></tr></thead>
+                <tbody id="editBody"></tbody>
+            </table>
+            <div class="flex justify-end gap-2">
+                <button onclick="document.getElementById('editModal').classList.add('hidden')" class="px-4 py-2 bg-gray-200 rounded">Batal</button>
+                <button onclick="saveEdit()" class="px-4 py-2 bg-teal-600 text-white rounded">Simpan Perubahan</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        let userRoles = [];
+
+        function switchTab(tabName) {
+            document.getElementById('tab-rkas').className = 'whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 border-transparent';
+            document.getElementById('tab-kas').className = 'whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 border-transparent';
+            document.getElementById(`tab-${tabName}`).className = 'whitespace-nowrap py-3 px-1 border-b-2 font-bold text-sm text-teal-600 border-teal-500';
+
+            document.getElementById('content-rkas').classList.add('hidden');
+            document.getElementById('content-kas').classList.add('hidden');
+            document.getElementById(`content-${tabName}`).classList.remove('hidden');
+        }
+
+        async function initPage() {
+            const sessionRes = await fetch('sadigs_api_v3/session_check.php');
+            const sessionData = await sessionRes.json();
+            if (!sessionData.success) { window.location.href = 'index.html'; return; }
+            userRoles = sessionData.roles;
+
+            // Render Sidebar
+            const nav = document.getElementById('sidebarNav');
+            nav.innerHTML = `<div class="bg-gray-50 rounded-lg p-2 mt-2"><h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase">KEUANGAN</h3><a id="navRkas" href="rkas_table.html" class="flex items-center gap-3 px-3 py-2.5 text-teal-700 bg-white rounded-md transition font-semibold text-sm shadow-sm"><i data-lucide="archive" class="w-5 h-5"></i> Tabel RKAS</a><a id="navRekapAnggaran" href="budget_plan_recap.html" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="clipboard-list" class="w-5 h-5"></i> Rekap Anggaran</a></div>`;
+            lucide.createIcons();
+
+            loadData();
+        }
+
+        async function loadData() {
+            const res = await fetch('sadigs_api_v3/get_budget_plans.php?context=foundation');
+            const result = await res.json();
+            
+            if(result.success) {
+                const pendingData = result.data.filter(d => d.status_foundation === 'pending');
+                const establishedData = result.data.filter(d => d.status_foundation !== 'pending');
+                renderTable('rkasBody', pendingData, true);
+                renderTable('kasBody', establishedData, false);
+            } else {
+                document.getElementById('rkasBody').innerHTML = '<tr><td colspan="5" class="px-6 py-10 text-center text-red-500">Gagal memuat data.</td></tr>';
+                document.getElementById('kasBody').innerHTML = '<tr><td colspan="5" class="px-6 py-10 text-center text-red-500">Gagal memuat data.</td></tr>';
+            }
+        }
+
+        function renderTable(tbodyId, data, isActionable) {
+            const tbody = document.getElementById(tbodyId);
+            tbody.innerHTML = '';
+            const isYayasan = userRoles.some(r => ['Ketua Yayasan', 'Bendahara Yayasan', 'Sekretaris Yayasan'].includes(r));
+
+            if (data.length === 0) {
+                const message = isActionable ? 'Tidak ada anggaran yang menunggu penetapan.' : 'Belum ada anggaran yang ditetapkan.';
+                tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-10 text-center text-gray-500">${message}</td></tr>`;
+                return;
+            }
+
+            data.forEach(row => {
+                const tr = document.createElement('tr');
+                let buttons = `<button onclick="toggleDetails(${row.id})" class="text-gray-600 hover:underline text-xs mr-2 font-semibold flex items-center gap-1"><i data-lucide="list" class="w-3 h-3"></i>Rincian</button>`;
+                
+                if (isActionable && isYayasan) {
+                    buttons += `
+                        <button onclick="openEdit(${row.id}, '${encodeURIComponent(JSON.stringify(row.details))}')" class="text-blue-600 hover:underline text-xs mr-2 font-bold">Edit</button>
+                        <button onclick="validate(${row.id}, 'approve_foundation')" class="text-green-600 hover:underline text-xs mr-2 font-bold">Tetapkan</button>
+                        <button onclick="validate(${row.id}, 'reject_foundation')" class="text-red-600 hover:underline text-xs font-bold">Tolak</button>
+                    `;
+                }
+
+                let statusHtml;
+                if(isActionable) {
+                    statusHtml = `<td class="px-6 py-4 text-center"><span class="px-2 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800">Disetujui</span></td>`;
+                } else {
+                    const finalStatusColor = row.status_foundation === 'approved' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+                    const finalStatusLabel = row.status_foundation === 'approved' ? 'Ditetapkan' : 'Ditolak';
+                    statusHtml = `<td class="px-6 py-4 text-center"><span class="px-2 py-1 rounded-full text-xs font-bold ${finalStatusColor}">${finalStatusLabel}</span></td>`;
+                }
+
+                tr.innerHTML = `
+                    <td class="px-6 py-4 font-bold">${row.category}</td>
+                    <td class="px-6 py-4">${row.period_type} ${row.period_name || ''} ${row.year}</td>
+                    <td class="px-6 py-4 text-right font-bold">Rp ${parseInt(row.total_amount).toLocaleString('id-ID')}</td>
+                    ${statusHtml}
+                    <td class="px-6 py-4 text-center">${buttons}</td>
+                `;
+                tbody.appendChild(tr);
+
+                const detailsTr = document.createElement('tr');
+                detailsTr.id = `details-${row.id}`;
+                detailsTr.className = "hidden";
+                const details = JSON.parse(row.details);
+                let detailsHtml = '<td colspan="5" class="p-4 bg-gray-50/70"><div class="max-w-4xl mx-auto"><h4 class="font-bold text-xs uppercase text-gray-600 mb-2">Rincian Pengajuan:</h4><table class="min-w-full bg-white text-xs rounded-lg shadow-sm overflow-hidden"><thead class="bg-gray-100"><tr><th class="px-3 py-2 text-left">Uraian</th><th class="px-3 py-2 text-center w-16">Jml</th><th class="px-3 py-2 text-center w-20">Satuan</th><th class="px-3 py-2 text-right w-28">Harga</th><th class="px-3 py-2 text-right w-32">Total</th></tr></thead><tbody>';
+                details.forEach(item => {
+                    detailsHtml += `<tr class="border-b last:border-0"><td class="px-3 py-2">${item.description}</td><td class="px-3 py-2 text-center">${item.qty || '-'}</td><td class="px-3 py-2 text-center">${item.unit || '-'}</td><td class="px-3 py-2 text-right">${item.price ? parseInt(item.price).toLocaleString('id-ID') : '-'}</td><td class="px-3 py-2 text-right font-mono">Rp ${parseInt(item.amount).toLocaleString('id-ID')}</td></tr>`;
+                });
+                detailsHtml += '</tbody></table></div></td>';
+                detailsTr.innerHTML = detailsHtml;
+                tbody.appendChild(detailsTr);
+            });
+            lucide.createIcons();
+        }
+
+        window.openEdit = function(id, detailsStr) {
+            const details = JSON.parse(decodeURIComponent(detailsStr));
+            document.getElementById('editId').value = id;
+            const tbody = document.getElementById('editBody');
+            tbody.innerHTML = '';
+            details.forEach((d) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="p-1"><input type="text" class="w-full border p-1 edit-desc" value="${d.description}"></td>
+                        <td class="p-1"><input type="number" class="w-full border p-1 edit-qty text-center" value="${d.qty || 0}" oninput="calcEditRow(this)"></td>
+                        <td class="p-1"><input type="text" class="w-full border p-1 edit-unit text-center" value="${d.unit || ''}"></td>
+                        <td class="p-1"><input type="number" class="w-full border p-1 edit-price text-right" value="${d.price || 0}" oninput="calcEditRow(this)"></td>
+                        <td class="p-1"><input type="number" class="w-full border p-1 edit-amt text-right bg-gray-50" value="${d.amount}" readonly></td>
+                    </tr>`;
+            });
+            document.getElementById('editModal').classList.remove('hidden');
+        }
+
+        window.calcEditRow = function(el) {
+            const row = el.closest('tr');
+            const qty = parseFloat(row.querySelector('.edit-qty').value) || 0;
+            const price = parseFloat(row.querySelector('.edit-price').value) || 0;
+            row.querySelector('.edit-amt').value = qty * price;
+        }
+
+        window.saveEdit = async function() {
+            const id = document.getElementById('editId').value;
+            const details = [];
+            document.querySelectorAll('#editBody tr').forEach(tr => {
+                details.push({ 
+                    description: tr.querySelector('.edit-desc').value, 
+                    qty: tr.querySelector('.edit-qty').value,
+                    unit: tr.querySelector('.edit-unit').value,
+                    price: tr.querySelector('.edit-price').value,
+                    amount: tr.querySelector('.edit-amt').value 
+                });
+            });
+            await fetch('sadigs_api_v3/validate_budget_plan.php', { method: 'POST', body: JSON.stringify({ id, action: 'update', details }) });
+            document.getElementById('editModal').classList.add('hidden');
+            loadData();
+        }
+
+        window.validate = async function(id, action) {
+            if(!confirm('Anda yakin?')) return;
+            await fetch('sadigs_api_v3/validate_budget_plan.php', { method: 'POST', body: JSON.stringify({ id, action }) });
+            loadData();
+        }
+
+        window.toggleDetails = function(rowId) {
+            const detailsRow = document.getElementById(`details-${rowId}`);
+            detailsRow.classList.toggle('hidden');
+        }
+
+        initPage();
+    </script>
+</body>
+</html>
