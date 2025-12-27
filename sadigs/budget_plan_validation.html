@@ -30,36 +30,83 @@
                 <p class="text-gray-500 text-sm mt-1">Persetujuan RKA oleh Kepala Sekolah dan Kepala Asrama.</p>
             </header>
 
-            <!-- Tabel 1: Sekolah -->
-            <div class="mb-8">
-                <h3 class="text-lg font-bold text-teal-800 mb-2 flex items-center gap-2"><i data-lucide="building" class="w-5 h-5"></i> Tabel RKA Unit Sekolah</h3>
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                    <table class="min-w-full divide-y divide-gray-200 text-sm" id="tableSekolah">
-                        <thead class="bg-gray-50"><tr><th class="px-4 py-3 text-left">Periode</th><th class="px-4 py-3 text-left">Pengaju</th><th class="px-4 py-3 text-right">Total</th><th class="px-4 py-3 text-center">Status</th><th class="px-4 py-3 text-center">Aksi</th></tr></thead>
-                        <tbody class="divide-y divide-gray-200"></tbody>
-                    </table>
+            <!-- Tab Buttons -->
+            <div class="mb-6 border-b border-gray-200">
+                <nav class="flex -mb-px space-x-6" aria-label="Tabs">
+                    <button id="tab-rka" onclick="switchTab('rka')" class="whitespace-nowrap py-3 px-1 border-b-2 font-bold text-sm text-teal-600 border-teal-500">
+                        Rencana Kegiatan dan Anggaran
+                    </button>
+                    <button id="tab-kas" onclick="switchTab('kas')" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 border-transparent">
+                        Kegiatan dan Anggaran Ditetapkan
+                    </button>
+                    <button id="tab-realisasi" onclick="switchTab('realisasi')" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 border-transparent">
+                        Realisasi Kegiatan dan Anggaran
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Tab Content -->
+            <div id="content-rka">
+                <!-- Tabel 1: Sekolah -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-bold text-teal-800 mb-2 flex items-center gap-2"><i data-lucide="building" class="w-5 h-5"></i> Tabel RKA Unit Sekolah</h3>
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                        <table class="min-w-full divide-y divide-gray-200 text-sm" id="tableSekolah">
+                            <thead class="bg-gray-50"><tr><th class="px-4 py-3 text-left">Periode</th><th class="px-4 py-3 text-left">Pengaju</th><th class="px-4 py-3 text-right">Total</th><th class="px-4 py-3 text-center">Status</th><th class="px-4 py-3 text-center">Aksi</th></tr></thead>
+                            <tbody class="divide-y divide-gray-200"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tabel 2: Asrama Putra -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-bold text-blue-800 mb-2 flex items-center gap-2"><i data-lucide="home" class="w-5 h-5"></i> Tabel RKA Unit Asrama Putra</h3>
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                        <table class="min-w-full divide-y divide-gray-200 text-sm" id="tablePutra">
+                            <thead class="bg-gray-50"><tr><th class="px-4 py-3 text-left">Periode</th><th class="px-4 py-3 text-left">Pengaju</th><th class="px-4 py-3 text-right">Total</th><th class="px-4 py-3 text-center">Status</th><th class="px-4 py-3 text-center">Aksi</th></tr></thead>
+                            <tbody class="divide-y divide-gray-200"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tabel 3: Asrama Putri -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-bold text-pink-800 mb-2 flex items-center gap-2"><i data-lucide="home" class="w-5 h-5"></i> Tabel RKA Unit Asrama Putri</h3>
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                        <table class="min-w-full divide-y divide-gray-200 text-sm" id="tablePutri">
+                            <thead class="bg-gray-50"><tr><th class="px-4 py-3 text-left">Periode</th><th class="px-4 py-3 text-left">Pengaju</th><th class="px-4 py-3 text-right">Total</th><th class="px-4 py-3 text-center">Status</th><th class="px-4 py-3 text-center">Aksi</th></tr></thead>
+                            <tbody class="divide-y divide-gray-200"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
-            <!-- Tabel 2: Asrama Putra -->
-            <div class="mb-8">
-                <h3 class="text-lg font-bold text-blue-800 mb-2 flex items-center gap-2"><i data-lucide="home" class="w-5 h-5"></i> Tabel RKA Unit Asrama Putra</h3>
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                    <table class="min-w-full divide-y divide-gray-200 text-sm" id="tablePutra">
-                        <thead class="bg-gray-50"><tr><th class="px-4 py-3 text-left">Periode</th><th class="px-4 py-3 text-left">Pengaju</th><th class="px-4 py-3 text-right">Total</th><th class="px-4 py-3 text-center">Status</th><th class="px-4 py-3 text-center">Aksi</th></tr></thead>
-                        <tbody class="divide-y divide-gray-200"></tbody>
-                    </table>
+            <div id="content-kas" class="hidden">
+                <div class="mb-8">
+                    <h3 class="text-lg font-bold text-teal-800 mb-2 flex items-center gap-2"><i data-lucide="building" class="w-5 h-5"></i> Anggaran Ditetapkan Unit Sekolah</h3>
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                        <table class="min-w-full divide-y divide-gray-200 text-sm" id="tableKasSekolah"><thead class="bg-gray-50"><tr><th class="px-4 py-3 text-left">Periode</th><th class="px-4 py-3 text-left">Pengaju</th><th class="px-4 py-3 text-right">Total</th><th class="px-4 py-3 text-center">Status</th><th class="px-4 py-3 text-center">Aksi</th></tr></thead><tbody class="divide-y divide-gray-200"></tbody></table>
+                    </div>
+                </div>
+                <div class="mb-8">
+                    <h3 class="text-lg font-bold text-blue-800 mb-2 flex items-center gap-2"><i data-lucide="home" class="w-5 h-5"></i> Anggaran Ditetapkan Unit Asrama Putra</h3>
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                        <table class="min-w-full divide-y divide-gray-200 text-sm" id="tableKasPutra"><thead class="bg-gray-50"><tr><th class="px-4 py-3 text-left">Periode</th><th class="px-4 py-3 text-left">Pengaju</th><th class="px-4 py-3 text-right">Total</th><th class="px-4 py-3 text-center">Status</th><th class="px-4 py-3 text-center">Aksi</th></tr></thead><tbody class="divide-y divide-gray-200"></tbody></table>
+                    </div>
+                </div>
+                <div class="mb-8">
+                    <h3 class="text-lg font-bold text-pink-800 mb-2 flex items-center gap-2"><i data-lucide="home" class="w-5 h-5"></i> Anggaran Ditetapkan Unit Asrama Putri</h3>
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                        <table class="min-w-full divide-y divide-gray-200 text-sm" id="tableKasPutri"><thead class="bg-gray-50"><tr><th class="px-4 py-3 text-left">Periode</th><th class="px-4 py-3 text-left">Pengaju</th><th class="px-4 py-3 text-right">Total</th><th class="px-4 py-3 text-center">Status</th><th class="px-4 py-3 text-center">Aksi</th></tr></thead><tbody class="divide-y divide-gray-200"></tbody></table>
+                    </div>
                 </div>
             </div>
 
-            <!-- Tabel 3: Asrama Putri -->
-            <div class="mb-8">
-                <h3 class="text-lg font-bold text-pink-800 mb-2 flex items-center gap-2"><i data-lucide="home" class="w-5 h-5"></i> Tabel RKA Unit Asrama Putri</h3>
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                    <table class="min-w-full divide-y divide-gray-200 text-sm" id="tablePutri">
-                        <thead class="bg-gray-50"><tr><th class="px-4 py-3 text-left">Periode</th><th class="px-4 py-3 text-left">Pengaju</th><th class="px-4 py-3 text-right">Total</th><th class="px-4 py-3 text-center">Status</th><th class="px-4 py-3 text-center">Aksi</th></tr></thead>
-                        <tbody class="divide-y divide-gray-200"></tbody>
-                    </table>
+            <div id="content-realisasi" class="hidden">
+                <div class="text-center py-16 bg-white rounded-xl border border-gray-200">
+                    <i data-lucide="construction" class="w-12 h-12 text-gray-400 mx-auto mb-4"></i>
+                    <h3 class="font-bold text-lg">Fitur Dalam Pengembangan</h3>
+                    <p class="text-gray-500 mt-1">Tabel realisasi anggaran akan segera tersedia.</p>
                 </div>
             </div>
         </main>
@@ -85,6 +132,16 @@
         lucide.createIcons();
         let userRoles = [];
 
+        function switchTab(tabName) {
+            ['rka', 'kas', 'realisasi'].forEach(tab => {
+                document.getElementById(`tab-${tab}`).className = 'whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 border-transparent';
+                document.getElementById(`content-${tab}`).classList.add('hidden');
+            });
+            document.getElementById(`tab-${tabName}`).className = 'whitespace-nowrap py-3 px-1 border-b-2 font-bold text-sm text-teal-600 border-teal-500';
+            document.getElementById(`content-${tabName}`).classList.remove('hidden');
+            lucide.createIcons(); // Re-render icons if they are in the new tab
+        }
+
         async function initPage() {
             const sessionRes = await fetch('sadigs_api_v3/session_check.php');
             const sessionData = await sessionRes.json();
@@ -103,13 +160,22 @@
             const res = await fetch('sadigs_api_v3/get_budget_plans.php?context=unit');
             const result = await res.json();
             if(result.success) {
-                renderTable('tableSekolah', result.data.filter(d => d.category === 'Sekolah'), ['Kepala Sekolah'], 'Tidak ada pengajuan dari unit Sekolah.');
-                renderTable('tablePutra', result.data.filter(d => d.category === 'Asrama Putra'), ['Kepala Asrama Putra'], 'Tidak ada pengajuan dari Asrama Putra.');
-                renderTable('tablePutri', result.data.filter(d => d.category === 'Asrama Putri'), ['Kepala Asrama Putri'], 'Tidak ada pengajuan dari Asrama Putri.');
+                const pendingData = result.data.filter(d => d.status_unit === 'pending');
+                const approvedData = result.data.filter(d => d.status_unit === 'approved');
+
+                // RKA Tab (Pending)
+                renderTable('tableSekolah', pendingData.filter(d => d.category === 'Sekolah'), ['Kepala Sekolah'], 'Tidak ada pengajuan dari unit Sekolah.', true);
+                renderTable('tablePutra', pendingData.filter(d => d.category === 'Asrama Putra'), ['Kepala Asrama Putra'], 'Tidak ada pengajuan dari Asrama Putra.', true);
+                renderTable('tablePutri', pendingData.filter(d => d.category === 'Asrama Putri'), ['Kepala Asrama Putri'], 'Tidak ada pengajuan dari Asrama Putri.', true);
+
+                // KAS Tab (Approved)
+                renderTable('tableKasSekolah', approvedData.filter(d => d.category === 'Sekolah'), ['Kepala Sekolah'], 'Tidak ada anggaran yang disetujui dari unit Sekolah.', false);
+                renderTable('tableKasPutra', approvedData.filter(d => d.category === 'Asrama Putra'), ['Kepala Asrama Putra'], 'Tidak ada anggaran yang disetujui dari Asrama Putra.', false);
+                renderTable('tableKasPutri', approvedData.filter(d => d.category === 'Asrama Putri'), ['Kepala Asrama Putri'], 'Tidak ada anggaran yang disetujui dari Asrama Putri.', false);
             }
         }
 
-        function renderTable(tableId, data, requiredRole, emptyMessage) {
+        function renderTable(tableId, data, requiredRole, emptyMessage, isActionable) {
             const tbody = document.querySelector(`#${tableId} tbody`);
             tbody.innerHTML = '';
             const canEdit = userRoles.some(r => requiredRole.includes(r));
@@ -125,7 +191,7 @@
                 const statusColor = row.status_unit === 'approved' ? 'text-green-600' : (row.status_unit === 'rejected' ? 'text-red-600' : 'text-yellow-600');
                 
                 let buttons = `<button onclick="toggleDetails(${row.id})" class="text-gray-600 hover:underline text-xs mr-2 font-semibold flex items-center gap-1"><i data-lucide="list" class="w-3 h-3"></i>Rincian</button>`;
-                if (canEdit && row.status_unit === 'pending') {
+                if (canEdit && isActionable) {
                     buttons += `
                         <button onclick="openEdit(${row.id}, '${encodeURIComponent(JSON.stringify(row.details))}')" class="text-blue-600 hover:underline text-xs mr-2 font-semibold">Edit</button>
                         <button onclick="validate(${row.id}, 'approve_unit')" class="text-green-600 hover:underline text-xs mr-2 font-semibold">Setujui</button>

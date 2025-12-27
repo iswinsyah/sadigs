@@ -34,10 +34,13 @@
             <div class="mb-6 border-b border-gray-200">
                 <nav class="flex -mb-px space-x-6" aria-label="Tabs">
                     <button id="tab-rkas" onclick="switchTab('rkas')" class="whitespace-nowrap py-3 px-1 border-b-2 font-bold text-sm text-teal-600 border-teal-500">
-                        Menunggu Penetapan (RKAS)
+                        Rencana Kegiatan dan Anggaran
                     </button>
                     <button id="tab-kas" onclick="switchTab('kas')" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 border-transparent">
                         Anggaran Ditetapkan (KAS)
+                    </button>
+                    <button id="tab-realisasi" onclick="switchTab('realisasi')" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 border-transparent">
+                        Realisasi Kegiatan dan Anggaran
                     </button>
                 </nav>
             </div>
@@ -78,6 +81,14 @@
                         </table>
                     </div>
                 </div>
+                <!-- Realisasi Table -->
+                <div id="content-realisasi" class="hidden">
+                    <div class="text-center py-16 bg-white rounded-xl border border-gray-200">
+                        <i data-lucide="construction" class="w-12 h-12 text-gray-400 mx-auto mb-4"></i>
+                        <h3 class="font-bold text-lg">Fitur Dalam Pengembangan</h3>
+                        <p class="text-gray-500 mt-1">Tabel realisasi anggaran akan segera tersedia.</p>
+                    </div>
+                </div>
             </div>
         </main>
     </div>
@@ -105,11 +116,14 @@
         function switchTab(tabName) {
             document.getElementById('tab-rkas').className = 'whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 border-transparent';
             document.getElementById('tab-kas').className = 'whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 border-transparent';
+            document.getElementById('tab-realisasi').className = 'whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 border-transparent';
             document.getElementById(`tab-${tabName}`).className = 'whitespace-nowrap py-3 px-1 border-b-2 font-bold text-sm text-teal-600 border-teal-500';
 
             document.getElementById('content-rkas').classList.add('hidden');
             document.getElementById('content-kas').classList.add('hidden');
+            document.getElementById('content-realisasi').classList.add('hidden');
             document.getElementById(`content-${tabName}`).classList.remove('hidden');
+            lucide.createIcons();
         }
 
         async function initPage() {
