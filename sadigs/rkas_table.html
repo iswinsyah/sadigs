@@ -169,13 +169,17 @@
             data.forEach(row => {
                 const tr = document.createElement('tr');
                 let buttons = `<button onclick="toggleDetails(${row.id})" class="text-gray-600 hover:underline text-xs mr-2 font-semibold flex items-center gap-1"><i data-lucide="list" class="w-3 h-3"></i>Rincian</button>`;
-                
+
                 if (isActionable && isYayasan) {
-                    buttons += `
-                        <button onclick="openEdit(${row.id}, '${encodeURIComponent(JSON.stringify(row.details))}')" class="text-blue-600 hover:underline text-xs mr-2 font-bold">Edit</button>
-                        <button onclick="validate(${row.id}, 'approve_foundation')" class="text-green-600 hover:underline text-xs mr-2 font-bold">Tetapkan</button>
-                        <button onclick="validate(${row.id}, 'reject_foundation')" class="text-red-600 hover:underline text-xs font-bold">Tolak</button>
-                    `;
+                    // Semua pengurus yayasan bisa mengedit
+                    buttons += `<button onclick="openEdit(${row.id}, '${encodeURIComponent(JSON.stringify(row.details))}')" class="text-blue-600 hover:underline text-xs mr-2 font-bold">Edit</button>`;
+
+                    // Hanya Ketua Yayasan yang bisa menetapkan atau menolak
+                    const isKetuaYayasan = userRoles.includes('Ketua Yayasan');
+                    if (isKetuaYayasan) {
+                        buttons += `<button onclick="validate(${row.id}, 'approve_foundation')" class="text-green-600 hover:underline text-xs mr-2 font-bold">Tetapkan</button>
+                                    <button onclick="validate(${row.id}, 'reject_foundation')" class="text-red-600 hover:underline text-xs font-bold">Tolak</button>`;
+                    }
                 }
 
                 let statusHtml;
