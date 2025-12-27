@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Validasi Rencana Anggaran | SADIGS 3.0</title>
+    <title>Validasi RKA Unit | SADIGS 3.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -26,13 +26,13 @@
 
         <main class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative">
             <header class="mb-8">
-                <h2 class="text-2xl lg:text-3xl font-bold text-gray-800">Validasi Rencana Anggaran</h2>
-                <p class="text-gray-500 text-sm mt-1">Persetujuan anggaran oleh Kepala Sekolah dan Kepala Asrama.</p>
+                <h2 class="text-2xl lg:text-3xl font-bold text-gray-800">Validasi RKA Unit</h2>
+                <p class="text-gray-500 text-sm mt-1">Persetujuan RKA oleh Kepala Sekolah dan Kepala Asrama.</p>
             </header>
 
             <!-- Tabel 1: Sekolah -->
             <div class="mb-8">
-                <h3 class="text-lg font-bold text-teal-800 mb-2 flex items-center gap-2"><i data-lucide="building" class="w-5 h-5"></i> Tabel Rencana Anggaran Sekolah</h3>
+                <h3 class="text-lg font-bold text-teal-800 mb-2 flex items-center gap-2"><i data-lucide="building" class="w-5 h-5"></i> Tabel RKA Unit Sekolah</h3>
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                     <table class="min-w-full divide-y divide-gray-200 text-sm" id="tableSekolah">
                         <thead class="bg-gray-50"><tr><th class="px-4 py-3 text-left">Periode</th><th class="px-4 py-3 text-left">Pengaju</th><th class="px-4 py-3 text-right">Total</th><th class="px-4 py-3 text-center">Status</th><th class="px-4 py-3 text-center">Aksi</th></tr></thead>
@@ -43,7 +43,7 @@
 
             <!-- Tabel 2: Asrama Putra -->
             <div class="mb-8">
-                <h3 class="text-lg font-bold text-blue-800 mb-2 flex items-center gap-2"><i data-lucide="home" class="w-5 h-5"></i> Tabel Rencana Anggaran Asrama Putra</h3>
+                <h3 class="text-lg font-bold text-blue-800 mb-2 flex items-center gap-2"><i data-lucide="home" class="w-5 h-5"></i> Tabel RKA Unit Asrama Putra</h3>
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                     <table class="min-w-full divide-y divide-gray-200 text-sm" id="tablePutra">
                         <thead class="bg-gray-50"><tr><th class="px-4 py-3 text-left">Periode</th><th class="px-4 py-3 text-left">Pengaju</th><th class="px-4 py-3 text-right">Total</th><th class="px-4 py-3 text-center">Status</th><th class="px-4 py-3 text-center">Aksi</th></tr></thead>
@@ -54,7 +54,7 @@
 
             <!-- Tabel 3: Asrama Putri -->
             <div class="mb-8">
-                <h3 class="text-lg font-bold text-pink-800 mb-2 flex items-center gap-2"><i data-lucide="home" class="w-5 h-5"></i> Tabel Rencana Anggaran Asrama Putri</h3>
+                <h3 class="text-lg font-bold text-pink-800 mb-2 flex items-center gap-2"><i data-lucide="home" class="w-5 h-5"></i> Tabel RKA Unit Asrama Putri</h3>
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                     <table class="min-w-full divide-y divide-gray-200 text-sm" id="tablePutri">
                         <thead class="bg-gray-50"><tr><th class="px-4 py-3 text-left">Periode</th><th class="px-4 py-3 text-left">Pengaju</th><th class="px-4 py-3 text-right">Total</th><th class="px-4 py-3 text-center">Status</th><th class="px-4 py-3 text-center">Aksi</th></tr></thead>
@@ -93,7 +93,7 @@
 
             // Render Sidebar
             const nav = document.getElementById('sidebarNav');
-            nav.innerHTML = `<div class="bg-gray-50 rounded-lg p-2 mt-2"><h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase">KEUANGAN</h3><a href="budget_plan_form.html" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="file-plus" class="w-5 h-5"></i> Form Anggaran</a><a href="budget_plan_validation.html" class="flex items-center gap-3 px-3 py-2.5 text-teal-700 bg-white rounded-md transition font-semibold text-sm shadow-sm"><i data-lucide="check-square" class="w-5 h-5"></i> Validasi Anggaran</a><a id="navRkas" href="rkas_table.html" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="archive" class="w-5 h-5"></i> Tabel RKAS</a></div>`;
+            nav.innerHTML = `<div class="bg-gray-50 rounded-lg p-2 mt-2"><h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase">KEUANGAN</h3><a href="budget_plan_form.html" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="file-plus" class="w-5 h-5"></i> RKA Pegawai</a><a href="budget_plan_validation.html" class="flex items-center gap-3 px-3 py-2.5 text-teal-700 bg-white rounded-md transition font-semibold text-sm shadow-sm"><i data-lucide="check-square" class="w-5 h-5"></i> RKA Unit</a><a id="navRkas" href="rkas_table.html" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="archive" class="w-5 h-5"></i> Tabel RKAS</a></div>`;
             lucide.createIcons();
 
             loadData();

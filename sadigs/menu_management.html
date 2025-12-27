@@ -220,7 +220,13 @@
                 const tdName = document.createElement('td');
                 tdName.className = "p-4 font-semibold text-gray-800 border-r border-gray-200 sticky left-0 bg-white z-10";
                 let displayName = menuId.replace(/^nav/, '').replace(/([A-Z])/g, ' $1').trim();
-                displayName = displayName.replace(/^(Formulir|Validasi|Tabel)\s*/i, '');
+                displayName = displayName.replace(/^(Formulir|Validasi|Tabel|Rekap)\s*/i, '');
+
+                // Custom renames
+                if (menuId === 'navFormAnggaran') displayName = 'RKA Pegawai';
+                if (menuId === 'navValidasiAnggaran') displayName = 'RKA Unit';
+                if (menuId === 'navRekapAnggaran') displayName = 'RKA Sekolah';
+
                 tdName.innerHTML = `<span class="text-base">${displayName}</span>`;
                 tr.appendChild(tdName);
 
