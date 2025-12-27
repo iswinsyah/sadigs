@@ -175,14 +175,22 @@
                     amount: tr.querySelector('.edit-amt').value 
                 });
             });
-            await fetch('sadigs_api_v3/validate_budget_plan.php', { method: 'POST', body: JSON.stringify({ id, action: 'update', details }) });
+            await fetch('sadigs_api_v3/validate_budget_plan.php', { 
+                method: 'POST', 
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ id, action: 'update', details }) 
+            });
             document.getElementById('editModal').classList.add('hidden');
             loadData();
         }
 
         window.validate = async function(id, action) {
             if(!confirm('Anda yakin?')) return;
-            await fetch('sadigs_api_v3/validate_budget_plan.php', { method: 'POST', body: JSON.stringify({ id, action }) });
+            await fetch('sadigs_api_v3/validate_budget_plan.php', { 
+                method: 'POST', 
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ id, action }) 
+            });
             loadData();
         }
 
