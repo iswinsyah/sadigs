@@ -176,14 +176,10 @@
                         'Walisantri'
                     ];
                     
-                    // Filter dan urutkan peran sesuai dengan hierarki yang ditentukan
                     roleList = data.roles
                         .filter(role => roleOrder.includes(role))
                         .sort((a, b) => roleOrder.indexOf(a) - roleOrder.indexOf(b));
 
-                    // 1. Sembunyikan menu lama ('Anggaran') yang sudah tidak terpakai
-                    let tempMenuList = data.menus.filter(menuId => menuId !== 'navRekapAnggaran');
-                    menuList = tempMenuList.filter(menuId => !['navFormAnggaran', 'navValidasiAnggaran', 'navRkaSekolah'].includes(menuId));
                     currentMatrix = data.matrix;
 
                     renderTable();
@@ -212,11 +208,10 @@
             // 2. Render Body (Menus) with grouping
             tbody.innerHTML = '';
 
-            // Define categories and their menus
             const categories = {
                 Form: {
                     label: 'Formulir',
-                    menus: ['navAbsensi', 'navBiodataPegawai', 'navBiodataSantri', 'navCalendarSettings', 'navIbadahHarian', 'navInputTahfizh', 'navMenuManagement', 'navProfil', 'navQuota', 'navRapat', 'navIzinPegawai', 'navFormulirPembayaran', 'navFormulirTransaksi', 'navIzinWalisantri'],
+                    menus: ['navAbsensi', 'navBiodataPegawai', 'navBiodataSantri', 'navCalendarSettings', 'navIbadahHarian', 'navInputTahfizh', 'navProfil', 'navQuota', 'navRapat', 'navIzinPegawai', 'navFormulirPembayaran', 'navFormulirTransaksi', 'navIzinWalisantri'],
                     icon: 'file-pen-line'
                 },
                 Val: {
@@ -236,9 +231,11 @@
                 }
             };
 
-            // Helper function to render a single menu row
+            const allCategorizedMenus = Object.values(categories).flatMap(c => c.menus);
+
             const renderMenuRow = (menuId) => {
-                if (menuId === 'navMenuManagement') return; // Skip self
+                // Skip navMenuManagement from being rendered
+                if (menuId === 'navMenuManagement') return;
 
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-gray-50";
@@ -246,8 +243,7 @@
                 const tdName = document.createElement('td');
                 tdName.className = "p-4 font-semibold text-gray-800 border-r border-gray-200 sticky left-0 bg-white z-10";
                 let displayName = menuId.replace(/^nav/, '').replace(/([A-Z])/g, ' $1').trim();
-                displayName = displayName.replace(/^(Formulir|Validasi|Tabel|Rekap)\s*/i, '');
-
+                
                 tdName.innerHTML = `<span class="text-base">${displayName}</span>`;
                 tr.appendChild(tdName);
 
@@ -267,12 +263,9 @@
                 tbody.appendChild(tr);
             };
 
-            // Iterate through categories in the desired order
             ['Form', 'Val', 'Tab', 'Grf'].forEach(catKey => {
                 const category = categories[catKey];
-                // Ambil langsung dari daftar menu di kategori, bukan dari database
-                const categoryMenus = category.menus
-                    .sort((a, b) => a.localeCompare(b));
+                const categoryMenus = category.menus.sort((a, b) => a.localeCompare(b));
 
                 if (categoryMenus.length > 0) {
                     const groupTr = document.createElement('tr');
@@ -283,31 +276,15 @@
                 }
             });
 
-            // Render any menus not in a category at the end
-            const uncategorizedMenus = menuList.filter(menuId => 
-                !categories.Form.menus.includes(menuId) &&
-                !categories.Val.menus.includes(menuId) &&
-                !categories.Tab.menus.includes(menuId) &&
-                !categories.Grf.menus.includes(menuId)
-            ).sort((a, b) => a.localeCompare(b));
-
-            if (uncategorizedMenus.length > 0) {
-                const groupTr = document.createElement('tr');
-                groupTr.className = 'bg-gray-200';
-                groupTr.innerHTML = `<td colspan="${roleList.length + 1}" class="p-2 font-bold text-gray-600 text-sm sticky left-0 z-10"><i data-lucide="folder-question" class="w-4 h-4 inline-block mr-2"></i>Lain-lain</td>`;
-                tbody.appendChild(groupTr);
-                uncategorizedMenus.forEach(renderMenuRow);
-            }
-
             lucide.createIcons();
         }
 
         async function saveChanges() {
             const btn = document.getElementById('saveBtn');
-            const originalText = btn.innerHTML;
-            btn.disabled = true; btn.innerHTML = 'Menyimpan...';
+            const originalHTML = btn.innerHTML;
+            btn.disabled = true; 
+            btn.innerHTML = 'Menyimpan...';
 
-            // Kumpulkan data dari semua checkbox
             const updates = [];
             const checkboxes = document.querySelectorAll('input[type="checkbox"][data-role]');
             
@@ -326,10 +303,18 @@
                     body: JSON.stringify({ updates: updates })
                 });
                 const result = await res.json();
-                if (result.success) alert('Pengaturan berhasil disimpan!');
-                else alert('Gagal: ' + result.message);
-            } catch (e) { alert('Terjadi kesalahan koneksi.'); }
-            finally { btn.disabled = false; btn.innerHTML = originalText; }
+                if (result.success) {
+                    alert('Pengaturan berhasil disimpan!');
+                } else {
+                    alert('Gagal: ' + result.message);
+                }
+            } catch (e) { 
+                alert('Terjadi kesalahan koneksi.'); 
+            } finally { 
+                btn.disabled = false; 
+                btn.innerHTML = originalHTML;
+                lucide.createIcons();
+            }
         }
 
         initPage();
