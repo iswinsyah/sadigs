@@ -290,13 +290,34 @@
                 return;
             }
 
-            // Simulasi Kirim (Karena endpoint belum ada di prompt)
-            // Nanti bisa diganti fetch ke endpoint 'sadigs_api_v3/submit_guardian_leave.php'
-            console.log("Mengirim data:", formData);
-            
-            // Tampilkan alert sukses simulasi
-            alert(`Surat izin untuk ananda ${formData.student_name} berhasil dibuat dan dikirim ke ${formData.musyrif}.`);
-            window.location.href = 'dashboard.html';
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalBtnHTML = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full inline-block mr-2"></span> Mengirim...';
+
+            try {
+                const res = await fetch('sadigs_api_v3/submit_guardian_leave.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await res.json();
+
+                if (result.success) {
+                    alert('Surat izin berhasil dikirim! Menunggu validasi Musyrif.');
+                    window.location.href = 'dashboard.html';
+                } else {
+                    alert('Gagal: ' + result.message);
+                }
+
+            } catch (error) {
+                console.error('Submission error:', error);
+                alert('Terjadi kesalahan koneksi saat mengirim data.');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalBtnHTML;
+            }
         });
 
         initPage();

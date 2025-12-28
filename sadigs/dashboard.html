@@ -125,6 +125,11 @@
                     <a id="navFormulirTransaksi" href="daily_transaction_form.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="pen-tool" class="w-5 h-5"></i> Form Transaksi Harian</a>
                     <a id="navTabelTransaksi" href="daily_transaction_list.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="book" class="w-5 h-5"></i> Buku Transaksi Harian</a>
                 </div>
+
+                <!-- Tombol Logout -->
+                <div class="pt-2">
+                    <button id="logoutBtn" class="w-full flex items-center gap-3 px-4 py-2 text-tombol-kedua hover:bg-tombol-kedua/10 rounded-lg transition font-medium"><i data-lucide="log-out" class="w-5 h-5"></i> Keluar</button>
+                </div>
             </nav>
         </aside>
 
@@ -172,15 +177,47 @@
                 </div>
             </div>
 
-            <!-- Area Konten Kosong (Placeholder) -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-10 flex flex-col items-center justify-center text-center min-h-[300px]">
-                <div class="bg-utama/10 p-4 rounded-full mb-4">
-                    <i data-lucide="layout" class="w-10 h-10 text-utama"></i>
+            <!-- =============================================== -->
+            <!--        KONTEN SPESIFIK PERAN (WIDGETS)          -->
+            <!-- =============================================== -->
+            <div id="dashboardWidgets" class="space-y-8">
+
+                <!-- Dashboard untuk Yayasan / Admin -->
+                <div id="yayasanDashboard" class="hidden space-y-6">
+                    <h3 class="text-lg font-bold text-gray-700">Ringkasan Manajemen</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <a href="verification_management.html" id="pendingUsersCard" class="bg-yellow-50 p-6 rounded-xl shadow-sm border border-yellow-200 hover:shadow-md transition block">
+                            <p class="text-sm font-bold text-yellow-500 uppercase">Verifikasi Pengguna</p>
+                            <p class="text-3xl font-extrabold text-yellow-700 mt-2">0 <span class="text-base font-medium">menunggu</span></p>
+                        </a>
+                        <a href="payment_validation.html" id="pendingPaymentsCard" class="bg-blue-50 p-6 rounded-xl shadow-sm border border-blue-200 hover:shadow-md transition block">
+                            <p class="text-sm font-bold text-blue-500 uppercase">Validasi Pembayaran</p>
+                            <p class="text-3xl font-extrabold text-blue-700 mt-2">0 <span class="text-base font-medium">menunggu</span></p>
+                        </a>
+                    </div>
                 </div>
-                <h3 class="text-lg font-bold text-gray-800">Area Kerja Utama</h3>
-                <p class="text-gray-500 max-w-md mt-2 text-sm">Pilih menu di sebelah kiri untuk mulai mengelola data akademik, administrasi, atau pengaturan yayasan.</p>
+
+                <!-- Dashboard untuk Musyrif -->
+                <div id="musyrifDashboard" class="hidden space-y-6">
+                    <h3 class="text-lg font-bold text-gray-700">Ringkasan Musyrif</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <a href="daily_worship_validation.html" id="pendingWorshipCard" class="bg-purple-50 p-6 rounded-xl shadow-sm border border-purple-200 hover:shadow-md transition block">
+                            <p class="text-sm font-bold text-purple-500 uppercase">Validasi Ibadah</p>
+                            <p class="text-3xl font-extrabold text-purple-700 mt-2">0 <span class="text-base font-medium">laporan</span></p>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Default Welcome Message -->
+                <div id="defaultDashboard" class="hidden bg-white rounded-xl shadow-sm border border-gray-100 p-10 flex flex-col items-center justify-center text-center min-h-[300px]">
+                    <div class="bg-utama/10 p-4 rounded-full mb-4">
+                        <i data-lucide="layout" class="w-10 h-10 text-utama"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-800">Selamat Datang!</h3>
+                    <p class="text-gray-500 max-w-md mt-2 text-sm">Pilih menu di sebelah kiri untuk mulai mengelola data. Jika menu belum muncul, lengkapi profil Anda atau hubungi admin.</p>
+                </div>
             </div>
-            
+
             <footer class="mt-10 text-center text-xs text-gray-400 pb-4">
                 &copy; 2025 Villa Quran Baron Malang - Sistem Administrasi Digital Sekolah
             </footer>
@@ -273,6 +310,49 @@
                             header.parentNode.insertBefore(banner, header.nextSibling);
                         }
                     }
+
+                    // --- LOGIKA TAMPILAN DASHBOARD BERDASARKAN PERAN ---
+                    const yayasanRoles = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan', 'Kepala Sekolah', 'Bendahara Sekolah'];
+                    const musyrifRoles = ['Musyrif', 'Musyrifah', 'Kepala Asrama Putra', 'Kepala Asrama Putri'];
+                    let isDashboardSet = false;
+
+                    if (data.roles.some(r => yayasanRoles.includes(r))) {
+                        document.getElementById('yayasanDashboard').classList.remove('hidden');
+                        isDashboardSet = true;
+                    }
+                    if (data.roles.some(r => musyrifRoles.includes(r))) {
+                        document.getElementById('musyrifDashboard').classList.remove('hidden');
+                        isDashboardSet = true;
+                    }
+
+                    // Jika tidak ada dashboard spesifik yang ditampilkan, tampilkan yang default
+                    if (!isDashboardSet) {
+                        document.getElementById('defaultDashboard').classList.remove('hidden');
+                    }
+
+                    // --- AMBIL DATA SUMMARY UNTUK WIDGETS ---
+                    fetch('sadigs_api_v3/get_dashboard_summary.php')
+                        .then(res => res.json())
+                        .then(summaryData => {
+                            if (summaryData.success) {
+                                const summary = summaryData.summary;
+                                // Update card verifikasi pengguna
+                                if (summary.pending_users_count !== undefined) {
+                                    const card = document.getElementById('pendingUsersCard');
+                                    card.querySelector('p:last-child').innerHTML = `${summary.pending_users_count} <span class="text-base font-medium">menunggu</span>`;
+                                }
+                                // Update card validasi pembayaran
+                                if (summary.pending_payments_count !== undefined) {
+                                    const card = document.getElementById('pendingPaymentsCard');
+                                    card.querySelector('p:last-child').innerHTML = `${summary.pending_payments_count} <span class="text-base font-medium">menunggu</span>`;
+                                }
+                                // Update card validasi ibadah
+                                if (summary.pending_worship_validations !== undefined) {
+                                    const card = document.getElementById('pendingWorshipCard');
+                                    card.querySelector('p:last-child').innerHTML = `${summary.pending_worship_validations} <span class="text-base font-medium">laporan</span>`;
+                                }
+                            }
+                        });
 
                     // --- LOGIKA MENU DINAMIS (DATABASE) ---
                     fetch('sadigs_api_v3/get_menu_permissions.php')
@@ -378,8 +458,8 @@
         });
 
         // Logika Logout
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            if(confirm('Apakah Anda yakin ingin keluar?')) {
+        document.getElementById('logoutBtn')?.addEventListener('click', () => {
+            if (confirm('Apakah Anda yakin ingin keluar?')) {
                 window.location.href = 'sadigs_api_v3/logout.php';
             }
         });
