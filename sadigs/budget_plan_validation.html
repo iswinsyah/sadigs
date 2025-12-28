@@ -167,17 +167,18 @@
             const result = await res.json();
             if(result.success) {
                 const pendingData = result.data.filter(d => d.status_unit === 'pending');
-                const approvedData = result.data.filter(d => d.status_unit === 'approved');
+                // PERBAIKAN ALUR: Tab "Ditetapkan" menampilkan data yang sudah final disetujui Yayasan.
+                const establishedData = result.data.filter(d => d.status_foundation === 'approved');
 
                 // RKA Tab (Pending)
                 renderTable('tableSekolah', pendingData.filter(d => d.category === 'Sekolah'), ['Kepala Sekolah'], 'Tidak ada pengajuan dari unit Sekolah.', true);
                 renderTable('tablePutra', pendingData.filter(d => d.category === 'Asrama Putra'), ['Kepala Asrama Putra'], 'Tidak ada pengajuan dari Asrama Putra.', true);
                 renderTable('tablePutri', pendingData.filter(d => d.category === 'Asrama Putri'), ['Kepala Asrama Putri'], 'Tidak ada pengajuan dari Asrama Putri.', true);
 
-                // KAS Tab (Approved)
-                renderTable('tableKasSekolah', approvedData.filter(d => d.category === 'Sekolah'), ['Kepala Sekolah'], 'Tidak ada anggaran yang disetujui dari unit Sekolah.', false);
-                renderTable('tableKasPutra', approvedData.filter(d => d.category === 'Asrama Putra'), ['Kepala Asrama Putra'], 'Tidak ada anggaran yang disetujui dari Asrama Putra.', false);
-                renderTable('tableKasPutri', approvedData.filter(d => d.category === 'Asrama Putri'), ['Kepala Asrama Putri'], 'Tidak ada anggaran yang disetujui dari Asrama Putri.', false);
+                // KAS Tab (Ditetapkan oleh Yayasan)
+                renderTable('tableKasSekolah', establishedData.filter(d => d.category === 'Sekolah'), ['Kepala Sekolah'], 'Tidak ada anggaran yang ditetapkan Yayasan untuk unit Sekolah.', false);
+                renderTable('tableKasPutra', establishedData.filter(d => d.category === 'Asrama Putra'), ['Kepala Asrama Putra'], 'Tidak ada anggaran yang ditetapkan Yayasan untuk Asrama Putra.', false);
+                renderTable('tableKasPutri', establishedData.filter(d => d.category === 'Asrama Putri'), ['Kepala Asrama Putri'], 'Tidak ada anggaran yang ditetapkan Yayasan untuk Asrama Putri.', false);
             }
         }
 
