@@ -8,6 +8,15 @@ ob_start();
 
 header('Content-Type: application/json');
 
+// Fungsi cadangan jika db_connect.php gagal dimuat
+if (!function_exists('sendJSONResponse')) {
+    function sendJSONResponse($data, $code = 200) {
+        http_response_code($code);
+        echo json_encode($data);
+        exit;
+    }
+}
+
 try {
     require_once 'db_connect.php';
 
@@ -70,7 +79,7 @@ try {
         sendJSONResponse(['success' => true]);
     }
 
-} catch (Exception $e) {
+} catch (Throwable $e) { // Ubah Exception menjadi Throwable untuk menangkap semua error
     if (isset($pdo) && $pdo->inTransaction()) {
         $pdo->rollBack();
     }

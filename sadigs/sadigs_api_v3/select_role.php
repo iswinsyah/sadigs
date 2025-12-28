@@ -7,38 +7,36 @@ if (!isset($_SESSION['user_id'])) {
     sendJSONResponse(['success' => false, 'message' => 'Unauthorized'], 401);
 }
 
-$pdo = getDBConnection();
-$user_id = $_SESSION['user_id'];
 $input = json_decode(file_get_contents('php://input'), true);
 $roles = $input['roles'] ?? [];
+$user_id = $_SESSION['user_id'];
 
 if (empty($roles)) {
-    sendJSONResponse(['success' => false, 'message' => 'Pilih minimal satu peran.'], 400);
+    sendJSONResponse(['success' => false, 'message' => 'Tidak ada peran yang dipilih.'], 400);
 }
 
 try {
+    $pdo = getDBConnection();
     $pdo->beginTransaction();
 
-    $stmt = $pdo->prepare("INSERT INTO user_roles (user_id, role_name, status) VALUES (?, ?, ?)");
+    // Siapkan statement insert
+    // Status default 'pending' agar menunggu validasi admin/yayasan
+    $stmt = $pdo->prepare("INSERT INTO user_roles (user_id, role_name, status) VALUES (?, ?, 'pending') ON DUPLICATE KEY UPDATE status = status");
 
     foreach ($roles as $role) {
-        // Cek duplikasi
-        $check = $pdo->prepare("SELECT id FROM user_roles WHERE user_id = ? AND role_name = ?");
-        $check->execute([$user_id, $role]);
-        
-        if ($check->rowCount() == 0) {
-            // Default status: PENDING
-            // Kecuali Santri/Walisantri jika Anda ingin auto-approve, ubah di sini.
-            // Sesuai request: "menunggu akunnya aktifasi oleh admin", jadi semua PENDING.
-            $stmt->execute([$user_id, $role, 'pending']);
-        }
+        // Validasi nama role sederhana (opsional)
+        $stmt->execute([$user_id, $role]);
     }
 
     $pdo->commit();
-    sendJSONResponse(['success' => true, 'message' => 'Peran berhasil diajukan. Mohon tunggu verifikasi admin.']);
+    
+    // Update session roles agar perubahan langsung terasa (opsional, tapi bagus untuk UX)
+    // Namun idealnya user harus relogin atau refresh dashboard untuk melihat status 'pending'
+    
+    sendJSONResponse(['success' => true, 'message' => 'Peran berhasil diajukan. Mohon tunggu validasi admin.']);
 
 } catch (Exception $e) {
-    $pdo->rollBack();
-    sendJSONResponse(['success' => false, 'message' => 'Gagal menyimpan: ' . $e->getMessage()], 500);
+    if ($pdo->inTransaction()) $pdo->rollBack();
+    sendJSONResponse(['success' => false, 'message' => 'Database error: ' . $e->getMessage()], 500);
 }
 ?>
