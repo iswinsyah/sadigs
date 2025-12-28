@@ -17,7 +17,7 @@ try {
             FROM users u
             JOIN user_roles ur ON u.user_id = ur.user_id
             LEFT JOIN employee_details ed ON u.user_id = ed.user_id
-            WHERE ur.role_name IN ('Kepala Sekolah', 'Kepala Asrama', 'Sekretaris Sekolah', 'Bendahara Sekolah', 'Musyrif', 'Ustadz')
+            WHERE ur.role_name IN ('Kepala Sekolah', 'Kepala Asrama Putra', 'Kepala Asrama Putri', 'Sekretaris Sekolah', 'Bendahara Sekolah', 'Musyrif', 'Ustadz', 'Musyrifah', 'Ustadzah')
             AND ur.status = 'approved'
             GROUP BY u.user_id
             ORDER BY u.full_name ASC";
