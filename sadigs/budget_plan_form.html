@@ -83,13 +83,13 @@
             <!-- Tab Buttons -->
             <div class="mb-6 border-b border-gray-200">
                 <nav class="flex -mb-px space-x-6" aria-label="Tabs">
-                    <button id="tab-pengajuan" onclick="switchTab('pengajuan')" class="whitespace-nowrap py-3 px-1 border-b-2 font-bold text-sm text-teal-600 border-teal-500">
+                    <button id="tab-pengajuan" onclick="switchTab('pengajuan')" class="whitespace-nowrap py-3 px-1 border-b-2 font-bold text-sm text-teal-600 border-teal-500 cursor-pointer">
                         Pengajuan (Rencana)
                     </button>
-                    <button id="tab-ditetapkan" onclick="switchTab('ditetapkan')" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 border-transparent">
+                    <button id="tab-ditetapkan" onclick="switchTab('ditetapkan')" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 border-transparent cursor-pointer">
                         Kegiatan & Anggaran Ditetapkan
                     </button>
-                    <button id="tab-pelaporan" onclick="switchTab('pelaporan')" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 border-transparent">
+                    <button id="tab-pelaporan" onclick="switchTab('pelaporan')" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 border-transparent cursor-pointer">
                         Laporan Realisasi
                     </button>
                 </nav>
@@ -243,7 +243,7 @@
 
         // --- Function Definitions ---
 
-        function switchTab(tabName) {
+        window.switchTab = function(tabName) {
             ['pengajuan', 'ditetapkan', 'pelaporan'].forEach(t => {
                 const tabButton = document.getElementById(`tab-${t}`);
                 const tabContent = document.getElementById(`content-${t}`);
@@ -254,7 +254,7 @@
             const activeTabContent = document.getElementById(`content-${tabName}`);
             if (activeTabButton) activeTabButton.className = 'whitespace-nowrap py-3 px-1 border-b-2 font-bold text-sm text-teal-600 border-teal-500';
             if (activeTabContent) activeTabContent.classList.remove('hidden');
-            lucide.createIcons();
+            if(typeof lucide !== 'undefined') lucide.createIcons();
         }
 
         function toggleForm(show) {

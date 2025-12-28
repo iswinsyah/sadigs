@@ -150,7 +150,13 @@
 
             // Render Sidebar
             const nav = document.getElementById('sidebarNav');
-            nav.innerHTML = `<div class="bg-gray-50 rounded-lg p-2 mt-2"><h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase">KEUANGAN</h3><a href="budget_plan_form.html" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="file-plus" class="w-5 h-5"></i> RKA Pegawai</a><a href="budget_plan_validation.html" class="flex items-center gap-3 px-3 py-2.5 text-teal-700 bg-white rounded-md transition font-semibold text-sm shadow-sm"><i data-lucide="check-square" class="w-5 h-5"></i> RKA Unit</a><a id="navRkaSekolah" href="rkas_table.html" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="archive" class="w-5 h-5"></i> RKA Sekolah</a></div>`;
+            const isYayasan = userRoles.some(r => ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan'].includes(r));
+            let rkaSekolahLink = '';
+            if (isYayasan) {
+                rkaSekolahLink = `<a id="navRkaSekolah" href="rkas_table.html" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="archive" class="w-5 h-5"></i> RKA Sekolah</a>`;
+            }
+
+            nav.innerHTML = `<div class="bg-gray-50 rounded-lg p-2 mt-2"><h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase">KEUANGAN</h3><a href="budget_plan_form.html" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="file-plus" class="w-5 h-5"></i> RKA Pegawai</a><a href="budget_plan_validation.html" class="flex items-center gap-3 px-3 py-2.5 text-teal-700 bg-white rounded-md transition font-semibold text-sm shadow-sm"><i data-lucide="check-square" class="w-5 h-5"></i> RKA Unit</a>${rkaSekolahLink}</div>`;
             lucide.createIcons();
 
             loadData();
