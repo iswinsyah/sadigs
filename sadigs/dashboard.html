@@ -282,18 +282,7 @@
                     fetch('sadigs_api_v3/get_menu_permissions.php')
                         .then(res => res.json())
                         .then(permData => {
-                            if (permData.success) {
-                                let allowedMenus = permData.permissions || [];
-                                
-                                // Perbaikan Alur: Pastikan RKA Sekolah hanya untuk Yayasan
-                                const yayasanRoles = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan'];
-                                const isYayasan = data.roles.some(r => yayasanRoles.includes(r));
-                                if (!isYayasan) {
-                                    allowedMenus = allowedMenus.filter(menuId => menuId !== 'navRkaSekolah');
-                                }
-                                
-                                // 1. Tampilkan menu yang diizinkan
-                                allowedMenus.forEach(id => {
+                            if (permData.success) {                                const allowedMenus = permData.permissions || [];                                // 1. Tampilkan menu yang diizinkan                                allowedMenus.forEach(id => {
                                     const el = document.getElementById(id);
                                     if (el) el.classList.remove('hidden');
                                 });
