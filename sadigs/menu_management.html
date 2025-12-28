@@ -182,11 +182,7 @@
 
                     // 1. Sembunyikan menu lama ('Anggaran') yang sudah tidak terpakai
                     let tempMenuList = data.menus.filter(menuId => menuId !== 'navRekapAnggaran');
-                    // 2. Pastikan menu baru 'RKA Sekolah' (navRkaSekolah) selalu ada di daftar agar bisa dikonfigurasi
-                    if (!tempMenuList.includes('navRkaSekolah')) {
-                        tempMenuList.push('navRkaSekolah');
-                    }
-                    menuList = tempMenuList;
+                    menuList = tempMenuList.filter(menuId => !['navFormAnggaran', 'navValidasiAnggaran', 'navRkaSekolah'].includes(menuId));
                     currentMatrix = data.matrix;
 
                     renderTable();
