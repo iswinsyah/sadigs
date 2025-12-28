@@ -297,14 +297,21 @@
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    document.getElementById('sidebarUsername').textContent = data.username;
-                    document.getElementById('userInitial').textContent = data.username.charAt(0).toUpperCase();
+                    const username = data.username || 'User';
+                    document.getElementById('sidebarUsername').textContent = username;
+                    document.getElementById('userInitial').textContent = username.charAt(0).toUpperCase();
+                    
                     const rawRoles = data.raw_roles || [];
+                    const activeRoles = data.roles || []; // Safety check: pastikan selalu array
 
                     // Update sidebar and main role display
                     let rolesText = 'User';
                     if (rawRoles.length > 0) {
-                        rolesText = rawRoles.map(r => r.status === 'approved' ? r.role_name : `${r.role_name} (Pending)`).join(', ');
+                        rolesText = rawRoles.map(r => {
+                            // Handle jika format data lama (string) atau properti hilang
+                            if (typeof r === 'string') return r;
+                            return r.status === 'approved' ? r.role_name : `${r.role_name} (Pending)`;
+                        }).join(', ');
                     }
                     document.getElementById('sidebarRole').textContent = rolesText;
                     document.getElementById('mainRoleDisplay').textContent = rolesText;
@@ -316,7 +323,7 @@
                         loadAvailableRoles(); // Muat daftar peran
                     } else {
                         // Jika punya peran tapi belum ada yang 'approved'
-                        if (data.roles.length === 0) {
+                        if (activeRoles.length === 0) {
                             
                             // Tampilkan Banner Pending
                             const banner = document.createElement('div');
@@ -327,7 +334,7 @@
                                     <div class="ml-3"><p class="text-sm text-yellow-700 font-medium">Akun Anda sedang menunggu aktivasi admin. Akses menu terbatas.</p></div>
                                 </div>`;
                             const header = document.querySelector('header');
-                            header.parentNode.insertBefore(banner, header.nextSibling);
+                            if (header) header.parentNode.insertBefore(banner, header.nextSibling);
                         }
                     }
 
@@ -336,13 +343,13 @@
                     const musyrifRoles = ['Musyrif', 'Musyrifah', 'Kepala Asrama Putra', 'Kepala Asrama Putri', 'Ustadz', 'Ustadzah'];
                     let isDashboardSet = false;
 
-                    if (data.roles.some(r => yayasanRoles.includes(r))) {
-                        document.getElementById('yayasanDashboard').classList.remove('hidden');
-                        isDashboardSet = true;
+                    if (activeRoles.some(r => yayasanRoles.includes(r))) {
+                        const el = document.getElementById('yayasanDashboard');
+                        if (el) { el.classList.remove('hidden'); isDashboardSet = true; }
                     }
-                    if (data.roles.some(r => musyrifRoles.includes(r))) {
-                        document.getElementById('musyrifDashboard').classList.remove('hidden');
-                        isDashboardSet = true;
+                    if (activeRoles.some(r => musyrifRoles.includes(r))) {
+                        const el = document.getElementById('musyrifDashboard');
+                        if (el) { el.classList.remove('hidden'); isDashboardSet = true; }
                     }
 
                     // Jika tidak ada dashboard spesifik yang ditampilkan, tampilkan yang default
