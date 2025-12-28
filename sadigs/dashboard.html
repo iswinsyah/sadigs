@@ -358,19 +358,22 @@
                     fetch('sadigs_api_v3/get_menu_permissions.php')
                         .then(res => res.json())
                         .then(permData => {
-                            if (permData.success) {                                const allowedMenus = permData.permissions || [];                                // 1. Tampilkan menu yang diizinkan                                allowedMenus.forEach(id => {
+                            if (permData.success) {
+                                const allowedMenus = permData.permissions || [];
+                                // 1. Tampilkan menu yang diizinkan
+                                allowedMenus.forEach(id => {
                                     const el = document.getElementById(id);
                                     if (el) el.classList.remove('hidden');
                                 });
                             
-                            // 2. Tampilkan grup menu jika memiliki item yang terlihat
-                            const menuGroups = ['groupYayasan', 'groupKepegawaian', 'groupKesantrian', 'groupKeuangan'];
-                            menuGroups.forEach(groupId => {
-                                const group = document.getElementById(groupId);
-                                if (group && group.querySelector('a:not(.hidden)')) {
-                                    group.classList.remove('hidden');
-                                }
-                            });
+                                // 2. Tampilkan grup menu jika memiliki item yang terlihat
+                                const menuGroups = ['groupYayasan', 'groupKepegawaian', 'groupKesantrian', 'groupKeuangan'];
+                                menuGroups.forEach(groupId => {
+                                    const group = document.getElementById(groupId);
+                                    if (group && group.querySelector('a:not(.hidden)')) {
+                                        group.classList.remove('hidden');
+                                    }
+                                });
                             }
                         })
                         .catch(e => console.error("Gagal memuat izin menu:", e));
