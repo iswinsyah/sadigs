@@ -205,6 +205,10 @@
                             <p class="text-sm font-bold text-purple-500 uppercase">Validasi Ibadah</p>
                             <p class="text-3xl font-extrabold text-purple-700 mt-2">0 <span class="text-base font-medium">laporan</span></p>
                         </a>
+                        <a href="guardian_leave_validation.html" id="pendingGuardianLeaveCard" class="bg-pink-50 p-6 rounded-xl shadow-sm border border-pink-200 hover:shadow-md transition block">
+                            <p class="text-sm font-bold text-pink-500 uppercase">Validasi Izin Walisantri</p>
+                            <p class="text-3xl font-extrabold text-pink-700 mt-2">0 <span class="text-base font-medium">izin</span></p>
+                        </a>
                     </div>
                 </div>
 
@@ -350,6 +354,11 @@
                                 if (summary.pending_worship_validations !== undefined) {
                                     const card = document.getElementById('pendingWorshipCard');
                                     card.querySelector('p:last-child').innerHTML = `${summary.pending_worship_validations} <span class="text-base font-medium">laporan</span>`;
+                                }
+                                // Update card validasi izin walisantri
+                                if (summary.pending_guardian_leaves !== undefined) {
+                                    const card = document.getElementById('pendingGuardianLeaveCard');
+                                    card.querySelector('p:last-child').innerHTML = `${summary.pending_guardian_leaves} <span class="text-base font-medium">izin</span>`;
                                 }
                             }
                         });

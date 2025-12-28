@@ -109,11 +109,15 @@
                 <form id="leaveRequestForm">
                     <!-- Header Surat -->
                     <div class="mb-8">
-                        <label class="block text-gray-700 font-bold mb-2">Kepada Yth Ustadz/Ustadzah</label>
+                        <div class="flex items-center gap-2 mb-2">
+                            <label class="text-gray-700 font-bold">Kepada Yth</label>
+                            <select id="titleSelect" class="px-3 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none bg-white font-medium">
+                                <option value="Ustadz">Ustadz</option>
+                                <option value="Ustadzah">Ustadzah</option>
+                            </select>
+                        </div>
                         <select id="musyrifSelect" class="w-full md:w-1/2 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none bg-white">
-                            <option value="">-- Pilih Musyrif/Ustadzah --</option>
-                            <option value="Kepala Asrama">Kepala Asrama</option>
-                            <option value="Musyrif">Musyrif Piket</option>
+                            <option value="">-- Pilih Nama Kepala Asrama --</option>
                         </select>
                     </div>
                     
@@ -121,7 +125,14 @@
                         <p class="font-medium">Assalamualaikum Warahmatullahi Wabarakatuh</p>
                         
                         <div>
-                            <p class="mb-2">Dengan ini saya Bapak/Ibu:</p>
+                            <div class="flex items-center gap-2 mb-2">
+                                <p>Dengan ini saya</p>
+                                <select id="parentTitle" class="px-2 py-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-teal-500 outline-none bg-white">
+                                    <option value="Bapak">Bapak</option>
+                                    <option value="Ibu">Ibu</option>
+                                </select>
+                                <p>:</p>
+                            </div>
                             <input type="text" id="parentName" class="w-full px-4 py-2 border border-gray-200 bg-gray-100 rounded-lg font-medium text-gray-800 mb-2" readonly placeholder="Nama Walisantri">
                             
                             <p class="mb-2 mt-4">Walisantri dari Putra/Putri saya ananda:</p>

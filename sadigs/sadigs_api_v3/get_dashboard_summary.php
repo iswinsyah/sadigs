@@ -45,6 +45,11 @@ try {
         ");
         $stmt->execute([$username]);
         $summary['pending_worship_validations'] = $stmt->fetchColumn();
+
+        // Hitung izin walisantri yang perlu divalidasi
+        $stmt = $pdo->prepare("SELECT COUNT(id) FROM guardian_leave_requests WHERE musyrif_username = ? AND status = 'pending'");
+        $stmt->execute([$username]);
+        $summary['pending_guardian_leaves'] = $stmt->fetchColumn();
     }
 
     sendJSONResponse(['success' => true, 'summary' => $summary]);
