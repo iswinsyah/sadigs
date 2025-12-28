@@ -136,14 +136,6 @@
                     return;
                 }
 
-                // Perbaikan Alur: Pastikan RKA Sekolah hanya untuk Yayasan
-                const yayasanRoles = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan'];
-                const isYayasan = sessionData.roles.some(r => yayasanRoles.includes(r));
-                if (!isYayasan) {
-                    // Hapus menu dari daftar yang akan ditampilkan
-                    allowedMenus = allowedMenus.filter(menuId => menuId !== 'navRkaSekolah');
-                }
-
                 // Render Sidebar
                 allowedMenus.forEach(id => { const el = document.getElementById(id); if(el) el.classList.remove('hidden'); });
                 if (document.querySelector('#menuYayasan a:not(.hidden)')) document.getElementById('menuYayasan').classList.remove('hidden');
@@ -227,17 +219,17 @@
             const categories = {
                 Form: {
                     label: 'Formulir',
-                    menus: ['navAbsensi', 'navBiodataPegawai', 'navBiodataSantri', 'navCalendarSettings', 'navIbadahHarian', 'navInputTahfizh', 'navMenuManagement', 'navProfil', 'navQuota', 'navRapat', 'navIzinPegawai', 'navFormulirPembayaran', 'navFormulirTransaksi', 'navFormAnggaran'],
+                    menus: ['navAbsensi', 'navBiodataPegawai', 'navBiodataSantri', 'navCalendarSettings', 'navIbadahHarian', 'navInputTahfizh', 'navMenuManagement', 'navProfil', 'navQuota', 'navRapat', 'navIzinPegawai', 'navFormulirPembayaran', 'navFormulirTransaksi'],
                     icon: 'file-pen-line'
                 },
                 Val: {
                     label: 'Validasi',
-                    menus: ['navValidasiIbadah', 'navVerifikasi', 'navValidasiPembayaran', 'navValidasiIzin', 'navValidasiAnggaran'],
+                    menus: ['navValidasiIbadah', 'navVerifikasi', 'navValidasiPembayaran', 'navValidasiIzin'],
                     icon: 'check-square'
                 },
                 Tab: {
                     label: 'Tabel Data',
-                    menus: ['navDashboard', 'navKalender', 'navJadwalRapat', 'navDaftarIzin', 'navBukuIndukPegawai', 'navBukuIndukSantri', 'navMentoring', 'navTabelPembayaran', 'navTabelTransaksi', 'navRkaSekolah', 'navRekapIbadahAnak', 'navViewTahfizh'],
+                    menus: ['navDashboard', 'navKalender', 'navJadwalRapat', 'navDaftarIzin', 'navBukuIndukPegawai', 'navBukuIndukSantri', 'navMentoring', 'navTabelPembayaran', 'navTabelTransaksi', 'navRekapIbadahAnak', 'navViewTahfizh'],
                     icon: 'table'
                 },
                 Grf: {
@@ -258,11 +250,6 @@
                 tdName.className = "p-4 font-semibold text-gray-800 border-r border-gray-200 sticky left-0 bg-white z-10";
                 let displayName = menuId.replace(/^nav/, '').replace(/([A-Z])/g, ' $1').trim();
                 displayName = displayName.replace(/^(Formulir|Validasi|Tabel|Rekap)\s*/i, '');
-
-                // Custom renames
-                if (menuId === 'navFormAnggaran') displayName = 'RKA Pegawai';
-                if (menuId === 'navValidasiAnggaran') displayName = 'RKA Unit';
-                if (menuId === 'navRkaSekolah') displayName = 'RKA Sekolah';
 
                 tdName.innerHTML = `<span class="text-base">${displayName}</span>`;
                 tr.appendChild(tdName);
