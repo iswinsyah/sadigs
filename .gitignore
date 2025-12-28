@@ -1,0 +1,5 @@
+# Abaikan file konfigurasi server
+.htaccess
+
+# Abaikan folder konfigurasi VS Code
+.vscode/
