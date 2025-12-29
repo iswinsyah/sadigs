@@ -1,10 +1,27 @@
 <?php
-header('Content-Type: application/json');
-require_once 'db_connect.php';
+// Matikan tampilan error PHP agar tidak merusak format JSON
+ini_set('display_errors', 0);
+error_reporting(E_ALL);
 
-if (session_status() === PHP_SESSION_NONE) session_start();
+// Mulai buffer output untuk menangkap error tak terduga
+ob_start();
+
+header('Content-Type: application/json');
+
+// Fungsi cadangan jika db_connect.php gagal dimuat
+if (!function_exists('sendJSONResponse')) {
+    function sendJSONResponse($data, $code = 200) {
+        http_response_code($code);
+        echo json_encode($data);
+        exit;
+    }
+}
 
 try {
+    require_once 'db_connect.php';
+
+    if (session_status() === PHP_SESSION_NONE) session_start();
+
     $pdo = getDBConnection();
     
     // Cek apakah tabel role_quotas ada, jika tidak buat dummy/default
@@ -27,10 +44,11 @@ try {
     // Di sini Anda bisa menambahkan logika query ke database 'role_quotas' jika sudah ada tabelnya.
     // Contoh: SELECT * FROM role_quotas ...
 
+    ob_clean();
     sendJSONResponse(['success' => true, 'quotas' => $defaultQuotas]);
 
-} catch (Exception $e) {
-    // Jika error, tetap kirim success false agar UI tidak macet
-    sendJSONResponse(['success' => false, 'message' => $e->getMessage()]);
+} catch (Throwable $e) {
+    ob_clean();
+    sendJSONResponse(['success' => false, 'message' => 'Server Error: ' . $e->getMessage()], 500);
 }
 ?>
