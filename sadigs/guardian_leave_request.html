@@ -1,8 +1,360 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulir Izin Walisantri | SADIGS 3.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'utama': '#4FB7B3',
+                        'kedua': '#26667F',
+                        'tombol-utama': '#3674B5',
+                        'tombol-kedua': '#F93827',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-white text-gray-800 font-sans antialiased">
+
+    <!-- HEADER MOBILE -->
+    <div class="lg:hidden flex items-center gap-4 bg-kedua text-white p-4 shadow-md sticky top-0 z-50">
+        <button id="mobileMenuBtn" class="focus:outline-none p-1 rounded hover:bg-kedua/80 transition">
+            <i data-lucide="menu" class="w-7 h-7"></i>
+        </button>
+        <div class="font-bold text-xl flex items-center gap-2">
+            <img src="https://raw.githubusercontent.com/villaqurankotabatu-commits/gambarvqbm/f44bf009884af11aba2c967a2401026225f7b02b/vila%20quran.png" alt="Logo" class="h-8">
+        </div>
+    </div>
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR -->
+        <aside id="sidebar" class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col transition-transform transform -translate-x-full lg:translate-x-0 fixed lg:static h-full z-40 shadow-2xl lg:shadow-none">
+            
+            <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-kedua text-white">
+                <img src="https://raw.githubusercontent.com/villaqurankotabatu-commits/gambarvqbm/f44bf009884af11aba2c967a2401026225f7b02b/vila%20quran.png" alt="Logo Villa Quran" class="h-9">
+            </div>
+
+            <div class="p-6 border-b border-gray-100 bg-utama/10">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-utama/20 flex items-center justify-center text-kedua font-bold text-lg shadow-sm">
+                        <span id="userInitial">U</span>
+                    </div>
+                    <div class="overflow-hidden">
+                        <p id="sidebarUsername" class="font-bold text-gray-800 text-sm truncate">Memuat...</p>
+                        <p id="sidebarRole" class="text-xs text-gray-500 truncate font-medium">Role...</p>
+                    </div>
+                </div>
+            </div>
+
+            <nav id="sidebarNav" class="flex-1 overflow-y-auto py-4 px-3 space-y-2 no-scrollbar">
+                
+                <div class="bg-gray-50 rounded-lg p-2">
+                    <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">UMUM</h3>
+                    <a id="navDashboard" href="dashboard.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard</a>
+                    <a id="navProfil" href="profile.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="user" class="w-5 h-5"></i> Profil Saya</a>
+                    <a id="navKalender" href="calendar_view.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="calendar" class="w-5 h-5"></i> Kalender Pendidikan</a>
+                </div>
+
+                <div id="groupYayasan" class="hidden bg-gray-50 rounded-lg p-2 mt-2">
+                    <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">MANAJEMEN YAYASAN</h3>
+                    <a id="navVerifikasi" href="verification_management.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="user-check" class="w-5 h-5"></i> Verifikasi Pengguna</a>
+                    <a id="navQuota" href="quota_management.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="users" class="w-5 h-5"></i> Atur Kuota Peran</a>
+                    <a id="navCalendarSettings" href="calendar_settings.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="calendar-cog" class="w-5 h-5"></i> Atur Kalender</a>
+                    <a id="navMenuManagement" href="menu_management.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="lock" class="w-5 h-5"></i> Manajemen Akses</a>
+                </div>
+
+                <div id="groupKepegawaian" class="hidden bg-gray-50 rounded-lg p-2 mt-2">
+                    <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KEPEGAWAIAN</h3>
+                    <a id="navAbsensi" href="attendance.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="map-pin" class="w-5 h-5"></i> Absensi Pegawai</a>
+                    <a id="navBiodataPegawai" href="employee_data.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="file-badge" class="w-5 h-5"></i> Biodata Pegawai</a>
+                    <a id="navBukuIndukPegawai" href="employee_master_book.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="book-open" class="w-5 h-5"></i> Buku Induk Pegawai</a>
+                    <a id="navIzinPegawai" href="leave_request.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="file-edit" class="w-5 h-5"></i> Formulir Izin</a>
+                    <a id="navValidasiIzin" href="leave_validation.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="check-square" class="w-5 h-5"></i> Validasi Izin</a>
+                    <a id="navDaftarIzin" href="leave_list.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="list-checks" class="w-5 h-5"></i> Daftar Izin</a>
+                    <a id="navRapat" href="meeting_invitation.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="mail" class="w-5 h-5"></i> Undang Rapat</a>
+                    <a id="navJadwalRapat" href="meeting_schedule.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="calendar-clock" class="w-5 h-5"></i> Jadwal Rapat</a>
+                </div>
+
+                <div id="groupKesantrian" class="hidden bg-gray-50 rounded-lg p-2 mt-2">
+                    <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KESANTRIAN</h3>
+                    <a id="navBiodataSantri" href="student_data.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="book-user" class="w-5 h-5"></i> Biodata Santri</a>
+                    <a id="navBukuIndukSantri" href="student_master_book.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="book" class="w-5 h-5"></i> Buku Induk Santri</a>
+                    <a id="navIbadahHarian" href="daily_worship_form.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="notebook-pen" class="w-5 h-5"></i> Laporan Ibadah Harian</a>
+                    <a id="navValidasiIbadah" href="daily_worship_validation.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="check-square" class="w-5 h-5"></i> Validasi Ibadah</a>
+                    <a id="navRekapIbadahAnak" href="select_student.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="clipboard-check" class="w-5 h-5"></i> Rekap Ibadah Anak</a>
+                    <a id="navInputTahfizh" href="tahfizh_report_form.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="book-marked" class="w-5 h-5"></i> Input Tahfizh</a>
+                    <a id="navViewTahfizh" href="tahfizh_student_view.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="book-open-check" class="w-5 h-5"></i> Laporan Tahfizh</a>
+                    <a id="navMentoring" href="mentoring_groups.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="users-round" class="w-5 h-5"></i> Kelompok Mentoring</a>
+                    <a id="navIzinWalisantri" href="guardian_leave_request.html" class="flex items-center gap-3 px-3 py-2.5 text-utama bg-white rounded-md transition font-semibold text-sm shadow-sm"><i data-lucide="mail-question" class="w-5 h-5"></i> Izin Walisantri</a>
+                </div>
+
+                <div id="groupKeuangan" class="hidden bg-gray-50 rounded-lg p-2 mt-2">
+                    <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KEUANGAN</h3>
+                    <a id="navFormulirPembayaran" href="payment_form.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="credit-card" class="w-5 h-5"></i> Formulir Pembayaran</a>
+                    <a id="navValidasiPembayaran" href="payment_validation.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="check-circle-2" class="w-5 h-5"></i> Validasi Pembayaran</a>
+                    <a id="navTabelPembayaran" href="payment_list.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="banknote" class="w-5 h-5"></i> Data Pembayaran</a>
+                    <a id="navRekapPembayaran" href="payment_recap.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="pie-chart" class="w-5 h-5"></i> Rekap Keuangan</a>
+                    <a id="navFormulirTransaksi" href="daily_transaction_form.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="pen-tool" class="w-5 h-5"></i> Form Transaksi Harian</a>
+                    <a id="navTabelTransaksi" href="daily_transaction_list.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="book" class="w-5 h-5"></i> Buku Transaksi Harian</a>
+                </div>
+            </nav>
+        </aside>
+
+        <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden lg:hidden backdrop-blur-sm"></div>
+
+        <main class="flex-1 overflow-y-auto bg-white p-4 lg:p-8 w-full relative">
+            <header class="mb-8">
+                <h2 class="text-2xl lg:text-3xl font-bold text-gray-800">Formulir Izin Walisantri</h2>
+                <p class="text-gray-500 text-sm mt-1">Ajukan permohonan izin untuk putra/putri Anda.</p>
+            </header>
+
+            <div class="max-w-3xl bg-white p-8 rounded-xl shadow-sm border border-gray-100">
+                <form id="leaveRequestForm">
+                    <!-- Header Surat -->
+                    <div class="mb-8">
+                        <div class="flex items-center gap-2 mb-2">
+                            <label class="text-gray-700 font-bold">Kepada Yth</label>
+                            <select id="titleSelect" class="px-3 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none bg-white font-medium">
+                                <option value="Ustadz">Ustadz</option>
+                                <option value="Ustadzah">Ustadzah</option>
+                            </select>
+                        </div>
+                        <select id="musyrifSelect" class="w-full md:w-1/2 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none bg-white">
+                            <option value="">-- Memuat Daftar Kepala Asrama --</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Isi Surat -->
+                    <div class="space-y-6 text-gray-800">
+                        <p class="font-medium">Assalamualaikum Warahmatullahi Wabarakatuh</p>
+                        
+                        <div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <p>Dengan ini saya</p>
+                                <select id="parentTitle" class="px-2 py-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-teal-500 outline-none bg-white">
+                                    <option value="Bapak">Bapak</option>
+                                    <option value="Ibu">Ibu</option>
+                                </select>
+                                <p>:</p>
+                            </div>
+                            <input type="text" id="parentName" class="w-full px-4 py-2 border border-gray-200 bg-gray-100 rounded-lg font-medium text-gray-800 mb-2" readonly placeholder="Nama Walisantri">
+                            
+                            <p class="mb-2 mt-4">Walisantri dari Putra/Putri saya ananda:</p>
+                            <input type="text" id="studentName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none" placeholder="Nama Lengkap Santri" required>
+                        </div>
+
+                        <div>
+                            <p class="mb-2">Bermaksud untuk mengajukan permohonan izin:</p>
+                            <select id="leaveType" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none bg-white" required>
+                                <option value="" disabled selected>- Pilih Jenis Izin -</option>
+                                <option value="Penjengukan">Penjengukan</option>
+                                <option value="Mengajak Pulang">Mengajak Pulang</option>
+                                <option value="Jalan-jalan">Jalan-jalan</option>
+                                <option value="Sakit">Sakit</option>
+                                <option value="Keperluan Keluarga">Keperluan Keluarga</option>
+                            </select>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="startDate" class="block text-sm font-medium text-gray-700 mb-1">Mulai Tanggal & Jam:</label>
+                                <div class="flex gap-2">
+                                    <input type="date" id="startDate" class="w-2/3 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none" required>
+                                    <input type="time" id="startTime" class="w-1/3 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none" required>
+                                </div>
+                            </div>
+                            <div>
+                                <label for="endDate" class="block text-sm font-medium text-gray-700 mb-1">Sampai Tanggal & Jam:</label>
+                                <div class="flex gap-2">
+                                    <input type="date" id="endDate" class="w-2/3 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none" required>
+                                    <input type="time" id="endTime" class="w-1/3 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="reason" class="block text-sm font-medium text-gray-700 mb-1">Alasan / Keterangan:</label>
+                            <textarea id="reason" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none" placeholder="Jelaskan alasan Anda secara singkat..." required></textarea>
+                        </div>
+
+                        <div class="border-t pt-6 text-sm text-gray-600 space-y-4">
+                            <p>Demikian surat permohonan ini saya sampaikan. Atas perhatian dan izin yang diberikan, saya ucapkan terima kasih.</p>
+                            <p>Wassalamualaikum Warahmatullahi Wabarakatuh</p>
+                            <div>
+                                <p>Hormat saya,</p>
+                                <p id="signatureName" class="mt-8 font-bold border-b border-gray-400 w-48">Memuat...</p>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end pt-4">
+                            <button type="submit" class="bg-tombol-utama hover:bg-tombol-utama/90 text-white font-bold py-3 px-8 rounded-lg transition shadow-md flex items-center gap-2">
+                                <i data-lucide="send" class="w-5 h-5"></i> Kirim Permohonan
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // Mobile Menu Logic
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        function toggleSidebar() {
+            const isClosed = sidebar.classList.contains('-translate-x-full');
+            if (isClosed) {
+                sidebar.classList.remove('-translate-x-full');
+                sidebarOverlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                sidebarOverlay.classList.add('hidden');
+            }
+        }
+
+        mobileMenuBtn.addEventListener('click', toggleSidebar);
+        sidebarOverlay.addEventListener('click', toggleSidebar);
+
+        async function initPage() {
+            try {
+                const sessionRes = await fetch('sadigs_api_v3/session_check.php');
+                const sessionData = await sessionRes.json();
+                if (!sessionData.success) { window.location.href = 'index.html'; return; }
+
+                document.getElementById('sidebarUsername').textContent = sessionData.username;
+                document.getElementById('userInitial').textContent = sessionData.username.charAt(0).toUpperCase();
+                document.getElementById('parentName').value = sessionData.username;
+                document.getElementById('signatureName').textContent = sessionData.username;
+                
+                const rawRoles = sessionData.raw_roles || [];
+                let rolesText = 'User';
+                if (rawRoles.length > 0) {
+                    rolesText = rawRoles.map(r => r.status === 'approved' ? r.role_name : `${r.role_name} (Pending)`).join(', ');
+                }
+                document.getElementById('sidebarRole').textContent = rolesText;
+
+                fetch('sadigs_api_v3/get_menu_permissions.php')
+                    .then(res => res.json())
+                    .then(permData => {
+                        if (permData.success) {
+                            const allowedMenus = permData.permissions || [];
+                            allowedMenus.forEach(id => {
+                                const el = document.getElementById(id);
+                                if (el) el.classList.remove('hidden');
+                            });
+                            const menuGroups = ['groupYayasan', 'groupKepegawaian', 'groupKesantrian', 'groupKeuangan'];
+                            menuGroups.forEach(groupId => {
+                                const group = document.getElementById(groupId);
+                                if (group && group.querySelector('a:not(.hidden)')) {
+                                    group.classList.remove('hidden');
+                                }
+                            });
+                        }
+                    });
+
+                loadKepalaAsrama();
+
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        async function loadKepalaAsrama() {
+            try {
+                const res = await fetch('sadigs_api_v3/get_all_employees.php');
+                const result = await res.json();
+                if (result.success && result.data) {
+                    const select = document.getElementById('musyrifSelect');
+                    const targets = result.data.filter(emp => 
+                        emp.roles && (emp.roles.includes('Kepala Asrama Putra') || emp.roles.includes('Kepala Asrama Putri'))
+                    );
+                    
+                    if (targets.length > 0) {
+                        select.innerHTML = '<option value="">-- Pilih Nama Kepala Asrama --</option>';
                         targets.forEach(t => {
                             const option = document.createElement('option');
-                            option.value = t.username; // Atau ID jika ada
+                            option.value = t.username;
                             option.textContent = t.full_name || t.username;
                             select.appendChild(option);
                         });
                     } else {
+                        select.innerHTML = '<option value="">-- Tidak ada data Kepala Asrama --</option>';
+                    }
+                }
+            } catch (e) {
+                console.log("Gagal memuat data Kepala Asrama.", e);
+                document.getElementById('musyrifSelect').innerHTML = '<option value="">-- Gagal memuat data --</option>';
+            }
+        }
 
+        document.getElementById('leaveRequestForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            
+            const formData = {
+                musyrif: document.getElementById('musyrifSelect').value,
+                student_name: document.getElementById('studentName').value,
+                leave_type: document.getElementById('leaveType').value,
+                start_date: document.getElementById('startDate').value,
+                start_time: document.getElementById('startTime').value,
+                end_date: document.getElementById('endDate').value,
+                end_time: document.getElementById('endTime').value,
+                reason: document.getElementById('reason').value,
+            };
+
+            // Validasi sederhana
+            if (!formData.musyrif || !formData.student_name || !formData.leave_type) {
+                alert('Harap lengkapi semua kolom yang wajib diisi.');
+                return;
+            }
+
+            const originalBtnHTML = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span> Mengirim...';
+
+            try {
+                const res = await fetch('sadigs_api_v3/submit_guardian_leave.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await res.json();
+
+                alert(result.message);
+                if (result.success) {
+                    window.location.href = 'dashboard.html';
+                }
+
+            } catch (error) {
+                console.error('Submission error:', error);
+                alert('Terjadi kesalahan koneksi saat mengirim data.');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalBtnHTML;
+                lucide.createIcons();
+            }
+        });
+
+        initPage();
+    </script>
+</body>
+</html>
