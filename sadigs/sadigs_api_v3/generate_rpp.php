@@ -24,8 +24,18 @@ $grade = htmlspecialchars($input['grade']);
 $topic = htmlspecialchars($input['topic']);
 $objectives = htmlspecialchars($input['objectives']);
 
-// 1. Susun prompt untuk AI
-$prompt = "Buatkan saya sebuah Rencana Pelaksanaan Pembelajaran (RPP) yang lengkap untuk jenjang {$grade}. Mata pelajarannya adalah {$subject} dengan materi pokok tentang {$topic}. Tujuan pembelajarannya adalah: {$objectives}. Sertakan komponen pendahuluan, kegiatan inti, penutup, dan penilaian.";
+// 1. Tentukan Fase Kurikulum Merdeka berdasarkan Kelas
+$phase = 'D'; // Default SMP
+$g = (int)$grade;
+if ($g >= 1 && $g <= 2) $phase = 'A';
+elseif ($g >= 3 && $g <= 4) $phase = 'B';
+elseif ($g >= 5 && $g <= 6) $phase = 'C';
+elseif ($g >= 7 && $g <= 9) $phase = 'D';
+elseif ($g == 10) $phase = 'E';
+elseif ($g >= 11 && $g <= 12) $phase = 'F';
+
+// 2. Susun prompt untuk AI (Disesuaikan dengan Kurikulum Merdeka)
+$prompt = "Buatkan Modul Ajar (Kurikulum Merdeka) lengkap untuk Fase {$phase} (Kelas {$grade}). Mata Pelajaran: {$subject}. Topik: {$topic}. Tujuan Pembelajaran: {$objectives}. Struktur: 1. Informasi Umum, 2. Komponen Inti (Capaian Pembelajaran, Pemahaman Bermakna, Pertanyaan Pemantik, Kegiatan Pembelajaran), 3. Asesmen/Penilaian.";
 
 // =================================================================
 // == TITIK INTEGRASI AI (GEMINI API) ==
@@ -52,23 +62,25 @@ $prompt = "Buatkan saya sebuah Rencana Pelaksanaan Pembelajaran (RPP) yang lengk
 sleep(2); // Simulasi AI sedang berpikir
 
 $mockResponse = "
-**RENCANA PELAKSANAAN PEMBELAJARAN (RPP)**\n
+**MODUL AJAR (KURIKULUM MERDEKA)**\n
 **Mata Pelajaran:** {$subject}
-**Kelas/Semester:** {$grade}
+**Kelas / Fase:** {$grade} / Fase {$phase}
 **Materi Pokok:** {$topic}
 **Alokasi Waktu:** 2 x 45 Menit\n
-**A. Tujuan Pembelajaran**
-{$objectives}\n
-**B. Kegiatan Pembelajaran**
-1.  **Pendahuluan (10 Menit):** Guru membuka pelajaran dengan salam, doa, dan melakukan apersepsi terkait materi {$topic}.
-2.  **Kegiatan Inti (70 Menit):** Guru menjelaskan konsep dasar {$topic} menggunakan media. Siswa dibagi menjadi beberapa kelompok untuk berdiskusi dan mengerjakan lembar kerja. Setiap kelompok mempresentasikan hasilnya.
-3.  **Penutup (10 Menit):** Guru bersama siswa membuat kesimpulan, melakukan refleksi, dan menutup pelajaran.\n
-**C. Penilaian**
-- Penilaian Sikap: Observasi selama diskusi.
-- Penilaian Pengetahuan: Tes tulis singkat (post-test).
-- Penilaian Keterampilan: Unjuk kerja saat presentasi.\n
+**A. KOMPONEN INTI**
+1. **Capaian Pembelajaran:** Peserta didik mampu memahami konsep {$topic} secara mendalam.
+2. **Tujuan Pembelajaran:** {$objectives}
+3. **Pemahaman Bermakna:** Siswa memahami relevansi {$topic} dalam kehidupan sehari-hari.
+4. **Pertanyaan Pemantik:** Bagaimana peran {$topic} dalam konteks nyata?\n
+**B. KEGIATAN PEMBELAJARAN**
+- **Pendahuluan (10'):** Salam, doa, apersepsi, dan penyampaian tujuan.
+- **Inti (70'):** Diferensiasi konten (video/artikel), diskusi kelompok (gotong royong), presentasi hasil (bernalar kritis).
+- **Penutup (10'):** Refleksi, kesimpulan, dan doa.\n
+**C. ASESMEN**
+- **Formatif:** Observasi diskusi dan LKPD.
+- **Sumatif:** Tes tertulis pemahaman konsep.\n
 ---
-*Catatan: RPP ini dibuat oleh AI dan merupakan draf. Harap sesuaikan kembali dengan kebutuhan spesifik di kelas Anda.*
+*Catatan: Modul Ajar ini dibuat oleh AI (Draft). Silakan sesuaikan dengan Profil Pelajar Pancasila di sekolah Anda.*
 ";
 
 sendJSONResponse(['success' => true, 'rpp' => $mockResponse]);

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Album RPP / Modul Ajar | SADIGS 3.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'utama': '#4FB7B3',
+                        'kedua': '#26667F',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+
+    <div class="flex h-screen overflow-hidden">
+        <!-- SIDEBAR -->
+        <aside id="sidebar" class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col hidden lg:flex">
+            <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-kedua text-white">
+                <img src="https://raw.githubusercontent.com/villaqurankotabatu-commits/gambarvqbm/f44bf009884af11aba2c967a2401026225f7b02b/vila%20quran.png" alt="Logo Villa Quran" class="h-9">
+            </div>
+            <div class="p-6">
+                <a href="dashboard.html" class="flex items-center gap-2 text-gray-600 hover:text-utama transition">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i> Kembali ke Dashboard
+                </a>
+            </div>
+            <nav id="sidebarNav" class="flex-1 overflow-y-auto py-4 px-3 space-y-2">
+                <!-- Menu akan dimuat oleh JS -->
+            </nav>
+        </aside>
+
+        <!-- KONTEN UTAMA -->
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative">
+            <header class="mb-8 flex justify-between items-center">
+                <div>
+                    <h2 class="text-2xl lg:text-3xl font-bold text-gray-800 flex items-center gap-3">
+                        <i data-lucide="book-copy" class="w-8 h-8 text-utama"></i>
+                        Album RPP / Modul Ajar
+                    </h2>
+                    <p class="text-gray-500 text-sm mt-1">Kumpulan Modul Ajar yang telah Anda buat dan simpan.</p>
+                </div>
+                <a href="rpp_generator.html" class="bg-utama hover:bg-utama/90 text-white px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2 shadow-sm">
+                    <i data-lucide="plus" class="w-4 h-4"></i> Buat Baru
+                </a>
+            </header>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="albumContainer">
+                <!-- Card RPP akan dimuat di sini -->
+                <div class="col-span-full text-center py-12 text-gray-400">Memuat data album...</div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        async function initPage() {
+            const sessionRes = await fetch('sadigs_api_v3/session_check.php');
+            const sessionData = await sessionRes.json();
+            if (!sessionData.success) { window.location.href = 'index.html'; return; }
+
+            try {
+                const permRes = await fetch('sadigs_api_v3/get_menu_permissions.php');
+                const permData = await permRes.json();
+                const allowedMenus = permData.success ? permData.permissions : [];
+
+                if (!allowedMenus.includes('navRppAlbum')) {
+                    alert('Anda tidak memiliki izin untuk mengakses halaman ini.');
+                    window.location.href = 'dashboard.html';
+                    return;
+                }
+                renderSidebar(allowedMenus);
+                loadAlbum();
+            } catch (e) { 
+                alert('Gagal memuat data.');
+            }
+        }
+
+        function renderSidebar(allowedMenus) {
+            const nav = document.getElementById('sidebarNav');
+            nav.innerHTML = `<div class="bg-gray-50 rounded-lg p-2"><h3 class="px-2 mb-2 text-xs font-bold text-gray-400">KEPEGAWAIAN</h3><a id="navRppGenerator" href="rpp_generator.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="brain-circuit" class="w-5 h-5"></i> RPP Generator (AI)</a><a id="navRppAlbum" href="rpp_album.html" class="flex items-center gap-3 px-3 py-2.5 text-utama bg-white rounded-md transition font-semibold text-sm shadow-sm"><i data-lucide="book-copy" class="w-5 h-5"></i> Album RPP</a></div>`;
+            allowedMenus.forEach(id => { const el = document.getElementById(id); if (el) el.classList.remove('hidden'); });
+            lucide.createIcons();
+        }
+
+        async function loadAlbum() {
+            const container = document.getElementById('albumContainer');
+            try {
+                const res = await fetch('sadigs_api_v3/get_rpp_album.php');
+                const result = await res.json();
+
+                if (result.success && result.data.length > 0) {
+                    container.innerHTML = '';
+                    result.data.forEach(item => {
+                        const card = document.createElement('div');
+                        card.className = 'bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition flex flex-col';
+                        card.innerHTML = `
+                            <div class="flex justify-between items-start mb-2">
+                                <span class="bg-teal-50 text-teal-700 text-xs font-bold px-2 py-1 rounded uppercase tracking-wide">${item.subject}</span>
+                                <span class="text-xs text-gray-400">${item.created_at_formatted}</span>
+                            </div>
+                            <h3 class="font-bold text-lg text-gray-800 mb-1 line-clamp-2">${item.topic}</h3>
+                            <p class="text-sm text-gray-500 mb-4">Kelas ${item.grade}</p>
+                            <div class="mt-auto pt-4 border-t border-gray-100 flex gap-2">
+                                <button onclick="alert('Fitur lihat detail akan segera hadir!')" class="flex-1 bg-gray-50 hover:bg-gray-100 text-gray-700 py-2 rounded-lg text-sm font-medium transition">Lihat</button>
+                                <button onclick="alert('Fitur hapus akan segera hadir!')" class="px-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            </div>
+                        `;
+                        container.appendChild(card);
+                        lucide.createIcons();
+                    });
+                } else {
+                    container.innerHTML = `<div class="col-span-full flex flex-col items-center justify-center py-12 text-gray-400"><i data-lucide="book-open" class="w-12 h-12 mb-3 opacity-20"></i><p>Belum ada Modul Ajar yang disimpan.</p></div>`;
+                    lucide.createIcons();
+                }
+            } catch (e) {
+                container.innerHTML = `<div class="col-span-full text-center py-12 text-red-400">Gagal memuat data album.</div>`;
+            }
+        }
+
+        initPage();
+    </script>
+</body>
+</html>
