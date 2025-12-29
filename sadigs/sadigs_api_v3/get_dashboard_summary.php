@@ -20,6 +20,14 @@ $summary = [];
 try {
     $pdo = getDBConnection();
 
+    // Summary untuk semua staf akademik (Kepsek, Musyrif, Guru, dll)
+    $academicRoles = ['Kepala Sekolah', 'Sekretaris Sekolah', 'Bendahara Sekolah', 'Musyrif', 'Musyrifah', 'Kepala Asrama Putra', 'Kepala Asrama Putri', 'Ustadz', 'Ustadzah'];
+    if (!empty(array_intersect($roles, $academicRoles))) {
+        // Hitung santri yang sedang pulang (izin disetujui dan dalam rentang waktu)
+        $stmt = $pdo->query("SELECT COUNT(id) FROM guardian_leave_requests WHERE status = 'approved' AND NOW() BETWEEN start_datetime AND end_datetime");
+        $summary['on_leave_count'] = $stmt->fetchColumn();
+    }
+
     // Summary untuk Yayasan / Bendahara / Kepala Sekolah
     $financeRoles = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan', 'Kepala Sekolah', 'Bendahara Sekolah'];
     if (!empty(array_intersect($roles, $financeRoles))) {

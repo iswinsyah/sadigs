@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Santri Pulang | SADIGS 3.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'utama': '#4FB7B3',
+                        'kedua': '#26667F',
+                        'tombol-utama': '#3674B5',
+                        'tombol-kedua': '#F93827',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-white text-gray-800 font-sans antialiased">
+
+    <div class="flex h-screen overflow-hidden">
+        <!-- SIDEBAR -->
+        <aside id="sidebar" class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col hidden lg:flex">
+            <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-kedua text-white">
+                <img src="https://raw.githubusercontent.com/villaqurankotabatu-commits/gambarvqbm/f44bf009884af11aba2c967a2401026225f7b02b/vila%20quran.png" alt="Logo Villa Quran" class="h-9">
+            </div>
+            <div class="p-6 border-b border-gray-100 bg-utama/10">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-utama/20 flex items-center justify-center text-kedua font-bold text-lg shadow-sm"><span id="userInitial">U</span></div>
+                    <div class="overflow-hidden">
+                        <p id="sidebarUsername" class="font-bold text-gray-800 text-sm truncate">Memuat...</p>
+                        <p id="sidebarRole" class="text-xs text-gray-500 truncate font-medium">Role...</p>
+                    </div>
+                </div>
+            </div>
+            <nav id="sidebarNav" class="flex-1 overflow-y-auto py-4 px-3 space-y-2">
+                <!-- Menu akan dimuat oleh JS -->
+            </nav>
+        </aside>
+
+        <!-- KONTEN UTAMA -->
+        <main class="flex-1 overflow-y-auto bg-white p-4 lg:p-8 w-full relative">
+            <header class="mb-8">
+                <h2 class="text-2xl lg:text-3xl font-bold text-gray-800">Santri yang Sedang Pulang</h2>
+                <p class="text-gray-500 text-sm mt-1">Daftar santri yang saat ini memiliki izin pulang aktif.</p>
+            </header>
+
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 text-sm">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Nama Santri</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Jenis Izin</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Jadwal Kembali</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Diajukan Oleh</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody" class="bg-white divide-y divide-gray-200">
+                            <tr><td colspan="4" class="px-6 py-10 text-center text-gray-500">Memuat data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        async function initPage() {
+            const sessionRes = await fetch('sadigs_api_v3/session_check.php');
+            const sessionData = await sessionRes.json();
+            if (!sessionData.success) { window.location.href = 'index.html'; return; }
+
+            document.getElementById('sidebarUsername').textContent = sessionData.username;
+            document.getElementById('userInitial').textContent = sessionData.username.charAt(0).toUpperCase();
+            
+            try {
+                const permRes = await fetch('sadigs_api_v3/get_menu_permissions.php');
+                const permData = await permRes.json();
+                const allowedMenus = permData.success ? permData.permissions : [];
+
+                const thisMenuId = 'navOnLeaveList';
+                if (!allowedMenus.includes(thisMenuId)) {
+                    alert('Anda tidak memiliki izin untuk mengakses halaman ini.');
+                    window.location.href = 'dashboard.html';
+                    return;
+                }
+                renderSidebar(allowedMenus);
+            } catch (e) { 
+                alert('Gagal memuat izin akses. Silakan coba lagi.');
+                window.location.href = 'dashboard.html';
+            }
+
+            loadData();
+        }
+
+        function renderSidebar(allowedMenus) {
+            const sidebarNav = document.getElementById('sidebarNav');
+            // Simple sidebar for this page
+            sidebarNav.innerHTML = `
+                <div class="bg-gray-50 rounded-lg p-2">
+                    <a id="navDashboard" href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard</a>
+                    <a id="navOnLeaveList" href="on_leave_list.html" class="flex items-center gap-3 px-3 py-2.5 text-utama bg-white rounded-md transition font-semibold text-sm shadow-sm"><i data-lucide="user-minus" class="w-5 h-5"></i> Santri Sedang Pulang</a>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        async function loadData() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-10 text-center text-gray-500">Memuat data...</td></tr>';
+            try {
+                const res = await fetch('sadigs_api_v3/get_on_leave_list.php');
+                const result = await res.json();
+                
+                if (result.success && result.data.length > 0) {
+                    tbody.innerHTML = '';
+                    result.data.forEach(row => {
+                        const tr = document.createElement('tr');
+                        tr.className = "hover:bg-gray-50";
+                        
+                        const endDate = new Date(row.end_datetime).toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'short' });
+
+                        tr.innerHTML = `
+                            <td class="px-4 py-3 align-top font-bold">${row.student_name}</td>
+                            <td class="px-4 py-3 align-top"><span class="px-2 py-1 bg-red-50 text-red-700 rounded-md font-medium text-xs">${row.leave_type}</span></td>
+                            <td class="px-4 py-3 align-top">${endDate}</td>
+                            <td class="px-4 py-3 align-top">${row.walisantri_name}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-10 text-center text-gray-500">Tidak ada santri yang sedang pulang saat ini.</td></tr>';
+                }
+            } catch (e) {
+                tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-10 text-center text-red-500">Gagal memuat data.</td></tr>';
+            }
+        }
+
+        initPage();
+    </script>
+</body>
+</html>

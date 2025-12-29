@@ -109,6 +109,7 @@
                     <a id="navIbadahHarian" href="daily_worship_form.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="notebook-pen" class="w-5 h-5"></i> Laporan Ibadah Harian</a>
                     <a id="navValidasiIbadah" href="daily_worship_validation.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="check-square" class="w-5 h-5"></i> Validasi Ibadah</a>
                     <a id="navGuardianLeaveValidation" href="guardian_leave_validation.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="mail-check" class="w-5 h-5"></i> Validasi Izin Walisantri</a>
+                    <a id="navOnLeaveList" href="on_leave_list.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="user-minus" class="w-5 h-5"></i> Santri Sedang Pulang</a>
                     <a id="navRekapIbadahAnak" href="select_student.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="clipboard-check" class="w-5 h-5"></i> Rekap Ibadah Anak</a>
                     <a id="navInputTahfizh" href="tahfizh_report_form.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="book-marked" class="w-5 h-5"></i> Input Tahfizh</a>
                     <a id="navViewTahfizh" href="tahfizh_student_view.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="book-open-check" class="w-5 h-5"></i> Laporan Tahfizh</a>
@@ -195,6 +196,10 @@
                             <p class="text-sm font-bold text-blue-500 uppercase">Validasi Pembayaran</p>
                             <p class="text-3xl font-extrabold text-blue-700 mt-2">0 <span class="text-base font-medium">menunggu</span></p>
                         </a>
+                        <a href="on_leave_list.html" id="onLeaveCardYayasan" class="bg-red-50 p-6 rounded-xl shadow-sm border border-red-200 hover:shadow-md transition block">
+                            <p class="text-sm font-bold text-red-500 uppercase">Santri Sedang Pulang</p>
+                            <p class="text-3xl font-extrabold text-red-700 mt-2">0 <span class="text-base font-medium">santri</span></p>
+                        </a>
                     </div>
                 </div>
 
@@ -209,6 +214,10 @@
                         <a href="guardian_leave_validation.html" id="pendingGuardianLeaveCard" class="bg-pink-50 p-6 rounded-xl shadow-sm border border-pink-200 hover:shadow-md transition block">
                             <p class="text-sm font-bold text-pink-500 uppercase">Validasi Izin Walisantri</p>
                             <p class="text-3xl font-extrabold text-pink-700 mt-2">0 <span class="text-base font-medium">izin</span></p>
+                        </a>
+                        <a href="on_leave_list.html" id="onLeaveCardMusyrif" class="bg-red-50 p-6 rounded-xl shadow-sm border border-red-200 hover:shadow-md transition block">
+                            <p class="text-sm font-bold text-red-500 uppercase">Santri Sedang Pulang</p>
+                            <p class="text-3xl font-extrabold text-red-700 mt-2">0 <span class="text-base font-medium">santri</span></p>
                         </a>
                     </div>
                 </div>
@@ -318,7 +327,7 @@
 
                     // --- LOGIKA TAMPILAN DASHBOARD BERDASARKAN PERAN ---
                     const yayasanRoles = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan', 'Kepala Sekolah', 'Bendahara Sekolah'];
-                    const musyrifRoles = ['Musyrif', 'Musyrifah', 'Kepala Asrama Putra', 'Kepala Asrama Putri'];
+                    const musyrifRoles = ['Musyrif', 'Musyrifah', 'Kepala Asrama Putra', 'Kepala Asrama Putri', 'Ustadz', 'Ustadzah'];
                     let isDashboardSet = false;
 
                     if (data.roles.some(r => yayasanRoles.includes(r))) {
@@ -360,6 +369,11 @@
                                 if (summary.pending_guardian_leaves !== undefined) {
                                     const card = document.getElementById('pendingGuardianLeaveCard');
                                     card.querySelector('p:last-child').innerHTML = `${summary.pending_guardian_leaves} <span class="text-base font-medium">izin</span>`;
+                                }
+                                // Update card santri pulang
+                                if (summary.on_leave_count !== undefined) {
+                                    document.getElementById('onLeaveCardYayasan').querySelector('p:last-child').innerHTML = `${summary.on_leave_count} <span class="text-base font-medium">santri</span>`;
+                                    document.getElementById('onLeaveCardMusyrif').querySelector('p:last-child').innerHTML = `${summary.on_leave_count} <span class="text-base font-medium">santri</span>`;
                                 }
                             }
                         });
