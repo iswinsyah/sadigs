@@ -27,6 +27,18 @@ $rpp_content = $input['rpp_content'];
 
 try {
     $pdo = getDBConnection();
+
+    // --- AUTO MIGRATION: Buat tabel jika belum ada ---
+    $pdo->exec("CREATE TABLE IF NOT EXISTS rpp_album (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        subject VARCHAR(255) NOT NULL,
+        grade VARCHAR(100),
+        topic VARCHAR(255) NOT NULL,
+        rpp_content TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    )");
     $stmt = $pdo->prepare(
         "INSERT INTO rpp_album (user_id, subject, grade, topic, rpp_content) VALUES (?, ?, ?, ?, ?)"
     );

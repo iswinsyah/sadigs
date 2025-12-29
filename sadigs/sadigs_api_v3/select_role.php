@@ -36,6 +36,18 @@ try {
     $pdo = getDBConnection();
     $pdo->beginTransaction();
 
+    // --- AUTO MIGRATION: Buat tabel jika belum ada ---
+    $pdo->exec("CREATE TABLE IF NOT EXISTS user_roles (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        role_name VARCHAR(50) NOT NULL,
+        status VARCHAR(20) DEFAULT 'pending',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        UNIQUE KEY unique_user_role (user_id, role_name)
+    )");
+    // ------------------------------------------------
+
     // Siapkan statement insert
     // Status default 'pending' agar menunggu validasi admin/yayasan
     $stmt = $pdo->prepare("INSERT INTO user_roles (user_id, role_name, status) VALUES (?, ?, 'pending') ON DUPLICATE KEY UPDATE status = status");
