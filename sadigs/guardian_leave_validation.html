@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validasi Izin Walisantri | SADIGS 3.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'utama': '#4FB7B3',
+                        'kedua': '#26667F',
+                        'tombol-utama': '#3674B5',
+                        'tombol-kedua': '#F93827',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+
+    <div class="flex h-screen overflow-hidden">
+        <!-- SIDEBAR -->
+        <aside id="sidebar" class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col hidden lg:flex">
+            <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-kedua text-white">
+                <img src="https://raw.githubusercontent.com/villaqurankotabatu-commits/gambarvqbm/f44bf009884af11aba2c967a2401026225f7b02b/vila%20quran.png" alt="Logo Villa Quran" class="h-9">
+            </div>
+            <div class="p-6 border-b border-gray-100 bg-utama/10">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-utama/20 flex items-center justify-center text-kedua font-bold text-lg shadow-sm"><span id="userInitial">U</span></div>
+                    <div class="overflow-hidden">
+                        <p id="sidebarUsername" class="font-bold text-gray-800 text-sm truncate">Memuat...</p>
+                        <p id="sidebarRole" class="text-xs text-gray-500 truncate font-medium">Role...</p>
+                    </div>
+                </div>
+            </div>
+            <nav id="sidebarNav" class="flex-1 overflow-y-auto py-4 px-3 space-y-2 no-scrollbar">
+                <!-- Menu akan dimuat oleh JS -->
+            </nav>
+        </aside>
+        <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden lg:hidden backdrop-blur-sm"></div>
+
+        <!-- KONTEN UTAMA -->
+        <main class="flex-1 overflow-y-auto bg-white p-4 lg:p-8 w-full relative">
+            <header class="mb-8">
+                <h2 class="text-2xl lg:text-3xl font-bold text-gray-800">Validasi Izin Walisantri</h2>
+                <p class="text-gray-500 text-sm mt-1">Setujui atau tolak permohonan izin yang masuk dari walisantri.</p>
+            </header>
+
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 text-sm">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Walisantri</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Nama Santri</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Jenis Izin</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Jadwal Izin</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Alasan</th>
+                                <th class="px-4 py-3 text-center font-bold text-gray-500 uppercase">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody" class="bg-white divide-y divide-gray-200">
+                            <tr><td colspan="6" class="px-6 py-10 text-center text-gray-500">Memuat data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        function renderSidebar(allowedMenus = []) {
+            const sidebarNav = document.getElementById('sidebarNav');
+            sidebarNav.innerHTML = `
+                <div class="bg-gray-50 rounded-lg p-2">
+                    <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">UMUM</h3>
+                    <a id="navDashboard" href="dashboard.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard</a>
+                    <a id="navProfil" href="profile.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="user" class="w-5 h-5"></i> Profil Saya</a>
+                </div>
+                <div id="groupYayasan" class="hidden bg-gray-50 rounded-lg p-2 mt-2">
+                    <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">MANAJEMEN YAYASAN</h3>
+                    <a id="navVerifikasi" href="verification_management.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="user-check" class="w-5 h-5"></i> Verifikasi Pengguna</a>
+                    <a id="navQuota" href="quota_management.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="users" class="w-5 h-5"></i> Atur Kuota Peran</a>
+                    <a id="navCalendarSettings" href="calendar_settings.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="calendar-cog" class="w-5 h-5"></i> Atur Kalender</a>
+                    <a id="navMenuManagement" href="menu_management.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="lock" class="w-5 h-5"></i> Manajemen Akses</a>
+                </div>
+                <div id="groupKepegawaian" class="hidden bg-gray-50 rounded-lg p-2 mt-2">
+                    <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KEPEGAWAIAN</h3>
+                    <a id="navAbsensi" href="attendance.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="map-pin" class="w-5 h-5"></i> Absensi Pegawai</a>
+                    <a id="navBiodataPegawai" href="employee_data.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="file-badge" class="w-5 h-5"></i> Biodata Pegawai</a>
+                    <a id="navBukuIndukPegawai" href="employee_master_book.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="book-open" class="w-5 h-5"></i> Buku Induk Pegawai</a>
+                    <a id="navIzinPegawai" href="leave_request.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="file-edit" class="w-5 h-5"></i> Formulir Izin</a>
+                    <a id="navValidasiIzin" href="leave_validation.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="check-square" class="w-5 h-5"></i> Validasi Izin</a>
+                    <a id="navDaftarIzin" href="leave_list.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="list-checks" class="w-5 h-5"></i> Daftar Izin</a>
+                    <a id="navRapat" href="meeting_invitation.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="mail" class="w-5 h-5"></i> Undang Rapat</a>
+                    <a id="navJadwalRapat" href="meeting_schedule.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="calendar-clock" class="w-5 h-5"></i> Jadwal Rapat</a>
+                </div>
+                <div id="groupKesantrian" class="hidden bg-gray-50 rounded-lg p-2 mt-2">
+                    <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KESANTRIAN</h3>
+                    <a id="navBiodataSantri" href="student_data.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="book-user" class="w-5 h-5"></i> Biodata Santri</a>
+                    <a id="navBukuIndukSantri" href="student_master_book.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="book" class="w-5 h-5"></i> Buku Induk Santri</a>
+                    <a id="navIbadahHarian" href="daily_worship_form.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="notebook-pen" class="w-5 h-5"></i> Laporan Ibadah Harian</a>
+                    <a id="navValidasiIbadah" href="daily_worship_validation.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="check-square" class="w-5 h-5"></i> Validasi Ibadah</a>
+                    <a id="navGuardianLeaveValidation" href="guardian_leave_validation.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-utama bg-white rounded-md transition font-semibold text-sm shadow-sm"><i data-lucide="mail-check" class="w-5 h-5"></i> Validasi Izin Walisantri</a>
+                    <a id="navRekapIbadahAnak" href="select_student.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="clipboard-check" class="w-5 h-5"></i> Rekap Ibadah Anak</a>
+                    <a id="navInputTahfizh" href="tahfizh_report_form.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="book-marked" class="w-5 h-5"></i> Input Tahfizh</a>
+                    <a id="navViewTahfizh" href="tahfizh_student_view.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="book-open-check" class="w-5 h-5"></i> Laporan Tahfizh</a>
+                    <a id="navMentoring" href="mentoring_groups.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="users-round" class="w-5 h-5"></i> Kelompok Mentoring</a>
+                    <a id="navIzinWalisantri" href="guardian_leave_request.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="mail-question" class="w-5 h-5"></i> Izin Walisantri</a>
+                </div>
+                <div id="groupKeuangan" class="hidden bg-gray-50 rounded-lg p-2 mt-2">
+                    <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KEUANGAN</h3>
+                    <a id="navFormulirPembayaran" href="payment_form.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="credit-card" class="w-5 h-5"></i> Formulir Pembayaran</a>
+                    <a id="navValidasiPembayaran" href="payment_validation.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="check-circle-2" class="w-5 h-5"></i> Validasi Pembayaran</a>
+                    <a id="navTabelPembayaran" href="payment_list.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="banknote" class="w-5 h-5"></i> Data Pembayaran</a>
+                    <a id="navRekapPembayaran" href="payment_recap.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="pie-chart" class="w-5 h-5"></i> Rekap Keuangan</a>
+                    <a id="navFormulirTransaksi" href="daily_transaction_form.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="pen-tool" class="w-5 h-5"></i> Form Transaksi Harian</a>
+                    <a id="navTabelTransaksi" href="daily_transaction_list.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="book" class="w-5 h-5"></i> Buku Transaksi Harian</a>
+                </div>
+            `;
+            
+            allowedMenus.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.remove('hidden');
+            });
+
+            const menuGroups = ['groupYayasan', 'groupKepegawaian', 'groupKesantrian', 'groupKeuangan'];
+            menuGroups.forEach(groupId => {
+                const group = document.getElementById(groupId);
+                if (group && group.querySelector('a:not(.hidden)')) {
+                    group.classList.remove('hidden');
+                }
+            });
+            lucide.createIcons();
+        }
+
+        async function initPage() {
+            const sessionRes = await fetch('sadigs_api_v3/session_check.php');
+            const sessionData = await sessionRes.json();
+            if (!sessionData.success) { window.location.href = 'index.html'; return; }
+
+            document.getElementById('sidebarUsername').textContent = sessionData.username;
+            document.getElementById('userInitial').textContent = sessionData.username.charAt(0).toUpperCase();
+            
+            try {
+                const permRes = await fetch('sadigs_api_v3/get_menu_permissions.php');
+                const permData = await permRes.json();
+                const allowedMenus = permData.success ? permData.permissions : [];
+
+                const thisMenuId = 'navGuardianLeaveValidation';
+                if (!allowedMenus.includes(thisMenuId)) {
+                    alert('Anda tidak memiliki izin untuk mengakses halaman ini.');
+                    window.location.href = 'dashboard.html';
+                    return;
+                }
+                renderSidebar(allowedMenus);
+            } catch (e) { 
+                alert('Gagal memuat izin akses. Silakan coba lagi.');
+                window.location.href = 'dashboard.html';
+            }
+
+            loadData();
+        }
+
+        async function loadData() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-10 text-center text-gray-500">Memuat data...</td></tr>';
+            try {
+                const res = await fetch('sadigs_api_v3/get_guardian_leave_requests.php');
+                const result = await res.json();
+                
+                if (result.success && result.data.length > 0) {
+                    tbody.innerHTML = '';
+                    result.data.forEach(row => {
+                        const tr = document.createElement('tr');
+                        tr.className = "hover:bg-gray-50";
+                        
+                        const startDate = new Date(row.start_datetime).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' });
+                        const endDate = new Date(row.end_datetime).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' });
+
+                        tr.innerHTML = `
+                            <td class="px-4 py-3 align-top"><div class="font-bold">${row.walisantri_name}</div></td>
+                            <td class="px-4 py-3 align-top">${row.student_name}</td>
+                            <td class="px-4 py-3 align-top"><span class="px-2 py-1 bg-blue-50 text-blue-700 rounded-md font-medium text-xs">${row.leave_type}</span></td>
+                            <td class="px-4 py-3 align-top">${startDate} - ${endDate}</td>
+                            <td class="px-4 py-3 align-top text-xs max-w-xs">${row.reason}</td>
+                            <td class="px-4 py-3 align-top text-center space-x-2">
+                                <button onclick="validate(${row.id}, 'approved')" class="bg-green-100 text-green-700 px-3 py-1 rounded-md font-semibold hover:bg-green-200 transition text-xs">Setujui</button>
+                                <button onclick="validate(${row.id}, 'rejected')" class="bg-red-100 text-red-700 px-3 py-1 rounded-md font-semibold hover:bg-red-200 transition text-xs">Tolak</button>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-10 text-center text-gray-500">Tidak ada permohonan izin yang perlu divalidasi.</td></tr>';
+                }
+            } catch (e) {
+                tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-10 text-center text-red-500">Gagal memuat data.</td></tr>';
+            }
+        }
+
+        window.validate = async function(requestId, action) {
+            if (!confirm(`Anda yakin ingin ${action === 'approved' ? 'menyetujui' : 'menolak'} izin ini?`)) return;
+            try {
+                const res = await fetch('sadigs_api_v3/validate_guardian_leave.php', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ request_id: requestId, action: action })
+                });
+                const result = await res.json();
+                alert(result.message);
+                if (result.success) loadData();
+            } catch (e) {
+                alert('Terjadi kesalahan koneksi.');
+            }
+        }
+
+        initPage();
+    </script>
+</body>
+</html>
