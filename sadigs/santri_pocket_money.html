@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uang Saku Saya | SADIGS 3.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+
+    <div class="flex h-screen overflow-hidden">
+        <!-- SIDEBAR -->
+        <aside id="sidebar" class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col hidden lg:flex">
+            <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-kedua text-white">
+                <img src="https://raw.githubusercontent.com/villaqurankotabatu-commits/gambarvqbm/f44bf009884af11aba2c967a2401026225f7b02b/vila%20quran.png" alt="Logo" class="h-9">
+            </div>
+            <div class="p-6">
+                <a href="dashboard.html" class="flex items-center gap-2 text-gray-600 hover:text-utama transition">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i> Kembali ke Dashboard
+                </a>
+            </div>
+            <nav id="sidebarNav" class="flex-1 overflow-y-auto py-4 px-3 space-y-2">
+                <!-- Menu akan dimuat oleh JS -->
+            </nav>
+        </aside>
+
+        <!-- KONTEN UTAMA -->
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative">
+            <header class="mb-8">
+                <h2 class="text-2xl lg:text-3xl font-bold text-gray-800 flex items-center gap-3">
+                    <i data-lucide="landmark" class="w-8 h-8 text-utama"></i>
+                    Uang Saku Saya
+                </h2>
+                <p class="text-gray-500 text-sm mt-1">Lihat saldo dan riwayat transaksi uang saku Anda.</p>
+            </header>
+
+            <!-- Saldo Card -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8 max-w-md">
+                <div class="flex justify-between items-center">
+                    <p class="text-sm font-bold text-gray-400 uppercase">Saldo Saat Ini</p>
+                    <button id="showWithdrawModalBtn" class="bg-utama/10 text-utama px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-utama/20 transition flex items-center gap-1.5">
+                        <i data-lucide="arrow-down-circle" class="w-4 h-4"></i> Tarik Uang
+                    </button>
+                </div>
+                <p id="balanceDisplay" class="text-4xl font-extrabold text-utama mt-2 animate-pulse">Rp ...</p>
+            </div>
+
+            <!-- Riwayat Transaksi -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <h3 class="text-lg font-bold text-gray-800 p-6 border-b">Riwayat Transaksi</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 text-sm">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Tanggal</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Jenis</th>
+                                <th class="px-4 py-3 text-right font-bold text-gray-500 uppercase">Jumlah</th>
+                                <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase">Catatan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody" class="bg-white divide-y divide-gray-200">
+                            <tr><td colspan="4" class="px-6 py-10 text-center text-gray-500">Memuat riwayat...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Penarikan -->
+    <div id="withdrawModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all">
+            <div class="p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-lg font-bold text-gray-800">Formulir Penarikan Uang Saku</h3>
+                    <button id="closeWithdrawModalBtn" class="text-gray-400 hover:text-gray-700 -mt-2 -mr-2 p-2 rounded-full">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+                <form id="withdrawForm" class="space-y-4">
+                    <div>
+                        <label for="withdrawAmount" class="block text-sm font-bold text-gray-700 mb-1">Jumlah Penarikan (Rp)</label>
+                        <input type="number" id="withdrawAmount" name="amount" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-lg font-bold focus:ring-2 focus:ring-utama outline-none" placeholder="Contoh: 50000" required>
+                        <p class="text-xs text-gray-500 mt-1">Saldo Anda saat ini: <strong id="modalBalance" class="text-utama">Rp 0</strong></p>
+                    </div>
+                    <div>
+                        <label for="withdrawNotes" class="block text-sm font-bold text-gray-700 mb-1">Keperluan</label>
+                        <textarea id="withdrawNotes" name="notes" rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-utama outline-none" placeholder="Contoh: Beli buku tulis" required></textarea>
+                    </div>
+                    <div class="pt-2">
+                        <button type="submit" id="submitWithdrawBtn" class="w-full bg-tombol-utama hover:bg-tombol-utama/90 text-white font-bold py-3 rounded-lg transition shadow-md flex justify-center items-center gap-2">
+                            <i data-lucide="send" class="w-5 h-5"></i> Ajukan Penarikan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        let currentBalance = 0;
+
+        function renderSidebar(allowedMenus) {
+            const nav = document.getElementById('sidebarNav');
+            nav.innerHTML = `
+                <div class="bg-gray-50 rounded-lg p-2">
+                    <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KESANTRIAN</h3>
+                    <a id="navSantriPocketMoney" href="santri_pocket_money.html" class="flex items-center gap-3 px-3 py-2.5 text-utama bg-white rounded-md transition font-semibold text-sm shadow-sm">
+                        <i data-lucide="landmark" class="w-5 h-5"></i> Uang Saku Saya
+                    </a>
+                </div>`;
+            lucide.createIcons();
+        }
+
+        async function initPage() {
+            const sessionRes = await fetch('sadigs_api_v3/session_check.php');
+            const sessionData = await sessionRes.json();
+            if (!sessionData.success) { window.location.href = 'index.html'; return; }
+
+            try {
+                const permRes = await fetch('sadigs_api_v3/get_menu_permissions.php');
+                const permData = await permRes.json();
+                const allowedMenus = permData.success ? permData.permissions : [];
+
+                if (!allowedMenus.includes('navSantriPocketMoney')) {
+                    alert('Anda tidak memiliki izin untuk mengakses halaman ini.');
+                    window.location.href = 'dashboard.html';
+                    return;
+                }
+                renderSidebar(allowedMenus);
+                loadData();
+            } catch (e) { 
+                alert('Gagal memuat data halaman.');
+            }
+        }
+
+        async function loadData() {
+            const tbody = document.getElementById('tableBody');
+            const balanceDisplay = document.getElementById('balanceDisplay');
+            const modalBalanceDisplay = document.getElementById('modalBalance');
+            
+            try {
+                const res = await fetch('sadigs_api_v3/get_santri_pocket_money.php');
+                const result = await res.json();
+                
+                if (result.success) {
+                    currentBalance = parseInt(result.balance) || 0;
+                    // Update Saldo
+                    balanceDisplay.textContent = 'Rp ' + currentBalance.toLocaleString('id-ID');
+                    modalBalanceDisplay.textContent = 'Rp ' + currentBalance.toLocaleString('id-ID');
+                    balanceDisplay.classList.remove('animate-pulse');
+
+                    // Update Tabel Riwayat
+                    if (result.transactions.length > 0) {
+                        tbody.innerHTML = '';
+                        result.transactions.forEach(row => {
+                            const isDeposit = row.transaction_type === 'deposit';
+                            const amountClass = isDeposit ? 'text-green-600' : 'text-red-600';
+                            const amountSign = isDeposit ? '+' : '-';
+                            const typeLabel = isDeposit ? 'Deposit' : 'Penarikan';
+                            const typeClass = isDeposit ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700';
+
+                            const tr = document.createElement('tr');
+                            tr.innerHTML = \`
+                                <td class="px-4 py-3 align-top">\${row.created_at_formatted}</td>
+                                <td class="px-4 py-3 align-top">
+                                    <span class="px-2 py-1 rounded-full text-xs font-bold \${typeClass}">\${typeLabel}</span>
+                                </td>
+                                <td class="px-4 py-3 align-top font-bold text-right \${amountClass}">\${amountSign} Rp \${parseInt(row.amount).toLocaleString('id-ID')}</td>
+                                <td class="px-4 py-3 align-top text-gray-500 text-xs">\${row.notes || '-'}</td>
+                            \`;
+                            tbody.appendChild(tr);
+                        });
+                    } else {
+                        tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-10 text-center text-gray-500">Belum ada riwayat transaksi.</td></tr>';
+                    }
+                } else {
+                     tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-10 text-center text-red-500">Gagal memuat data.</td></tr>';
+                     balanceDisplay.textContent = 'Gagal memuat';
+                }
+            } catch (e) {
+                tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-10 text-center text-red-500">Gagal memuat data.</td></tr>';
+                balanceDisplay.textContent = 'Gagal memuat';
+            }
+        }
+
+        // --- Modal Logic ---
+        const modal = document.getElementById('withdrawModal');
+        const showBtn = document.getElementById('showWithdrawModalBtn');
+        const closeBtn = document.getElementById('closeWithdrawModalBtn');
+        const withdrawForm = document.getElementById('withdrawForm');
+        const submitWithdrawBtn = document.getElementById('submitWithdrawBtn');
+
+        showBtn.addEventListener('click', () => modal.classList.remove('hidden'));
+        closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
+
+        withdrawForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const amount = parseInt(document.getElementById('withdrawAmount').value);
+
+            if (amount > currentBalance) {
+                alert('Saldo tidak mencukupi untuk melakukan penarikan sejumlah ini.');
+                return;
+            }
+
+            if (!confirm('Anda yakin ingin mengajukan penarikan?')) return;
+
+            const originalBtnHTML = submitWithdrawBtn.innerHTML;
+            submitWithdrawBtn.disabled = true;
+            submitWithdrawBtn.innerHTML = 'Mengirim...';
+
+            const data = {
+                amount: amount,
+                notes: document.getElementById('withdrawNotes').value
+            };
+
+            try {
+                const res = await fetch('sadigs_api_v3/request_withdrawal.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+                alert(result.message);
+                if (result.success) {
+                    modal.classList.add('hidden');
+                    withdrawForm.reset();
+                    loadData(); // Refresh data untuk menampilkan transaksi pending
+                }
+            } catch (error) {
+                alert('Terjadi kesalahan koneksi.');
+            } finally {
+                submitWithdrawBtn.disabled = false;
+                submitWithdrawBtn.innerHTML = originalBtnHTML;
+                lucide.createIcons();
+            }
+        });
+
+        initPage();
+    </script>
+</body>
+</html>

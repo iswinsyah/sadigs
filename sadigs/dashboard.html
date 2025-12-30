@@ -120,6 +120,9 @@
                     <a id="navViewTahfizh" href="tahfizh_student_view.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="book-open-check" class="w-5 h-5"></i> Laporan Tahfizh</a>
                     <a id="navMentoring" href="mentoring_groups.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="users-round" class="w-5 h-5"></i> Kelompok Mentoring</a>
                     <a id="navIzinWalisantri" href="guardian_leave_request.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="mail-question" class="w-5 h-5"></i> Izin Walisantri</a>
+                    <a id="navMusyrifPocketMoney" href="musyrif_pocket_money_view.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="archive" class="w-5 h-5"></i> Riwayat Deposit Santri</a>
+                    <a id="navSantriPocketMoney" href="santri_pocket_money.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="landmark" class="w-5 h-5"></i> Uang Saku Saya</a>
+                    <a id="navMusyrifWithdrawalValidation" href="musyrif_withdrawal_validation.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="check-square" class="w-5 h-5"></i> Validasi Penarikan</a>
                 </div>
 
                 <!-- Div 5: KEUANGAN -->
@@ -129,6 +132,8 @@
                     <a id="navValidasiPembayaran" href="payment_validation.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="check-circle-2" class="w-5 h-5"></i> Validasi Pembayaran</a>
                     <a id="navTabelPembayaran" href="payment_list.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="banknote" class="w-5 h-5"></i> Data Pembayaran</a>
                     <a id="navRekapPembayaran" href="payment_recap.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="pie-chart" class="w-5 h-5"></i> Rekap Keuangan</a>
+                    <a id="navPocketMoneyDeposit" href="pocket_money_deposit.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="wallet" class="w-5 h-5"></i> Deposit Uang Saku</a>
+                    <a id="navPocketMoneyValidation" href="pocket_money_validation.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="check-circle-2" class="w-5 h-5"></i> Validasi Uang Saku</a>
                     <a id="navFormulirTransaksi" href="daily_transaction_form.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="pen-tool" class="w-5 h-5"></i> Form Transaksi Harian</a>
                     <a id="navTabelTransaksi" href="daily_transaction_list.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="book" class="w-5 h-5"></i> Buku Transaksi Harian</a>
                 </div>
@@ -201,6 +206,10 @@
                             <p class="text-sm font-bold text-blue-500 uppercase">Validasi Pembayaran</p>
                             <p class="text-3xl font-extrabold text-blue-700 mt-2">0 <span class="text-base font-medium">menunggu</span></p>
                         </a>
+                        <a href="pocket_money_validation.html" id="pendingPocketMoneyCard" class="bg-green-50 p-6 rounded-xl shadow-sm border border-green-200 hover:shadow-md transition block">
+                            <p class="text-sm font-bold text-green-500 uppercase">Validasi Uang Saku</p>
+                            <p class="text-3xl font-extrabold text-green-700 mt-2">0 <span class="text-base font-medium">menunggu</span></p>
+                        </a>
                         <a href="on_leave_list.html" id="onLeaveCardYayasan" class="bg-red-50 p-6 rounded-xl shadow-sm border border-red-200 hover:shadow-md transition block">
                             <p class="text-sm font-bold text-red-500 uppercase">Santri Sedang Pulang</p>
                             <p class="text-3xl font-extrabold text-red-700 mt-2">0 <span class="text-base font-medium">santri</span></p>
@@ -223,6 +232,10 @@
                         <a href="guardian_leave_validation.html" id="pendingGuardianLeaveCard" class="bg-pink-50 p-6 rounded-xl shadow-sm border border-pink-200 hover:shadow-md transition block">
                             <p class="text-sm font-bold text-pink-500 uppercase">Validasi Izin Walisantri</p>
                             <p class="text-3xl font-extrabold text-pink-700 mt-2">0 <span class="text-base font-medium">izin</span></p>
+                        </a>
+                        <a href="musyrif_withdrawal_validation.html" id="pendingWithdrawalCard" class="bg-indigo-50 p-6 rounded-xl shadow-sm border border-indigo-200 hover:shadow-md transition block">
+                            <p class="text-sm font-bold text-indigo-500 uppercase">Validasi Penarikan</p>
+                            <p class="text-3xl font-extrabold text-indigo-700 mt-2">0 <span class="text-base font-medium">request</span></p>
                         </a>
                         <a href="on_leave_list.html" id="onLeaveCardMusyrif" class="bg-red-50 p-6 rounded-xl shadow-sm border border-red-200 hover:shadow-md transition block">
                             <p class="text-sm font-bold text-red-500 uppercase">Santri Sedang Pulang</p>
@@ -380,6 +393,11 @@
                                     const card = document.getElementById('pendingPaymentsCard');
                                     card.querySelector('p:last-child').innerHTML = `${summary.pending_payments_count} <span class="text-base font-medium">menunggu</span>`;
                                 }
+                                // Update card validasi uang saku
+                                if (summary.pending_pocket_money_count !== undefined) {
+                                    const card = document.getElementById('pendingPocketMoneyCard');
+                                    card.querySelector('p:last-child').innerHTML = `${summary.pending_pocket_money_count} <span class="text-base font-medium">menunggu</span>`;
+                                }
                                 // Update card validasi ibadah
                                 if (summary.pending_worship_validations !== undefined) {
                                     const card = document.getElementById('pendingWorshipCard');
@@ -389,6 +407,11 @@
                                 if (summary.pending_guardian_leaves !== undefined) {
                                     const card = document.getElementById('pendingGuardianLeaveCard');
                                     card.querySelector('p:last-child').innerHTML = `${summary.pending_guardian_leaves} <span class="text-base font-medium">izin</span>`;
+                                }
+                                // Update card validasi penarikan uang saku
+                                if (summary.pending_withdrawal_count !== undefined) {
+                                    const card = document.getElementById('pendingWithdrawalCard');
+                                    card.querySelector('p:last-child').innerHTML = `${summary.pending_withdrawal_count} <span class="text-base font-medium">request</span>`;
                                 }
                                 // Update card santri pulang
                                 if (summary.on_leave_count !== undefined) {

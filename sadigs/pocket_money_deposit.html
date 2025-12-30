@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deposit Uang Saku | SADIGS 3.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+
+    <div class="flex h-screen overflow-hidden">
+        <!-- SIDEBAR -->
+        <aside id="sidebar" class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col hidden lg:flex">
+            <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-kedua text-white">
+                <img src="https://raw.githubusercontent.com/villaqurankotabatu-commits/gambarvqbm/f44bf009884af11aba2c967a2401026225f7b02b/vila%20quran.png" alt="Logo" class="h-9">
+            </div>
+            <div class="p-6">
+                <a href="dashboard.html" class="flex items-center gap-2 text-gray-600 hover:text-utama transition">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i> Kembali ke Dashboard
+                </a>
+            </div>
+            <nav id="sidebarNav" class="flex-1 overflow-y-auto py-4 px-3 space-y-2">
+                <!-- Menu akan dimuat oleh JS -->
+            </nav>
+        </aside>
+
+        <!-- KONTEN UTAMA -->
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative">
+            <header class="mb-8">
+                <h2 class="text-2xl lg:text-3xl font-bold text-gray-800 flex items-center gap-3">
+                    <i data-lucide="wallet" class="w-8 h-8 text-utama"></i>
+                    Formulir Deposit Uang Saku
+                </h2>
+                <p class="text-gray-500 text-sm mt-1">Kirim titipan uang saku untuk putra/putri Anda.</p>
+            </header>
+
+            <div class="max-w-3xl bg-white p-8 rounded-xl shadow-sm border border-gray-100">
+                <form id="depositForm" class="space-y-6" enctype="multipart/form-data">
+                    
+                    <div>
+                        <label for="santri_id" class="block text-sm font-bold text-gray-700 mb-1">1. Titipan untuk Santri</label>
+                        <select id="santri_id" name="santri_id" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-utama outline-none bg-white" required>
+                            <option value="">-- Pilih Putra/Putri Anda --</option>
+                        </select>
+                    </div>
+
+                    <div id="musyrifInfo" class="hidden bg-blue-50 p-4 rounded-lg border border-blue-200 text-sm">
+                        Uang saku akan dititipkan kepada Musyrif/ah: <strong id="musyrifName" class="text-blue-800">Memuat...</strong>
+                    </div>
+
+                    <div>
+                        <label for="amount" class="block text-sm font-bold text-gray-700 mb-1">2. Jumlah Uang Saku (Rp)</label>
+                        <input type="number" id="amount" name="amount" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-utama outline-none" placeholder="Contoh: 100000" required>
+                    </div>
+
+                    <div>
+                        <label for="notes" class="block text-sm font-bold text-gray-700 mb-1">3. Catatan (Opsional)</label>
+                        <textarea id="notes" name="notes" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-utama outline-none" placeholder="Contoh: Untuk jajan pekan ini."></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">4. Bukti Transfer</label>
+                        <input type="file" name="proof_file" accept="image/*,application/pdf" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-utama/10 file:text-utama hover:file:bg-utama/20" required>
+                        <p class="text-xs text-gray-400 mt-1">Format: JPG, PNG, atau PDF. Maksimal 2MB.</p>
+                    </div>
+
+                    <div class="pt-4 border-t">
+                        <button type="submit" id="submitBtn" class="w-full bg-tombol-utama hover:bg-tombol-utama/90 text-white font-bold py-3 rounded-lg transition shadow-md flex justify-center items-center gap-2">
+                            <i data-lucide="send" class="w-5 h-5"></i> Kirim Deposit
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        function renderSidebar(allowedMenus) {
+            const nav = document.getElementById('sidebarNav');
+            nav.innerHTML = `<div class="bg-gray-50 rounded-lg p-2"><h3 class="px-2 mb-2 text-xs font-bold text-gray-400">UANG SAKU</h3><a id="navPocketMoneyDeposit" href="pocket_money_deposit.html" class="flex items-center gap-3 px-3 py-2.5 text-utama bg-white rounded-md transition font-semibold text-sm shadow-sm"><i data-lucide="wallet" class="w-5 h-5"></i> Deposit Uang Saku</a></div>`;
+            lucide.createIcons();
+        }
+
+        async function initPage() {
+            const sessionRes = await fetch('sadigs_api_v3/session_check.php');
+            const sessionData = await sessionRes.json();
+            if (!sessionData.success) { window.location.href = 'index.html'; return; }
+
+            try {
+                const permRes = await fetch('sadigs_api_v3/get_menu_permissions.php');
+                const permData = await permRes.json();
+                const allowedMenus = permData.success ? permData.permissions : [];
+
+                if (!allowedMenus.includes('navPocketMoneyDeposit')) {
+                    alert('Anda tidak memiliki izin untuk mengakses halaman ini.');
+                    window.location.href = 'dashboard.html';
+                    return;
+                }
+                renderSidebar(allowedMenus);
+                loadMyChildren();
+            } catch (e) { 
+                alert('Gagal memuat data halaman.');
+            }
+        }
+
+        async function loadMyChildren() {
+            const select = document.getElementById('santri_id');
+            try {
+                const res = await fetch('sadigs_api_v3/get_my_children.php');
+                const result = await res.json();
+                if (result.success && result.children.length > 0) {
+                    result.children.forEach(child => {
+                        const option = document.createElement('option');
+                        option.value = child.user_id;
+                        option.textContent = child.full_name || child.username;
+                        select.appendChild(option);
+                    });
+                } else {
+                    select.innerHTML = '<option value="">Tidak ada data santri terhubung</option>';
+                    select.disabled = true;
+                }
+            } catch (e) {
+                select.innerHTML = '<option value="">Gagal memuat data</option>';
+            }
+        }
+
+        document.getElementById('santri_id').addEventListener('change', async function() {
+            const santriId = this.value;
+            const musyrifInfoDiv = document.getElementById('musyrifInfo');
+            const musyrifNameEl = document.getElementById('musyrifName');
+
+            if (!santriId) {
+                musyrifInfoDiv.classList.add('hidden');
+                return;
+            }
+
+            musyrifInfoDiv.classList.remove('hidden');
+            musyrifNameEl.textContent = 'Mencari...';
+
+            try {
+                const res = await fetch(`sadigs_api_v3/get_student_mentor.php?student_id=${santriId}`);
+                const result = await res.json();
+                musyrifNameEl.textContent = result.success ? result.mentor_name : 'Tidak Ditemukan';
+            } catch (e) {
+                musyrifNameEl.textContent = 'Gagal memuat';
+            }
+        });
+
+        document.getElementById('depositForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = 'Mengirim...';
+
+            const formData = new FormData(e.target);
+
+            try {
+                const res = await fetch('sadigs_api_v3/submit_pocket_money.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await res.json();
+                alert(result.message);
+                if (result.success) {
+                    e.target.reset();
+                    document.getElementById('musyrifInfo').classList.add('hidden');
+                }
+            } catch (error) { 
+                alert('Terjadi kesalahan koneksi.'); 
+            } finally { 
+                btn.disabled = false; 
+                btn.innerHTML = originalText; 
+                lucide.createIcons();
+            }
+        });
+
+        initPage();
+    </script>
+</body>
+</html>
