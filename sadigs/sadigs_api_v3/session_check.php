@@ -30,6 +30,9 @@ if (isset($_SESSION['user_id'], $_SESSION['username'])) {
         }
     }
 
+    // SINKRONISASI: Perbarui variabel sesi dengan data peran terbaru dari database.
+    $_SESSION['roles'] = $approved_roles;
+
     // Sesi valid, kirimkan data ke dashboard.html
     sendJSONResponse(array(
         'success' => true,
