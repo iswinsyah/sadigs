@@ -1,46 +1,49 @@
 <?php
-// Matikan tampilan error PHP agar tidak merusak format JSON
-ini_set('display_errors', 0);
-error_reporting(E_ALL);
-
-// Mulai buffer output untuk menangkap error tak terduga
-ob_start();
-
+// API: Manage Menu Permissions (Get Matrix & Update)
 header('Content-Type: application/json');
+require_once 'db_connect.php';
 
-// Fungsi cadangan jika db_connect.php gagal dimuat
-if (!function_exists('sendJSONResponse')) {
-    function sendJSONResponse($data, $code = 200) {
-        http_response_code($code);
-        echo json_encode($data);
-        exit;
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+if (!isset($_SESSION['user_id'])) {
+    sendJSONResponse(['success' => false, 'message' => 'Unauthorized'], 401);
+    exit;
+}
+
+$pdo = getDBConnection();
+
+// 1. Pastikan tabel menu_permissions ada
+$pdo->exec("CREATE TABLE IF NOT EXISTS menu_permissions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    role_name VARCHAR(50) NOT NULL,
+    menu_id VARCHAR(100) NOT NULL,
+    is_allowed TINYINT(1) DEFAULT 0,
+    UNIQUE KEY unique_perm (role_name, menu_id)
+)");
+
+// 2. Seed Default Permission jika tabel kosong (Agar Ketua Yayasan tidak terkunci)
+$stmtCount = $pdo->query("SELECT COUNT(*) FROM menu_permissions");
+if ($stmtCount->fetchColumn() == 0) {
+    // Berikan akses vital ke Ketua Yayasan
+    $defaults = [
+        ['Ketua Yayasan', 'navMenuManagement'],
+        ['Ketua Yayasan', 'navDashboard'],
+        ['Ketua Yayasan', 'navVerifikasi'],
+        ['Ketua Yayasan', 'navQuota']
+    ];
+    $stmtInsert = $pdo->prepare("INSERT INTO menu_permissions (role_name, menu_id, is_allowed) VALUES (?, ?, 1)");
+    foreach ($defaults as $d) {
+        $stmtInsert->execute($d);
     }
 }
 
-try {
-    require_once 'db_connect.php';
+$method = $_SERVER['REQUEST_METHOD'];
 
-    if (session_status() === PHP_SESSION_NONE) session_start();
-    if (!isset($_SESSION['user_id'])) {
-        throw new Exception('Unauthorized', 401);
-    }
-
-    $pdo = getDBConnection();
-
-    // --- AUTO MIGRATION: Buat tabel jika belum ada ---
-    $pdo->exec("CREATE TABLE IF NOT EXISTS menu_permissions (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        role_name VARCHAR(50) NOT NULL,
-        menu_id VARCHAR(100) NOT NULL,
-        can_view TINYINT(1) DEFAULT 0,
-        UNIQUE KEY unique_permission (role_name, menu_id)
-    )");
-    // ------------------------------------------------
-
-    $method = $_SERVER['REQUEST_METHOD'];
-
-    if ($method === 'GET') {
-        // 1. Daftar Semua Peran (Hardcoded agar urutan sesuai hierarki)
+if ($method === 'GET') {
+    try {
+        // Daftar Peran (Sesuai dengan quota.php agar konsisten)
         $allRoles = [
             'Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan',
             'Kepala Sekolah', 'Sekretaris Sekolah', 'Bendahara Sekolah',
@@ -49,41 +52,35 @@ try {
             'Santri Rijal', 'Santri Nisa\'', 'Walisantri'
         ];
 
-        // 2. Ambil Matrix Izin dari Database
-        $stmt = $pdo->query("SELECT role_name, menu_id, can_view FROM menu_permissions");
-        $permissions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        // Ambil data permission yang ada
+        $stmt = $pdo->query("SELECT role_name, menu_id, is_allowed FROM menu_permissions");
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         $matrix = [];
-        foreach ($permissions as $p) {
-            $matrix[$p['menu_id']][$p['role_name']] = (int)$p['can_view'];
+        foreach ($rows as $row) {
+            if (!isset($matrix[$row['menu_id']])) {
+                $matrix[$row['menu_id']] = [];
+            }
+            $matrix[$row['menu_id']][$row['role_name']] = (int)$row['is_allowed'];
         }
 
-        // Bersihkan buffer sebelum kirim output
-        ob_clean();
         sendJSONResponse(['success' => true, 'roles' => $allRoles, 'matrix' => $matrix]);
-    }
-    elseif ($method === 'POST') {
-        $input = json_decode(file_get_contents('php://input'), true);
-        $updates = $input['updates'] ?? [];
 
-        $pdo->beginTransaction();
-        $stmt = $pdo->prepare("INSERT INTO menu_permissions (role_name, menu_id, can_view) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE can_view = VALUES(can_view)");
-        
-        foreach ($updates as $u) {
-            $stmt->execute([$u['role'], $u['menu'], $u['state']]);
+    } catch (Exception $e) {
+        sendJSONResponse(['success' => false, 'message' => $e->getMessage()], 500);
+    }
+} elseif ($method === 'POST') {
+    $input = json_decode(file_get_contents('php://input'), true);
+    $updates = $input['updates'] ?? [];
+
+    try {
+        $stmt = $pdo->prepare("INSERT INTO menu_permissions (role_name, menu_id, is_allowed) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE is_allowed = VALUES(is_allowed)");
+        foreach ($updates as $update) {
+            $stmt->execute([$update['role'], $update['menu'], $update['state']]);
         }
-        
-        $pdo->commit();
-        
-        ob_clean();
         sendJSONResponse(['success' => true]);
+    } catch (Exception $e) {
+        sendJSONResponse(['success' => false, 'message' => $e->getMessage()], 500);
     }
-
-} catch (Throwable $e) { // Ubah Exception menjadi Throwable untuk menangkap semua error
-    if (isset($pdo) && $pdo->inTransaction()) {
-        $pdo->rollBack();
-    }
-    ob_clean(); // Hapus output error PHP yang mungkin muncul
-    sendJSONResponse(['success' => false, 'message' => $e->getMessage()], 500);
 }
 ?>
