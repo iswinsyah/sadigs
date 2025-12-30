@@ -28,6 +28,13 @@ $pdo->exec("CREATE TABLE IF NOT EXISTS menu_permissions (
     UNIQUE KEY unique_perm (role_name, menu_id)
 )");
 
+// --- KUNCI PENGAMAN (FAILSAFE) ---
+// Pastikan Ketua Yayasan SELALU bisa mengakses halaman Manajemen Akses.
+$stmt_failsafe = $pdo->prepare("INSERT INTO menu_permissions (role_name, menu_id, is_allowed) VALUES ('Ketua Yayasan', 'navMenuManagement', 1) ON DUPLICATE KEY UPDATE is_allowed = 1");
+$stmt_failsafe->execute();
+// --- AKHIR KUNCI PENGAMAN ---
+
+
 // 2. Seed Default Permission jika tabel kosong (Agar Ketua Yayasan tidak terkunci)
 $stmtCount = $pdo->query("SELECT COUNT(*) FROM menu_permissions");
 if ($stmtCount->fetchColumn() == 0) {
