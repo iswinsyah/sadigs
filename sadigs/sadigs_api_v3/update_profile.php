@@ -41,25 +41,18 @@ try {
 
     // 2. Update Peran di tabel 'user_roles'
     if (isset($input['roles']) && is_array($input['roles'])) {
-        $new_roles = $input['roles'];
-        $protected_roles = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan'];
-
-        // Hapus semua peran LAMA yang TIDAK TERPROTEKSI
-        $placeholders = implode(',', array_fill(0, count($protected_roles), '?'));
-        $stmt_delete = $pdo->prepare("DELETE FROM user_roles WHERE user_id = ? AND role_name NOT IN ($placeholders)");
-        $stmt_delete->execute(array_merge([$user_id], $protected_roles));
-
-        // Tambahkan peran BARU (yang tidak terproteksi) dengan status 'approved'
-        $stmt_insert = $pdo->prepare("INSERT IGNORE INTO user_roles (user_id, role_name, status) VALUES (?, ?, 'approved')");
-        foreach ($new_roles as $role) {
-            if (!in_array($role, $protected_roles)) {
-                $stmt_insert->execute([$user_id, $role]);
-            }
+        $requested_roles = $input['roles'];
+        
+        // Gunakan logika yang sama dengan select_role.php untuk keamanan.
+        // Hanya menambahkan peran baru sebagai 'pending' dan tidak mengubah yang sudah ada.
+        $stmt_roles = $pdo->prepare("INSERT INTO user_roles (user_id, role_name, status) VALUES (?, ?, 'pending') ON DUPLICATE KEY UPDATE status = status");
+        foreach ($requested_roles as $role) {
+            $stmt_roles->execute([$user_id, $role]);
         }
     }
 
     $pdo->commit();
-    sendJSONResponse(['success' => true, 'message' => 'Profil dan peran berhasil diperbarui. Halaman akan dimuat ulang.']);
+    sendJSONResponse(['success' => true, 'message' => 'Profil berhasil diperbarui. Pengajuan peran baru (jika ada) telah dikirim untuk validasi. Halaman akan dimuat ulang.']);
 
 } catch (Exception $e) {
     if ($pdo->inTransaction()) $pdo->rollBack();
