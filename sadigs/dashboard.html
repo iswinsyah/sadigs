@@ -359,15 +359,15 @@
                     }
 
                     // --- LOGIKA TAMPILAN DASHBOARD BERDASARKAN PERAN ---
-                    const yayasanRoles = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan', 'Kepala Sekolah', 'Bendahara Sekolah'];
+                    const yayasanRoles = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan', 'Kepala Sekolah', 'Bendahara Sekolah', 'Sekretaris Sekolah'];
                     const musyrifRoles = ['Musyrif', 'Musyrifah', 'Kepala Asrama Putra', 'Kepala Asrama Putri', 'Ustadz', 'Ustadzah'];
                     let isDashboardSet = false;
 
-                    if (activeRoles.some(r => yayasanRoles.includes(r))) {
+                    if (activeRoles.some(r => yayasanRoles.includes(typeof r === 'string' ? r : r.role_name))) {
                         const el = document.getElementById('yayasanDashboard');
                         if (el) { el.classList.remove('hidden'); isDashboardSet = true; }
                     }
-                    if (activeRoles.some(r => musyrifRoles.includes(r))) {
+                    if (activeRoles.some(r => musyrifRoles.includes(typeof r === 'string' ? r : r.role_name))) {
                         const el = document.getElementById('musyrifDashboard');
                         if (el) { el.classList.remove('hidden'); isDashboardSet = true; }
                     }
