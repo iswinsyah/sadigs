@@ -157,32 +157,12 @@
                 const data = await res.json();
 
                 if (data.success) {
-                    const roleOrder = [
-                        'Ketua Yayasan',
-                        'Sekretaris Yayasan',
-                        'Bendahara Yayasan',
-                        'Kepala Sekolah',
-                        'Sekretaris Sekolah',
-                        'Bendahara Sekolah',
-                        'Kepala Ma\'had',
-                        'Kepala Asrama Putra',
-                        'Kepala Asrama Putri',
-                        'Musyrif',
-                        'Musyrifah',
-                        'Ustadz',
-                        'Ustadzah',
-                        'Santri Rijal',
-                        'Santri Nisa\'',
-                        'Walisantri'
-                    ];
-                    
-                    roleList = data.roles
-                        .filter(role => roleOrder.includes(role))
-                        .sort((a, b) => roleOrder.indexOf(a) - roleOrder.indexOf(b));
-
+                    // The lists are now coming from the backend
+                    roleList = data.roles;
                     currentMatrix = data.matrix;
+                    const categories = data.categories;
 
-                    renderTable();
+                    renderTable(categories);
                 } else {
                     alert('Gagal memuat data: ' + data.message);
                     document.getElementById('tableBody').innerHTML = `<tr><td class="p-8 text-center text-red-500">Gagal memuat data: ${data.message}</td></tr>`;
@@ -194,7 +174,7 @@
             }
         }
 
-        function renderTable() {
+        function renderTable(categories) {
             const thead = document.getElementById('tableHeader');
             const tbody = document.getElementById('tableBody');
 
@@ -209,31 +189,6 @@
 
             // 2. Render Body (Menus) with grouping
             tbody.innerHTML = '';
-
-            const categories = {
-                Form: {
-                    label: 'Formulir',
-                    menus: ['navAbsensi', 'navBiodataPegawai', 'navBiodataSantri', 'navCalendarSettings', 'navIbadahHarian', 'navInputTahfizh', 'navProfil', 'navQuota', 'navRapat', 'navIzinPegawai', 'navFormulirPembayaran', 'navFormulirTransaksi', 'navIzinWalisantri', 'navRppGenerator', 'navPocketMoneyDeposit'],
-                    icon: 'file-pen-line'
-                },
-                Val: {
-                    label: 'Validasi',
-                    menus: ['navValidasiIbadah', 'navVerifikasi', 'navValidasiPembayaran', 'navValidasiIzin', 'navGuardianLeaveValidation', 'navPocketMoneyValidation', 'navMusyrifWithdrawalValidation'],
-                    icon: 'check-square'
-                },
-                Tab: {
-                    label: 'Tabel Data',
-                    menus: ['navDashboard', 'navKalender', 'navJadwalRapat', 'navDaftarIzin', 'navBukuIndukPegawai', 'navBukuIndukSantri', 'navMentoring', 'navTabelPembayaran', 'navTabelTransaksi', 'navRekapIbadahAnak', 'navViewTahfizh', 'navOnLeaveList', 'navRppAlbum', 'navMusyrifPocketMoney', 'navSantriPocketMoney'],
-                    icon: 'table'
-                },
-                Grf: {
-                    label: 'Grafik',
-                    menus: ['navRekapPembayaran'],
-                    icon: 'bar-chart-2'
-                }
-            };
-
-            const allCategorizedMenus = Object.values(categories).flatMap(c => c.menus);
 
             const renderMenuRow = (menuId) => {
                 // Skip navMenuManagement from being rendered
@@ -265,7 +220,7 @@
                 tbody.appendChild(tr);
             };
 
-            ['Form', 'Val', 'Tab', 'Grf'].forEach(catKey => {
+            Object.keys(categories).forEach(catKey => {
                 const category = categories[catKey];
                 const categoryMenus = category.menus.sort((a, b) => a.localeCompare(b));
 

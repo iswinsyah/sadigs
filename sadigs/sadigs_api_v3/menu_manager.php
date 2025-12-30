@@ -52,6 +52,30 @@ if ($method === 'GET') {
             'Santri Rijal', 'Santri Nisa\'', 'Walisantri'
         ];
 
+        // Daftar Menu (Single Source of Truth)
+        $categories = [
+            'Form' => [
+                'label' => 'Formulir',
+                'menus' => ['navAbsensi', 'navBiodataPegawai', 'navBiodataSantri', 'navCalendarSettings', 'navIbadahHarian', 'navInputTahfizh', 'navProfil', 'navQuota', 'navRapat', 'navIzinPegawai', 'navFormulirPembayaran', 'navFormulirTransaksi', 'navIzinWalisantri', 'navRppGenerator', 'navPocketMoneyDeposit'],
+                'icon' => 'file-pen-line'
+            ],
+            'Val' => [
+                'label' => 'Validasi',
+                'menus' => ['navValidasiIbadah', 'navVerifikasi', 'navValidasiPembayaran', 'navValidasiIzin', 'navGuardianLeaveValidation', 'navPocketMoneyValidation', 'navMusyrifWithdrawalValidation'],
+                'icon' => 'check-square'
+            ],
+            'Tab' => [
+                'label' => 'Tabel Data',
+                'menus' => ['navDashboard', 'navKalender', 'navJadwalRapat', 'navDaftarIzin', 'navBukuIndukPegawai', 'navBukuIndukSantri', 'navMentoring', 'navTabelPembayaran', 'navTabelTransaksi', 'navRekapIbadahAnak', 'navViewTahfizh', 'navOnLeaveList', 'navRppAlbum', 'navMusyrifPocketMoney', 'navSantriPocketMoney'],
+                'icon' => 'table'
+            ],
+            'Grf' => [
+                'label' => 'Grafik',
+                'menus' => ['navRekapPembayaran'],
+                'icon' => 'bar-chart-2'
+            ]
+        ];
+
         // Ambil data permission yang ada
         $stmt = $pdo->query("SELECT role_name, menu_id, is_allowed FROM menu_permissions");
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -64,7 +88,7 @@ if ($method === 'GET') {
             $matrix[$row['menu_id']][$row['role_name']] = (int)$row['is_allowed'];
         }
 
-        sendJSONResponse(['success' => true, 'roles' => $allRoles, 'matrix' => $matrix]);
+        sendJSONResponse(['success' => true, 'roles' => $allRoles, 'categories' => $categories, 'matrix' => $matrix]);
 
     } catch (Exception $e) {
         sendJSONResponse(['success' => false, 'message' => $e->getMessage()], 500);
