@@ -158,9 +158,9 @@
 
                 if (data.success) {
                     // The lists are now coming from the backend
-                    roleList = data.roles;
-                    currentMatrix = data.matrix;
-                    const categories = data.categories;
+                    roleList = data.roles || [];
+                    currentMatrix = data.matrix || {};
+                    const categories = data.categories || {};
 
                     renderTable(categories);
                 } else {
@@ -170,7 +170,7 @@
             } catch (e) {
                 console.error(e);
                 // alert('Terjadi kesalahan koneksi.'); // Optional: disable alert to not spam user
-                document.getElementById('tableBody').innerHTML = `<tr><td class="p-8 text-center text-red-500">Terjadi kesalahan koneksi atau server error.<br>Silakan coba refresh halaman.</td></tr>`;
+                document.getElementById('tableBody').innerHTML = `<tr><td class="p-8 text-center text-red-500">Error: ${e.message}<br>Silakan coba refresh halaman.</td></tr>`;
             }
         }
 

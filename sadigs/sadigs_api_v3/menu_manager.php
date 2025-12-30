@@ -1,5 +1,9 @@
 <?php
 // API: Manage Menu Permissions (Get Matrix & Update)
+// Matikan error display agar tidak merusak JSON
+ini_set('display_errors', 0);
+error_reporting(0);
+ob_start(); // Mulai buffer output
 header('Content-Type: application/json');
 require_once 'db_connect.php';
 
@@ -12,6 +16,7 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
+try {
 $pdo = getDBConnection();
 
 // 1. Pastikan tabel menu_permissions ada
@@ -42,7 +47,6 @@ if ($stmtCount->fetchColumn() == 0) {
 $method = $_SERVER['REQUEST_METHOD'];
 
 if ($method === 'GET') {
-    try {
         // Daftar Peran (Sesuai dengan quota.php agar konsisten)
         $allRoles = [
             'Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan',
@@ -88,23 +92,23 @@ if ($method === 'GET') {
             $matrix[$row['menu_id']][$row['role_name']] = (int)$row['is_allowed'];
         }
 
+        ob_clean(); // Bersihkan buffer sebelum kirim JSON
         sendJSONResponse(['success' => true, 'roles' => $allRoles, 'categories' => $categories, 'matrix' => $matrix]);
 
-    } catch (Exception $e) {
-        sendJSONResponse(['success' => false, 'message' => $e->getMessage()], 500);
-    }
 } elseif ($method === 'POST') {
     $input = json_decode(file_get_contents('php://input'), true);
     $updates = $input['updates'] ?? [];
 
-    try {
         $stmt = $pdo->prepare("INSERT INTO menu_permissions (role_name, menu_id, is_allowed) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE is_allowed = VALUES(is_allowed)");
         foreach ($updates as $update) {
             $stmt->execute([$update['role'], $update['menu'], $update['state']]);
         }
+        ob_clean();
         sendJSONResponse(['success' => true]);
-    } catch (Exception $e) {
-        sendJSONResponse(['success' => false, 'message' => $e->getMessage()], 500);
-    }
+}
+
+} catch (Exception $e) {
+    ob_clean();
+    sendJSONResponse(['success' => false, 'message' => 'Server Error: ' . $e->getMessage()], 500);
 }
 ?>
