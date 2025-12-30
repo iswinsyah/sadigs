@@ -1,54 +1,66 @@
 <?php
-// Matikan tampilan error PHP agar tidak merusak format JSON
-ini_set('display_errors', 0);
-error_reporting(E_ALL);
-
-// Mulai buffer output untuk menangkap error tak terduga
-ob_start();
-
+// API: Get Role Quotas
 header('Content-Type: application/json');
+require_once 'db_connect.php';
 
-// Fungsi cadangan jika db_connect.php gagal dimuat
-if (!function_exists('sendJSONResponse')) {
-    function sendJSONResponse($data, $code = 200) {
-        http_response_code($code);
-        echo json_encode($data);
-        exit;
-    }
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Izinkan akses publik (untuk halaman login/signup jika perlu) atau batasi ke user login
+// Untuk dashboard, user harus login.
+if (!isset($_SESSION['user_id'])) {
+    // Boleh return unauthorized, atau return data kosong jika dipanggil public
+    // sendJSONResponse(['success' => false, 'message' => 'Unauthorized'], 401);
+    // exit;
 }
 
 try {
-    require_once 'db_connect.php';
-
-    if (session_status() === PHP_SESSION_NONE) session_start();
-
     $pdo = getDBConnection();
-    
-    // Cek apakah tabel role_quotas ada, jika tidak buat dummy/default
-    // Untuk saat ini kita kembalikan kuota default yang longgar agar fitur jalan
-    $defaultQuotas = [
-        'Musyrif' => ['max_limit' => 20, 'current_count' => 0, 'is_full' => false],
-        'Musyrifah' => ['max_limit' => 20, 'current_count' => 0, 'is_full' => false],
-        'Ustadz' => ['max_limit' => 50, 'current_count' => 0, 'is_full' => false],
-        'Ustadzah' => ['max_limit' => 50, 'current_count' => 0, 'is_full' => false],
-        'Kepala Asrama Putra' => ['max_limit' => 1, 'current_count' => 0, 'is_full' => false],
-        'Kepala Asrama Putri' => ['max_limit' => 1, 'current_count' => 0, 'is_full' => false],
-        'Kepala Sekolah' => ['max_limit' => 1, 'current_count' => 0, 'is_full' => false],
-        'Bendahara Sekolah' => ['max_limit' => 2, 'current_count' => 0, 'is_full' => false],
-        'Sekretaris Sekolah' => ['max_limit' => 2, 'current_count' => 0, 'is_full' => false],
-        'Ketua Yayasan' => ['max_limit' => 1, 'current_count' => 0, 'is_full' => false],
-        'Sekretaris Yayasan' => ['max_limit' => 1, 'current_count' => 0, 'is_full' => false],
-        'Bendahara Yayasan' => ['max_limit' => 1, 'current_count' => 0, 'is_full' => false],
+
+    // 1. Pastikan tabel quota_settings ada (Auto Migration) - Gunakan nama tabel yang konsisten
+    $pdo->exec("CREATE TABLE IF NOT EXISTS quota_settings (
+        role_name VARCHAR(50) PRIMARY KEY,
+        max_limit INT NOT NULL DEFAULT 0
+    )");
+
+    // 2. Ambil Batas Kuota
+    $stmt = $pdo->query("SELECT role_name, max_limit FROM quota_settings");
+    $limits = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+
+    // 3. Hitung Pengguna Saat Ini per Peran (Hanya yang statusnya approved)
+    // Asumsi tabel user_roles ada. Jika belum ada, query ini akan gagal, tapi kita tangkap errornya.
+    $counts = [];
+    try {
+        $stmt = $pdo->query("SELECT role_name, COUNT(*) as cnt FROM user_roles WHERE status = 'approved' GROUP BY role_name");
+        $counts = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+    } catch (Exception $e) {
+        // Tabel user_roles mungkin belum ada atau kosong
+    }
+
+    // 4. Daftar Peran yang Dikelola
+    $allRoles = [
+        'Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan',
+        'Kepala Sekolah', 'Sekretaris Sekolah', 'Bendahara Sekolah',
+        'Kepala Ma\'had', 'Kepala Asrama Putra', 'Kepala Asrama Putri',
+        'Musyrif', 'Musyrifah', 'Ustadz', 'Ustadzah'
     ];
 
-    // Di sini Anda bisa menambahkan logika query ke database 'role_quotas' jika sudah ada tabelnya.
-    // Contoh: SELECT * FROM role_quotas ...
+    $quotas = [];
+    foreach ($allRoles as $role) {
+        $max = isset($limits[$role]) ? (int)$limits[$role] : 0;
+        $current = isset($counts[$role]) ? (int)$counts[$role] : 0;
+        
+        $quotas[$role] = [
+            'max_limit' => $max,
+            'current_count' => $current,
+            'is_full' => ($max > 0 && $current >= $max)
+        ];
+    }
 
-    ob_clean();
-    sendJSONResponse(['success' => true, 'quotas' => $defaultQuotas]);
+    sendJSONResponse(['success' => true, 'quotas' => $quotas]);
 
-} catch (Throwable $e) {
-    ob_clean();
-    sendJSONResponse(['success' => false, 'message' => 'Server Error: ' . $e->getMessage()], 500);
+} catch (Exception $e) {
+    sendJSONResponse(['success' => false, 'message' => 'Database error: ' . $e->getMessage()], 500);
 }
 ?>
