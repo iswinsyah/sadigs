@@ -38,26 +38,36 @@ try {
         // Hitung pembayaran yang menunggu validasi
         $stmt = $pdo->query("SELECT COUNT(id) FROM payments WHERE status = 'pending'");
         $summary['pending_payments_count'] = $stmt->fetchColumn();
+
+        // Hitung deposit uang saku yang menunggu validasi
+        $stmt = $pdo->query("SELECT COUNT(id) FROM pocket_money_transactions WHERE status = 'pending' AND transaction_type = 'deposit'");
+        $summary['pending_pocket_money_count'] = $stmt->fetchColumn();
     }
 
     // Summary untuk Musyrif
     $musyrifRoles = ['Musyrif', 'Musyrifah', 'Kepala Asrama Putra', 'Kepala Asrama Putri'];
      if (!empty(array_intersect($roles, $musyrifRoles))) {
         // Hitung laporan ibadah yang perlu divalidasi
+        // FIX: Query diperbaiki untuk menggunakan musyrif_id dan join yang benar
         $stmt = $pdo->prepare("
             SELECT COUNT(r.id) 
             FROM daily_worship_reports r
-            JOIN users u ON r.user_id = u.id
-            JOIN mentoring_groups mg ON u.id = mg.student_id
-            WHERE mg.musyrif_username = ? AND r.validation_status = 'pending'
+            JOIN mentoring_groups mg ON r.user_id = mg.student_id
+            WHERE mg.musyrif_id = ? AND r.validation_status = 'pending'
         ");
-        $stmt->execute([$username]);
+        $stmt->execute([$user_id]);
         $summary['pending_worship_validations'] = $stmt->fetchColumn();
 
         // Hitung izin walisantri yang perlu divalidasi
+        // NOTE: Query ini mengasumsikan tabel 'guardian_leave_requests' memiliki kolom 'musyrif_username'
         $stmt = $pdo->prepare("SELECT COUNT(id) FROM guardian_leave_requests WHERE musyrif_username = ? AND status = 'pending'");
         $stmt->execute([$username]);
         $summary['pending_guardian_leaves'] = $stmt->fetchColumn();
+
+        // Hitung penarikan uang saku yang perlu divalidasi
+        $stmt = $pdo->prepare("SELECT COUNT(id) FROM pocket_money_transactions WHERE musyrif_id = ? AND status = 'pending' AND transaction_type = 'withdrawal'");
+        $stmt->execute([$user_id]);
+        $summary['pending_withdrawal_count'] = $stmt->fetchColumn();
     }
 
     sendJSONResponse(['success' => true, 'summary' => $summary]);
