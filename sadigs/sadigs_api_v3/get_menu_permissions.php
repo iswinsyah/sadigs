@@ -38,7 +38,12 @@ $permissions = $stmt->fetchAll(PDO::FETCH_COLUMN);
 // Memastikan Ketua Yayasan SELALU punya akses ke Manajemen Menu & Dashboard
 // meskipun database kosong atau error.
 if (in_array('Ketua Yayasan', $roles)) {
-    $wajibAda = ['navDashboard', 'navMenuManagement', 'navVerifikasi', 'navQuota'];
+    $wajibAda = [
+        'navDashboard', 'navProfil', 'navKalender', 'navVerifikasi', 'navQuota', 'navCalendarSettings', 'navMenuManagement',
+        'navAbsensi', 'navBiodataPegawai', 'navBukuIndukPegawai', 'navIzinPegawai', 'navValidasiIzin', 'navDaftarIzin', 'navRapat', 'navJadwalRapat', 'navRppGenerator', 'navRppAlbum',
+        'navBiodataSantri', 'navBukuIndukSantri', 'navIbadahHarian', 'navValidasiIbadah', 'navGuardianLeaveValidation', 'navOnLeaveList', 'navRekapIbadahAnak', 'navInputTahfizh', 'navViewTahfizh', 'navMentoring', 'navIzinWalisantri', 'navMusyrifPocketMoney', 'navSantriPocketMoney', 'navMusyrifWithdrawalValidation',
+        'navFormulirPembayaran', 'navValidasiPembayaran', 'navTabelPembayaran', 'navRekapPembayaran', 'navPocketMoneyDeposit', 'navPocketMoneyValidation', 'navFormulirTransaksi', 'navTabelTransaksi'
+    ];
     foreach ($wajibAda as $m) {
         if (!in_array($m, $permissions)) $permissions[] = $m;
     }
