@@ -7,6 +7,31 @@ ob_start();
 // Menggunakan satu sumber koneksi dan fungsi utility
 require_once 'db_connect.php';
 
+// --- DARURAT: RESET IZIN VIA SESSION CHECK ---
+if (isset($_GET['reset_permissions']) && $_GET['reset_permissions'] == '1') {
+    try {
+        $pdo = getDBConnection();
+        $pdo->exec("TRUNCATE TABLE menu_permissions");
+        $defaults = [
+            'Ketua Yayasan' => ['navDashboard', 'navProfil', 'navKalender', 'navVerifikasi', 'navQuota', 'navCalendarSettings', 'navMenuManagement', 'navBiodataPegawai', 'navBukuIndukPegawai', 'navValidasiIzin', 'navDaftarIzin', 'navRapat', 'navJadwalRapat', 'navBukuIndukSantri', 'navMentoring', 'navValidasiPembayaran', 'navTabelPembayaran', 'navRekapPembayaran', 'navPocketMoneyValidation', 'navTabelTransaksi'],
+            'Bendahara Yayasan' => ['navDashboard', 'navProfil', 'navKalender', 'navValidasiPembayaran', 'navTabelPembayaran', 'navRekapPembayaran', 'navPocketMoneyValidation', 'navTabelTransaksi'],
+            'Musyrif' => ['navDashboard', 'navProfil', 'navKalender', 'navAbsensi', 'navIzinPegawai', 'navJadwalRapat', 'navValidasiIbadah', 'navGuardianLeaveValidation', 'navOnLeaveList', 'navInputTahfizh', 'navMentoring', 'navMusyrifPocketMoney', 'navMusyrifWithdrawalValidation'],
+            'Musyrifah' => ['navDashboard', 'navProfil', 'navKalender', 'navAbsensi', 'navIzinPegawai', 'navJadwalRapat', 'navValidasiIbadah', 'navGuardianLeaveValidation', 'navOnLeaveList', 'navInputTahfizh', 'navMentoring', 'navMusyrifPocketMoney', 'navMusyrifWithdrawalValidation'],
+            'Walisantri' => ['navDashboard', 'navProfil', 'navKalender', 'navRekapIbadahAnak', 'navViewTahfizh', 'navIzinWalisantri', 'navPocketMoneyDeposit'],
+            'Santri Rijal' => ['navDashboard', 'navProfil', 'navKalender', 'navBiodataSantri', 'navIbadahHarian', 'navViewTahfizh', 'navSantriPocketMoney'],
+            'Santri Nisa\'' => ['navDashboard', 'navProfil', 'navKalender', 'navBiodataSantri', 'navIbadahHarian', 'navViewTahfizh', 'navSantriPocketMoney'],
+        ];
+        $stmt = $pdo->prepare("INSERT INTO menu_permissions (role_name, menu_id, is_allowed) VALUES (?, ?, 1)");
+        foreach ($defaults as $role => $menus) { foreach ($menus as $menu) { $stmt->execute([$role, $menu]); } }
+        ob_end_clean(); header('Content-Type: text/html');
+        echo "<h1 style='color:green; text-align:center; margin-top:50px;'>✅ RESET BERHASIL!</h1><p style='text-align:center;'>Silakan <a href='../dashboard.html'>kembali ke Dashboard</a>.</p>";
+        exit;
+    } catch (Exception $e) {
+        echo "Error: " . $e->getMessage(); exit;
+    }
+}
+// ---------------------------------------------
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }

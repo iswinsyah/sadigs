@@ -34,5 +34,16 @@ $stmt = $pdo->prepare($sql);
 $stmt->execute($roles);
 $permissions = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
+// --- BYPASS DARURAT: PAKSA AKSES KETUA YAYASAN ---
+// Memastikan Ketua Yayasan SELALU punya akses ke Manajemen Menu & Dashboard
+// meskipun database kosong atau error.
+if (in_array('Ketua Yayasan', $roles)) {
+    $wajibAda = ['navDashboard', 'navMenuManagement', 'navVerifikasi', 'navQuota'];
+    foreach ($wajibAda as $m) {
+        if (!in_array($m, $permissions)) $permissions[] = $m;
+    }
+}
+// -------------------------------------------------
+
 sendJSONResponse(['success' => true, 'permissions' => $permissions]);
 ?>

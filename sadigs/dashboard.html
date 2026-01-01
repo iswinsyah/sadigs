@@ -541,6 +541,24 @@
                 window.location.href = 'sadigs_api_v3/logout.php';
             }
         });
+
+        // FUNGSI DARURAT
+        async function emergencyReset() {
+            // Sembunyikan banner setelah diklik
+            const banner = document.getElementById('emergencyBanner');
+            if (banner) banner.style.display = 'none';
+
+            if (!confirm('Yakin ingin mereset semua izin akses ke pengaturan awal? Ini akan memperbaiki menu yang hilang.')) return;
+            
+            try {
+                const res = await fetch('sadigs_api_v3/session_check.php?reset_permissions=1');
+                const text = await res.text();
+                alert("Sistem Merespon: RESET BERHASIL!\n\nHalaman akan dimuat ulang sekarang.");
+                window.location.reload();
+            } catch (err) {
+                alert("Gagal menghubungi server: " + err);
+            }
+        }
     </script>
 </body>
 </html>
