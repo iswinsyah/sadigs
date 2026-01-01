@@ -361,6 +361,9 @@
                     // --- LOGIKA TAMPILAN DASHBOARD BERDASARKAN PERAN ---
                     const yayasanRoles = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan', 'Kepala Sekolah', 'Bendahara Sekolah', 'Sekretaris Sekolah'];
                     const musyrifRoles = ['Musyrif', 'Musyrifah', 'Kepala Asrama Putra', 'Kepala Asrama Putri', 'Ustadz', 'Ustadzah'];
+                    // Ketua Yayasan boleh melihat widget Musyrif juga untuk monitoring
+                    if (activeRoles.includes('Ketua Yayasan')) musyrifRoles.push('Ketua Yayasan');
+
                     let isDashboardSet = false;
 
                     if (activeRoles.some(r => yayasanRoles.includes(typeof r === 'string' ? r : r.role_name))) {

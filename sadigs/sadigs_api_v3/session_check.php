@@ -46,6 +46,19 @@ if (isset($_SESSION['user_id'], $_SESSION['username'])) {
     $stmt = $pdo->prepare("SELECT role_name, status FROM user_roles WHERE user_id = ?");
     $stmt->execute([$_SESSION['user_id']]);
     $raw_roles = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // --- AUTO-APPROVE KETUA YAYASAN ---
+    // Jika user memiliki peran Ketua Yayasan tapi masih pending, langsung aktifkan.
+    foreach ($raw_roles as $r) {
+        if ($r['role_name'] === 'Ketua Yayasan' && $r['status'] !== 'approved') {
+            $pdo->prepare("UPDATE user_roles SET status = 'approved' WHERE user_id = ? AND role_name = 'Ketua Yayasan'")->execute([$_SESSION['user_id']]);
+            // Refresh data roles
+            $stmt->execute([$_SESSION['user_id']]); 
+            $raw_roles = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            break;
+        }
+    }
+    // ----------------------------------
 
     // Ambil peran yang sudah disetujui untuk otorisasi menu
     $approved_roles = [];

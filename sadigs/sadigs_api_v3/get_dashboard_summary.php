@@ -51,7 +51,7 @@ try {
         // FIX: Query diperbaiki untuk menggunakan musyrif_id dan join yang benar
         $stmt = $pdo->prepare("
             SELECT COUNT(r.id) 
-            FROM daily_worship_reports r
+            FROM ibadah_harian r
             JOIN mentoring_groups mg ON r.user_id = mg.student_id
             WHERE mg.musyrif_id = ? AND r.validation_status = 'pending'
         ");
