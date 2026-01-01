@@ -99,7 +99,7 @@ if ($method === 'GET') {
         $categories = [
             'Form' => [
                 'label' => 'Formulir',
-                'menus' => ['navAbsensi', 'navBiodataPegawai', 'navBiodataSantri', 'navCalendarSettings', 'navIbadahHarian', 'navInputTahfizh', 'navProfil', 'navQuota', 'navRapat', 'navIzinPegawai', 'navFormulirPembayaran', 'navFormulirTransaksi', 'navIzinWalisantri', 'navRppGenerator', 'navPocketMoneyDeposit', 'navMenuManagement'],
+                'menus' => ['navAbsensi', 'navBiodataPegawai', 'navBiodataSantri', 'navCalendarSettings', 'navIbadahHarian', 'navInputTahfizh', 'navInputNilai', 'navProfil', 'navQuota', 'navRapat', 'navIzinPegawai', 'navFormulirPembayaran', 'navFormulirTransaksi', 'navIzinWalisantri', 'navRppGenerator', 'navPocketMoneyDeposit', 'navMenuManagement'],
                 'icon' => 'file-pen-line'
             ],
             'Val' => [
