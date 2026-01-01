@@ -51,7 +51,7 @@ $permissions = [];
 try {
     $pdo = getDBConnection();
     
-    // Coba ambil dari database dulu
+    // PRIORITAS 1: AMBIL DARI DATABASE (UTAMA)
     // Gunakan try-catch khusus query ini agar jika tabel hilang, script tidak mati
     $placeholders = implode(',', array_fill(0, count($roles), '?'));
     $sql = "SELECT DISTINCT menu_id FROM menu_permissions WHERE role_name IN ($placeholders) AND is_allowed = 1";
@@ -67,7 +67,8 @@ try {
 }
 
 // --- LOGIKA PENYELAMAT (RESCUE LOGIC) ---
-// Jika permissions masih kosong (karena DB kosong/error),
+// PRIORITAS 2: GUNAKAN HARDCODED FALLBACK (CADANGAN)
+// Jika permissions kosong (karena DB kosong/error/belum disetting),
 // ATAU jika user adalah Ketua Yayasan (kita paksa lengkap),
 // maka gabungkan dengan data hardcoded.
 if (empty($permissions) || in_array('Ketua Yayasan', $roles)) {
