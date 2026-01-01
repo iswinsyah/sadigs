@@ -19,6 +19,18 @@ if (!isset($_SESSION['user_id'])) {
 try {
 $pdo = getDBConnection();
 
+// --- AUTO-FIX: STANDARISASI KOLOM DATABASE ---
+// Mengatasi error "Unknown column 'is_allowed'" dengan mengubah 'can_view' menjadi 'is_allowed'
+try {
+    $check = $pdo->query("SHOW COLUMNS FROM menu_permissions LIKE 'can_view'");
+    if ($check->rowCount() > 0) {
+        $pdo->exec("ALTER TABLE menu_permissions CHANGE COLUMN can_view is_allowed TINYINT(1) DEFAULT 0");
+    }
+} catch (Exception $e) {
+    // Abaikan error (misal tabel belum ada)
+}
+// ---------------------------------------------
+
 // --- DARURAT: RESET IZIN VIA URL ---
 if (isset($_GET['reset_now'])) {
     ob_end_clean(); header('Content-Type: text/html');
