@@ -136,8 +136,13 @@ if ($method === 'GET') {
             $matrix[$row['menu_id']][$row['role_name']] = (int)$row['is_allowed'];
         }
 
+        // Ambil nama menu yang benar dari database
+        $stmt_names = $pdo->query("SELECT menu_id, menu_name FROM menus");
+        $menu_names = $stmt_names->fetchAll(PDO::FETCH_KEY_PAIR);
+
+
         ob_clean(); // Bersihkan buffer sebelum kirim JSON
-        sendJSONResponse(['success' => true, 'roles' => $allRoles, 'categories' => $categories, 'matrix' => $matrix]);
+        sendJSONResponse(['success' => true, 'roles' => $allRoles, 'categories' => $categories, 'matrix' => $matrix, 'menu_names' => $menu_names]);
 
 } elseif ($method === 'POST') {
     $input = json_decode(file_get_contents('php://input'), true);
