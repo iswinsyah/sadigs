@@ -86,14 +86,11 @@ if ($stmtCount->fetchColumn() == 0) {
 $method = $_SERVER['REQUEST_METHOD'];
 
 if ($method === 'GET') {
-        // Daftar Peran (Sesuai dengan quota.php agar konsisten)
-        $allRoles = [
-            'Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan',
-            'Kepala Sekolah', 'Sekretaris Sekolah', 'Bendahara Sekolah',
-            'Kepala Ma\'had', 'Kepala Asrama Putra', 'Kepala Asrama Putri',
-            'Musyrif', 'Musyrifah', 'Ustadz', 'Ustadzah',
-            'Santri Rijal', 'Santri Nisa\'', 'Walisantri'
-        ];
+        // Ambil daftar peran secara dinamis dari database
+        $stmt_roles = $pdo->query("SELECT role_name FROM quota_settings UNION SELECT role_name FROM user_roles");
+        $db_roles = $stmt_roles->fetchAll(PDO::FETCH_COLUMN);
+        $allRoles = array_unique($db_roles);
+        sort($allRoles);
 
         // Daftar Menu (Single Source of Truth)
         $categories = [

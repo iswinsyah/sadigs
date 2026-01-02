@@ -3,278 +3,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manajemen Akses Menu | SADIGS 3.0</title>
+    <title>Manajemen Akses Menu | SADIGS</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
-        .custom-scrollbar::-webkit-scrollbar { height: 8px; width: 8px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        thead th { position: sticky; top: 0; background-color: #f9fafb; z-index: 10; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+<body class="bg-gray-50">
+    <div class="container mx-auto p-4 lg:p-8">
+        <div class="flex items-center gap-3 mb-6">
+            <a href="dashboard.html" class="p-2 bg-white rounded-full shadow-sm hover:bg-gray-100 transition"><i data-lucide="arrow-left" class="w-5 h-5 text-gray-600"></i></a>
+            <h1 class="text-2xl font-bold text-gray-800">Manajemen Akses Menu</h1>
+        </div>
 
-    <div class="flex h-screen overflow-hidden">
-        <!-- SIDEBAR -->
-        <aside id="sidebar" class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col hidden lg:flex">
-            <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-teal-600 text-white">
-                <h1 class="text-2xl font-extrabold tracking-wider">SADIGS</h1>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="p-4 bg-yellow-50 text-sm text-yellow-800 flex gap-2">
+                <i data-lucide="info" class="w-5 h-5 flex-shrink-0"></i>
+                <p>Atur menu mana saja yang dapat diakses oleh setiap peran. Perubahan akan langsung aktif setelah disimpan.</p>
             </div>
-            <div class="p-6">
-                <a href="dashboard.html" class="flex items-center gap-2 text-gray-600 hover:text-teal-600 transition">
-                    <i data-lucide="arrow-left" class="w-5 h-5"></i> Kembali ke Dashboard
-                </a>
+            <div id="loading" class="text-center py-20">
+                <i data-lucide="loader-2" class="w-8 h-8 animate-spin mx-auto text-blue-500"></i>
+                <p class="text-gray-500 mt-2">Memuat data izin akses...</p>
             </div>
-            <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-2 no-scrollbar">
-                <!-- Div 1: UMUM -->
-                <div class="bg-gray-50 rounded-lg p-2">
-                    <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">UMUM</h3>
-                    <a id="navDashboard" href="dashboard.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard</a>
-                    <a id="navKalender" href="calendar_view.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="table" class="w-5 h-5"></i> Tabel Kalender</a>
-                    <a id="navProfil" href="profile.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="user" class="w-5 h-5"></i> Profil Saya</a>
-                </div>
-
-                <!-- Container untuk menu Yayasan -->
-                <div id="menuYayasan" class="hidden space-y-2">
-                    <div class="bg-gray-50 rounded-lg p-2">
-                        <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KEPEGAWAIAN</h3>
-                        <a id="navAbsensi" href="attendance.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="map-pin" class="w-5 h-5"></i> Absensi Pegawai</a>
-                        <a id="navBiodataPegawai" href="employee_data.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="file-badge" class="w-5 h-5"></i> Biodata Pegawai</a>
-                        <a id="navIzinPegawai" href="leave_request.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="file-edit" class="w-5 h-5"></i> Izin Pegawai</a>
-                        <a id="navValidasiIzin" href="leave_validation.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="check-square" class="w-5 h-5"></i> Validasi Izin</a>
-                        <a id="navDaftarIzin" href="leave_list.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="list-checks" class="w-5 h-5"></i> Daftar Izin</a>
-                        <a id="navBukuIndukPegawai" href="employee_master_book.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="book-open" class="w-5 h-5"></i> Buku Induk Pegawai</a>
-                        <a id="navRapat" href="meeting_invitation.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="mail" class="w-5 h-5"></i> Formulir Undang Rapat</a>
-                        <a id="navJadwalRapat" href="meeting_schedule.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="calendar-clock" class="w-5 h-5"></i> Jadwal Rapat</a>
-                    </div>
-                    <div id="groupKhusus" class="hidden bg-gray-50 rounded-lg p-2">
-                        <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KHUSUS</h3>
-                        <a id="navVerifikasi" href="verification_management.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="users" class="w-5 h-5"></i> Verifikasi Pegawai</a>
-                        <a id="navQuota" href="quota_management.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="user-cog" class="w-5 h-5"></i> Atur Kuota</a>
-                        <a id="navCalendarSettings" href="calendar_settings.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="calendar-cog" class="w-5 h-5"></i> Atur Kalender</a>
-                        <a id="navMenuManagement" href="menu_management.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-teal-700 bg-white rounded-md transition font-semibold text-sm shadow-sm"><i data-lucide="lock" class="w-5 h-5"></i> Manajemen Akses</a>
-                    </div>
-                </div>
-
-                <!-- Div 4: KESANTRIAN -->
-                <div id="groupSantri" class="hidden bg-gray-50 rounded-lg p-2 mt-2">
-                    <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KESANTRIAN</h3>
-                    <a id="navBiodataSantri" href="student_data.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="book-user" class="w-5 h-5"></i> Biodata Santri</a>
-                    <a id="navBukuIndukSantri" href="student_master_book.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="book" class="w-5 h-5"></i> Buku Induk Santri</a>
-                    <a id="navIbadahHarian" href="daily_worship_form.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="notebook-pen" class="w-5 h-5"></i> Ibadah Harian</a>
-                    <a id="navMentoring" href="mentoring_groups.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="users-round" class="w-5 h-5"></i> Kelompok Mentoring</a>
-                    <a id="navValidasiIbadah" href="daily_worship_validation.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="check-square" class="w-5 h-5"></i> Validasi Ibadah</a>
-                    <a id="navIzinWalisantri" href="guardian_leave_request.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="mail-question" class="w-5 h-5"></i> Izin Walisantri</a>
-                </div>
-            </nav>
-        </aside>
-
-        <!-- KONTEN UTAMA -->
-        <main class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative">
-            <header class="mb-8 flex justify-between items-center">
-                <div>
-                    <h2 class="text-2xl lg:text-3xl font-bold text-gray-800">Manajemen Akses Menu</h2>
-                    <p class="text-gray-500 text-sm mt-1">Atur visibilitas menu untuk setiap peran (Role).</p>
-                </div>
-                <button onclick="saveChanges()" id="saveBtn" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-md flex items-center gap-2">
-                    <i data-lucide="save" class="w-4 h-4"></i> Simpan Perubahan
-                </button>
-            </header>
-
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div class="overflow-auto custom-scrollbar" style="max-height: 65vh;">
-                    <table class="min-w-full border-collapse text-sm">
-                        <thead class="bg-gray-100">
-                            <tr id="tableHeader">
-                                <th class="p-4 text-left font-bold text-gray-700 border-b border-r border-gray-200 sticky left-0 top-0 bg-gray-100 z-20 min-w-[200px]">
-                                    Nama Menu
-                                </th>
-                                <!-- Kolom Role akan diisi JS -->
-                            </tr>
-                        </thead>
-                        <tbody id="tableBody" class="divide-y divide-gray-200">
-                            <tr><td class="p-8 text-center text-gray-500">Memuat data...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
+            <div id="tableContainer" class="hidden overflow-x-auto">
+                <table class="w-full text-sm text-left">
+                    <thead id="tableHead" class="bg-gray-50 text-gray-600 uppercase text-xs"></thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
             </div>
-            
-            <div class="mt-4 p-4 bg-blue-50 text-blue-800 rounded-lg text-sm border border-blue-100">
-                <p class="font-bold mb-1"><i data-lucide="info" class="w-4 h-4 inline mr-1"></i> Catatan:</p>
-                <ul class="list-disc list-inside ml-2">
-                    <li>Centang kotak untuk <strong>mengizinkan</strong> peran melihat menu tersebut.</li>
-                    <li>Perubahan akan langsung berlaku setelah tombol "Simpan" ditekan.</li>
-                    <li>Pastikan Anda tidak menghapus akses Anda sendiri ke menu ini!</li>
-                </ul>
-            </div>
-        </main>
+        </div>
+        
+        <div class="mt-6 flex justify-end">
+            <button id="saveBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition shadow-md flex items-center gap-2 disabled:opacity-50" disabled>
+                <i data-lucide="save" class="w-5 h-5"></i> Simpan Perubahan
+            </button>
+        </div>
     </div>
 
     <script>
         lucide.createIcons();
-        let currentMatrix = {};
-        let roleList = [];
-        let menuList = [];
+        let changes = [];
 
-        async function initPage() {
-            // Cek Sesi
-            const sessionRes = await fetch('sadigs_api_v3/session_check.php');
-            const sessionData = await sessionRes.json();
-            if (!sessionData.success) { window.location.href = 'index.html'; return; }
+        const loadingEl = document.getElementById('loading');
+        const tableContainer = document.getElementById('tableContainer');
+        const tableHead = document.getElementById('tableHead');
+        const tableBody = document.getElementById('tableBody');
+        const saveBtn = document.getElementById('saveBtn');
 
-            // --- LOGIKA MENU DINAMIS (DATABASE) ---
+        async function loadPermissions() {
             try {
-                const permRes = await fetch('sadigs_api_v3/get_menu_permissions.php?t=' + new Date().getTime());
-                const permData = await permRes.json();
-                const allowedMenus = permData.success ? permData.permissions : [];
-
-                // Cek Otorisasi Halaman ini
-                if (!allowedMenus.includes('navMenuManagement')) {
-                    alert('Akses Ditolak. Anda tidak memiliki izin untuk mengakses halaman ini.');
-                    window.location.href = 'dashboard.html';
-                    return;
-                }
-
-                // Render Sidebar
-                allowedMenus.forEach(id => { const el = document.getElementById(id); if(el) el.classList.remove('hidden'); });
-                if (document.querySelector('#menuYayasan a:not(.hidden)')) document.getElementById('menuYayasan').classList.remove('hidden');
-                if (document.querySelector('#groupKhusus a:not(.hidden)')) document.getElementById('groupKhusus').classList.remove('hidden');
-                if (document.querySelector('#groupSantri a:not(.hidden)')) document.getElementById('groupSantri').classList.remove('hidden');
-            } catch (e) { 
-                console.error(e); 
-                alert('Gagal memuat izin akses. Silakan coba lagi.');
-                window.location.href = 'dashboard.html';
-            }
-
-            loadData();
-        }
-
-        async function loadData() {
-            try {
-                const res = await fetch('sadigs_api_v3/menu_manager.php?t=' + new Date().getTime());
+                const res = await fetch('sadigs_api_v3/menu_manager.php');
                 const data = await res.json();
 
-                if (data.success) {
-                    // The lists are now coming from the backend
-                    roleList = data.roles || [];
-                    currentMatrix = data.matrix || {};
-                    const categories = data.categories || {};
-
-                    renderTable(categories);
-                } else {
-                    alert('Gagal memuat data: ' + data.message);
-                    document.getElementById('tableBody').innerHTML = `<tr><td class="p-8 text-center text-red-500">Gagal memuat data: ${data.message}</td></tr>`;
+                if (!data.success) {
+                    throw new Error(data.message);
                 }
-            } catch (e) {
-                console.error(e);
-                // alert('Terjadi kesalahan koneksi.'); // Optional: disable alert to not spam user
-                document.getElementById('tableBody').innerHTML = `<tr><td class="p-8 text-center text-red-500">Error: ${e.message}<br>Silakan coba refresh halaman.</td></tr>`;
+
+                const { roles, categories, matrix, menu_names } = data;
+                
+                // Build Header
+                let headerHtml = '<tr><th class="px-4 py-3">Menu</th>';
+                roles.forEach(role => {
+                    headerHtml += `<th class="px-4 py-3 text-center">${role}</th>`;
+                });
+                headerHtml += '</tr>';
+                tableHead.innerHTML = headerHtml;
+
+                // Build Body
+                tableBody.innerHTML = '';
+                for (const catKey in categories) {
+                    const category = categories[catKey];
+                    // Category Row
+                    const catRow = document.createElement('tr');
+                    catRow.className = 'bg-gray-100';
+                    catRow.innerHTML = `<td colspan="${roles.length + 1}" class="px-4 py-2 font-bold text-gray-700">${category.label}</td>`;
+                    tableBody.appendChild(catRow);
+
+                    // Menu Rows
+                    category.menus.forEach(menuId => {
+                        const menuRow = document.createElement('tr');
+                        menuRow.className = 'border-b hover:bg-gray-50';
+                        
+                        // Menu Name Cell - INI BAGIAN PERBAIKANNYA
+                        const menuName = menu_names[menuId] || menuId;
+                        menuRow.innerHTML = `<td class="px-4 py-3 font-medium text-gray-800">${menuName}</td>`;
+
+                        // Checkbox Cells
+                        roles.forEach(role => {
+                            const isAllowed = matrix[menuId] && matrix[menuId][role] ? 1 : 0;
+                            const td = document.createElement('td');
+                            td.className = 'text-center';
+                            td.innerHTML = `<input type="checkbox" data-role="${role}" data-menu="${menuId}" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" ${isAllowed ? 'checked' : ''}>`;
+                            menuRow.appendChild(td);
+                        });
+                        tableBody.appendChild(menuRow);
+                    });
+                }
+
+                loadingEl.classList.add('hidden');
+                tableContainer.classList.remove('hidden');
+                addEventListeners();
+
+            } catch (err) {
+                loadingEl.innerHTML = `<p class="text-red-500">Gagal memuat data: ${err.message}</p>`;
             }
         }
 
-        function renderTable(categories) {
-            const thead = document.getElementById('tableHeader');
-            const tbody = document.getElementById('tableBody');
-
-            // 1. Render Header (Roles)
-            while (thead.children.length > 1) { thead.removeChild(thead.lastChild); }
-            roleList.forEach(role => {
-                const th = document.createElement('th');
-                th.className = "p-4 text-center font-bold text-gray-700 border-b border-gray-200 min-w-[120px] sticky top-0 bg-gray-100 z-10";
-                th.textContent = role;
-                thead.appendChild(th);
-            });
-
-            // 2. Render Body (Menus) with grouping
-            tbody.innerHTML = '';
-
-            const renderMenuRow = (menuId) => {
-                // Skip navMenuManagement from being rendered
-                if (menuId === 'navMenuManagement') return;
-
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-gray-50";
-
-                const tdName = document.createElement('td');
-                tdName.className = "p-4 font-semibold text-gray-800 border-r border-gray-200 sticky left-0 bg-white z-10";
-                let displayName = menuId.replace(/^nav/, '').replace(/([A-Z])/g, ' $1').trim();
-                
-                tdName.innerHTML = `<span class="text-base">${displayName}</span>`;
-                tr.appendChild(tdName);
-
-                roleList.forEach(role => {
-                    const td = document.createElement('td');
-                    td.className = "p-3 text-center border-r border-gray-100 last:border-r-0";
-                    const isChecked = (currentMatrix[menuId] && currentMatrix[menuId][role] === 1);
-                    td.innerHTML = `
-                        <input type="checkbox" 
-                            class="w-5 h-5 text-teal-600 rounded border-gray-300 focus:ring-teal-500 cursor-pointer"
-                            data-role="${role}" 
-                            data-menu="${menuId}"
-                            ${isChecked ? 'checked' : ''}>
-                    `;
-                    tr.appendChild(td);
+        function addEventListeners() {
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.addEventListener('change', (e) => {
+                    saveBtn.disabled = false;
+                    saveBtn.classList.remove('disabled:opacity-50');
+                    
+                    const change = {
+                        role: e.target.dataset.role,
+                        menu: e.target.dataset.menu,
+                        state: e.target.checked ? 1 : 0
+                    };
+                    changes = changes.filter(c => !(c.role === change.role && c.menu === change.menu));
+                    changes.push(change);
                 });
-                tbody.appendChild(tr);
-            };
-
-            Object.keys(categories).forEach(catKey => {
-                const category = categories[catKey];
-                const categoryMenus = category.menus.sort((a, b) => a.localeCompare(b));
-
-                if (categoryMenus.length > 0) {
-                    const groupTr = document.createElement('tr');
-                    groupTr.className = 'bg-gray-200';
-                    groupTr.innerHTML = `<td colspan="${roleList.length + 1}" class="p-2 font-bold text-gray-600 text-sm sticky left-0 z-10"><i data-lucide="${category.icon}" class="w-4 h-4 inline-block mr-2"></i>${category.label}</td>`;
-                    tbody.appendChild(groupTr);
-                    categoryMenus.forEach(renderMenuRow);
-                }
             });
-
-            lucide.createIcons();
         }
 
-        async function saveChanges() {
-            const btn = document.getElementById('saveBtn');
-            const originalHTML = btn.innerHTML;
-            btn.disabled = true; 
-            btn.innerHTML = 'Menyimpan...';
-
-            const updates = [];
-            const checkboxes = document.querySelectorAll('input[type="checkbox"][data-role]');
-            
-            checkboxes.forEach(cb => {
-                updates.push({
-                    role: cb.dataset.role,
-                    menu: cb.dataset.menu,
-                    state: cb.checked ? 1 : 0
-                });
-            });
+        saveBtn.addEventListener('click', async () => {
+            if (changes.length === 0) return;
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = 'Menyimpan...';
 
             try {
                 const res = await fetch('sadigs_api_v3/menu_manager.php', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ updates: updates })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ updates: changes })
                 });
                 const result = await res.json();
                 if (result.success) {
-                    alert('Pengaturan berhasil disimpan!');
-                } else {
-                    alert('Gagal: ' + result.message);
-                }
-            } catch (e) { 
-                alert('Terjadi kesalahan koneksi.'); 
-            } finally { 
-                btn.disabled = false; 
-                btn.innerHTML = originalHTML;
+                    alert('Perubahan berhasil disimpan!');
+                    changes = [];
+                    saveBtn.innerHTML = '<i data-lucide="save" class="w-5 h-5"></i> Simpan Perubahan';
+                    lucide.createIcons();
+                } else { throw new Error(result.message || 'Gagal menyimpan.'); }
+            } catch (err) {
+                alert('Error: ' + err.message);
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '<i data-lucide="save" class="w-5 h-5"></i> Simpan Perubahan';
                 lucide.createIcons();
             }
-        }
+        });
 
-        initPage();
+        loadPermissions();
     </script>
 </body>
 </html>
