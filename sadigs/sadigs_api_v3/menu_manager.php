@@ -118,7 +118,7 @@ if ($method === 'GET') {
                 'icon' => 'bar-chart-2'
             ],
             'Wgt' => [
-                'label' => 'Widget Dashboard',
+                'label' => 'Ringkasan Dasbor',
                 'menus' => ['navYayasanWidget', 'navMusyrifWidget'],
                 'icon' => 'layout-grid'
             ]
