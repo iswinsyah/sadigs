@@ -116,6 +116,11 @@ if ($method === 'GET') {
                 'label' => 'Grafik',
                 'menus' => ['navRekapPembayaran'],
                 'icon' => 'bar-chart-2'
+            ],
+            'Wgt' => [
+                'label' => 'Widget Dashboard',
+                'menus' => ['navYayasanWidget', 'navMusyrifWidget'],
+                'icon' => 'layout-grid'
             ]
         ];
 

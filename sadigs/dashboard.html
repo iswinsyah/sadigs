@@ -386,28 +386,6 @@
                         }
                     }
 
-                    // --- LOGIKA TAMPILAN DASHBOARD BERDASARKAN PERAN ---
-                    const yayasanRoles = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan', 'Kepala Sekolah', 'Bendahara Sekolah', 'Sekretaris Sekolah'];
-                    const musyrifRoles = ['Musyrif', 'Musyrifah', 'Kepala Asrama Putra', 'Kepala Asrama Putri', 'Ustadz', 'Ustadzah'];
-                    // Ketua Yayasan boleh melihat widget Musyrif juga untuk monitoring
-                    if (activeRoles.includes('Ketua Yayasan')) musyrifRoles.push('Ketua Yayasan');
-
-                    let isDashboardSet = false;
-
-                    if (activeRoles.some(r => yayasanRoles.includes(typeof r === 'string' ? r : r.role_name))) {
-                        const el = document.getElementById('yayasanDashboard');
-                        if (el) { el.classList.remove('hidden'); isDashboardSet = true; }
-                    }
-                    if (activeRoles.some(r => musyrifRoles.includes(typeof r === 'string' ? r : r.role_name))) {
-                        const el = document.getElementById('musyrifDashboard');
-                        if (el) { el.classList.remove('hidden'); isDashboardSet = true; }
-                    }
-
-                    // Jika tidak ada dashboard spesifik yang ditampilkan, tampilkan yang default
-                    if (!isDashboardSet) {
-                        document.getElementById('defaultDashboard').classList.remove('hidden');
-                    }
-
                     // --- AMBIL DATA SUMMARY UNTUK WIDGETS ---
                     fetch('sadigs_api_v3/get_dashboard_summary.php')
                         .then(res => res.json())
@@ -501,6 +479,23 @@
                                         group.classList.remove('hidden');
                                     }
                                 });
+
+                                // --- LOGIKA BARU: TAMPILKAN WIDGET BERDASARKAN IZIN ---
+                                let isDashboardSet = false;
+                                if (allowedMenus.includes('navYayasanWidget')) {
+                                    const el = document.getElementById('yayasanDashboard');
+                                    if (el) { el.classList.remove('hidden'); isDashboardSet = true; }
+                                }
+                                if (allowedMenus.includes('navMusyrifWidget')) {
+                                    const el = document.getElementById('musyrifDashboard');
+                                    if (el) { el.classList.remove('hidden'); isDashboardSet = true; }
+                                }
+
+                                // Jika tidak ada dashboard spesifik yang ditampilkan, tampilkan yang default
+                                if (!isDashboardSet) {
+                                    document.getElementById('defaultDashboard').classList.remove('hidden');
+                                }
+
                             }
                         })
                         .catch(e => console.error("Gagal memuat izin menu:", e));
