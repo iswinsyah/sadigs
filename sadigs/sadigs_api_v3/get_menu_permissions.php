@@ -69,9 +69,8 @@ try {
 // --- LOGIKA PENYELAMAT (RESCUE LOGIC) ---
 // PRIORITAS 2: GUNAKAN HARDCODED FALLBACK (CADANGAN)
 // Jika permissions kosong (karena DB kosong/error/belum disetting),
-// ATAU jika user adalah Ketua Yayasan (kita paksa lengkap),
 // maka gabungkan dengan data hardcoded.
-if (empty($permissions) || in_array('Ketua Yayasan', $roles)) {
+if (empty($permissions)) {
     foreach ($roles as $role) {
         if (isset($fallback_perms[$role])) {
             // Gabungkan array (merge)
