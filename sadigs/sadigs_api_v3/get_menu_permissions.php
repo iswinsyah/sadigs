@@ -86,6 +86,15 @@ if (empty($permissions) && empty($isConfigured)) {
     }
 }
 
+// --- KUNCI PENGAMAN (FAILSAFE) ---
+// Pastikan Ketua Yayasan SELALU bisa mengakses halaman Manajemen Akses
+// untuk mencegah terkunci dari sistem.
+if (in_array('Ketua Yayasan', $roles)) {
+    if (!in_array('navMenuManagement', $permissions)) {
+        $permissions[] = 'navMenuManagement';
+    }
+}
+
 // Hapus duplikat
 $permissions = array_unique($permissions);
 // Pastikan array indexnya rapi (re-index)
