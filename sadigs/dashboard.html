@@ -198,7 +198,7 @@
                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                     <div class="bg-gradient-to-r from-blue-600 to-blue-500 px-6 py-3 flex items-center gap-2 text-white">
                         <i data-lucide="bell" class="w-5 h-5"></i>
-                        <h3 class="font-bold text-sm uppercase tracking-wide">Papan Informasi & Peraturan</h3>
+                        <h3 id="regulationsTitle" class="font-bold text-sm uppercase tracking-wide">Papan Informasi & Peraturan</h3>
                     </div>
                     <div id="regulationsList" class="p-4 space-y-3 bg-blue-50/30">
                         <!-- Item peraturan akan dimuat di sini -->
@@ -341,6 +341,16 @@
                     myRawRoles = rawRoles;
                     const activeRoles = data.roles || []; // Safety check: pastikan selalu array
 
+                    // --- UPDATE JUDUL WIDGET PERATURAN (AMANAH) ---
+                    let regTitle = 'Papan Informasi & Peraturan';
+                    if (activeRoles.includes('Walisantri')) {
+                        regTitle = 'Amanah dan Prosedur Walisantri';
+                    } else if (activeRoles.length > 0) {
+                        regTitle = 'Amanah ' + activeRoles[0];
+                    }
+                    const regTitleEl = document.getElementById('regulationsTitle');
+                    if (regTitleEl) regTitleEl.textContent = regTitle;
+
                     // Update sidebar and main role display
                     let rolesText = 'User';
                     if (rawRoles.length > 0) {
@@ -465,8 +475,9 @@
                                 });
                                 lucide.createIcons();
                             } else {
-                                // Jika tidak ada peraturan, sembunyikan widget atau tampilkan pesan kosong
-                                document.getElementById('regulationsWidget').classList.add('hidden');
+                                // Tampilkan widget meski kosong agar judul 'Amanah' terlihat
+                                document.getElementById('regulationsWidget').classList.remove('hidden');
+                                document.getElementById('regulationsList').innerHTML = '<p class="text-center text-gray-500 text-sm py-4 italic">Belum ada amanah atau informasi baru.</p>';
                             }
                         });
 
