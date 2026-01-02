@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Program Tahunan (Prota) | SADIGS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>body{font-family:'Inter',sans-serif;}</style>
+</head>
+<body class="bg-gray-50">
+    <div class="max-w-6xl mx-auto p-4 lg:p-8">
+        <div class="flex items-center gap-3 mb-6">
+            <a href="dashboard.html" class="p-2 bg-white rounded-full shadow-sm hover:bg-gray-100 transition"><i data-lucide="arrow-left" class="w-5 h-5 text-gray-600"></i></a>
+            <h1 class="text-2xl font-bold text-gray-800">Program Tahunan (Prota)</h1>
+        </div>
+
+        <!-- Filter -->
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-6 flex flex-col md:flex-row gap-4">
+            <div class="flex-1">
+                <label class="block text-xs font-medium text-gray-500">Mata Pelajaran</label>
+                <input type="text" id="filterSubject" class="w-full p-2 border border-gray-300 rounded-lg mt-1" placeholder="Contoh: Fiqih">
+            </div>
+            <div class="flex-1">
+                <label class="block text-xs font-medium text-gray-500">Fase / Kelas</label>
+                <input type="text" id="filterGrade" class="w-full p-2 border border-gray-300 rounded-lg mt-1" placeholder="Contoh: Fase D / Kelas 7">
+            </div>
+            <div class="flex items-end">
+                <button onclick="loadData()" class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-md flex justify-center items-center gap-2">
+                    <i data-lucide="search" class="w-5 h-5"></i> Tampilkan
+                </button>
+            </div>
+        </div>
+
+        <div id="loading" class="text-center py-10 hidden"><i data-lucide="loader-2" class="w-8 h-8 animate-spin mx-auto text-blue-500"></i></div>
+
+        <!-- Konten Prota -->
+        <div id="protaContent" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Semester Ganjil -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100">
+                <div class="p-4 border-b">
+                    <h2 class="text-lg font-bold text-gray-800">Semester Ganjil</h2>
+                    <p class="text-sm text-gray-500">Panduan Pekan Efektif: <span id="ganjil_efektif" class="font-bold text-green-600">...</span></p>
+                </div>
+                <div id="listGanjil" class="p-4 space-y-2"></div>
+                <div class="p-4 border-t">
+                    <form onsubmit="addObjective(event, 'Ganjil')" class="space-y-2">
+                        <input type="text" name="learning_objective" class="w-full p-2 border border-gray-300 rounded-lg" placeholder="Tambah Tujuan Pembelajaran..." required>
+                        <button type="submit" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 rounded-lg text-sm">Tambah</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Semester Genap -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100">
+                <div class="p-4 border-b">
+                    <h2 class="text-lg font-bold text-gray-800">Semester Genap</h2>
+                    <p class="text-sm text-gray-500">Panduan Pekan Efektif: <span id="genap_efektif" class="font-bold text-green-600">...</span></p>
+                </div>
+                <div id="listGenap" class="p-4 space-y-2"></div>
+                <div class="p-4 border-t">
+                    <form onsubmit="addObjective(event, 'Genap')" class="space-y-2">
+                        <input type="text" name="learning_objective" class="w-full p-2 border border-gray-300 rounded-lg" placeholder="Tambah Tujuan Pembelajaran..." required>
+                        <button type="submit" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 rounded-lg text-sm">Tambah</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        async function loadData() {
+            const subject = document.getElementById('filterSubject').value;
+            const grade = document.getElementById('filterGrade').value;
+            if (!subject || !grade) {
+                alert('Mata Pelajaran dan Fase/Kelas wajib diisi.');
+                return;
+            }
+
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('protaContent').classList.add('hidden');
+
+            try {
+                // 1. Get Effective Weeks
+                const weeksRes = await fetch('sadigs_api_v3/calculate_academic_weeks.php');
+                const weeksResult = await weeksRes.json();
+                if (weeksResult.success) {
+                    document.getElementById('ganjil_efektif').textContent = weeksResult.data.ganjil.effective_weeks;
+                    document.getElementById('genap_efektif').textContent = weeksResult.data.genap.effective_weeks;
+                }
+
+                // 2. Get Prota Data
+                const protaRes = await fetch(`sadigs_api_v3/prota_api.php?subject=${subject}&grade=${grade}`);
+                const protaResult = await protaRes.json();
+                if (!protaResult.success) throw new Error(protaResult.message);
+
+                renderList('Ganjil', protaResult.data.ganjil);
+                renderList('Genap', protaResult.data.genap);
+
+            } catch (err) {
+                alert('Gagal memuat data: ' + err.message);
+            } finally {
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('protaContent').classList.remove('hidden');
+            }
+        }
+
+        function renderList(semester, items) {
+            const container = document.getElementById(semester === 'Ganjil' ? 'listGanjil' : 'listGenap');
+            container.innerHTML = '';
+            if (items.length === 0) {
+                container.innerHTML = '<p class="text-center text-gray-400 text-sm py-4 italic">Belum ada data.</p>';
+                return;
+            }
+            items.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center justify-between bg-gray-50 p-2 rounded-lg text-sm';
+                div.innerHTML = `
+                    <span class="text-gray-700">${item.learning_objective}</span>
+                    <button onclick="deleteObjective(${item.id})" class="p-1 text-gray-400 hover:text-red-500 transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                `;
+                container.appendChild(div);
+            });
+            lucide.createIcons();
+        }
+
+        async function addObjective(event, semester) {
+            event.preventDefault();
+            const form = event.target;
+            const input = form.querySelector('input[name="learning_objective"]');
+            const objective = input.value;
+
+            const subject = document.getElementById('filterSubject').value;
+            const grade = document.getElementById('filterGrade').value;
+
+            const data = {
+                subject,
+                grade,
+                semester,
+                learning_objective: objective
+            };
+
+            try {
+                const res = await fetch('sadigs_api_v3/prota_api.php', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+                if (!result.success) throw new Error(result.message);
+                
+                input.value = ''; // Clear input
+                loadData(); // Refresh list
+
+            } catch (err) {
+                alert('Gagal menambah data: ' + err.message);
+            }
+        }
+
+        async function deleteObjective(id) {
+            if (!confirm('Yakin ingin menghapus tujuan pembelajaran ini?')) return;
+
+            try {
+                const res = await fetch(`sadigs_api_v3/prota_api.php?id=${id}`, {
+                    method: 'DELETE'
+                });
+                const result = await res.json();
+                if (!result.success) throw new Error(result.message);
+
+                loadData(); // Refresh list
+
+            } catch (err) {
+                alert('Gagal menghapus data: ' + err.message);
+            }
+        }
+    </script>
+</body>
+</html>
