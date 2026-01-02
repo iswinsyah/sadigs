@@ -99,12 +99,12 @@ if ($method === 'GET') {
         $categories = [
             'Form' => [
                 'label' => 'Formulir',
-                'menus' => ['navAbsensi', 'navBiodataPegawai', 'navBiodataSantri', 'navCalendarSettings', 'navIbadahHarian', 'navInputTahfizh', 'navInputNilai', 'navProfil', 'navQuota', 'navRapat', 'navIzinPegawai', 'navFormulirPembayaran', 'navFormulirTransaksi', 'navIzinWalisantri', 'navRppGenerator', 'navPocketMoneyDeposit', 'navMenuManagement'],
+                'menus' => ['navAbsensi', 'navBiodataPegawai', 'navBiodataSantri', 'navCalendarSettings', 'navIbadahHarian', 'navInputTahfizh', 'navInputNilai', 'navBuatPeraturan', 'navProfil', 'navQuota', 'navRapat', 'navIzinPegawai', 'navFormulirPembayaran', 'navFormulirTransaksi', 'navIzinWalisantri', 'navRppGenerator', 'navPocketMoneyDeposit', 'navMenuManagement'],
                 'icon' => 'file-pen-line'
             ],
             'Val' => [
                 'label' => 'Validasi',
-                'menus' => ['navValidasiIbadah', 'navVerifikasi', 'navValidasiPembayaran', 'navValidasiIzin', 'navGuardianLeaveValidation', 'navPocketMoneyValidation', 'navMusyrifWithdrawalValidation'],
+                'menus' => ['navValidasiIbadah', 'navVerifikasi', 'navValidasiPembayaran', 'navValidasiIzin', 'navGuardianLeaveValidation', 'navPocketMoneyValidation', 'navMusyrifWithdrawalValidation', 'navValidasiPeraturan'],
                 'icon' => 'check-square'
             ],
             'Tab' => [

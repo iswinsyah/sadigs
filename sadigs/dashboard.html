@@ -117,6 +117,7 @@
                     <a id="navOnLeaveList" href="on_leave_list.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="user-minus" class="w-5 h-5"></i> Santri Sedang Pulang</a>
                     <a id="navRekapIbadahAnak" href="select_student.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="clipboard-check" class="w-5 h-5"></i> Rekap Ibadah Anak</a>
                     <a id="navInputTahfizh" href="tahfizh_report_form.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="book-marked" class="w-5 h-5"></i> Input Tahfizh</a>
+                    <a id="navBuatPeraturan" href="create_regulation.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="megaphone" class="w-5 h-5"></i> Terbitkan Peraturan</a>
                     <a id="navInputNilai" href="input_grades.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="graduation-cap" class="w-5 h-5"></i> Input Nilai Rapot</a>
                     <a id="navViewTahfizh" href="tahfizh_student_view.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="book-open-check" class="w-5 h-5"></i> Laporan Tahfizh</a>
                     <a id="navMentoring" href="mentoring_groups.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="users-round" class="w-5 h-5"></i> Kelompok Mentoring</a>
@@ -130,6 +131,7 @@
                 <!-- Div 5: KEUANGAN -->
                 <div id="groupKeuangan" class="hidden bg-gray-50 rounded-lg p-2 mt-2">
                     <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KEUANGAN</h3>
+                    <a id="navValidasiPeraturan" href="validate_regulation.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="gavel" class="w-5 h-5"></i> Validasi Peraturan</a>
                     <a id="navFormulirPembayaran" href="payment_form.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="credit-card" class="w-5 h-5"></i> Formulir Pembayaran</a>
                     <a id="navValidasiPembayaran" href="payment_validation.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="check-circle-2" class="w-5 h-5"></i> Validasi Pembayaran</a>
                     <a id="navTabelPembayaran" href="payment_list.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="banknote" class="w-5 h-5"></i> Data Pembayaran</a>
@@ -187,6 +189,20 @@
                         <div class="p-2 bg-blue-50 rounded-lg text-blue-600">
                             <i data-lucide="shield" class="w-6 h-6"></i>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- WIDGET: Papan Informasi & Peraturan -->
+            <div id="regulationsWidget" class="hidden mb-8">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="bg-gradient-to-r from-blue-600 to-blue-500 px-6 py-3 flex items-center gap-2 text-white">
+                        <i data-lucide="bell" class="w-5 h-5"></i>
+                        <h3 class="font-bold text-sm uppercase tracking-wide">Papan Informasi & Peraturan</h3>
+                    </div>
+                    <div id="regulationsList" class="p-4 space-y-3 bg-blue-50/30">
+                        <!-- Item peraturan akan dimuat di sini -->
+                        <p class="text-center text-gray-400 text-sm py-2">Memuat informasi...</p>
                     </div>
                 </div>
             </div>
@@ -423,6 +439,34 @@
                                     document.getElementById('onLeaveCardYayasan').querySelector('p:last-child').innerHTML = `${summary.on_leave_count} <span class="text-base font-medium">santri</span>`;
                                     document.getElementById('onLeaveCardMusyrif').querySelector('p:last-child').innerHTML = `${summary.on_leave_count} <span class="text-base font-medium">santri</span>`;
                                 }
+                            }
+                        });
+                    
+                    // --- LOAD WIDGET PERATURAN ---
+                    fetch('sadigs_api_v3/get_regulations.php?action=list_active')
+                        .then(res => res.json())
+                        .then(regData => {
+                            if (regData.success && regData.data.length > 0) {
+                                document.getElementById('regulationsWidget').classList.remove('hidden');
+                                const regContainer = document.getElementById('regulationsList');
+                                regContainer.innerHTML = '';
+                                
+                                regData.data.forEach(item => {
+                                    const div = document.createElement('div');
+                                    div.className = 'bg-white p-4 rounded-lg border-l-4 border-blue-500 shadow-sm hover:shadow-md transition';
+                                    div.innerHTML = `
+                                        <div class="flex justify-between items-start">
+                                            <h4 class="font-bold text-gray-800">${item.title}</h4>
+                                            <span class="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">${item.formatted_date}</span>
+                                        </div>
+                                        <p class="text-sm text-gray-600 mt-1 whitespace-pre-wrap">${item.content}</p>
+                                    `;
+                                    regContainer.appendChild(div);
+                                });
+                                lucide.createIcons();
+                            } else {
+                                // Jika tidak ada peraturan, sembunyikan widget atau tampilkan pesan kosong
+                                document.getElementById('regulationsWidget').classList.add('hidden');
                             }
                         });
 
