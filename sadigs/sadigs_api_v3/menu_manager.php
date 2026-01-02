@@ -90,7 +90,29 @@ if ($method === 'GET') {
         $stmt_roles = $pdo->query("SELECT role_name FROM quota_settings UNION SELECT role_name FROM user_roles");
         $db_roles = $stmt_roles->fetchAll(PDO::FETCH_COLUMN);
         $allRoles = array_unique($db_roles);
-        sort($allRoles);
+        
+        // Definisikan urutan custom untuk kolom peran
+        $custom_order = [
+            'Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan',
+            'Kepala Sekolah', 'Sekretaris Sekolah', 'Bendahara Sekolah',
+            'Kepala Asrama Putra', 'Kepala Asrama Putri',
+            'Musyrif', 'Musyrifah', 'Ustadz', 'Ustadzah',
+            'Santri Rijal', 'Santri Nisa\'', 'Walisantri'
+        ];
+
+        // Buat map untuk pencarian cepat posisi
+        $order_map = array_flip($custom_order);
+
+        // Lakukan sorting custom
+        usort($allRoles, function($a, $b) use ($order_map) {
+            $pos_a = isset($order_map[$a]) ? $order_map[$a] : PHP_INT_MAX;
+            $pos_b = isset($order_map[$b]) ? $order_map[$b] : PHP_INT_MAX;
+
+            if ($pos_a == $pos_b) {
+                return strcmp($a, $b); // Jika sama (atau keduanya tidak ada di map), sort alfabetis
+            }
+            return $pos_a - $pos_b;
+        });
 
         // Daftar Menu (Single Source of Truth)
         $categories = [
