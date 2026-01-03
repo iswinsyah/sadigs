@@ -24,19 +24,12 @@
                     <p class="text-sm text-gray-500">Sesuaikan hari efektif dan libur untuk satu tahun ajaran.</p>
                 </div>
             </div>
-            <div class="flex items-center gap-4">
-                <div>
-                    <label for="academicYear" class="block text-xs font-medium text-gray-500">Tahun Ajaran</label>
-                    <select id="academicYear" class="p-2.5 border border-gray-300 rounded-lg bg-white text-sm font-medium shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mt-1" onchange="renderCalendar()">
-                        <option value="2024/2025">Tahun Ajaran 2024/2025</option>
-                        <option value="2025/2026">Tahun Ajaran 2025/2026</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="firstSundayInput" class="block text-xs font-medium text-gray-500">Ahad Pertama di Bulan Juli (Acuan)</label>
-                    <input type="date" id="firstSundayInput" class="p-2.5 border border-gray-300 rounded-lg bg-white text-sm font-medium shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mt-1" onchange="renderCalendar()">
-                </div>
-                <button onclick="saveCalendar()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium transition shadow-sm flex items-center gap-2 self-end">
+            <div class="flex items-center gap-3">
+                <select id="academicYear" class="p-2.5 border border-gray-300 rounded-lg bg-white text-sm font-medium shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" onchange="renderCalendar()">
+                    <option value="2024/2025">Tahun Ajaran 2024/2025</option>
+                    <option value="2025/2026">Tahun Ajaran 2025/2026</option>
+                </select>
+                <button onclick="saveCalendar()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium transition shadow-sm flex items-center gap-2">
                     <i data-lucide="save" class="w-4 h-4"></i> Simpan Perubahan
                 </button>
             </div>
@@ -58,10 +51,9 @@
             </div>
         </div>
         
-        <div class="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-gray-500">
+        <div class="mt-4 flex gap-4 text-sm text-gray-500">
             <div class="flex items-center gap-2"><div class="w-4 h-4 bg-gray-200 rounded border"></div> Tanggal Tidak Ada</div>
             <div class="flex items-center gap-2"><div class="w-4 h-4 bg-white rounded border"></div> Hari Efektif</div>
-            <div class="flex items-center gap-2"><div class="w-4 h-4 bg-red-50 rounded border border-red-200"></div> Hari Ahad</div>
             <div class="flex items-center gap-2"><div class="w-4 h-4 bg-red-50 rounded border border-red-100"></div> Hari Libur (Contoh)</div>
         </div>
     </div>
@@ -82,29 +74,10 @@
             return new Date(year, month, 0).getDate();
         }
 
-        function findFirstSundayOfJuly(year) {
-            for (let day = 1; day <= 7; day++) {
-                // Bulan 6 adalah Juli di object Date JavaScript (0-indexed)
-                const date = new Date(year, 6, day);
-                if (date.getDay() === 0) { // 0 adalah hari Minggu
-                    return date;
-                }
-            }
-            return null; // Seharusnya tidak pernah terjadi
-        }
-
         function renderCalendar() {
             const academicYear = document.getElementById('academicYear').value;
             const [startYear, endYear] = academicYear.split('/').map(Number);
             
-            const firstSundayInput = document.getElementById('firstSundayInput');
-            if (!firstSundayInput.value) {
-                const firstSunday = findFirstSundayOfJuly(startYear);
-                if(firstSunday) firstSundayInput.value = firstSunday.toISOString().split('T')[0];
-            }
-
-            const firstSundayRef = firstSundayInput.value ? new Date(firstSundayInput.value + 'T00:00:00') : null;
-
             // 1. Render Headers (1-31)
             const theadRow = document.querySelector('thead tr');
             theadRow.innerHTML = '<th class="p-3 text-left font-bold sticky left-0 bg-gray-50 z-20 border-r border-gray-200 min-w-[150px] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">Bulan</th>';
@@ -129,21 +102,10 @@
                 
                 for (let d = 1; d <= 31; d++) {
                     const isValidDate = d <= daysInMonth;
-                    let isSundayBasedOnRef = false;
-
-                    if (isValidDate && firstSundayRef) {
-                        // Bulan di JS Date object adalah 0-indexed
-                        const cellDate = new Date(currentYear, m.id - 1, d);
-                        const diffTime = cellDate.getTime() - firstSundayRef.getTime();
-                        const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
-                        if (diffDays % 7 === 0) {
-                            isSundayBasedOnRef = true;
-                        }
-                    }
                     
                     if (isValidDate) {
                         // Sel Aktif (Tanggal Valid)
-                        rowHtml += `<td class="p-0 border-l border-gray-100 relative ${isSundayBasedOnRef ? 'bg-red-50' : ''}">
+                        rowHtml += `<td class="p-0 border-l border-gray-100 relative">
                             <input type="text" 
                                 class="w-full h-10 text-center text-xs focus:bg-blue-50 focus:ring-2 focus:ring-inset focus:ring-blue-500 outline-none transition-all bg-transparent text-gray-700 font-medium"
                                 data-month="${m.id}" 
