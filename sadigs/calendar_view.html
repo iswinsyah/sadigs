@@ -145,28 +145,35 @@
         mobileMenuBtn.addEventListener('click', toggleSidebar);
         sidebarOverlay.addEventListener('click', toggleSidebar);
 
-        // --- DEFINISI SINGKATAN & WARNA ---
+        // --- DEFINISI KEGIATAN, KODE & WARNA ---
         const eventStyles = {
-            // Key harus sama dengan 'name' di form calendar_settings.html
-            'awal_semester_ganjil': { abbr: 'AS1', color: 'bg-blue-200 text-blue-800', label: 'Agenda Semester' },
-            'raport_semester_ganjil': { abbr: 'RP1', color: 'bg-blue-200 text-blue-800', label: 'Agenda Semester' },
-            'awal_semester_genap': { abbr: 'AS2', color: 'bg-blue-200 text-blue-800', label: 'Agenda Semester' },
-            'raport_semester_genap': { abbr: 'RP2', color: 'bg-blue-200 text-blue-800', label: 'Agenda Semester' },
-            'tahun_baru_islam': { abbr: 'TBI', color: 'bg-green-200 text-green-800', label: 'Hari Besar' },
-            'maulid_nabi': { abbr: 'MLN', color: 'bg-green-200 text-green-800', label: 'Hari Besar' },
-            'isra_miraj': { abbr: 'IMN', color: 'bg-green-200 text-green-800', label: 'Hari Besar' },
-            'uts_ganjil': { abbr: 'UT1', color: 'bg-yellow-200 text-yellow-800', label: 'Periode Ujian' },
-            'uas_ganjil': { abbr: 'UA1', color: 'bg-yellow-200 text-yellow-800', label: 'Periode Ujian' },
-            'pas_ganjil': { abbr: 'PA1', color: 'bg-yellow-200 text-yellow-800', label: 'Periode Ujian' },
-            'uts_genap': { abbr: 'UT2', color: 'bg-yellow-200 text-yellow-800', label: 'Periode Ujian' },
-            'uas_genap': { abbr: 'UA2', color: 'bg-yellow-200 text-yellow-800', label: 'Periode Ujian' },
-            'pas_genap': { abbr: 'PA2', color: 'bg-yellow-200 text-yellow-800', label: 'Periode Ujian' },
-            'libur_sebelum_hari_raya': { abbr: 'LHR', color: 'bg-red-200 text-red-800', label: 'Periode Libur' },
-            'libur_setelah_hari_raya': { abbr: 'LHR', color: 'bg-red-200 text-red-800', label: 'Periode Libur' },
-            'idul_fitri': { abbr: 'IDF', color: 'bg-red-200 text-red-800', label: 'Periode Libur' },
-            'idul_adha': { abbr: 'IDA', color: 'bg-red-200 text-red-800', label: 'Periode Libur' },
-            'libur_semester_1': { abbr: 'LS1', color: 'bg-red-200 text-red-800', label: 'Periode Libur' },
-            'libur_semester_2': { abbr: 'LS2', color: 'bg-red-200 text-red-800', label: 'Periode Libur' },
+            'ahad_juli_1': { code: 'A1J', color: 'bg-red-100 text-red-800', label: 'Hari Ahad Acuan' },
+            'kedatangan_santri_1': { code: 'KDS', color: 'bg-blue-100 text-blue-800', label: 'Kedatangan Santri' },
+            'awal_semester_1': { code: 'AS1', color: 'bg-blue-200 text-blue-800', label: 'Awal Semester' },
+            'mos': { code: 'MOS', color: 'bg-indigo-100 text-indigo-800', label: 'Orientasi' },
+            'uts_1': { code: 'UT1', color: 'bg-yellow-100 text-yellow-800', label: 'Ujian Tengah Semester' },
+            'uas_1': { code: 'UA1', color: 'bg-yellow-200 text-yellow-800', label: 'Ujian Akhir Semester' },
+            'pas_1': { code: 'PA1', color: 'bg-yellow-200 text-yellow-800', label: 'Penilaian Akhir Semester' },
+            'class_meeting_1': { code: 'PP1', color: 'bg-purple-100 text-purple-800', label: 'Pekan Prestasi' },
+            'terima_raport_1': { code: 'TR1', color: 'bg-blue-200 text-blue-800', label: 'Terima Raport' },
+            'libur_semester_1': { code: 'LS1', color: 'bg-gray-200 text-gray-700', label: 'Libur Semester' },
+            'kedatangan_santri_2': { code: 'KDS', color: 'bg-blue-100 text-blue-800', label: 'Kedatangan Santri' },
+            'awal_semester_2': { code: 'AS2', color: 'bg-blue-200 text-blue-800', label: 'Awal Semester' },
+            'ldks': { code: 'LDK', color: 'bg-indigo-100 text-indigo-800', label: 'LDKS' },
+            'uts_2': { code: 'UT2', color: 'bg-yellow-100 text-yellow-800', label: 'Ujian Tengah Semester' },
+            'uas_2': { code: 'UA2', color: 'bg-yellow-200 text-yellow-800', label: 'Ujian Akhir Semester' },
+            'pas_2': { code: 'PA2', color: 'bg-yellow-200 text-yellow-800', label: 'Penilaian Akhir Semester' },
+            'class_meeting_2': { code: 'PP2', color: 'bg-purple-100 text-purple-800', label: 'Pekan Prestasi' },
+            'terima_raport_2': { code: 'TR2', color: 'bg-blue-200 text-blue-800', label: 'Terima Raport' },
+            'libur_semester_2': { code: 'LS2', color: 'bg-gray-200 text-gray-700', label: 'Libur Semester' },
+            'hut_ri': { code: '178', color: 'bg-red-200 text-red-800', label: 'Hari Nasional' },
+            'maulid_nabi': { code: 'MLD', color: 'bg-green-200 text-green-800', label: 'Hari Besar Islam' },
+            'isra_miraj': { code: 'IMN', color: 'bg-green-200 text-green-800', label: 'Hari Besar Islam' },
+            'idul_fitri': { code: 'IDF', color: 'bg-green-300 text-green-900', label: 'Idul Fitri' },
+            'idul_adha': { code: 'IDA', color: 'bg-green-300 text-green-900', label: 'Idul Adha' },
+            'tahun_baru_hijriyah': { code: 'TBH', color: 'bg-green-200 text-green-800', label: 'Hari Besar Islam' },
+            'libur_ramadhan': { code: 'LBR', color: 'bg-gray-200 text-gray-700', label: 'Libur Ramadhan' },
+            'libur_syawal': { code: 'LBS', color: 'bg-gray-200 text-gray-700', label: 'Libur Syawal' },
         };
 
         // --- GENERATE TABLE ---
@@ -297,16 +304,16 @@
                     if (cellDate.getMonth() !== monthIndex) continue;
 
                     for (const eventKey in events) {
-                        const event = events[eventKey];
-                        if (!event.start) continue;
+                        const eventData = events[eventKey];
+                        if (!eventData.start_date) continue;
 
-                        const startDate = new Date(event.start + 'T00:00:00');
-                        const endDate = event.end ? new Date(event.end + 'T00:00:00') : startDate;
+                        const startDate = new Date(eventData.start_date + 'T00:00:00');
+                        const endDate = eventData.end_date ? new Date(eventData.end_date + 'T00:00:00') : startDate;
 
                         if (cellDate >= startDate && cellDate <= endDate) {
                             const style = eventStyles[eventKey];
                             if (style) {
-                                cell.innerHTML = `<div class="w-full h-full flex items-center justify-center ${style.color} rounded-sm">${style.abbr}</div>`;
+                                cell.innerHTML = `<div class="w-full h-full flex items-center justify-center ${style.color} rounded-sm">${style.code}</div>`;
                                 cell.title = style.label; // Tooltip
                                 break; // Pindah ke sel berikutnya setelah event ditemukan
                             }
