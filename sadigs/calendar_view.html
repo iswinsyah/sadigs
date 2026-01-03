@@ -270,10 +270,10 @@
                 document.getElementById('groupSantri').classList.remove('hidden');
 
                 // --- Ambil data kalender dan isi tabel ---
-                const calRes = await fetch('sadigs_api_v3/calendar.php?t=' + new Date().getTime());
+                const calRes = await fetch('sadigs_api_v3/calendar_events_api.php?t=' + new Date().getTime());
                 const calData = await calRes.json();
-                if (calData.success && calData.events) {
-                    populateTable(calData.events);
+                if (calData.success && calData.data) {
+                    populateTable(calData.data);
                     populateLegend();
                 }
 
