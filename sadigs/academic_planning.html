@@ -8,6 +8,12 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
+        /* Custom scrollbar for table */
+        .custom-scrollbar::-webkit-scrollbar { height: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
         body{font-family:'Inter',sans-serif;}
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -129,6 +135,69 @@
                     </div>
                 </div>
                 <div id="error" class="hidden bg-red-50 p-4 rounded-lg text-red-700"></div>
+
+                <!-- PROGRAM SEMESTER -->
+                <div class="mt-12">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Program Semester (Promes)</h2>
+                    
+                    <!-- Promes Ganjil -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">Semester Ganjil</h3>
+                        <div class="overflow-x-auto custom-scrollbar pb-2">
+                            <table class="w-full text-xs border-collapse min-w-[1200px]" id="tablePromesGanjil">
+                                <thead class="bg-gray-100">
+                                    <tr>
+                                        <th rowspan="2" class="p-2 text-left border w-10">No</th>
+                                        <th rowspan="2" class="p-2 text-left border min-w-[250px]">Tujuan Pembelajaran / Materi Pokok</th>
+                                        <th rowspan="2" class="p-2 text-center border w-20">Alokasi Waktu (JP)</th>
+                                        <th colspan="5" class="p-1 text-center border bg-gray-200">Juli</th>
+                                        <th colspan="5" class="p-1 text-center border bg-gray-200">Agustus</th>
+                                        <th colspan="5" class="p-1 text-center border bg-gray-200">September</th>
+                                        <th colspan="5" class="p-1 text-center border bg-gray-200">Oktober</th>
+                                        <th colspan="5" class="p-1 text-center border bg-gray-200">November</th>
+                                        <th colspan="5" class="p-1 text-center border bg-gray-200">Desember</th>
+                                    </tr>
+                                    <tr class="bg-gray-50">
+                                        <script>for(let i=0; i<6; i++) for(let w=1; w<=5; w++) document.write(`<th class="p-1 text-center border text-gray-500 w-6">${w}</th>`);</script>
+                                    </tr>
+                                </thead>
+                                <tbody id="promesGanjilBody">
+                                    <!-- Rows will be added by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <button onclick="addRow('ganjil')" class="mt-4 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold py-2 px-4 rounded-lg transition">+ Tambah Baris</button>
+                    </div>
+
+                    <!-- Promes Genap -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">Semester Genap</h3>
+                        <div class="overflow-x-auto custom-scrollbar pb-2">
+                            <table class="w-full text-xs border-collapse min-w-[1200px]" id="tablePromesGenap">
+                                <thead class="bg-gray-100">
+                                    <tr>
+                                        <th rowspan="2" class="p-2 text-left border w-10">No</th>
+                                        <th rowspan="2" class="p-2 text-left border min-w-[250px]">Tujuan Pembelajaran / Materi Pokok</th>
+                                        <th rowspan="2" class="p-2 text-center border w-20">Alokasi Waktu (JP)</th>
+                                        <th colspan="5" class="p-1 text-center border bg-gray-200">Januari</th>
+                                        <th colspan="5" class="p-1 text-center border bg-gray-200">Februari</th>
+                                        <th colspan="5" class="p-1 text-center border bg-gray-200">Maret</th>
+                                        <th colspan="5" class="p-1 text-center border bg-gray-200">April</th>
+                                        <th colspan="5" class="p-1 text-center border bg-gray-200">Mei</th>
+                                        <th colspan="5" class="p-1 text-center border bg-gray-200">Juni</th>
+                                    </tr>
+                                    <tr class="bg-gray-50">
+                                        <script>for(let i=0; i<6; i++) for(let w=1; w<=5; w++) document.write(`<th class="p-1 text-center border text-gray-500 w-6">${w}</th>`);</script>
+                                    </tr>
+                                </thead>
+                                <tbody id="promesGenapBody">
+                                    <!-- Rows will be added by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <button onclick="addRow('genap')" class="mt-4 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold py-2 px-4 rounded-lg transition">+ Tambah Baris</button>
+                    </div>
+                </div>
             </div>
         </main>
     </div>
@@ -217,6 +286,32 @@
             document.getElementById('ganjil_efektif').textContent = finalEfektifGanjil;
             document.getElementById('genap_efektif').textContent = finalEfektifGenap;
         }
+
+        function addRow(semester) {
+            const tbodyId = semester === 'ganjil' ? 'promesGanjilBody' : 'promesGenapBody';
+            const tbody = document.getElementById(tbodyId);
+            const rowCount = tbody.rows.length + 1;
+
+            const tr = document.createElement('tr');
+            tr.className = 'border-b';
+
+            let cellsHTML = `
+                <td class="p-1 text-center border">${rowCount}</td>
+                <td class="p-1 border" contenteditable="true"></td>
+                <td class="p-1 border text-center" contenteditable="true"></td>
+            `;
+
+            // 6 bulan * 5 pekan = 30 checkbox
+            for (let i = 0; i < 30; i++) {
+                cellsHTML += `<td class="p-1 border text-center"><input type="checkbox" class="w-3 h-3"></td>`;
+            }
+
+            tr.innerHTML = cellsHTML;
+            tbody.appendChild(tr);
+        }
+
+        // Tambahkan 5 baris awal sebagai contoh
+        for(let i=0; i<5; i++) { addRow('ganjil'); addRow('genap'); }
 
         async function calculateWeeks() {
             try {
