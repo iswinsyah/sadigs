@@ -12,15 +12,31 @@ try {
         $events[$event['event_key']] = $event;
     }
 
-    // Get semester boundaries
-    $start_ganjil = $events['awal_semester_1']['start_date'] ?? null;
-    $end_ganjil = $events['terima_raport_1']['end_date'] ?? $events['terima_raport_1']['start_date'] ?? null;
-    $start_genap = $events['awal_semester_2']['start_date'] ?? null;
-    $end_genap = $events['terima_raport_2']['end_date'] ?? $events['terima_raport_2']['start_date'] ?? null;
-
-    if (!$start_ganjil || !$end_ganjil || !$start_genap || !$end_genap) {
-        throw new Exception("Batas awal dan akhir semester Ganjil & Genap belum diatur di Kalender Pendidikan.");
+    // Helper function to find date from multiple possible keys (New & Old compatibility)
+    function find_date($events, $keys, $type = 'start') {
+        foreach ($keys as $key) {
+            if (isset($events[$key])) {
+                if ($type === 'start' && !empty($events[$key]['start_date'])) return $events[$key]['start_date'];
+                if ($type === 'end') {
+                    if (!empty($events[$key]['end_date'])) return $events[$key]['end_date'];
+                    if (!empty($events[$key]['start_date'])) return $events[$key]['start_date']; // Fallback
+                }
+            }
+        }
+        return null;
     }
+
+    // Get semester boundaries with fallback to old keys
+    $start_ganjil = find_date($events, ['awal_semester_1', 'start_ganjil'], 'start');
+    $end_ganjil   = find_date($events, ['terima_raport_1', 'end_ganjil', 'raport_semester_ganjil'], 'end');
+    $start_genap  = find_date($events, ['awal_semester_2', 'start_genap'], 'start');
+    $end_genap    = find_date($events, ['terima_raport_2', 'end_genap', 'raport_semester_genap'], 'end');
+
+    // Specific error reporting
+    if (!$start_ganjil) throw new Exception("Tanggal 'Awal Semester Ganjil' belum diatur.");
+    if (!$end_ganjil) throw new Exception("Tanggal 'Terima Raport Ganjil' belum diatur.");
+    if (!$start_genap) throw new Exception("Tanggal 'Awal Semester Genap' belum diatur.");
+    if (!$end_genap) throw new Exception("Tanggal 'Terima Raport Genap' belum diatur.");
 
     // Identify all non-effective event keys
     $non_effective_keys = [
@@ -43,7 +59,9 @@ try {
         'idul_adha', // Idul Adha
         'tahun_baru_hijriyah', // Tahun Baru Hijriyah
         'libur_ramadhan', // Libur Awal Ramadhan
-        'libur_syawal' // Libur Hari Raya
+        'libur_syawal', // Libur Hari Raya
+        // Compatibility with old keys
+        'uts_ganjil', 'uas_ganjil', 'uts_genap', 'uas_genap', 'libur_semester_ganjil', 'libur_semester_genap'
     ];
 
     $non_effective_periods = [];
