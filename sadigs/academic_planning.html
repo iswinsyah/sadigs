@@ -90,6 +90,10 @@
                                 <span class="text-gray-600">Pekan Tidak Efektif</span>
                                 <span id="ganjil_non_efektif" class="font-bold text-lg text-red-600">...</span>
                             </div>
+                            <div class="flex justify-between items-center">
+                                <label for="ganjil_cadangan" class="text-gray-600">Cadangan</label>
+                                <input type="number" id="ganjil_cadangan" value="0" min="0" class="w-20 p-1 border border-gray-300 rounded-md text-center font-bold" oninput="recalculateEffectiveWeeks()">
+                            </div>
                             <div class="flex justify-between items-center bg-green-50 p-3 rounded-lg mt-2">
                                 <span class="text-green-800 font-bold">Pekan Efektif</span>
                                 <span id="ganjil_efektif" class="font-extrabold text-2xl text-green-700">...</span>
@@ -113,6 +117,10 @@
                                 <span class="text-gray-600">Pekan Tidak Efektif</span>
                                 <span id="genap_non_efektif" class="font-bold text-lg text-red-600">...</span>
                             </div>
+                            <div class="flex justify-between items-center">
+                                <label for="genap_cadangan" class="text-gray-600">Cadangan</label>
+                                <input type="number" id="genap_cadangan" value="0" min="0" class="w-20 p-1 border border-gray-300 rounded-md text-center font-bold" oninput="recalculateEffectiveWeeks()">
+                            </div>
                             <div class="flex justify-between items-center bg-green-50 p-3 rounded-lg mt-2">
                                 <span class="text-green-800 font-bold">Pekan Efektif</span>
                                 <span id="genap_efektif" class="font-extrabold text-2xl text-green-700">...</span>
@@ -127,6 +135,7 @@
 
     <script>
         lucide.createIcons();
+        let initialEffectiveWeeks = { ganjil: 0, genap: 0 };
 
         // Mobile Menu Logic
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
@@ -198,6 +207,17 @@
             container.innerHTML = tableHTML;
         }
 
+        function recalculateEffectiveWeeks() {
+            const cadanganGanjil = parseInt(document.getElementById('ganjil_cadangan').value) || 0;
+            const cadanganGenap = parseInt(document.getElementById('genap_cadangan').value) || 0;
+
+            const finalEfektifGanjil = initialEffectiveWeeks.ganjil - cadanganGanjil;
+            const finalEfektifGenap = initialEffectiveWeeks.genap - cadanganGenap;
+
+            document.getElementById('ganjil_efektif').textContent = finalEfektifGanjil;
+            document.getElementById('genap_efektif').textContent = finalEfektifGenap;
+        }
+
         async function calculateWeeks() {
             try {
                 const res = await fetch('sadigs_api_v3/calculate_academic_weeks.php');
@@ -210,15 +230,18 @@
                 const { ganjil, genap } = result.data;
                 document.getElementById('ganjil_total').textContent = ganjil.total_weeks;
                 document.getElementById('ganjil_non_efektif').textContent = ganjil.non_effective_weeks;
-                document.getElementById('ganjil_efektif').textContent = ganjil.effective_weeks;
+                initialEffectiveWeeks.ganjil = ganjil.effective_weeks;
 
                 document.getElementById('genap_total').textContent = genap.total_weeks;
                 document.getElementById('genap_non_efektif').textContent = genap.non_effective_weeks;
-                document.getElementById('genap_efektif').textContent = genap.effective_weeks;
+                initialEffectiveWeeks.genap = genap.effective_weeks;
 
                 // Render tabel rincian bulanan
                 renderMonthlyTable('ganjil', ganjil.monthly_breakdown);
                 renderMonthlyTable('genap', genap.monthly_breakdown);
+
+                // Lakukan kalkulasi awal dengan cadangan 0
+                recalculateEffectiveWeeks();
 
                 document.getElementById('loading').classList.add('hidden');
                 document.getElementById('content').classList.remove('hidden');
