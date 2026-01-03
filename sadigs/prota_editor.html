@@ -113,9 +113,12 @@
                         <label class="block text-xs font-medium text-gray-500">Fase / Kelas</label>
                         <input type="text" id="filterGrade" class="w-full p-2 border border-gray-300 rounded-lg mt-1" placeholder="Contoh: Fase D / Kelas 7">
                     </div>
-                    <div class="flex items-end">
+                    <div class="flex items-end gap-2">
                         <button onclick="loadData()" class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-md flex justify-center items-center gap-2">
                             <i data-lucide="search" class="w-5 h-5"></i> Tampilkan
+                        </button>
+                        <button onclick="generateSyllabus()" id="generateBtn" class="w-full md:w-auto bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-md flex justify-center items-center gap-2">
+                            <i data-lucide="sparkles" class="w-5 h-5"></i> Generate (AI)
                         </button>
                     </div>
                 </div>
@@ -475,6 +478,46 @@
                 }
             } catch (err) {
                 alert('Gagal menyimpan Promes: ' + err.message);
+            }
+        }
+
+        async function generateSyllabus() {
+            const subject = document.getElementById('filterSubject').value;
+            const grade = document.getElementById('filterGrade').value;
+            if (!subject || !grade) {
+                alert('Mata Pelajaran dan Fase/Kelas wajib diisi untuk generate silabus.');
+                return;
+            }
+
+            if (!confirm(`Anda yakin ingin men-generate silabus untuk ${subject} - ${grade}?\n\nPERINGATAN: Tindakan ini akan MENGHAPUS dan MENGGANTI semua Tujuan Pembelajaran yang sudah ada untuk mata pelajaran ini.`)) {
+                return;
+            }
+
+            const generateBtn = document.getElementById('generateBtn');
+            generateBtn.disabled = true;
+            generateBtn.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Generating...`;
+            lucide.createIcons();
+
+            try {
+                const res = await fetch('sadigs_api_v3/generate_syllabus_api.php', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ subject, grade })
+                });
+
+                const result = await res.json();
+                if (!result.success) {
+                    throw new Error(result.message);
+                }
+
+                alert(result.message);
+                loadData(); // Muat ulang data Prota & Promes
+            } catch (err) {
+                alert('Gagal generate silabus: ' + err.message);
+            } finally {
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = `<i data-lucide="sparkles" class="w-5 h-5"></i> Generate (AI)`;
+                lucide.createIcons();
             }
         }
     </script>
