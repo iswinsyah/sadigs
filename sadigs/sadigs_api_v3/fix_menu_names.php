@@ -64,8 +64,7 @@ try {
         'navRppGenerator' => 'RPP Generator (AI)',
         'navYayasanWidget' => 'Ringkasan Manajemen',
         'navMusyrifWidget' => 'Ringkasan Musyrif',
-        'navPerencanaanAkademik' => 'Agenda Ustadz',
-        'navProta' => 'Prota & Promes',
+        'navPerencanaanAkademik' => 'Buku Kerja Ustadz',
     ];
 
     $stmt = $pdo->prepare("INSERT INTO menus (menu_id, menu_name) VALUES (?, ?) ON DUPLICATE KEY UPDATE menu_name = VALUES(menu_name)");
