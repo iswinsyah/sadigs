@@ -138,7 +138,29 @@
 
                 <!-- PROGRAM SEMESTER -->
                 <div class="mt-12">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">Program Semester (Promes)</h2>
+                    <h2 class="text-xl font-bold text-gray-800">Program Semester (Promes)</h2>
+
+                    <!-- Generator Controls -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 my-4 flex flex-col md:flex-row gap-4 items-end">
+                        <div class="flex-1">
+                            <label for="promesSubject" class="block text-sm font-medium text-gray-500">Mata Pelajaran</label>
+                            <input type="text" id="promesSubject" class="w-full p-2 border border-gray-300 rounded-lg mt-1" placeholder="Contoh: Ilmu Pengetahuan Alam">
+                        </div>
+                        <div class="flex-1">
+                            <label for="promesGrade" class="block text-sm font-medium text-gray-500">Kelas</label>
+                            <select id="promesGrade" class="w-full p-2 border border-gray-300 rounded-lg mt-1 bg-white appearance-none">
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
+                            </select>
+                        </div>
+                        <button onclick="generatePromes()" id="generatePromesBtn" class="w-full md:w-auto bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-md flex justify-center items-center gap-2">
+                            <i data-lucide="sparkles" class="w-5 h-5"></i> Generate
+                        </button>
+                    </div>
                     
                     <!-- Promes Ganjil -->
                     <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8">
@@ -287,7 +309,67 @@
             document.getElementById('genap_efektif').textContent = finalEfektifGenap;
         }
 
-        function addRow(semester) {
+        async function generatePromes() {
+            const subject = document.getElementById('promesSubject').value;
+            const grade = document.getElementById('promesGrade').value;
+
+            if (!subject || !grade) {
+                alert('Mata Pelajaran dan Kelas harus diisi.');
+                return;
+            }
+
+            const btn = document.getElementById('generatePromesBtn');
+            const originalHTML = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Generating...`;
+            lucide.createIcons();
+
+            // Clear existing tables
+            document.getElementById('promesGanjilBody').innerHTML = '<tr><td colspan="33" class="p-4 text-center text-gray-400">AI sedang bekerja...</td></tr>';
+            document.getElementById('promesGenapBody').innerHTML = '<tr><td colspan="33" class="p-4 text-center text-gray-400">AI sedang bekerja...</td></tr>';
+
+            try {
+                const res = await fetch('sadigs_api_v3/generate_promes_api.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ subject, grade })
+                });
+
+                const result = await res.json();
+                if (!result.success) {
+                    throw new Error(result.message);
+                }
+                
+                populatePromesTable('ganjil', result.data.ganjil);
+                populatePromesTable('genap', result.data.genap);
+
+            } catch (err) {
+                alert('Gagal generate Promes: ' + err.message);
+                document.getElementById('promesGanjilBody').innerHTML = '<tr><td colspan="33" class="p-4 text-center text-red-500">Gagal.</td></tr>';
+                document.getElementById('promesGenapBody').innerHTML = '<tr><td colspan="33" class="p-4 text-center text-red-500">Gagal.</td></tr>';
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHTML;
+                lucide.createIcons();
+            }
+        }
+
+        function populatePromesTable(semester, items) {
+            const tbodyId = semester === 'ganjil' ? 'promesGanjilBody' : 'promesGenapBody';
+            const tbody = document.getElementById(tbodyId);
+            tbody.innerHTML = '';
+
+            if (!items || items.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="33" class="p-4 text-center text-gray-400 italic">Tidak ada materi ditemukan untuk semester ini.</td></tr>';
+                return;
+            }
+
+            items.forEach((item, index) => {
+                addRow(semester, item);
+            });
+        }
+
+        function addRow(semester, content = '') {
             const tbodyId = semester === 'ganjil' ? 'promesGanjilBody' : 'promesGenapBody';
             const tbody = document.getElementById(tbodyId);
             const rowCount = tbody.rows.length + 1;
@@ -297,7 +379,7 @@
 
             let cellsHTML = `
                 <td class="p-1 text-center border">${rowCount}</td>
-                <td class="p-1 border" contenteditable="true"></td>
+                <td class="p-1 border" contenteditable="true">${content}</td>
                 <td class="p-1 border text-center" contenteditable="true"></td>
             `;
 
@@ -310,8 +392,9 @@
             tbody.appendChild(tr);
         }
 
-        // Tambahkan 5 baris awal sebagai contoh
-        for(let i=0; i<5; i++) { addRow('ganjil'); addRow('genap'); }
+        // Kosongkan tabel saat pertama kali dimuat
+        document.getElementById('promesGanjilBody').innerHTML = '<tr><td colspan="33" class="p-4 text-center text-gray-400 italic">Isi form di atas dan klik Generate untuk mengisi tabel ini.</td></tr>';
+        document.getElementById('promesGenapBody').innerHTML = '<tr><td colspan="33" class="p-4 text-center text-gray-400 italic">Isi form di atas dan klik Generate untuk mengisi tabel ini.</td></tr>';
 
         async function calculateWeeks() {
             try {
