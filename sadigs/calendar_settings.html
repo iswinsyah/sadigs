@@ -22,8 +22,52 @@
         </div>
 
         <!-- Konten akan ditambahkan di sini sesuai arahan selanjutnya -->
-        <div id="calendar-container" class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <p class="text-center text-gray-500">Konten kalender akan ditata ulang di sini.</p>
+        <div id="calendar-container" class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-sm">
+                    <thead class="bg-gray-50 border-b border-gray-200">
+                        <tr>
+                            <th class="p-3 text-left font-bold text-gray-600 w-12">No.</th>
+                            <th class="p-3 text-left font-bold text-gray-600">Kegiatan</th>
+                            <th class="p-3 text-left font-bold text-gray-600">Kode</th>
+                            <th class="p-3 text-left font-bold text-gray-600">Mulai Tanggal</th>
+                            <th class="p-3 text-left font-bold text-gray-600">Sampai Tanggal</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        <tr class="hover:bg-gray-50"> <td class="p-3">1</td> <td class="p-3 font-medium">Hari Ahad pekan pertama bulan Juli</td> <td class="p-3">A1J</td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> </tr>
+                        <tr class="hover:bg-gray-50"> <td class="p-3">2</td> <td class="p-3 font-medium">Kedatangan Santri</td> <td class="p-3">KDS</td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> </tr>
+                        <tr class="hover:bg-gray-50"> <td class="p-3">3</td> <td class="p-3 font-medium">Awal Semester ganjil</td> <td class="p-3">AS1</td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> </tr>
+                        <tr class="hover:bg-gray-50"> <td class="p-3">4</td> <td class="p-3 font-medium">Masa Orientasi Santri</td> <td class="p-3">MOS</td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> </tr>
+                        <tr class="hover:bg-gray-50"> <td class="p-3">5</td> <td class="p-3 font-medium">Ujian Tengah Semester Ganjil</td> <td class="p-3">UT1</td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> </tr>
+                        <tr class="hover:bg-gray-50"> <td class="p-3">6</td> <td class="p-3 font-medium">Ujian Akhir Semester Ganjil</td> <td class="p-3">UA1</td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> </tr>
+                        <tr class="hover:bg-gray-50"> <td class="p-3">7</td> <td class="p-3 font-medium">Penilaian Akhir Semester Ganjil</td> <td class="p-3">PA1</td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> </tr>
+                        <tr class="hover:bg-gray-50"> <td class="p-3">8</td> <td class="p-3 font-medium">Pekan Prestasi (Class Meeting)</td> <td class="p-3">PP1</td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> </tr>
+                        <tr class="hover:bg-gray-50"> <td class="p-3">9</td> <td class="p-3 font-medium">Terima Raport & Penjemputan</td> <td class="p-3">TR1</td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> </tr>
+                        <tr class="hover:bg-gray-50"> <td class="p-3">10</td> <td class="p-3 font-medium">Libur Semester 1</td> <td class="p-3">LS1</td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> </tr>
+                        <tr class="hover:bg-gray-50"> <td class="p-3">11</td> <td class="p-3 font-medium">Kedatangan Santri</td> <td class="p-3">KDS</td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> </tr>
+                        <tr class="hover:bg-gray-50"> <td class="p-3">12</td> <td class="p-3 font-medium">Awal Semester Genap</td> <td class="p-3">AS2</td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> </tr>
+                        <tr class="hover:bg-gray-50"> <td class="p-3">13</td> <td class="p-3 font-medium">LDKS</td> <td class="p-3">LDK</td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> </tr>
+                        <tr class="hover:bg-gray-50"> <td class="p-3">14</td> <td class="p-3 font-medium">Ujian Tengah Semester Genap</td> <td class="p-3">UT2</td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> </tr>
+                        <tr class="hover:bg-gray-50"> <td class="p-3">15</td> <td class="p-3 font-medium">Ujian Akhir Semester Genap</td> <td class="p-3">UA2</td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> </tr>
+                        <tr class="hover:bg-gray-50"> <td class="p-3">16</td> <td class="p-3 font-medium">Penilaian Akhir Semester Genap</td> <td class="p-3">PA2</td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> </tr>
+                        <tr class="hover:bg-gray-50"> <td class="p-3">17</td> <td class="p-3 font-medium">Pekan Prestasi (Class Meeting)</td> <td class="p-3">PP2</td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> </tr>
+                        <tr class="hover:bg-gray-50"> <td class="p-3">18</td> <td class="p-3 font-medium">Terima Raport & Penjemputan</td> <td class="p-3">TR2</td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> </tr>
+                        <tr class="hover:bg-gray-50"> <td class="p-3">19</td> <td class="p-3 font-medium">Libur Semester 2</td> <td class="p-3">LS2</td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> </tr>
+                        <tr class="hover:bg-gray-50"> <td class="p-3">20</td> <td class="p-3 font-medium">HUT RI</td> <td class="p-3">178</td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> </tr>
+                        <tr class="hover:bg-gray-50"> <td class="p-3">21</td> <td class="p-3 font-medium">Maulid Nabi SAW</td> <td class="p-3">MLD</td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> </tr>
+                        <tr class="hover:bg-gray-50"> <td class="p-3">22</td> <td class="p-3 font-medium">Isro' Mi'roj</td> <td class="p-3">IMN</td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> </tr>
+                        <tr class="hover:bg-gray-50"> <td class="p-3">23</td> <td class="p-3 font-medium">Idul Fitri</td> <td class="p-3">IDF</td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> </tr>
+                        <tr class="hover:bg-gray-50"> <td class="p-3">24</td> <td class="p-3 font-medium">Idul Adha</td> <td class="p-3">IDA</td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> </tr>
+                        <tr class="hover:bg-gray-50"> <td class="p-3">25</td> <td class="p-3 font-medium">Tahun Baru Hijriyah</td> <td class="p-3">TBH</td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> <td class="p-3"><input type="date" class="p-1 border rounded-md"></td> </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="p-4 bg-gray-50 border-t">
+                <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-md">
+                    Simpan Kalender
+                </button>
+            </div>
         </div>
 
     </div>
