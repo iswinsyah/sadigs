@@ -13,10 +13,10 @@ try {
     }
 
     // Get semester boundaries
-    $start_ganjil = $events['start_ganjil']['start_date'] ?? null;
-    $end_ganjil = $events['end_ganjil']['end_date'] ?? null;
-    $start_genap = $events['start_genap']['start_date'] ?? null;
-    $end_genap = $events['end_genap']['end_date'] ?? null;
+    $start_ganjil = $events['awal_semester_1']['start_date'] ?? null;
+    $end_ganjil = $events['terima_raport_1']['end_date'] ?? $events['terima_raport_1']['start_date'] ?? null;
+    $start_genap = $events['awal_semester_2']['start_date'] ?? null;
+    $end_genap = $events['terima_raport_2']['end_date'] ?? $events['terima_raport_2']['start_date'] ?? null;
 
     if (!$start_ganjil || !$end_ganjil || !$start_genap || !$end_genap) {
         throw new Exception("Batas awal dan akhir semester Ganjil & Genap belum diatur di Kalender Pendidikan.");
@@ -24,10 +24,27 @@ try {
 
     // Identify all non-effective event keys
     $non_effective_keys = [
-        'libur_awal_puasa', 'libur_idul_fitri', 'libur_semester_ganjil',
-        'libur_semester_genap', 'uts_ganjil', 'uas_ganjil', 'uts_genap', 'uas_genap'
+        'mos', // Masa Orientasi
+        'uts_1', // Ujian Tengah Semester Ganjil
+        'uas_1', // Ujian Akhir Semester Ganjil
+        'pas_1', // Penilaian Akhir Semester Ganjil
+        'class_meeting_1', // Pekan Prestasi Ganjil
+        'libur_semester_1', // Libur Semester 1
+        'ldks', // LDKS
+        'uts_2', // Ujian Tengah Semester Genap
+        'uas_2', // Ujian Akhir Semester Genap
+        'pas_2', // Penilaian Akhir Semester Genap
+        'class_meeting_2', // Pekan Prestasi Genap
+        'libur_semester_2', // Libur Semester 2
+        'hut_ri', // HUT RI
+        'maulid_nabi', // Maulid Nabi
+        'isra_miraj', // Isra' Mi'raj
+        'idul_fitri', // Idul Fitri
+        'idul_adha', // Idul Adha
+        'tahun_baru_hijriyah', // Tahun Baru Hijriyah
+        'libur_ramadhan', // Libur Awal Ramadhan
+        'libur_syawal' // Libur Hari Raya
     ];
-    for ($i = 1; $i <= 10; $i++) { $non_effective_keys[] = "libur_nasional_$i"; }
 
     $non_effective_periods = [];
     foreach ($non_effective_keys as $key) {
