@@ -84,6 +84,7 @@ try {
         
         $total_weeks = 0;
         $non_effective_weeks = 0;
+        $monthly_breakdown = [];
         
         $current = clone $start;
         $current->modify('monday this week');
@@ -93,20 +94,34 @@ try {
             $week_start = clone $current;
             $week_end = (clone $current)->modify('+6 days');
 
+            // Dapatkan bulan untuk pekan ini (berdasarkan hari Senin)
+            $month_of_week = (int)$current->format('n'); // 1-12
+            if (!isset($monthly_breakdown[$month_of_week])) {
+                $monthly_breakdown[$month_of_week] = ['total' => 0, 'non_effective' => 0];
+            }
+            $monthly_breakdown[$month_of_week]['total']++;
+
             foreach ($non_effective_periods as $period) {
                 // Cek jika pekan ini tumpang tindih dengan periode tidak efektif
                 if ($week_start <= $period['end'] && $week_end >= $period['start']) {
                     $non_effective_weeks++;
+                    $monthly_breakdown[$month_of_week]['non_effective']++;
                     break; 
                 }
             }
             $current->modify('+1 week');
         }
 
+        // Tambahkan pekan efektif ke rincian bulanan
+        foreach ($monthly_breakdown as $month => &$data) {
+            $data['effective'] = $data['total'] - $data['non_effective'];
+        }
+
         return [
             'total_weeks' => $total_weeks,
             'non_effective_weeks' => $non_effective_weeks,
-            'effective_weeks' => $total_weeks - $non_effective_weeks
+            'effective_weeks' => $total_weeks - $non_effective_weeks,
+            'monthly_breakdown' => $monthly_breakdown
         ];
     }
 
