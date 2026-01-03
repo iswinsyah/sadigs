@@ -7,51 +7,143 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>body{font-family:'Inter',sans-serif;}</style>
+    <style>
+        body{font-family:'Inter',sans-serif;}
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
 </head>
-<body class="bg-gray-50">
-    <div class="max-w-7xl mx-auto p-4 lg:p-8">
-        <div class="flex items-center gap-3 mb-6">
-            <div class="flex items-center gap-3">
-                <a href="dashboard.html" class="p-2 bg-white rounded-full shadow-sm hover:bg-gray-100 transition"><i data-lucide="arrow-left" class="w-5 h-5 text-gray-600"></i></a>
-                <div>
-                    <h1 class="text-2xl font-bold text-gray-800">Atur Kalender Pendidikan</h1>
-                    <p class="text-sm text-gray-500">Tata ulang kalender pendidikan dari awal.</p>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+
+    <!-- HEADER MOBILE -->
+    <div class="lg:hidden flex justify-between items-center bg-teal-600 text-white p-4 shadow-md sticky top-0 z-50">
+        <div class="font-bold text-xl flex items-center gap-2"><span>SADIGS 3.0</span></div>
+        <button id="mobileMenuBtn" class="focus:outline-none p-1 rounded hover:bg-teal-700 transition"><i data-lucide="menu" class="w-7 h-7"></i></button>
+    </div>
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR -->
+        <aside id="sidebar" class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col transition-transform transform -translate-x-full lg:translate-x-0 fixed lg:static h-full z-40 shadow-2xl lg:shadow-none">
+            <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-teal-600 text-white">
+                <h1 class="text-2xl font-extrabold tracking-wider">SADIGS</h1>
+            </div>
+            <div class="p-6 border-b border-gray-100 bg-teal-50">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-teal-200 flex items-center justify-center text-teal-800 font-bold text-lg shadow-sm"><span id="userInitial">U</span></div>
+                    <div class="overflow-hidden">
+                        <p id="sidebarUsername" class="font-bold text-gray-800 text-sm truncate">Memuat...</p>
+                        <p id="sidebarRole" class="text-xs text-gray-500 truncate font-medium">Role...</p>
+                    </div>
                 </div>
             </div>
-        </div>
+            <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-2 no-scrollbar">
+                <!-- Div 1: UMUM -->
+                <div class="bg-gray-50 rounded-lg p-2">
+                    <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">UMUM</h3>
+                    <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard</a>
+                    <a href="calendar_view.html" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="table" class="w-5 h-5"></i> Tabel Kalender</a>
+                    <a href="profile.html" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="user" class="w-5 h-5"></i> Profil Saya</a>
+                </div>
+                <!-- Container untuk menu Yayasan -->
+                <div id="menuYayasan" class="hidden space-y-2">
+                    <div class="bg-gray-50 rounded-lg p-2">
+                        <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KHUSUS</h3>
+                        <a id="navVerifikasi" href="verification_management.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="users" class="w-5 h-5"></i> Verifikasi Pegawai</a>
+                        <a id="navQuota" href="quota_management.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="user-cog" class="w-5 h-5"></i> Atur Kuota</a>
+                        <a id="navCalendarSettings" href="calendar_settings.html" class="flex items-center gap-3 px-3 py-2.5 text-teal-700 bg-white rounded-md transition font-semibold text-sm shadow-sm"><i data-lucide="calendar-cog" class="w-5 h-5"></i> Atur Kalender</a>
+                    </div>
+                </div>
+                <div class="pt-2">
+                    <button id="logoutBtn" class="w-full flex items-center gap-3 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition font-medium"><i data-lucide="log-out" class="w-5 h-5"></i> Keluar</button>
+                </div>
+            </nav>
+        </aside>
+        <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden lg:hidden backdrop-blur-sm"></div>
 
-        <!-- Konten akan ditambahkan di sini sesuai arahan selanjutnya -->
-        <div id="calendar-container" class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="min-w-full text-sm">
-                    <thead class="bg-gray-50 border-b border-gray-200">
-                        <tr>
-                            <th class="p-3 text-left font-bold text-gray-600 w-12">No.</th>
-                            <th class="p-3 text-left font-bold text-gray-600">Kegiatan</th>
-                            <th class="p-3 text-left font-bold text-gray-600">Kode</th>
-                            <th class="p-3 text-left font-bold text-gray-600">Mulai Tanggal</th>
-                            <th class="p-3 text-left font-bold text-gray-600">Sampai Tanggal</th>
-                        </tr>
-                    </thead>
-                    <tbody id="events-table-body" class="divide-y divide-gray-100">
-                        <!-- Rows will be generated by JavaScript -->
-                        <tr><td colspan="5" class="p-8 text-center text-gray-400">Memuat daftar kegiatan...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="p-4 bg-gray-50 border-t">
-                <button id="saveButton" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-md flex items-center gap-2">
-                    <i data-lucide="save" class="w-4 h-4"></i>
-                    Simpan Kalender
-                </button>
-            </div>
-        </div>
+        <!-- KONTEN UTAMA -->
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="flex items-center gap-3">
+                        <a href="dashboard.html" class="p-2 bg-white rounded-full shadow-sm hover:bg-gray-100 transition lg:hidden"><i data-lucide="arrow-left" class="w-5 h-5 text-gray-600"></i></a>
+                        <div>
+                            <h1 class="text-2xl font-bold text-gray-800">Atur Kalender Pendidikan</h1>
+                            <p class="text-sm text-gray-500">Tata ulang kalender pendidikan dari awal.</p>
+                        </div>
+                    </div>
+                </div>
 
+                <!-- Konten akan ditambahkan di sini sesuai arahan selanjutnya -->
+                <div id="calendar-container" class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full text-sm">
+                            <thead class="bg-gray-50 border-b border-gray-200">
+                                <tr>
+                                    <th class="p-3 text-left font-bold text-gray-600 w-12">No.</th>
+                                    <th class="p-3 text-left font-bold text-gray-600">Kegiatan</th>
+                                    <th class="p-3 text-left font-bold text-gray-600">Kode</th>
+                                    <th class="p-3 text-left font-bold text-gray-600">Mulai Tanggal</th>
+                                    <th class="p-3 text-left font-bold text-gray-600">Sampai Tanggal</th>
+                                </tr>
+                            </thead>
+                            <tbody id="events-table-body" class="divide-y divide-gray-100">
+                                <!-- Rows will be generated by JavaScript -->
+                                <tr><td colspan="5" class="p-8 text-center text-gray-400">Memuat daftar kegiatan...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="p-4 bg-gray-50 border-t">
+                        <button id="saveButton" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-md flex items-center gap-2">
+                            <i data-lucide="save" class="w-4 h-4"></i>
+                            Simpan Kalender
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
 
     <script>
         lucide.createIcons();
+
+        // Mobile Menu Logic
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        function toggleSidebar() {
+            sidebar.classList.toggle('-translate-x-full');
+            sidebarOverlay.classList.toggle('hidden');
+        }
+        mobileMenuBtn.addEventListener('click', toggleSidebar);
+        sidebarOverlay.addEventListener('click', toggleSidebar);
+
+        // Session Check & Sidebar Init
+        async function initSidebar() {
+            try {
+                const sessionRes = await fetch('sadigs_api_v3/session_check.php');
+                const sessionData = await sessionRes.json();
+                if (!sessionData.success) { window.location.href = 'index.html'; return; }
+
+                document.getElementById('sidebarUsername').textContent = sessionData.username;
+                document.getElementById('userInitial').textContent = sessionData.username.charAt(0).toUpperCase();
+                const rawRoles = sessionData.raw_roles || [];
+                document.getElementById('sidebarRole').textContent = rawRoles.length > 0 ? rawRoles.map(r => r.role_name).join(', ') : 'User';
+
+                const yayasanRoles = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan'];
+                const isYayasan = sessionData.roles.some(r => yayasanRoles.includes(r));
+                if (isYayasan) {
+                    document.getElementById('menuYayasan').classList.remove('hidden');
+                    document.getElementById('navVerifikasi').classList.remove('hidden');
+                    document.getElementById('navQuota').classList.remove('hidden');
+                }
+            } catch (e) { console.error(e); }
+        }
+        initSidebar();
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            if(confirm('Keluar aplikasi?')) window.location.href = 'sadigs_api_v3/logout.php';
+        });
         
         const calendarEvents = [
             { key: 'ahad_juli_1', name: 'Hari Ahad pekan pertama bulan Juli', code: 'A1J' },
