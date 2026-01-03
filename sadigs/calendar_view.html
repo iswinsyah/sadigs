@@ -288,6 +288,12 @@
             const today = new Date();
             const startYear = (today.getMonth() < 6) ? today.getFullYear() - 1 : today.getFullYear();
 
+            // 1. Cari referensi Ahad Pertama Juli
+            let sundayRef = null;
+            if (events['ahad_juli_1'] && events['ahad_juli_1'].start_date) {
+                sundayRef = new Date(events['ahad_juli_1'].start_date + 'T00:00:00');
+            }
+
             const tableRows = tbody.querySelectorAll('tr');
             tableRows.forEach((row, monthRowIndex) => {
                 const monthName = months[monthRowIndex];
@@ -303,6 +309,16 @@
                     // Pastikan tanggal valid untuk bulan tersebut (misal: tidak ada 31 Februari)
                     if (cellDate.getMonth() !== monthIndex) continue;
 
+                    let isSunday = false;
+                    if (sundayRef) {
+                        const diffTime = cellDate.getTime() - sundayRef.getTime();
+                        const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+                        if (diffDays % 7 === 0) {
+                            isSunday = true;
+                        }
+                    }
+
+                    let eventFound = false;
                     for (const eventKey in events) {
                         const eventData = events[eventKey];
                         if (!eventData.start_date) continue;
@@ -315,9 +331,15 @@
                             if (style) {
                                 cell.innerHTML = `<div class="w-full h-full flex items-center justify-center ${style.color} rounded-sm">${style.code}</div>`;
                                 cell.title = style.label; // Tooltip
+                                eventFound = true;
                                 break; // Pindah ke sel berikutnya setelah event ditemukan
                             }
                         }
+                    }
+
+                    if (!eventFound && isSunday) {
+                        cell.innerHTML = `<div class="w-full h-full flex items-center justify-center bg-red-100 text-red-800 rounded-sm">AHD</div>`;
+                        cell.title = "Hari Ahad";
                     }
                 }
             });
