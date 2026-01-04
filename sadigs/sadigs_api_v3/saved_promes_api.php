@@ -21,12 +21,12 @@ try {
             sendJSONResponse(['success' => false, 'message' => 'Mata Pelajaran dan Kelas wajib diisi.'], 400);
         }
 
-        $stmt = $pdo->prepare("SELECT promes_data, status FROM saved_promes WHERE user_id = ? AND subject = ? AND grade = ? AND academic_year = ?");
+        $stmt = $pdo->prepare("SELECT promes_data, status, cp FROM saved_promes WHERE user_id = ? AND subject = ? AND grade = ? AND academic_year = ?");
         $stmt->execute([$user_id, $subject, $grade, $academic_year]);
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($data) {
-            sendJSONResponse(['success' => true, 'data' => json_decode($data['promes_data'], true), 'status' => $data['status']]);
+            sendJSONResponse(['success' => true, 'data' => json_decode($data['promes_data'], true), 'status' => $data['status'], 'cp' => $data['cp']]);
         } else {
             sendJSONResponse(['success' => false, 'message' => 'Data Promes belum tersimpan.'], 404);
         }
@@ -36,6 +36,7 @@ try {
         $subject = isset($input['subject']) ? trim($input['subject']) : null;
         $grade = isset($input['grade']) ? trim($input['grade']) : null;
         $promes_data = $input['promes_data'] ?? null;
+        $cp = $input['cp'] ?? null;
         $action = $input['action'] ?? 'save'; // 'save', 'submit', 'unlock'
 
         if (!$subject || !$grade) {
@@ -55,11 +56,11 @@ try {
         $promes_data_json = json_encode($promes_data);
 
         $stmt = $pdo->prepare(
-            "INSERT INTO saved_promes (user_id, subject, grade, academic_year, promes_data, status) 
-             VALUES (?, ?, ?, ?, ?, ?) 
-             ON DUPLICATE KEY UPDATE promes_data = VALUES(promes_data), status = VALUES(status)"
+            "INSERT INTO saved_promes (user_id, subject, grade, cp, academic_year, promes_data, status) 
+             VALUES (?, ?, ?, ?, ?, ?, ?) 
+             ON DUPLICATE KEY UPDATE promes_data = VALUES(promes_data), status = VALUES(status), cp = VALUES(cp)"
         );
-        $stmt->execute([$user_id, $subject, $grade, $academic_year, $promes_data_json, $status]);
+        $stmt->execute([$user_id, $subject, $grade, $cp, $academic_year, $promes_data_json, $status]);
 
         sendJSONResponse(['success' => true, 'message' => 'Program Semester berhasil disimpan sebagai ' . $status . '.']);
 
