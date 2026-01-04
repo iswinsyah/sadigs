@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RPP Generator (AI) | SADIGS 3.0</title>
+    <title>Modul Ajar Generator | SADIGS 3.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -52,9 +52,9 @@
             <header class="mb-8">
                 <h2 class="text-2xl lg:text-3xl font-bold text-gray-800 flex items-center gap-3">
                     <i data-lucide="brain-circuit" class="w-8 h-8 text-utama"></i>
-                    RPP Generator Berbasis AI
+                    Modul Ajar Generator
                 </h2>
-                <p class="text-gray-500 text-sm mt-1">Buat draf Rencana Pelaksanaan Pembelajaran dengan bantuan kecerdasan buatan.</p>
+                <p class="text-gray-500 text-sm mt-1">Buat draf Modul Ajar dengan bantuan kecerdasan buatan.</p>
             </header>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
@@ -79,7 +79,7 @@
                         </div>
                         <div class="pt-2">
                             <button type="submit" id="generateBtn" class="w-full bg-tombol-utama hover:bg-tombol-utama/90 text-white font-bold py-3 rounded-lg transition shadow-md flex justify-center items-center gap-2">
-                                <i data-lucide="sparkles" class="w-5 h-5"></i> Generate RPP dengan AI
+                                <i data-lucide="sparkles" class="w-5 h-5"></i> Generate Modul Ajar
                             </button>
                         </div>
                     </form>
@@ -88,12 +88,12 @@
                 <!-- Kolom Hasil -->
                 <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-100 min-h-[400px]">
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-bold text-gray-800">Hasil Generasi RPP</h3>
+                        <h3 class="text-lg font-bold text-gray-800">Hasil Generasi Modul Ajar</h3>
                         <button id="saveToAlbumBtn" class="hidden bg-green-100 text-green-700 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-green-200 transition flex items-center gap-2">
                             <i data-lucide="book-plus" class="w-4 h-4"></i> Simpan ke Album
                         </button>
                     </div>
-                    <div id="resultContainer" class="prose max-w-none bg-gray-50 p-4 rounded-lg border border-gray-200 min-h-[300px]">
+                    <div id="resultContainer" class="prose max-w-none bg-gray-50 p-4 rounded-lg border border-gray-200 min-h-[300px]" contenteditable="true">
                         <div id="placeholder" class="text-center text-gray-400 pt-20">Hasil akan muncul di sini...</div>
                         <div id="loading" class="hidden text-center text-gray-500 pt-20 animate-pulse">Memproses permintaan Anda...</div>
                         <div id="rppResult"></div>
@@ -132,7 +132,7 @@
 
         function renderSidebar(allowedMenus) {
             const nav = document.getElementById('sidebarNav');
-            nav.innerHTML = `<div class="bg-gray-50 rounded-lg p-2"><h3 class="px-2 mb-2 text-xs font-bold text-gray-400">KEPEGAWAIAN</h3><a id="navRppGenerator" href="rpp_generator.html" class="flex items-center gap-3 px-3 py-2.5 text-utama bg-white rounded-md transition font-semibold text-sm shadow-sm"><i data-lucide="brain-circuit" class="w-5 h-5"></i> RPP Generator (AI)</a><a id="navRppAlbum" href="rpp_album.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="book-copy" class="w-5 h-5"></i> Album RPP</a></div>`;
+            nav.innerHTML = `<div class="bg-gray-50 rounded-lg p-2"><h3 class="px-2 mb-2 text-xs font-bold text-gray-400">KEPEGAWAIAN</h3><a id="navRppGenerator" href="rpp_generator.html" class="flex items-center gap-3 px-3 py-2.5 text-utama bg-white rounded-md transition font-semibold text-sm shadow-sm"><i data-lucide="brain-circuit" class="w-5 h-5"></i> Modul Ajar Generator</a><a id="navRppAlbum" href="rpp_album.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="book-copy" class="w-5 h-5"></i> Album Modul Ajar</a></div>`;
             allowedMenus.forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.classList.remove('hidden');
@@ -188,7 +188,7 @@
         document.getElementById('saveToAlbumBtn').addEventListener('click', async () => {
             const btn = document.getElementById('saveToAlbumBtn');
             if (!generatedRppContent) {
-                alert('Tidak ada RPP untuk disimpan.');
+                alert('Tidak ada Modul Ajar untuk disimpan.');
                 return;
             }
 
@@ -212,7 +212,7 @@
                 const result = await res.json();
                 alert(result.message);
             } catch (error) {
-                alert('Gagal menyimpan RPP karena kesalahan koneksi.');
+                alert('Gagal menyimpan Modul Ajar karena kesalahan koneksi.');
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = originalBtnHTML;
