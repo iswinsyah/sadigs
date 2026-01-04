@@ -57,53 +57,51 @@ function getMockPromesSyllabus($subject, $grade) {
 
     // Simulasi perbedaan materi berdasarkan kelas untuk Biologi/IPA
     if (strpos($subject_lower, 'biologi') !== false || strpos($subject_lower, 'ipa') !== false) {
-        if ($grade == '10' || $grade == 'X') {
+        if ($grade == '12' || $grade == 'XII') {
             return [
-                'ganjil' => ['Menganalisis berbagai tingkat keanekaragaman hayati.', 'Memahami prinsip klasifikasi makhluk hidup.', 'Menganalisis struktur dan replikasi virus.'],
-                'genap' => ['Menganalisis komponen ekosistem dan interaksinya.', 'Menganalisis data perubahan lingkungan.', 'Menerapkan metode ilmiah dalam pengamatan biologi.']
+                'ganjil' => [
+                    ['topic' => 'Pertumbuhan dan Perkembangan', 'tp' => 'Menjelaskan konsep pertumbuhan dan perkembangan pada tumbuhan.'],
+                    ['topic' => 'Metabolisme Sel', 'tp' => 'Menganalisis proses katabolisme dan anabolisme karbohidrat.'],
+                    ['topic' => 'Metabolisme Sel', 'tp' => 'Menjelaskan keterkaitan proses metabolisme karbohidrat, lemak, dan protein.']
+                ],
+                'genap' => [
+                    ['topic' => 'Genetika', 'tp' => 'Menganalisis pola-pola hereditas pada makhluk hidup.'],
+                    ['topic' => 'Evolusi', 'tp' => 'Menjelaskan teori evolusi dan bukti-bukti yang mendukungnya.'],
+                    ['topic' => 'Bioteknologi', 'tp' => 'Menganalisis prinsip-prinsip bioteknologi dan penerapannya.']
+                ]
             ];
-        } elseif ($grade == '11' || $grade == 'XI') {
+        } elseif ($grade == '10' || $grade == 'X') {
             return [
-                'ganjil' => ['Menjelaskan komponen kimiawi penyusun sel.', 'Menganalisis bioproses dalam sel (transpor membran).', 'Menganalisis struktur jaringan pada tumbuhan.'],
-                'genap' => ['Menganalisis sistem gerak pada manusia.', 'Menganalisis sistem sirkulasi pada manusia.', 'Menganalisis sistem pencernaan makanan.']
+                'ganjil' => [
+                    ['topic' => 'Ruang Lingkup Biologi', 'tp' => 'Menjelaskan ruang lingkup biologi dan metode ilmiah.'],
+                    ['topic' => 'Keanekaragaman Hayati', 'tp' => 'Menganalisis berbagai tingkat keanekaragaman hayati di Indonesia.'],
+                    ['topic' => 'Virus dan Peranannya', 'tp' => 'Mendeskripsikan ciri, replikasi, dan peran virus dalam kehidupan.']
+                ],
+                'genap' => [
+                    ['topic' => 'Protista', 'tp' => 'Mengelompokkan protista berdasarkan ciri-ciri umum.'],
+                    ['topic' => 'Fungi (Jamur)', 'tp' => 'Mengelompokkan jamur berdasarkan ciri dan peranannya.'],
+                    ['topic' => 'Ekologi', 'tp' => 'Menganalisis interaksi antar komponen ekosistem.']
+                ]
             ];
         }
-        // Default Biologi/IPA jika kelas lain
     }
 
     // Data Mock Default Lama
     if (strpos($subject_lower, 'fiqih') !== false) {
         return [
             'ganjil' => [
-                'Memahami konsep Thaharah (bersuci) dari hadas dan najis.',
-                'Menganalisis tata cara wudhu, tayamum, dan mandi wajib.',
-                'Mempraktikkan shalat fardhu lima waktu dengan benar.',
-                'Memahami ketentuan puasa Ramadhan dan puasa sunnah.',
-                'Menganalisis konsep zakat fitrah dan zakat maal.',
+                ['topic' => 'Thaharah', 'tp' => 'Memahami konsep Thaharah (bersuci) dari hadas dan najis.'],
+                ['topic' => 'Thaharah', 'tp' => 'Menganalisis tata cara wudhu, tayamum, dan mandi wajib.'],
+                ['topic' => 'Shalat', 'tp' => 'Mempraktikkan shalat fardhu lima waktu dengan benar.'],
+                ['topic' => 'Puasa', 'tp' => 'Memahami ketentuan puasa Ramadhan dan puasa sunnah.'],
+                ['topic' => 'Zakat', 'tp' => 'Menganalisis konsep zakat fitrah dan zakat maal.']
             ],
             'genap' => [
-                'Memahami sejarah dan tata cara ibadah haji dan umrah.',
-                'Menganalisis konsep jual beli yang sesuai syariat Islam.',
-                'Memahami konsep riba dan bahayanya dalam transaksi ekonomi.',
-                'Menganalisis ketentuan tentang makanan dan minuman yang halal dan haram.',
-                'Memahami konsep pernikahan dan keluarga dalam Islam.',
-            ]
-        ];
-    } elseif (strpos($subject_lower, 'ipa') !== false) {
-        return [
-            'ganjil' => [
-                'Mengidentifikasi ciri-ciri makhluk hidup dan benda mati.',
-                'Menganalisis ekosistem dan interaksi antar komponennya.',
-                'Memahami konsep energi dan transformasinya dalam kehidupan sehari-hari.',
-                'Mendeskripsikan sistem tata surya dan pergerakan benda langit.',
-                'Melakukan percobaan sederhana tentang sifat-sifat zat (padat, cair, gas).',
-            ],
-            'genap' => [
-                'Memahami sistem pernapasan pada manusia dan hewan.',
-                'Menganalisis sistem peredaran darah dan fungsinya.',
-                'Memahami konsep gaya dan gerak serta hukum Newton.',
-                'Mendeskripsikan prinsip kerja pesawat sederhana.',
-                'Memahami konsep listrik statis dan dinamis dalam rangkaian sederhana.',
+                ['topic' => 'Haji dan Umrah', 'tp' => 'Memahami sejarah dan tata cara ibadah haji dan umrah.'],
+                ['topic' => 'Muamalah', 'tp' => 'Menganalisis konsep jual beli yang sesuai syariat Islam.'],
+                ['topic' => 'Muamalah', 'tp' => 'Memahami konsep riba dan bahayanya dalam transaksi ekonomi.'],
+                ['topic' => 'Makanan dan Minuman Halal', 'tp' => 'Menganalisis ketentuan tentang makanan dan minuman yang halal dan haram.'],
+                ['topic' => 'Pernikahan', 'tp' => 'Memahami konsep pernikahan dan keluarga dalam Islam.']
             ]
         ];
     }
@@ -111,16 +109,16 @@ function getMockPromesSyllabus($subject, $grade) {
     // Respons cerdas untuk mapel umum lainnya
     return [
         'ganjil' => [
-            "Memahami konsep dasar dan ruang lingkup {$subject}.",
-            "Menganalisis fenomena {$subject} dalam kehidupan sehari-hari.",
-            "Menerapkan prinsip-prinsip {$subject} untuk menyelesaikan masalah sederhana.",
-            "Melakukan pengamatan atau eksperimen terkait materi {$subject} semester ini."
+            ['topic' => "Dasar-dasar {$subject}", 'tp' => "Memahami konsep dasar dan ruang lingkup {$subject}."],
+            ['topic' => "Dasar-dasar {$subject}", 'tp' => "Menganalisis fenomena {$subject} dalam kehidupan sehari-hari."],
+            ['topic' => "Penerapan {$subject}", 'tp' => "Menerapkan prinsip-prinsip {$subject} untuk menyelesaikan masalah sederhana."],
+            ['topic' => "Penerapan {$subject}", 'tp' => "Melakukan pengamatan atau eksperimen terkait materi {$subject} semester ini."]
         ],
         'genap' => [
-            "Mengevaluasi penerapan {$subject} dalam konteks yang lebih luas.",
-            "Merancang proyek sederhana berbasis {$subject}.",
-            "Memahami perkembangan terbaru dalam bidang {$subject}.",
-            "Menyajikan hasil analisis {$subject} dalam bentuk laporan atau presentasi."
+            ['topic' => "Evaluasi {$subject}", 'tp' => "Mengevaluasi penerapan {$subject} dalam konteks yang lebih luas."],
+            ['topic' => "Proyek {$subject}", 'tp' => "Merancang proyek sederhana berbasis {$subject}."],
+            ['topic' => "Konteks Global {$subject}", 'tp' => "Memahami perkembangan terbaru dalam bidang {$subject}."],
+            ['topic' => "Komunikasi Ilmiah", 'tp' => "Menyajikan hasil analisis {$subject} dalam bentuk laporan atau presentasi."]
         ]
     ];
 }
