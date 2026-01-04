@@ -19,7 +19,11 @@
             }
         }
     </script>
-    <style>body { font-family: 'Inter', sans-serif; }</style>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .prose h2 { font-size: 1.25rem; font-weight: bold; margin-top: 1.5rem; margin-bottom: 0.5rem; }
+        .prose h3 { font-size: 1.1rem; font-weight: bold; margin-top: 1rem; margin-bottom: 0.5rem; }
+    </style>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans antialiased">
 
@@ -59,6 +63,25 @@
                 <div class="col-span-full text-center py-12 text-gray-400">Memuat data album...</div>
             </div>
         </main>
+
+        <!-- Modal untuk Lihat Detail -->
+        <div id="viewModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+            <div class="bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col">
+                <div class="flex justify-between items-center p-4 border-b">
+                    <h3 id="modalTitle" class="font-bold text-lg text-gray-800">Detail Modul Ajar</h3>
+                    <button onclick="closeModal()" class="p-2 rounded-full hover:bg-gray-100">
+                        <i data-lucide="x" class="w-5 h-5 text-gray-600"></i>
+                    </button>
+                </div>
+                <div id="modalContent" class="p-6 overflow-y-auto prose max-w-none">
+                    <!-- Konten modul ajar akan dimuat di sini -->
+                </div>
+                <div class="p-4 border-t bg-gray-50 rounded-b-xl text-right">
+                     <button onclick="closeModal()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg text-sm font-semibold">Tutup</button>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script>
@@ -112,8 +135,8 @@
                             <h3 class="font-bold text-lg text-gray-800 mb-1 line-clamp-2">${item.topic}</h3>
                             <p class="text-sm text-gray-500 mb-4">Kelas ${item.grade}</p>
                             <div class="mt-auto pt-4 border-t border-gray-100 flex gap-2">
-                                <button onclick="alert('Fitur lihat detail akan segera hadir!')" class="flex-1 bg-gray-50 hover:bg-gray-100 text-gray-700 py-2 rounded-lg text-sm font-medium transition">Lihat</button>
-                                <button onclick="alert('Fitur hapus akan segera hadir!')" class="px-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                                <button onclick="viewModule(${item.id})" class="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-700 py-2 rounded-lg text-sm font-bold transition">Lihat</button>
+                                <button onclick="deleteModule(${item.id})" class="px-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition" title="Hapus"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                             </div>
                         `;
                         container.appendChild(card);
@@ -125,6 +148,52 @@
                 }
             } catch (e) {
                 container.innerHTML = `<div class="col-span-full text-center py-12 text-red-400">Gagal memuat data album.</div>`;
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('viewModal').classList.add('hidden');
+        }
+
+        async function viewModule(id) {
+            const modal = document.getElementById('viewModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalContent = document.getElementById('modalContent');
+
+            modal.classList.remove('hidden');
+            modalTitle.textContent = 'Memuat...';
+            modalContent.innerHTML = '<p class="text-center text-gray-400">Mengambil data modul ajar...</p>';
+
+            try {
+                const res = await fetch(`sadigs_api_v3/get_rpp_album.php?id=${id}`);
+                const result = await res.json();
+                if (result.success) {
+                    modalTitle.textContent = result.data.topic;
+                    // Mengganti newline menjadi <br> dan format bold
+                    const formattedContent = result.data.rpp_content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+                    modalContent.innerHTML = formattedContent;
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (e) {
+                modalContent.innerHTML = `<p class="text-red-500">Gagal memuat detail: ${e.message}</p>`;
+            }
+        }
+
+        async function deleteModule(id) {
+            if (!confirm('Anda yakin ingin menghapus Modul Ajar ini dari album?')) return;
+
+            try {
+                const res = await fetch('sadigs_api_v3/get_rpp_album.php', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: id })
+                });
+                const result = await res.json();
+                alert(result.message);
+                if (result.success) loadAlbum(); // Muat ulang album
+            } catch (e) {
+                alert('Gagal menghapus: ' + e.message);
             }
         }
 
