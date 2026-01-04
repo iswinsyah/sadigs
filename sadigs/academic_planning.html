@@ -138,27 +138,25 @@
 
                 <!-- PROGRAM SEMESTER -->
                 <div class="mt-12">
-                    <h2 class="text-xl font-bold text-gray-800">Program Semester (Promes)</h2>
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold text-gray-800">Program Semester (Promes)</h2>
+                        <button onclick="savePromes()" id="savePromesBtn" class="hidden bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition shadow-md flex items-center gap-2">
+                            <i data-lucide="save" class="w-4 h-4"></i> Simpan
+                        </button>
+                    </div>
 
                     <!-- Generator Controls -->
                     <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 my-4 flex flex-col md:flex-row gap-4 items-end">
                         <div class="flex-1">
                             <label for="promesSubject" class="block text-sm font-medium text-gray-500">Mata Pelajaran</label>
-                            <input type="text" id="promesSubject" class="w-full p-2 border border-gray-300 rounded-lg mt-1" placeholder="Contoh: Ilmu Pengetahuan Alam">
+                            <input type="text" id="promesSubject" class="w-full p-2 border border-gray-300 rounded-lg mt-1" placeholder="Contoh: Fiqih">
                         </div>
                         <div class="flex-1">
                             <label for="promesGrade" class="block text-sm font-medium text-gray-500">Kelas</label>
-                            <select id="promesGrade" class="w-full p-2 border border-gray-300 rounded-lg mt-1 bg-white appearance-none">
-                                <option value="7">7</option>
-                                <option value="8">8</option>
-                                <option value="9">9</option>
-                                <option value="10">10</option>
-                                <option value="11">11</option>
-                                <option value="12">12</option>
-                            </select>
+                            <input type="text" id="promesGrade" class="w-full p-2 border border-gray-300 rounded-lg mt-1" placeholder="Contoh: 7">
                         </div>
-                        <button onclick="generatePromes()" id="generatePromesBtn" class="w-full md:w-auto bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-md flex justify-center items-center gap-2">
-                            <i data-lucide="sparkles" class="w-5 h-5"></i> Generate
+                        <button onclick="loadOrGeneratePromes()" id="showPromesBtn" class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-md flex justify-center items-center gap-2">
+                            <i data-lucide="play" class="w-5 h-5"></i> Tampilkan
                         </button>
                     </div>
                     
@@ -309,16 +307,15 @@
             document.getElementById('genap_efektif').textContent = finalEfektifGenap;
         }
 
-        async function generatePromes() {
+        async function loadOrGeneratePromes() {
             const subject = document.getElementById('promesSubject').value;
             const grade = document.getElementById('promesGrade').value;
-
             if (!subject || !grade) {
                 alert('Mata Pelajaran dan Kelas harus diisi.');
                 return;
             }
 
-            const btn = document.getElementById('generatePromesBtn');
+            const btn = document.getElementById('showPromesBtn');
             const originalHTML = btn.innerHTML;
             btn.disabled = true;
             btn.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Generating...`;
@@ -328,6 +325,35 @@
             document.getElementById('promesGanjilBody').innerHTML = '<tr><td colspan="33" class="p-4 text-center text-gray-400">AI sedang bekerja...</td></tr>';
             document.getElementById('promesGenapBody').innerHTML = '<tr><td colspan="33" class="p-4 text-center text-gray-400">AI sedang bekerja...</td></tr>';
 
+            try {
+                // 1. Coba muat data tersimpan
+                const loadRes = await fetch(`sadigs_api_v3/saved_promes_api.php?subject=${encodeURIComponent(subject)}&grade=${encodeURIComponent(grade)}`);
+                if (loadRes.ok) {
+                    const loadResult = await loadRes.json();
+                    if (loadResult.success) {
+                        populatePromesTable('ganjil', loadResult.data.ganjil || []);
+                        populatePromesTable('genap', loadResult.data.genap || []);
+                        document.getElementById('savePromesBtn').classList.remove('hidden');
+                        return; // Berhenti di sini jika data ditemukan
+                    }
+                }
+
+                // 2. Jika tidak ada, generate baru
+                if (!confirm('Data Promes untuk mapel ini belum ada. Buat baru dengan AI?')) {
+                    document.getElementById('promesGanjilBody').innerHTML = '<tr><td colspan="33" class="p-4 text-center text-gray-400 italic">Dibatalkan.</td></tr>';
+                    document.getElementById('promesGenapBody').innerHTML = '<tr><td colspan="33" class="p-4 text-center text-gray-400 italic"></td></tr>';
+                    return;
+                }
+                await generateNewPromes(subject, grade);
+
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHTML;
+                lucide.createIcons();
+            }
+        }
+
+        async function generateNewPromes(subject, grade) {
             try {
                 const res = await fetch('sadigs_api_v3/generate_promes_api.php', {
                     method: 'POST',
@@ -340,20 +366,21 @@
                     throw new Error(result.message);
                 }
                 
-                populatePromesTable('ganjil', result.data.ganjil);
-                populatePromesTable('genap', result.data.genap);
+                // Konversi hasil AI (hanya teks TP) ke format objek penuh
+                const ganjilData = result.data.ganjil.map(tp => ({ tp_text: tp, allocation_jp: '', checked_weeks: [] }));
+                const genapData = result.data.genap.map(tp => ({ tp_text: tp, allocation_jp: '', checked_weeks: [] }));
+
+                populatePromesTable('ganjil', ganjilData);
+                populatePromesTable('genap', genapData);
+                document.getElementById('savePromesBtn').classList.remove('hidden');
 
             } catch (err) {
                 alert('Gagal generate Promes: ' + err.message);
                 document.getElementById('promesGanjilBody').innerHTML = '<tr><td colspan="33" class="p-4 text-center text-red-500">Gagal.</td></tr>';
                 document.getElementById('promesGenapBody').innerHTML = '<tr><td colspan="33" class="p-4 text-center text-red-500">Gagal.</td></tr>';
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = originalHTML;
-                lucide.createIcons();
             }
         }
-
+        
         function populatePromesTable(semester, items) {
             const tbodyId = semester === 'ganjil' ? 'promesGanjilBody' : 'promesGenapBody';
             const tbody = document.getElementById(tbodyId);
@@ -365,7 +392,7 @@
             }
 
             items.forEach((item, index) => {
-                addRow(semester, item);
+                addRow(semester, item.tp_text, item.allocation_jp, item.checked_weeks);
             });
         }
 
@@ -389,7 +416,7 @@
             });
         }
 
-        function addRow(semester, content = '') {
+        function addRow(semester, content = '', jp = '', checkedWeeks = []) {
             const tbodyId = semester === 'ganjil' ? 'promesGanjilBody' : 'promesGenapBody';
             const tbody = document.getElementById(tbodyId);
             const rowCount = tbody.rows.length + 1;
@@ -421,6 +448,60 @@
         // Kosongkan tabel saat pertama kali dimuat
         document.getElementById('promesGanjilBody').innerHTML = '<tr><td colspan="33" class="p-4 text-center text-gray-400 italic">Isi form di atas dan klik Generate untuk mengisi tabel ini.</td></tr>';
         document.getElementById('promesGenapBody').innerHTML = '<tr><td colspan="33" class="p-4 text-center text-gray-400 italic">Isi form di atas dan klik Generate untuk mengisi tabel ini.</td></tr>';
+
+        async function savePromes() {
+            const subject = document.getElementById('promesSubject').value;
+            const grade = document.getElementById('promesGrade').value;
+            if (!subject || !grade) {
+                alert('Mata Pelajaran dan Kelas harus diisi untuk menyimpan.');
+                return;
+            }
+
+            const btn = document.getElementById('savePromesBtn');
+            const originalHTML = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Menyimpan...`;
+            lucide.createIcons();
+
+            const scrapeTable = (tbodyId) => {
+                const data = [];
+                document.querySelectorAll(`#${tbodyId} tr`).forEach(row => {
+                    if (row.cells.length < 3) return;
+                    const tp_text = row.cells[1].querySelector('div[contenteditable]').innerText.trim();
+                    if (!tp_text) return; // Jangan simpan baris kosong
+
+                    const allocation_jp = row.cells[2].innerText.trim();
+                    const checked_weeks = Array.from(row.querySelectorAll('input:checked')).map(cb => cb.dataset.weekId);
+                    data.push({ tp_text, allocation_jp, checked_weeks });
+                });
+                return data;
+            };
+
+            const dataToSave = {
+                subject,
+                grade,
+                promes_data: {
+                    ganjil: scrapeTable('promesGanjilBody'),
+                    genap: scrapeTable('promesGenapBody')
+                }
+            };
+
+            try {
+                const res = await fetch('sadigs_api_v3/saved_promes_api.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dataToSave)
+                });
+                const result = await res.json();
+                alert(result.message);
+            } catch (err) {
+                alert('Gagal menyimpan: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHTML;
+                lucide.createIcons();
+            }
+        }
 
         async function calculateWeeks() {
             try {
