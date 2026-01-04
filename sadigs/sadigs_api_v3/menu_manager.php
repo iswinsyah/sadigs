@@ -131,7 +131,8 @@ if ($method === 'GET') {
                 'menus' => [
                     'navValidasiIbadah', 'navValidasiIzin', 'navValidasiPembayaran', 'navValidasiPeraturan', 
                     'navVerifikasi', 'navGuardianLeaveValidation', 'navPocketMoneyValidation', 
-                    'navMusyrifWithdrawalValidation'
+                    'navMusyrifWithdrawalValidation',
+                    'navMonitoringAkademik'
                 ],
                 'icon' => 'check-square'
             ],

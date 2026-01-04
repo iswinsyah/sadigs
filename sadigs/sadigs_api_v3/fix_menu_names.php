@@ -65,6 +65,7 @@ try {
         'navYayasanWidget' => 'Ringkasan Manajemen',
         'navMusyrifWidget' => 'Ringkasan Musyrif',
         'navPerencanaanAkademik' => 'Buku Kerja Ustadz',
+        'navMonitoringAkademik' => 'Monitoring Akademik',
     ];
 
     $stmt = $pdo->prepare("INSERT INTO menus (menu_id, menu_name) VALUES (?, ?) ON DUPLICATE KEY UPDATE menu_name = VALUES(menu_name)");
