@@ -10,13 +10,14 @@ if (!isset($_SESSION['user_id'])) {
 $input = json_decode(file_get_contents('php://input'), true);
 $subject = $input['subject'] ?? null;
 $grade = $input['grade'] ?? null;
+$custom_prompt = $input['custom_prompt'] ?? null;
 
 if (!$subject || !$grade) {
     sendJSONResponse(['success' => false, 'message' => 'Mata Pelajaran dan Kelas wajib diisi.'], 400);
 }
 
 // --- FUNGSI PANGGIL AI GEMINI (SIAP PAKAI) ---
-function generateWithGemini($subject, $grade) {
+function generateWithGemini($subject, $grade, $custom_prompt) {
     // Masukkan API Key Gemini Anda di sini nanti
     $apiKey = ''; 
     
@@ -24,8 +25,12 @@ function generateWithGemini($subject, $grade) {
 
     $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' . $apiKey;
     
-    $prompt = "Bertindaklah sebagai ahli kurikulum. Buatkan daftar Tujuan Pembelajaran (TP) yang ringkas dan operasional untuk mata pelajaran '$subject' kelas $grade (Fase D/E/F) sesuai Kurikulum Merdeka. " .
-              "Pisahkan output untuk Semester Ganjil dan Genap. " .
+    // Gunakan prompt dari user jika ada, jika tidak gunakan default
+    $base_prompt = $custom_prompt ? $custom_prompt : 
+                   "Bertindaklah sebagai ahli kurikulum. Buatkan daftar Tujuan Pembelajaran (TP) yang ringkas dan operasional untuk mata pelajaran '$subject' kelas $grade (Fase D/E/F) sesuai Kurikulum Merdeka. Pisahkan output untuk Semester Ganjil dan Genap.";
+
+    // Tambahkan instruksi format JSON di akhir agar output konsisten
+    $prompt = $base_prompt . 
               "Format output WAJIB JSON murni tanpa markdown: { \"ganjil\": [\"TP 1...\", \"TP 2...\"], \"genap\": [\"TP 3...\", \"TP 4...\"] }";
 
     $data = ['contents' => [['parts' => [['text' => $prompt]]]]];
@@ -50,6 +55,23 @@ function generateWithGemini($subject, $grade) {
 function getMockPromesSyllabus($subject, $grade) {
     $subject_lower = strtolower($subject);
 
+    // Simulasi perbedaan materi berdasarkan kelas untuk Biologi/IPA
+    if (strpos($subject_lower, 'biologi') !== false || strpos($subject_lower, 'ipa') !== false) {
+        if ($grade == '10' || $grade == 'X') {
+            return [
+                'ganjil' => ['Menganalisis berbagai tingkat keanekaragaman hayati.', 'Memahami prinsip klasifikasi makhluk hidup.', 'Menganalisis struktur dan replikasi virus.'],
+                'genap' => ['Menganalisis komponen ekosistem dan interaksinya.', 'Menganalisis data perubahan lingkungan.', 'Menerapkan metode ilmiah dalam pengamatan biologi.']
+            ];
+        } elseif ($grade == '11' || $grade == 'XI') {
+            return [
+                'ganjil' => ['Menjelaskan komponen kimiawi penyusun sel.', 'Menganalisis bioproses dalam sel (transpor membran).', 'Menganalisis struktur jaringan pada tumbuhan.'],
+                'genap' => ['Menganalisis sistem gerak pada manusia.', 'Menganalisis sistem sirkulasi pada manusia.', 'Menganalisis sistem pencernaan makanan.']
+            ];
+        }
+        // Default Biologi/IPA jika kelas lain
+    }
+
+    // Data Mock Default Lama
     if (strpos($subject_lower, 'fiqih') !== false) {
         return [
             'ganjil' => [
@@ -105,7 +127,7 @@ function getMockPromesSyllabus($subject, $grade) {
 
 try {
     // Coba pakai AI dulu, kalau gagal/kosong baru pakai Mock
-    $syllabus = generateWithGemini($subject, $grade) ?? getMockPromesSyllabus($subject, $grade);
+    $syllabus = generateWithGemini($subject, $grade, $custom_prompt) ?? getMockPromesSyllabus($subject, $grade);
     sendJSONResponse(['success' => true, 'data' => $syllabus]);
 } catch (Exception $e) {
     sendJSONResponse(['success' => false, 'message' => 'AI Error: ' . $e->getMessage()], 500);
