@@ -138,84 +138,10 @@
 
                 <!-- PROGRAM SEMESTER -->
                 <div class="mt-12">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-xl font-bold text-gray-800">Program Semester (Promes)</h2>
-                        <button onclick="savePromes()" id="savePromesBtn" class="hidden bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition shadow-md flex items-center gap-2">
-                            <i data-lucide="save" class="w-4 h-4"></i> Simpan
-                        </button>
-                    </div>
-
-                    <!-- Generator Controls -->
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 my-4 flex flex-col md:flex-row gap-4 items-end">
-                        <div class="flex-1">
-                            <label for="promesSubject" class="block text-sm font-medium text-gray-500">Mata Pelajaran</label>
-                            <input type="text" id="promesSubject" class="w-full p-2 border border-gray-300 rounded-lg mt-1" placeholder="Contoh: Fiqih">
-                        </div>
-                        <div class="flex-1">
-                            <label for="promesGrade" class="block text-sm font-medium text-gray-500">Kelas</label>
-                            <input type="text" id="promesGrade" class="w-full p-2 border border-gray-300 rounded-lg mt-1" placeholder="Contoh: 7">
-                        </div>
-                        <button onclick="loadOrGeneratePromes(true)" id="showPromesBtn" class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-md flex justify-center items-center gap-2">
-                            <i data-lucide="play" class="w-5 h-5"></i> Tampilkan
-                        </button>
-                    </div>
-                    
-                    <!-- Promes Ganjil -->
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4">Semester Ganjil</h3>
-                        <div class="overflow-x-auto custom-scrollbar pb-2">
-                            <table class="w-full text-xs border-collapse min-w-[1200px]" id="tablePromesGanjil">
-                                <thead class="bg-gray-100">
-                                    <tr>
-                                        <th rowspan="2" class="p-2 text-left border w-10">No</th>
-                                        <th rowspan="2" class="p-2 text-left border min-w-[250px]">Tujuan Pembelajaran (TP)</th>
-                                        <th rowspan="2" class="p-2 text-center border w-20">Alokasi Waktu (JP)</th>
-                                        <th colspan="5" class="p-1 text-center border bg-gray-200">Juli</th>
-                                        <th colspan="5" class="p-1 text-center border bg-gray-200">Agustus</th>
-                                        <th colspan="5" class="p-1 text-center border bg-gray-200">September</th>
-                                        <th colspan="5" class="p-1 text-center border bg-gray-200">Oktober</th>
-                                        <th colspan="5" class="p-1 text-center border bg-gray-200">November</th>
-                                        <th colspan="5" class="p-1 text-center border bg-gray-200">Desember</th>
-                                    </tr>
-                                    <tr class="bg-gray-50">
-                                        <script>for(let i=0; i<6; i++) for(let w=1; w<=5; w++) document.write(`<th class="p-1 text-center border text-gray-500 w-6">${w}</th>`);</script>
-                                    </tr>
-                                </thead>
-                                <tbody id="promesGanjilBody">
-                                    <!-- Rows will be added by JS -->
-                                </tbody>
-                            </table>
-                        </div>
-                        <button onclick="addRow('ganjil')" class="mt-4 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold py-2 px-4 rounded-lg transition">+ Tambah Baris</button>
-                    </div>
-
-                    <!-- Promes Genap -->
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4">Semester Genap</h3>
-                        <div class="overflow-x-auto custom-scrollbar pb-2">
-                            <table class="w-full text-xs border-collapse min-w-[1200px]" id="tablePromesGenap">
-                                <thead class="bg-gray-100">
-                                    <tr>
-                                        <th rowspan="2" class="p-2 text-left border w-10">No</th>
-                                        <th rowspan="2" class="p-2 text-left border min-w-[250px]">Tujuan Pembelajaran (TP)</th>
-                                        <th rowspan="2" class="p-2 text-center border w-20">Alokasi Waktu (JP)</th>
-                                        <th colspan="5" class="p-1 text-center border bg-gray-200">Januari</th>
-                                        <th colspan="5" class="p-1 text-center border bg-gray-200">Februari</th>
-                                        <th colspan="5" class="p-1 text-center border bg-gray-200">Maret</th>
-                                        <th colspan="5" class="p-1 text-center border bg-gray-200">April</th>
-                                        <th colspan="5" class="p-1 text-center border bg-gray-200">Mei</th>
-                                        <th colspan="5" class="p-1 text-center border bg-gray-200">Juni</th>
-                                    </tr>
-                                    <tr class="bg-gray-50">
-                                        <script>for(let i=0; i<6; i++) for(let w=1; w<=5; w++) document.write(`<th class="p-1 text-center border text-gray-500 w-6">${w}</th>`);</script>
-                                    </tr>
-                                </thead>
-                                <tbody id="promesGenapBody">
-                                    <!-- Rows will be added by JS -->
-                                </tbody>
-                            </table>
-                        </div>
-                        <button onclick="addRow('genap')" class="mt-4 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold py-2 px-4 rounded-lg transition">+ Tambah Baris</button>
+                    <h2 class="text-xl font-bold text-gray-800 mb-2">Program Semester (Promes)</h2>
+                    <p class="text-sm text-gray-500 mb-6">Anda dapat mengelola hingga 3 Buku Kerja untuk mata pelajaran atau kelas yang berbeda. Klik judul untuk membuka.</p>
+                    <div id="promesWidgetsContainer" class="space-y-4">
+                        <!-- Widgets will be injected here by JS -->
                     </div>
                 </div>
             </div>
@@ -252,17 +178,9 @@
         }
         initSidebar();
 
-        // --- FITUR INGAT SESI TERAKHIR ---
-        // Saat halaman dimuat, cek apakah ada pekerjaan terakhir
         window.addEventListener('DOMContentLoaded', () => {
-            const lastSubject = localStorage.getItem('lastPromesSubject');
-            const lastGrade = localStorage.getItem('lastPromesGrade');
-            if (lastSubject && lastGrade) {
-                document.getElementById('promesSubject').value = lastSubject;
-                document.getElementById('promesGrade').value = lastGrade;
-                // Otomatis muat data tanpa klik tombol (silent load)
-                loadOrGeneratePromes(false); 
-            }
+            createAllWidgets();
+            loadAllWidgetsState();
         });
 
         document.getElementById('logoutBtn').addEventListener('click', () => {
@@ -320,60 +238,210 @@
             document.getElementById('genap_efektif').textContent = finalEfektifGenap;
         }
 
-        async function loadOrGeneratePromes(isManualClick = true) {
-            // Trim input agar spasi tidak menyebabkan data dianggap berbeda
-            const subject = document.getElementById('promesSubject').value.trim();
-            const grade = document.getElementById('promesGrade').value.trim();
+        // =================================================================
+        // WIDGET-BASED PROMES LOGIC
+        // =================================================================
+
+        function createAllWidgets() {
+            const container = document.getElementById('promesWidgetsContainer');
+            container.innerHTML = '';
+            for (let i = 1; i <= 3; i++) {
+                container.innerHTML += generateWidgetHTML(i);
+            }
+            lucide.createIcons();
+        }
+
+        function loadAllWidgetsState() {
+            for (let i = 1; i <= 3; i++) {
+                const state = JSON.parse(localStorage.getItem(`promesWidget-${i}`));
+                if (state && state.subject && state.grade) {
+                    const widget = document.getElementById(`widget-${i}`);
+                    widget.querySelector(`#promesSubject-${i}`).value = state.subject;
+                    widget.querySelector(`#promesGrade-${i}`).value = state.grade;
+                    
+                    const title = widget.querySelector('.widget-title');
+                    title.textContent = `Buku Kerja ${i}: ${state.subject} - Kelas ${state.grade}`;
+
+                    const showBtn = widget.querySelector('button[onclick^="loadOrGeneratePromes"]');
+                    loadOrGeneratePromes(showBtn, false);
+                }
+            }
+        }
+
+        function generateWidgetHTML(widgetId) {
+            let weekHeader = '';
+            for(let i=0; i<6; i++) { for(let w=1; w<=5; w++) { weekHeader += `<th class="p-1 text-center border text-gray-500 w-6">${w}</th>`; } }
+
+            return `
+            <div id="widget-${widgetId}" class="promes-widget bg-white rounded-xl shadow-sm border border-gray-100" data-widget-id="${widgetId}">
+                <div class="widget-header p-4 border-b flex justify-between items-center cursor-pointer bg-gray-50 rounded-t-xl" onclick="toggleWidget(this)">
+                    <h3 class="widget-title text-lg font-bold text-gray-800">Buku Kerja ${widgetId}: Baru</h3>
+                    <div class="flex items-center gap-2">
+                        <button onclick="event.stopPropagation(); clearWidget(this)" class="p-1 text-gray-400 hover:text-red-500" title="Bersihkan Buku Kerja Ini">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                        <button class="p-1 text-gray-500" title="Buka/Tutup">
+                            <i data-lucide="chevron-down" class="w-5 h-5 transition-transform"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="widget-content hidden p-4 space-y-6">
+                    <div class="flex flex-col md:flex-row gap-4 items-end">
+                        <div class="flex-1">
+                            <label for="promesSubject-${widgetId}" class="block text-sm font-medium text-gray-500">Mata Pelajaran</label>
+                            <input type="text" id="promesSubject-${widgetId}" class="w-full p-2 border border-gray-300 rounded-lg mt-1" placeholder="Contoh: Fiqih">
+                        </div>
+                        <div class="flex-1">
+                            <label for="promesGrade-${widgetId}" class="block text-sm font-medium text-gray-500">Kelas</label>
+                            <input type="text" id="promesGrade-${widgetId}" class="w-full p-2 border border-gray-300 rounded-lg mt-1" placeholder="Contoh: 7">
+                        </div>
+                        <button onclick="loadOrGeneratePromes(this, true)" class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-md flex justify-center items-center gap-2">
+                            <i data-lucide="play" class="w-5 h-5"></i> Tampilkan
+                        </button>
+                    </div>
+
+                    <div class="text-right">
+                        <button onclick="savePromes(this)" id="savePromesBtn-${widgetId}" class="hidden bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition shadow-md flex items-center gap-2">
+                            <i data-lucide="save" class="w-4 h-4"></i> Simpan
+                        </button>
+                    </div>
+
+                    <div id="tablesContainer-${widgetId}" class="hidden space-y-8">
+                        <div>
+                            <h3 class="text-base font-bold text-gray-800 mb-4">Semester Ganjil</h3>
+                            <div class="overflow-x-auto custom-scrollbar pb-2">
+                                <table class="w-full text-xs border-collapse min-w-[1200px]">
+                                    <thead class="bg-gray-100">
+                                        <tr><th rowspan="2" class="p-2 text-left border w-10">No</th><th rowspan="2" class="p-2 text-left border min-w-[250px]">Tujuan Pembelajaran (TP)</th><th rowspan="2" class="p-2 text-center border w-20">Alokasi Waktu (JP)</th><th colspan="5" class="p-1 text-center border bg-gray-200">Juli</th><th colspan="5" class="p-1 text-center border bg-gray-200">Agustus</th><th colspan="5" class="p-1 text-center border bg-gray-200">September</th><th colspan="5" class="p-1 text-center border bg-gray-200">Oktober</th><th colspan="5" class="p-1 text-center border bg-gray-200">November</th><th colspan="5" class="p-1 text-center border bg-gray-200">Desember</th></tr>
+                                        <tr class="bg-gray-50">${weekHeader}</tr>
+                                    </thead>
+                                    <tbody id="promesGanjilBody-${widgetId}"></tbody>
+                                </table>
+                            </div>
+                            <button onclick="addRow(this, 'ganjil')" class="mt-4 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold py-2 px-4 rounded-lg transition">+ Tambah Baris</button>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-gray-800 mb-4">Semester Genap</h3>
+                            <div class="overflow-x-auto custom-scrollbar pb-2">
+                                <table class="w-full text-xs border-collapse min-w-[1200px]">
+                                    <thead class="bg-gray-100">
+                                        <tr><th rowspan="2" class="p-2 text-left border w-10">No</th><th rowspan="2" class="p-2 text-left border min-w-[250px]">Tujuan Pembelajaran (TP)</th><th rowspan="2" class="p-2 text-center border w-20">Alokasi Waktu (JP)</th><th colspan="5" class="p-1 text-center border bg-gray-200">Januari</th><th colspan="5" class="p-1 text-center border bg-gray-200">Februari</th><th colspan="5" class="p-1 text-center border bg-gray-200">Maret</th><th colspan="5" class="p-1 text-center border bg-gray-200">April</th><th colspan="5" class="p-1 text-center border bg-gray-200">Mei</th><th colspan="5" class="p-1 text-center border bg-gray-200">Juni</th></tr>
+                                        <tr class="bg-gray-50">${weekHeader}</tr>
+                                    </thead>
+                                    <tbody id="promesGenapBody-${widgetId}"></tbody>
+                                </table>
+                            </div>
+                            <button onclick="addRow(this, 'genap')" class="mt-4 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold py-2 px-4 rounded-lg transition">+ Tambah Baris</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            `;
+        }
+
+        function toggleWidget(header) {
+            const widget = header.closest('.promes-widget');
+            const content = widget.querySelector('.widget-content');
+            const icon = header.querySelector('i[data-lucide="chevron-down"]');
+            content.classList.toggle('hidden');
+            icon.classList.toggle('rotate-180');
+        }
+
+        async function clearWidget(button) {
+            if (!confirm('Anda yakin ingin membersihkan buku kerja ini? Semua data (TP, alokasi JP, dan centang) akan dihapus dari server.')) return;
+            
+            const widget = button.closest('.promes-widget');
+            const widgetId = widget.dataset.widgetId;
+            const subject = widget.querySelector(`#promesSubject-${widgetId}`).value.trim();
+            const grade = widget.querySelector(`#promesGrade-${widgetId}`).value.trim();
+
+            // Clear UI
+            widget.querySelector(`#promesSubject-${widgetId}`).value = '';
+            widget.querySelector(`#promesGrade-${widgetId}`).value = '';
+            widget.querySelector(`#promesGanjilBody-${widgetId}`).innerHTML = '';
+            widget.querySelector(`#promesGenapBody-${widgetId}`).innerHTML = '';
+            widget.querySelector(`#tablesContainer-${widgetId}`).classList.add('hidden');
+            widget.querySelector(`#savePromesBtn-${widgetId}`).classList.add('hidden');
+            widget.querySelector('.widget-title').textContent = `Buku Kerja ${widgetId}: Baru`;
+
+            // Clear storage
+            localStorage.removeItem(`promesWidget-${widgetId}`);
+
+            // Clear from server if subject and grade exist
+            if (subject && grade) {
+                try {
+                    await fetch('sadigs_api_v3/saved_promes_api.php', {
+                        method: 'DELETE',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ subject, grade })
+                    });
+                } catch (e) { console.error("Gagal menghapus data di server:", e); }
+            }
+        }
+
+        async function loadOrGeneratePromes(button, isManualClick = true) {
+            const widget = button.closest('.promes-widget');
+            const widgetId = widget.dataset.widgetId;
+            const subject = widget.querySelector(`#promesSubject-${widgetId}`).value.trim();
+            const grade = widget.querySelector(`#promesGrade-${widgetId}`).value.trim();
+
             if (!subject || !grade) {
                 alert('Mata Pelajaran dan Kelas harus diisi.');
                 return;
             }
 
-            const btn = document.getElementById('showPromesBtn');
-            const originalHTML = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Generating...`;
+            const originalHTML = button.innerHTML;
+            button.disabled = true;
+            button.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Loading...`;
             lucide.createIcons();
 
-            // Clear existing tables
-            document.getElementById('promesGanjilBody').innerHTML = '<tr><td colspan="33" class="p-4 text-center text-gray-400">AI sedang bekerja...</td></tr>';
-            document.getElementById('promesGenapBody').innerHTML = '<tr><td colspan="33" class="p-4 text-center text-gray-400">AI sedang bekerja...</td></tr>';
+            const tablesContainer = widget.querySelector(`#tablesContainer-${widgetId}`);
+            const ganjilBody = widget.querySelector(`#promesGanjilBody-${widgetId}`);
+            const genapBody = widget.querySelector(`#promesGenapBody-${widgetId}`);
+            ganjilBody.innerHTML = '<tr><td colspan="33" class="p-4 text-center text-gray-400">Mencari data...</td></tr>';
+            genapBody.innerHTML = '';
 
             try {
-                // 1. Coba muat data tersimpan
                 const loadRes = await fetch(`sadigs_api_v3/saved_promes_api.php?subject=${encodeURIComponent(subject)}&grade=${encodeURIComponent(grade)}`);
                 if (loadRes.ok) {
                     const loadResult = await loadRes.json();
                     if (loadResult.success) {
-                        populatePromesTable('ganjil', loadResult.data.ganjil || []);
-                        populatePromesTable('genap', loadResult.data.genap || []);
-                        document.getElementById('savePromesBtn').classList.remove('hidden');
-                        
-                        // Simpan ke memori browser agar saat balik lagi langsung muncul
-                        localStorage.setItem('lastPromesSubject', subject);
-                        localStorage.setItem('lastPromesGrade', grade);
-                        return; // Berhenti di sini jika data ditemukan
+                        populatePromesTable(widgetId, 'ganjil', loadResult.data.ganjil || []);
+                        populatePromesTable(widgetId, 'genap', loadResult.data.genap || []);
+                        widget.querySelector(`#savePromesBtn-${widgetId}`).classList.remove('hidden');
+                        tablesContainer.classList.remove('hidden');
+                        localStorage.setItem(`promesWidget-${widgetId}`, JSON.stringify({ subject, grade }));
+                        widget.querySelector('.widget-title').textContent = `Buku Kerja ${widgetId}: ${subject} - Kelas ${grade}`;
+                        return;
                     }
                 }
 
-                // 2. Jika tidak ada, generate baru (Hanya jika diklik manual)
-                if (!isManualClick) return; // Jangan generate otomatis saat auto-load
-
-                if (!confirm('Data Promes untuk mapel ini belum ada. Buat baru dengan AI?')) {
-                    document.getElementById('promesGanjilBody').innerHTML = '<tr><td colspan="33" class="p-4 text-center text-gray-400 italic">Dibatalkan.</td></tr>';
-                    document.getElementById('promesGenapBody').innerHTML = '<tr><td colspan="33" class="p-4 text-center text-gray-400 italic"></td></tr>';
+                if (!isManualClick) {
+                    ganjilBody.innerHTML = '<tr><td colspan="33" class="p-4 text-center text-gray-400 italic">Data tidak ditemukan.</td></tr>';
                     return;
                 }
-                await generateNewPromes(subject, grade);
+                
+                if (!confirm('Data Promes untuk mapel ini belum ada. Buat baru dengan AI?')) {
+                    ganjilBody.innerHTML = '<tr><td colspan="33" class="p-4 text-center text-gray-400 italic">Dibatalkan.</td></tr>';
+                    return;
+                }
+                await generateNewPromes(widget, subject, grade);
 
             } finally {
-                btn.disabled = false;
-                btn.innerHTML = originalHTML;
+                button.disabled = false;
+                button.innerHTML = originalHTML;
                 lucide.createIcons();
             }
         }
 
-        async function generateNewPromes(subject, grade) {
+        async function generateNewPromes(widget, subject, grade) {
+            const widgetId = widget.dataset.widgetId;
+            const ganjilBody = widget.querySelector(`#promesGanjilBody-${widgetId}`);
+            const genapBody = widget.querySelector(`#promesGenapBody-${widgetId}`);
+            ganjilBody.innerHTML = '<tr><td colspan="33" class="p-4 text-center text-gray-400">AI sedang bekerja...</td></tr>';
+            genapBody.innerHTML = '';
+
             try {
                 const res = await fetch('sadigs_api_v3/generate_promes_api.php', {
                     method: 'POST',
@@ -386,23 +454,23 @@
                     throw new Error(result.message);
                 }
                 
-                // Konversi hasil AI (hanya teks TP) ke format objek penuh
                 const ganjilData = result.data.ganjil.map(tp => ({ tp_text: tp, allocation_jp: '', checked_weeks: [] }));
                 const genapData = result.data.genap.map(tp => ({ tp_text: tp, allocation_jp: '', checked_weeks: [] }));
 
-                populatePromesTable('ganjil', ganjilData);
-                populatePromesTable('genap', genapData);
-                document.getElementById('savePromesBtn').classList.remove('hidden');
+                populatePromesTable(widgetId, 'ganjil', ganjilData);
+                populatePromesTable(widgetId, 'genap', genapData);
+                widget.querySelector(`#savePromesBtn-${widgetId}`).classList.remove('hidden');
+                widget.querySelector(`#tablesContainer-${widgetId}`).classList.remove('hidden');
+                widget.querySelector('.widget-title').textContent = `Buku Kerja ${widgetId}: ${subject} - Kelas ${grade}`;
 
             } catch (err) {
                 alert('Gagal generate Promes: ' + err.message);
-                document.getElementById('promesGanjilBody').innerHTML = '<tr><td colspan="33" class="p-4 text-center text-red-500">Gagal.</td></tr>';
-                document.getElementById('promesGenapBody').innerHTML = '<tr><td colspan="33" class="p-4 text-center text-red-500">Gagal.</td></tr>';
+                ganjilBody.innerHTML = '<tr><td colspan="33" class="p-4 text-center text-red-500">Gagal.</td></tr>';
             }
         }
         
-        function populatePromesTable(semester, items) {
-            const tbodyId = semester === 'ganjil' ? 'promesGanjilBody' : 'promesGenapBody';
+        function populatePromesTable(widgetId, semester, items) {
+            const tbodyId = semester === 'ganjil' ? `promesGanjilBody-${widgetId}` : `promesGenapBody-${widgetId}`;
             const tbody = document.getElementById(tbodyId);
             tbody.innerHTML = '';
 
@@ -412,7 +480,7 @@
             }
 
             items.forEach((item, index) => {
-                addRow(semester, item.tp_text, item.allocation_jp, item.checked_weeks);
+                addRow(null, semester, item.tp_text, item.allocation_jp, item.checked_weeks, widgetId);
             });
         }
 
@@ -436,8 +504,14 @@
             });
         }
 
-        function addRow(semester, content = '', jp = '', checkedWeeks = []) {
-            const tbodyId = semester === 'ganjil' ? 'promesGanjilBody' : 'promesGenapBody';
+        function addRow(button, semester, content = '', jp = '', checkedWeeks = [], widgetId = null) {
+            if (button) {
+                const widget = button.closest('.promes-widget');
+                widgetId = widget.dataset.widgetId;
+            }
+            if (!widgetId) return;
+
+            const tbodyId = semester === 'ganjil' ? `promesGanjilBody-${widgetId}` : `promesGenapBody-${widgetId}`;
             const tbody = document.getElementById(tbodyId);
             const rowCount = tbody.rows.length + 1;
 
@@ -452,40 +526,40 @@
                         <i data-lucide="copy" class="w-3 h-3"></i>
                     </button>
                 </td>
-                <td class="p-1 border text-center" contenteditable="true"></td>
+                <td class="p-1 border text-center" contenteditable="true">${jp}</td>
             `;
 
-            // 6 bulan * 5 pekan = 30 checkbox
-            for (let i = 0; i < 30; i++) {
-                cellsHTML += `<td class="p-1 border text-center"><input type="checkbox" class="w-3 h-3"></td>`;
-            }
-
+            const months = semester === 'ganjil' ? [7,8,9,10,11,12] : [1,2,3,4,5,6];
+            months.forEach(m => {
+                for (let w = 1; w <= 5; w++) {
+                    const weekId = `${m}-${w}`;
+                    const isChecked = checkedWeeks.includes(weekId);
+                    cellsHTML += `<td class="p-1 border text-center"><input type="checkbox" class="w-3 h-3" data-week-id="${weekId}" ${isChecked ? 'checked' : ''}></td>`;
+                }
+            });
             tr.innerHTML = cellsHTML;
             tbody.appendChild(tr);
             lucide.createIcons();
         }
 
-        // Kosongkan tabel saat pertama kali dimuat
-        document.getElementById('promesGanjilBody').innerHTML = '<tr><td colspan="33" class="p-4 text-center text-gray-400 italic">Isi form di atas dan klik Generate untuk mengisi tabel ini.</td></tr>';
-        document.getElementById('promesGenapBody').innerHTML = '<tr><td colspan="33" class="p-4 text-center text-gray-400 italic">Isi form di atas dan klik Generate untuk mengisi tabel ini.</td></tr>';
+        async function savePromes(button) {
+            const widget = button.closest('.promes-widget');
+            const widgetId = widget.dataset.widgetId;
+            const subject = widget.querySelector(`#promesSubject-${widgetId}`).value.trim();
+            const grade = widget.querySelector(`#promesGrade-${widgetId}`).value.trim();
 
-        async function savePromes() {
-            const subject = document.getElementById('promesSubject').value.trim();
-            const grade = document.getElementById('promesGrade').value.trim();
             if (!subject || !grade) {
                 alert('Mata Pelajaran dan Kelas harus diisi untuk menyimpan.');
                 return;
             }
-
-            const btn = document.getElementById('savePromesBtn');
-            const originalHTML = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Menyimpan...`;
+            const originalHTML = button.innerHTML;
+            button.disabled = true;
+            button.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Menyimpan...`;
             lucide.createIcons();
 
             const scrapeTable = (tbodyId) => {
                 const data = [];
-                document.querySelectorAll(`#${tbodyId} tr`).forEach(row => {
+                widget.querySelectorAll(`#${tbodyId} tr`).forEach(row => {
                     if (row.cells.length < 3) return;
                     const tp_text = row.cells[1].querySelector('div[contenteditable]').innerText.trim();
                     if (!tp_text) return; // Jangan simpan baris kosong
@@ -501,8 +575,8 @@
                 subject,
                 grade,
                 promes_data: {
-                    ganjil: scrapeTable('promesGanjilBody'),
-                    genap: scrapeTable('promesGenapBody')
+                    ganjil: scrapeTable(`promesGanjilBody-${widgetId}`),
+                    genap: scrapeTable(`promesGenapBody-${widgetId}`)
                 }
             };
 
@@ -515,14 +589,13 @@
                 const result = await res.json();
                 alert(result.message);
                 
-                // Update memori browser
-                localStorage.setItem('lastPromesSubject', subject);
-                localStorage.setItem('lastPromesGrade', grade);
+                localStorage.setItem(`promesWidget-${widgetId}`, JSON.stringify({ subject, grade }));
+                widget.querySelector('.widget-title').textContent = `Buku Kerja ${widgetId}: ${subject} - Kelas ${grade}`;
             } catch (err) {
                 alert('Gagal menyimpan: ' + err.message);
             } finally {
-                btn.disabled = false;
-                btn.innerHTML = originalHTML;
+                button.disabled = false;
+                button.innerHTML = originalHTML;
                 lucide.createIcons();
             }
         }

@@ -51,6 +51,24 @@ try {
         $stmt->execute([$user_id, $subject, $grade, $academic_year, $promes_data_json]);
 
         sendJSONResponse(['success' => true, 'message' => 'Program Semester berhasil disimpan!']);
+
+    } elseif ($method === 'DELETE') {
+        $input = json_decode(file_get_contents('php://input'), true);
+        $subject = isset($input['subject']) ? trim($input['subject']) : null;
+        $grade = isset($input['grade']) ? trim($input['grade']) : null;
+
+        if (!$subject || !$grade) {
+            sendJSONResponse(['success' => false, 'message' => 'Data tidak lengkap untuk menghapus.'], 400);
+        }
+
+        $stmt = $pdo->prepare("DELETE FROM saved_promes WHERE user_id = ? AND subject = ? AND grade = ? AND academic_year = ?");
+        $stmt->execute([$user_id, $subject, $grade, $academic_year]);
+
+        if ($stmt->rowCount() > 0) {
+            sendJSONResponse(['success' => true, 'message' => 'Data Buku Kerja berhasil dihapus.']);
+        } else {
+            sendJSONResponse(['success' => true, 'message' => 'Tidak ada data yang cocok untuk dihapus.']);
+        }
     }
 } catch (Exception $e) {
     sendJSONResponse(['success' => false, 'message' => $e->getMessage()], 500);
