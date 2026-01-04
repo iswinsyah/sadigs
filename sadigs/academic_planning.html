@@ -422,7 +422,7 @@
             const promptBox = document.getElementById(`promesPrompt-${widgetId}`);
             
             if(subject && grade && fase) {
-                let basePrompt = `Bertindaklah sebagai ahli kurikulum. Untuk mata pelajaran '${subject}' kelas ${grade} (Fase ${fase}, Kurikulum Merdeka), buatkan daftar Materi Pokok/Topik beserta Tujuan Pembelajarannya (TP) yang ringkas dan operasional. Pisahkan output untuk Semester Ganjil dan Genap.`;
+                let basePrompt = `Bertindaklah sebagai ahli kurikulum. Untuk mata pelajaran '${subject}' kelas ${grade} (Fase ${fase}, Kurikulum Merdeka), cantumkan teks CP yang ada di kurikulum merdeka, dan buatkan daftar Materi Pokok/Topik beserta Tujuan Pembelajarannya (TP) yang ringkas dan operasional. Pisahkan output untuk Semester Ganjil dan Genap.`;
                 if (cp && cp.trim() !== '') {
                     basePrompt += ` Pastikan TP yang dibuat merupakan turunan dari Capaian Pembelajaran berikut: "${cp}"`;
                 }
