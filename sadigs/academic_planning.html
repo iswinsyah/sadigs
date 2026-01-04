@@ -43,18 +43,39 @@
                     </div>
                 </div>
             </div>
-            <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-2 no-scrollbar">
-                <!-- Div 1: UMUM -->
+            <nav id="sidebarNav" class="flex-1 overflow-y-auto py-4 px-3 space-y-2 no-scrollbar">
+                
+                <!-- KELOMPOK 1: UMUM -->
                 <div class="bg-gray-50 rounded-lg p-2">
                     <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">UMUM</h3>
-                    <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard</a>
-                    <a href="calendar_view.html" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="table" class="w-5 h-5"></i> Tabel Kalender</a>
-                    <a href="profile.html" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="user" class="w-5 h-5"></i> Profil Saya</a>
+                    <a id="navDashboard" href="dashboard.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard</a>
+                    <a id="navProfil" href="profile.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="user" class="w-5 h-5"></i> Profil Saya</a>
+                    <a id="navKalender" href="calendar_view.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="calendar" class="w-5 h-5"></i> Kalender Pendidikan</a>
                 </div>
-                <!-- Div 2: KEPEGAWAIAN -->
-                <div class="bg-gray-50 rounded-lg p-2">
+
+                <!-- KELOMPOK 2: KEPEGAWAIAN -->
+                <div id="groupKepegawaian" class="hidden bg-gray-50 rounded-lg p-2 mt-2">
                     <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KEPEGAWAIAN</h3>
-                    <a href="academic_planning.html" class="flex items-center gap-3 px-3 py-2.5 text-teal-700 bg-white rounded-md transition font-semibold text-sm shadow-sm"><i data-lucide="book-check" class="w-5 h-5"></i> Buku Kerja Ustadz</a>
+                    <a id="navAbsensi" href="attendance.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="map-pin" class="w-5 h-5"></i> Absensi Pegawai</a>
+                    <a id="navIzinPegawai" href="leave_request.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="file-edit" class="w-5 h-5"></i> Formulir Izin</a>
+                    <a id="navRapat" href="meeting_invitation.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="mail" class="w-5 h-5"></i> Undang Rapat</a>
+                    <a id="navJadwalRapat" href="meeting_schedule.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="calendar-clock" class="w-5 h-5"></i> Jadwal Rapat</a>
+                    <a id="navRppGenerator" href="rpp_generator.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="brain-circuit" class="w-5 h-5"></i> RPP Generator (AI)</a>
+                    <a id="navRppAlbum" href="rpp_album.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="book-copy" class="w-5 h-5"></i> Album RPP</a>
+                    <a id="navPerencanaanAkademik" href="academic_planning.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-teal-700 bg-white rounded-md transition font-semibold text-sm shadow-sm"><i data-lucide="book-check" class="w-5 h-5"></i> Buku Kerja Ustadz</a>
+                </div>
+
+                <!-- KELOMPOK 3: KHUSUS -->
+                <div id="groupKhusus" class="hidden bg-gray-50 rounded-lg p-2 mt-2">
+                    <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">MENU KHUSUS</h3>
+                    <a id="navInputNilai" href="input_grades.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="graduation-cap" class="w-5 h-5"></i> Input Nilai Rapot</a>
+                    <a id="navMentoring" href="mentoring_groups.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="users-round" class="w-5 h-5"></i> Kelompok Mentoring</a>
+                    <a id="navValidasiIbadah" href="daily_worship_validation.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="check-square" class="w-5 h-5"></i> Validasi Ibadah</a>
+                    <a id="navInputTahfizh" href="tahfizh_report_form.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="book-marked" class="w-5 h-5"></i> Input Tahfizh</a>
+                    <a id="navGuardianLeaveValidation" href="guardian_leave_validation.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="mail-check" class="w-5 h-5"></i> Validasi Izin Walisantri</a>
+                    <a id="navOnLeaveList" href="on_leave_list.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="user-minus" class="w-5 h-5"></i> Santri Sedang Pulang</a>
+                    <a id="navMusyrifPocketMoney" href="musyrif_pocket_money_view.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="archive" class="w-5 h-5"></i> Riwayat Deposit Santri</a>
+                    <a id="navMusyrifWithdrawalValidation" href="musyrif_withdrawal_validation.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="check-square" class="w-5 h-5"></i> Validasi Penarikan</a>
                 </div>
                 <div class="pt-2">
                     <button id="logoutBtn" class="w-full flex items-center gap-3 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition font-medium"><i data-lucide="log-out" class="w-5 h-5"></i> Keluar</button>
@@ -174,6 +195,27 @@
                 document.getElementById('userInitial').textContent = sessionData.username.charAt(0).toUpperCase();
                 const rawRoles = sessionData.raw_roles || [];
                 document.getElementById('sidebarRole').textContent = rawRoles.length > 0 ? rawRoles.map(r => r.role_name).join(', ') : 'User';
+
+                // --- LOGIKA MENU DINAMIS (DATABASE) ---
+                const permRes = await fetch('sadigs_api_v3/get_menu_permissions.php');
+                const permData = await permRes.json();
+                if (permData.success) {
+                    const allowedMenus = permData.permissions || [];
+                    // 1. Tampilkan menu yang diizinkan
+                    allowedMenus.forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) el.classList.remove('hidden');
+                    });
+                
+                    // 2. Tampilkan grup menu jika memiliki item yang terlihat
+                    const menuGroups = ['groupKepegawaian', 'groupKhusus'];
+                    menuGroups.forEach(groupId => {
+                        const group = document.getElementById(groupId);
+                        if (group && group.querySelector('a:not(.hidden)')) {
+                            group.classList.remove('hidden');
+                        }
+                    });
+                }
             } catch (e) { console.error(e); }
         }
         initSidebar();
