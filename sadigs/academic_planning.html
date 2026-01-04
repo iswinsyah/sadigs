@@ -296,9 +296,10 @@
         function loadAllWidgetsState() {
             for (let i = 1; i <= 3; i++) {
                 const state = JSON.parse(localStorage.getItem(`promesWidget-${i}`));
-                if (state && state.subject && state.grade) {
+                if (state && state.subject && state.grade && state.fase) {
                     const widget = document.getElementById(`widget-${i}`);
                     widget.querySelector(`#promesSubject-${i}`).value = state.subject;
+                    widget.querySelector(`#promesFase-${i}`).value = state.fase;
                     widget.querySelector(`#promesGrade-${i}`).value = state.grade;
                     
                     const title = widget.querySelector('.widget-title');
@@ -330,14 +331,27 @@
 
                 <div class="widget-content hidden p-4 space-y-6">
                     <div class="space-y-4">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div class="md:col-span-2">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+                            <div class="md:col-span-1">
                                 <label for="promesSubject-${widgetId}" class="block text-sm font-medium text-gray-500">Mata Pelajaran</label>
                                 <input type="text" id="promesSubject-${widgetId}" oninput="updateAiPrompt(${widgetId})" class="w-full p-2 border border-gray-300 rounded-lg mt-1" placeholder="Contoh: Biologi">
                             </div>
                             <div>
+                                <label for="promesFase-${widgetId}" class="block text-sm font-medium text-gray-500">Fase</label>
+                                <select id="promesFase-${widgetId}" onchange="updateAiPrompt(${widgetId})" class="w-full p-2 border border-gray-300 rounded-lg mt-1 bg-white">
+                                    <option value="">Pilih Fase</option>
+                                    <option value="D">D</option>
+                                    <option value="E">E</option>
+                                    <option value="F">F</option>
+                                </select>
+                            </div>
+                            <div>
                                 <label for="promesGrade-${widgetId}" class="block text-sm font-medium text-gray-500">Kelas</label>
-                                <input type="text" id="promesGrade-${widgetId}" oninput="updateAiPrompt(${widgetId})" class="w-full p-2 border border-gray-300 rounded-lg mt-1" placeholder="Contoh: 12">
+                                <select id="promesGrade-${widgetId}" onchange="updateAiPrompt(${widgetId})" class="w-full p-2 border border-gray-300 rounded-lg mt-1 bg-white">
+                                    <option value="">Pilih Kelas</option>
+                                    <option value="7">7</option><option value="8">8</option><option value="9">9</option>
+                                    <option value="10">10</option><option value="11">11</option><option value="12">12</option>
+                                </select>
                             </div>
                         </div>
                         <div>
@@ -403,11 +417,12 @@
         function updateAiPrompt(widgetId) {
             const subject = document.getElementById(`promesSubject-${widgetId}`).value;
             const grade = document.getElementById(`promesGrade-${widgetId}`).value;
+            const fase = document.getElementById(`promesFase-${widgetId}`).value;
             const cp = document.getElementById(`promesCP-${widgetId}`).value;
             const promptBox = document.getElementById(`promesPrompt-${widgetId}`);
             
-            if(subject && grade) {
-                let basePrompt = `Bertindaklah sebagai ahli kurikulum. Untuk mata pelajaran '${subject}' kelas ${grade} (Kurikulum Merdeka), buatkan daftar Materi Pokok/Topik beserta Tujuan Pembelajarannya (TP) yang ringkas dan operasional. Pisahkan output untuk Semester Ganjil dan Genap.`;
+            if(subject && grade && fase) {
+                let basePrompt = `Bertindaklah sebagai ahli kurikulum. Untuk mata pelajaran '${subject}' kelas ${grade} (Fase ${fase}, Kurikulum Merdeka), buatkan daftar Materi Pokok/Topik beserta Tujuan Pembelajarannya (TP) yang ringkas dan operasional. Pisahkan output untuk Semester Ganjil dan Genap.`;
                 if (cp && cp.trim() !== '') {
                     basePrompt += ` Pastikan TP yang dibuat merupakan turunan dari Capaian Pembelajaran berikut: "${cp}"`;
                 }
@@ -434,6 +449,7 @@
             // Clear UI
             widget.querySelector(`#promesSubject-${widgetId}`).value = '';
             widget.querySelector(`#promesGrade-${widgetId}`).value = '';
+            widget.querySelector(`#promesFase-${widgetId}`).value = '';
             widget.querySelector(`#promesCP-${widgetId}`).value = '';
             widget.querySelector(`#promesPrompt-${widgetId}`).value = '';
             widget.querySelector(`#promesGanjilBody-${widgetId}`).innerHTML = '';
@@ -451,7 +467,7 @@
                     await fetch('sadigs_api_v3/saved_promes_api.php', {
                         method: 'DELETE',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ subject, grade })
+                        body: JSON.stringify({ subject, grade, fase: widget.querySelector(`#promesFase-${widgetId}`).value.trim() })
                     });
                 } catch (e) { console.error("Gagal menghapus data di server:", e); }
             }
@@ -461,10 +477,11 @@
             const widget = button.closest('.promes-widget');
             const widgetId = widget.dataset.widgetId;
             const subject = widget.querySelector(`#promesSubject-${widgetId}`).value.trim();
+            const fase = widget.querySelector(`#promesFase-${widgetId}`).value.trim();
             const grade = widget.querySelector(`#promesGrade-${widgetId}`).value.trim();
 
-            if (!subject || !grade) {
-                alert('Mata Pelajaran dan Kelas harus diisi.');
+            if (!subject || !grade || !fase) {
+                alert('Mata Pelajaran, Fase, dan Kelas harus diisi.');
                 return;
             }
 
@@ -480,7 +497,7 @@
             genapBody.innerHTML = '';
 
             try {
-                const loadRes = await fetch(`sadigs_api_v3/saved_promes_api.php?subject=${encodeURIComponent(subject)}&grade=${encodeURIComponent(grade)}`);
+                const loadRes = await fetch(`sadigs_api_v3/saved_promes_api.php?subject=${encodeURIComponent(subject)}&fase=${encodeURIComponent(fase)}&grade=${encodeURIComponent(grade)}`);
                 if (loadRes.ok) {
                     const loadResult = await loadRes.json();
                     if (loadResult.success) {
@@ -494,7 +511,7 @@
                         populatePromesTable(widgetId, 'ganjil', promesData.ganjil || []);
                         populatePromesTable(widgetId, 'genap', promesData.genap || []);
                         tablesContainer.classList.remove('hidden');
-                        localStorage.setItem(`promesWidget-${widgetId}`, JSON.stringify({ subject, grade }));
+                        localStorage.setItem(`promesWidget-${widgetId}`, JSON.stringify({ subject, fase, grade }));
                         widget.querySelector('.widget-title').textContent = `Buku Kerja ${widgetId}: ${subject} - Kelas ${grade}`;
                         
                         updateWidgetUI(widget, status);
@@ -669,10 +686,11 @@
             const widget = button.closest('.promes-widget');
             const widgetId = widget.dataset.widgetId;
             const subject = widget.querySelector(`#promesSubject-${widgetId}`).value.trim();
+            const fase = widget.querySelector(`#promesFase-${widgetId}`).value.trim();
             const grade = widget.querySelector(`#promesGrade-${widgetId}`).value.trim();
             const cp = widget.querySelector(`#promesCP-${widgetId}`).value.trim();
 
-            if (!subject || !grade) {
+            if (!subject || !grade || !fase) {
                 alert('Mata Pelajaran dan Kelas harus diisi.');
                 return;
             }
@@ -703,6 +721,7 @@
             const dataToSave = {
                 subject,
                 grade,
+                fase,
                 cp,
                 action,
                 promes_data: {
@@ -720,7 +739,7 @@
                 const result = await res.json();
                 alert(result.message);
                 if (result.success) {
-                    localStorage.setItem(`promesWidget-${widgetId}`, JSON.stringify({ subject, grade }));
+                    localStorage.setItem(`promesWidget-${widgetId}`, JSON.stringify({ subject, fase, grade }));
                     widget.querySelector('.widget-title').textContent = `Buku Kerja ${widgetId}: ${subject} - Kelas ${grade}`;
                     updateWidgetUI(widget, action === 'submit' ? 'submitted' : 'draft');
                 }
@@ -740,13 +759,14 @@
             const widget = button.closest('.promes-widget');
             const widgetId = widget.dataset.widgetId;
             const subject = widget.querySelector(`#promesSubject-${widgetId}`).value.trim();
+            const fase = widget.querySelector(`#promesFase-${widgetId}`).value.trim();
             const grade = widget.querySelector(`#promesGrade-${widgetId}`).value.trim();
 
             try {
                 const res = await fetch('sadigs_api_v3/saved_promes_api.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ subject, grade, action: 'unlock' })
+                    body: JSON.stringify({ subject, fase, grade, action: 'unlock' })
                 });
                 const result = await res.json();
                 alert(result.message);
