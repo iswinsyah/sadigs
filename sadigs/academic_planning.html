@@ -303,7 +303,7 @@
                     widget.querySelector(`#promesGrade-${i}`).value = state.grade;
                     
                     const title = widget.querySelector('.widget-title');
-                    title.textContent = `Alur Tujuan Pembelajaran ${i}: ${state.subject} - Kelas ${state.grade}`;
+                    title.textContent = `Perangkat Ajar ${i}: ${state.subject} - Kelas ${state.grade}`;
 
                     const showBtn = widget.querySelector('button[onclick^="loadOrGeneratePromes"]');
                     loadOrGeneratePromes(showBtn, false);
@@ -318,7 +318,7 @@
             return `
             <div id="widget-${widgetId}" class="promes-widget bg-white rounded-xl shadow-sm border border-gray-100" data-widget-id="${widgetId}">
                 <div class="widget-header p-4 border-b flex justify-between items-center cursor-pointer bg-gray-50 rounded-t-xl" onclick="toggleWidget(this)">
-                    <h3 class="widget-title text-lg font-bold text-gray-800">Alur Tujuan Pembelajaran ${widgetId}: Baru</h3>
+                    <h3 class="widget-title text-lg font-bold text-gray-800">Perangkat Ajar ${widgetId}: Baru</h3>
                     <div class="flex items-center gap-2">
                         <button onclick="event.stopPropagation(); clearWidget(this)" class="p-1 text-gray-400 hover:text-red-500" title="Bersihkan Buku Kerja Ini">
                             <i data-lucide="trash-2" class="w-4 h-4"></i>
@@ -331,6 +331,7 @@
 
                 <div class="widget-content hidden p-4 space-y-6">
                     <div class="space-y-4">
+                        <!-- GLOBAL INPUTS (SHARED) -->
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
                             <div class="md:col-span-1">
                                 <label for="promesSubject-${widgetId}" class="block text-sm font-medium text-gray-500">Mata Pelajaran</label>
@@ -354,64 +355,130 @@
                                 </select>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- TABS NAVIGATION -->
+                    <div class="border-b border-gray-200">
+                        <nav class="-mb-px flex space-x-4" aria-label="Tabs">
+                            <button onclick="switchTab(${widgetId}, 'atp')" id="tab-btn-atp-${widgetId}" class="tab-btn border-b-2 border-blue-500 text-blue-600 whitespace-nowrap py-2 px-1 font-medium text-sm flex items-center gap-2">
+                                <i data-lucide="list-tree" class="w-4 h-4"></i> ATP (Promes)
+                            </button>
+                            <button onclick="switchTab(${widgetId}, 'modul')" id="tab-btn-modul-${widgetId}" class="tab-btn border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 font-medium text-sm flex items-center gap-2">
+                                <i data-lucide="book-open" class="w-4 h-4"></i> Modul Ajar
+                            </button>
+                            <button onclick="switchTab(${widgetId}, 'lkpd')" id="tab-btn-lkpd-${widgetId}" class="tab-btn border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 font-medium text-sm flex items-center gap-2">
+                                <i data-lucide="file-text" class="w-4 h-4"></i> LKPD
+                            </button>
+                            <button onclick="switchTab(${widgetId}, 'soal')" id="tab-btn-soal-${widgetId}" class="tab-btn border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 font-medium text-sm flex items-center gap-2">
+                                <i data-lucide="help-circle" class="w-4 h-4"></i> Asesmen (Soal)
+                            </button>
+                        </nav>
+                    </div>
+
+                    <!-- TAB CONTENT: ATP (PROMES) -->
+                    <div id="tab-content-atp-${widgetId}" class="space-y-4">
                         <div>
                             <label for="promesPrompt-${widgetId}" class="block text-sm font-medium text-gray-500">Instruksi untuk AI (Otomatis/Edit)</label>
                             <textarea id="promesPrompt-${widgetId}" rows="2" class="w-full p-2 border border-gray-300 rounded-lg mt-1 text-sm bg-gray-50 focus:bg-white transition" placeholder="Prompt akan terisi otomatis..."></textarea>
                         </div>
-                        <button onclick="loadOrGeneratePromes(this, true)" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition shadow-md flex justify-center items-center gap-2" title="Tampilkan data tersimpan atau generate baru"><i data-lucide="play" class="w-5 h-5"></i> Tampilkan / Generate</button>
+                        <button onclick="loadOrGeneratePromes(this, true)" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition shadow-md flex justify-center items-center gap-2" title="Tampilkan data tersimpan atau generate baru"><i data-lucide="play" class="w-5 h-5"></i> Tampilkan / Generate ATP</button>
                         <div>
                             <label for="promesCP-${widgetId}" class="block text-sm font-medium text-gray-500">Capaian Pembelajaran (CP)</label>
                             <textarea id="promesCP-${widgetId}" oninput="updateAiPrompt(${widgetId})" rows="2" class="w-full p-2 border border-gray-300 rounded-lg mt-1 text-sm" placeholder="Contoh: Di akhir fase E, peserta didik memiliki kemampuan untuk responsif terhadap isu-isu global..."></textarea>
                         </div>
+
+                        <div class="flex justify-end items-center gap-3 pt-2">
+                            <div id="statusBadge-${widgetId}" class="hidden items-center gap-2 text-sm font-semibold text-green-600 bg-green-100 px-3 py-1.5 rounded-full">
+                                <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                                <span>Telah Diajukan</span>
+                            </div>
+                            <button onclick="unlockPromes(this)" id="unlockPromesBtn-${widgetId}" class="hidden bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg transition shadow-md flex items-center gap-2">
+                                <i data-lucide="unlock" class="w-4 h-4"></i> Buka Kunci
+                            </button>
+                            <button onclick="savePromes(this)" id="savePromesBtn-${widgetId}" class="hidden bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition shadow-md flex items-center gap-2">
+                                <i data-lucide="save" class="w-4 h-4"></i> Simpan ATP
+                            </button>
+                            <button onclick="submitPromes(this)" id="submitPromesBtn-${widgetId}" class="hidden bg-blue-800 hover:bg-blue-900 text-white font-bold py-2 px-4 rounded-lg transition shadow-md flex items-center gap-2">
+                                <i data-lucide="lock" class="w-4 h-4"></i> Kunci & Ajukan
+                            </button>
+                        </div>
+
+                        <div id="tablesContainer-${widgetId}" class="hidden space-y-8">
+                            <div>
+                                <h3 class="text-base font-bold text-gray-800 mb-4">Semester Ganjil</h3>
+                                <div class="overflow-x-auto custom-scrollbar pb-2">
+                                    <table class="w-full text-xs border-collapse min-w-[1200px]">
+                                        <thead class="bg-gray-100">
+                                        <tr><th rowspan="2" class="p-2 text-left border w-10">No</th><th rowspan="2" class="p-2 text-left border min-w-[200px]">Topik / Materi Pokok</th><th rowspan="2" class="p-2 text-left border min-w-[250px]">Tujuan Pembelajaran (TP)</th><th rowspan="2" class="p-2 text-center border w-20">Alokasi Waktu (JP)</th><th colspan="5" class="p-1 text-center border bg-gray-200">Juli</th><th colspan="5" class="p-1 text-center border bg-gray-200">Agustus</th><th colspan="5" class="p-1 text-center border bg-gray-200">September</th><th colspan="5" class="p-1 text-center border bg-gray-200">Oktober</th><th colspan="5" class="p-1 text-center border bg-gray-200">November</th><th colspan="5" class="p-1 text-center border bg-gray-200">Desember</th></tr>
+                                            <tr class="bg-gray-50">${weekHeader}</tr>
+                                        </thead>
+                                        <tbody id="promesGanjilBody-${widgetId}"></tbody>
+                                    </table>
+                                </div>
+                                <button onclick="addRow(this, 'ganjil')" class="mt-4 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold py-2 px-4 rounded-lg transition">+ Tambah Baris</button>
+                            </div>
+                            <div>
+                                <h3 class="text-base font-bold text-gray-800 mb-4">Semester Genap</h3>
+                                <div class="overflow-x-auto custom-scrollbar pb-2">
+                                    <table class="w-full text-xs border-collapse min-w-[1200px]">
+                                        <thead class="bg-gray-100">
+                                            <tr><th rowspan="2" class="p-2 text-left border w-10">No</th><th rowspan="2" class="p-2 text-left border min-w-[200px]">Topik / Materi Pokok</th><th rowspan="2" class="p-2 text-left border min-w-[250px]">Tujuan Pembelajaran (TP)</th><th rowspan="2" class="p-2 text-center border w-20">Alokasi Waktu (JP)</th><th colspan="5" class="p-1 text-center border bg-gray-200">Januari</th><th colspan="5" class="p-1 text-center border bg-gray-200">Februari</th><th colspan="5" class="p-1 text-center border bg-gray-200">Maret</th><th colspan="5" class="p-1 text-center border bg-gray-200">April</th><th colspan="5" class="p-1 text-center border bg-gray-200">Mei</th><th colspan="5" class="p-1 text-center border bg-gray-200">Juni</th></tr>
+                                            <tr class="bg-gray-50">${weekHeader}</tr>
+                                        </thead>
+                                        <tbody id="promesGenapBody-${widgetId}"></tbody>
+                                    </table>
+                                </div>
+                                <button onclick="addRow(this, 'genap')" class="mt-4 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold py-2 px-4 rounded-lg transition">+ Tambah Baris</button>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="flex justify-end items-center gap-3">
-                        <div id="statusBadge-${widgetId}" class="hidden items-center gap-2 text-sm font-semibold text-green-600 bg-green-100 px-3 py-1.5 rounded-full">
-                            <i data-lucide="check-circle-2" class="w-4 h-4"></i>
-                            <span>Telah Diajukan</span>
-                        </div>
-                        <button onclick="unlockPromes(this)" id="unlockPromesBtn-${widgetId}" class="hidden bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg transition shadow-md flex items-center gap-2">
-                            <i data-lucide="unlock" class="w-4 h-4"></i> Buka Kunci
-                        </button>
-                        <button onclick="savePromes(this)" id="savePromesBtn-${widgetId}" class="hidden bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition shadow-md flex items-center gap-2">
-                            <i data-lucide="save" class="w-4 h-4"></i> Simpan
-                        </button>
-                        <button onclick="submitPromes(this)" id="submitPromesBtn-${widgetId}" class="hidden bg-blue-800 hover:bg-blue-900 text-white font-bold py-2 px-4 rounded-lg transition shadow-md flex items-center gap-2">
-                            <i data-lucide="lock" class="w-4 h-4"></i> Kunci & Ajukan
-                        </button>
+                    <!-- TAB CONTENT: MODUL AJAR -->
+                    <div id="tab-content-modul-${widgetId}" class="hidden space-y-4 p-4 bg-gray-50 rounded-lg border border-dashed border-gray-300 text-center">
+                        <i data-lucide="construction" class="w-10 h-10 text-gray-400 mx-auto mb-2"></i>
+                        <p class="text-gray-500">Generator Modul Ajar akan segera hadir di sini.</p>
                     </div>
 
-                    <div id="tablesContainer-${widgetId}" class="hidden space-y-8">
-                        <div>
-                            <h3 class="text-base font-bold text-gray-800 mb-4">Semester Ganjil</h3>
-                            <div class="overflow-x-auto custom-scrollbar pb-2">
-                                <table class="w-full text-xs border-collapse min-w-[1200px]">
-                                    <thead class="bg-gray-100">
-                                    <tr><th rowspan="2" class="p-2 text-left border w-10">No</th><th rowspan="2" class="p-2 text-left border min-w-[200px]">Topik / Materi Pokok</th><th rowspan="2" class="p-2 text-left border min-w-[250px]">Tujuan Pembelajaran (TP)</th><th rowspan="2" class="p-2 text-center border w-20">Alokasi Waktu (JP)</th><th colspan="5" class="p-1 text-center border bg-gray-200">Juli</th><th colspan="5" class="p-1 text-center border bg-gray-200">Agustus</th><th colspan="5" class="p-1 text-center border bg-gray-200">September</th><th colspan="5" class="p-1 text-center border bg-gray-200">Oktober</th><th colspan="5" class="p-1 text-center border bg-gray-200">November</th><th colspan="5" class="p-1 text-center border bg-gray-200">Desember</th></tr>
-                                        <tr class="bg-gray-50">${weekHeader}</tr>
-                                    </thead>
-                                    <tbody id="promesGanjilBody-${widgetId}"></tbody>
-                                </table>
-                            </div>
-                            <button onclick="addRow(this, 'ganjil')" class="mt-4 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold py-2 px-4 rounded-lg transition">+ Tambah Baris</button>
-                        </div>
-                        <div>
-                            <h3 class="text-base font-bold text-gray-800 mb-4">Semester Genap</h3>
-                            <div class="overflow-x-auto custom-scrollbar pb-2">
-                                <table class="w-full text-xs border-collapse min-w-[1200px]">
-                                    <thead class="bg-gray-100">
-                                        <tr><th rowspan="2" class="p-2 text-left border w-10">No</th><th rowspan="2" class="p-2 text-left border min-w-[200px]">Topik / Materi Pokok</th><th rowspan="2" class="p-2 text-left border min-w-[250px]">Tujuan Pembelajaran (TP)</th><th rowspan="2" class="p-2 text-center border w-20">Alokasi Waktu (JP)</th><th colspan="5" class="p-1 text-center border bg-gray-200">Januari</th><th colspan="5" class="p-1 text-center border bg-gray-200">Februari</th><th colspan="5" class="p-1 text-center border bg-gray-200">Maret</th><th colspan="5" class="p-1 text-center border bg-gray-200">April</th><th colspan="5" class="p-1 text-center border bg-gray-200">Mei</th><th colspan="5" class="p-1 text-center border bg-gray-200">Juni</th></tr>
-                                        <tr class="bg-gray-50">${weekHeader}</tr>
-                                    </thead>
-                                    <tbody id="promesGenapBody-${widgetId}"></tbody>
-                                </table>
-                            </div>
-                            <button onclick="addRow(this, 'genap')" class="mt-4 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold py-2 px-4 rounded-lg transition">+ Tambah Baris</button>
-                        </div>
+                    <!-- TAB CONTENT: LKPD -->
+                    <div id="tab-content-lkpd-${widgetId}" class="hidden space-y-4 p-4 bg-gray-50 rounded-lg border border-dashed border-gray-300 text-center">
+                        <i data-lucide="construction" class="w-10 h-10 text-gray-400 mx-auto mb-2"></i>
+                        <p class="text-gray-500">Generator LKPD akan segera hadir di sini.</p>
+                    </div>
+
+                    <!-- TAB CONTENT: SOAL -->
+                    <div id="tab-content-soal-${widgetId}" class="hidden space-y-4 p-4 bg-gray-50 rounded-lg border border-dashed border-gray-300 text-center">
+                        <i data-lucide="construction" class="w-10 h-10 text-gray-400 mx-auto mb-2"></i>
+                        <p class="text-gray-500">Generator Soal Asesmen akan segera hadir di sini.</p>
                     </div>
                 </div>
             </div>
             `;
+        }
+
+        function switchTab(widgetId, tabName) {
+            const widget = document.getElementById(`widget-${widgetId}`);
+            
+            // Hide all tab contents
+            ['atp', 'modul', 'lkpd', 'soal'].forEach(t => {
+                const content = widget.querySelector(`#tab-content-${t}-${widgetId}`);
+                const btn = widget.querySelector(`#tab-btn-${t}-${widgetId}`);
+                
+                if (content) content.classList.add('hidden');
+                if (btn) {
+                    btn.classList.remove('border-blue-500', 'text-blue-600');
+                    btn.classList.add('border-transparent', 'text-gray-500');
+                }
+            });
+
+            // Show selected tab
+            const selectedContent = widget.querySelector(`#tab-content-${tabName}-${widgetId}`);
+            const selectedBtn = widget.querySelector(`#tab-btn-${tabName}-${widgetId}`);
+            
+            if (selectedContent) selectedContent.classList.remove('hidden');
+            if (selectedBtn) {
+                selectedBtn.classList.remove('border-transparent', 'text-gray-500');
+                selectedBtn.classList.add('border-blue-500', 'text-blue-600');
+            }
         }
 
         function updateAiPrompt(widgetId) {
@@ -455,7 +522,7 @@
             widget.querySelector(`#promesGanjilBody-${widgetId}`).innerHTML = '';
             widget.querySelector(`#promesGenapBody-${widgetId}`).innerHTML = '';
             widget.querySelector(`#savePromesBtn-${widgetId}`).classList.add('hidden');
-            widget.querySelector('.widget-title').textContent = `Alur Tujuan Pembelajaran ${widgetId}: Baru`;
+            widget.querySelector('.widget-title').textContent = `Perangkat Ajar ${widgetId}: Baru`;
 
             // Clear storage
             localStorage.removeItem(`promesWidget-${widgetId}`);
@@ -511,7 +578,7 @@
                         populatePromesTable(widgetId, 'genap', promesData.genap || []);
                         tablesContainer.classList.remove('hidden');
                         localStorage.setItem(`promesWidget-${widgetId}`, JSON.stringify({ subject, fase, grade }));
-                        widget.querySelector('.widget-title').textContent = `Alur Tujuan Pembelajaran ${widgetId}: ${subject} - Kelas ${grade}`;
+                        widget.querySelector('.widget-title').textContent = `Perangkat Ajar ${widgetId}: ${subject} - Kelas ${grade}`;
                         
                         updateWidgetUI(widget, status);
                         return;
@@ -566,7 +633,7 @@
                 widget.querySelector(`#savePromesBtn-${widgetId}`).classList.remove('hidden');
                 widget.querySelector(`#submitPromesBtn-${widgetId}`).classList.remove('hidden');
                 widget.querySelector(`#tablesContainer-${widgetId}`).classList.remove('hidden');
-                widget.querySelector('.widget-title').textContent = `Alur Tujuan Pembelajaran ${widgetId}: ${subject} - Kelas ${grade}`;
+                widget.querySelector('.widget-title').textContent = `Perangkat Ajar ${widgetId}: ${subject} - Kelas ${grade}`;
 
             } catch (err) {
                 alert('Gagal generate Promes: ' + err.message);
@@ -742,7 +809,7 @@
                 alert(result.message);
                 if (result.success) {
                     localStorage.setItem(`promesWidget-${widgetId}`, JSON.stringify({ subject, fase, grade }));
-                    widget.querySelector('.widget-title').textContent = `Alur Tujuan Pembelajaran ${widgetId}: ${subject} - Kelas ${grade}`;
+                    widget.querySelector('.widget-title').textContent = `Perangkat Ajar ${widgetId}: ${subject} - Kelas ${grade}`;
                     updateWidgetUI(widget, action === 'submit' ? 'submitted' : 'draft');
                 }
             } catch (err) {
