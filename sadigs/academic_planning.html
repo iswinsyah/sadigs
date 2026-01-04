@@ -343,9 +343,19 @@
                         </button>
                     </div>
 
-                    <div class="text-right">
+                    <div class="flex justify-end items-center gap-3">
+                        <div id="statusBadge-${widgetId}" class="hidden items-center gap-2 text-sm font-semibold text-green-600 bg-green-100 px-3 py-1.5 rounded-full">
+                            <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                            <span>Telah Diajukan</span>
+                        </div>
+                        <button onclick="unlockPromes(this)" id="unlockPromesBtn-${widgetId}" class="hidden bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg transition shadow-md flex items-center gap-2">
+                            <i data-lucide="unlock" class="w-4 h-4"></i> Buka Kunci
+                        </button>
                         <button onclick="savePromes(this)" id="savePromesBtn-${widgetId}" class="hidden bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition shadow-md flex items-center gap-2">
                             <i data-lucide="save" class="w-4 h-4"></i> Simpan
+                        </button>
+                        <button onclick="submitPromes(this)" id="submitPromesBtn-${widgetId}" class="hidden bg-blue-800 hover:bg-blue-900 text-white font-bold py-2 px-4 rounded-lg transition shadow-md flex items-center gap-2">
+                            <i data-lucide="lock" class="w-4 h-4"></i> Kunci & Ajukan
                         </button>
                     </div>
 
@@ -449,12 +459,16 @@
                 if (loadRes.ok) {
                     const loadResult = await loadRes.json();
                     if (loadResult.success) {
-                        populatePromesTable(widgetId, 'ganjil', loadResult.data.ganjil || []);
-                        populatePromesTable(widgetId, 'genap', loadResult.data.genap || []);
-                        widget.querySelector(`#savePromesBtn-${widgetId}`).classList.remove('hidden');
+                        const promesData = loadResult.data;
+                        const status = loadResult.status;
+
+                        populatePromesTable(widgetId, 'ganjil', promesData.ganjil || []);
+                        populatePromesTable(widgetId, 'genap', promesData.genap || []);
                         tablesContainer.classList.remove('hidden');
                         localStorage.setItem(`promesWidget-${widgetId}`, JSON.stringify({ subject, grade }));
                         widget.querySelector('.widget-title').textContent = `Buku Kerja ${widgetId}: ${subject} - Kelas ${grade}`;
+                        
+                        updateWidgetUI(widget, status);
                         return;
                     }
                 }
@@ -502,6 +516,7 @@
                 populatePromesTable(widgetId, 'ganjil', ganjilData);
                 populatePromesTable(widgetId, 'genap', genapData);
                 widget.querySelector(`#savePromesBtn-${widgetId}`).classList.remove('hidden');
+                widget.querySelector(`#submitPromesBtn-${widgetId}`).classList.remove('hidden');
                 widget.querySelector(`#tablesContainer-${widgetId}`).classList.remove('hidden');
                 widget.querySelector('.widget-title').textContent = `Buku Kerja ${widgetId}: ${subject} - Kelas ${grade}`;
 
@@ -511,6 +526,31 @@
             }
         }
         
+        function updateWidgetUI(widget, status) {
+            const widgetId = widget.dataset.widgetId;
+            const isSubmitted = status === 'submitted';
+
+            // Toggle buttons visibility
+            widget.querySelector(`#savePromesBtn-${widgetId}`).classList.toggle('hidden', isSubmitted);
+            widget.querySelector(`#submitPromesBtn-${widgetId}`).classList.toggle('hidden', isSubmitted);
+            widget.querySelector(`#unlockPromesBtn-${widgetId}`).classList.toggle('hidden', !isSubmitted);
+            widget.querySelector(`#statusBadge-${widgetId}`).classList.toggle('hidden', !isSubmitted);
+            widget.querySelector(`#statusBadge-${widgetId}`).classList.toggle('flex', isSubmitted);
+
+            // Disable/Enable inputs
+            const contentDivs = widget.querySelectorAll('div[contenteditable]');
+            const checkboxes = widget.querySelectorAll('input[type="checkbox"]');
+            const addRowButtons = widget.querySelectorAll('button[onclick^="addRow"]');
+
+            contentDivs.forEach(div => div.setAttribute('contenteditable', !isSubmitted));
+            checkboxes.forEach(cb => cb.disabled = isSubmitted);
+            addRowButtons.forEach(btn => btn.disabled = isSubmitted);
+
+            // Add visual cue for disabled state
+            const tablesContainer = widget.querySelector(`#tablesContainer-${widgetId}`);
+            tablesContainer.classList.toggle('opacity-70', isSubmitted);
+        }
+
         function populatePromesTable(widgetId, semester, items) {
             const tbodyId = semester === 'ganjil' ? `promesGanjilBody-${widgetId}` : `promesGenapBody-${widgetId}`;
             const tbody = document.getElementById(tbodyId);
@@ -584,19 +624,29 @@
             lucide.createIcons();
         }
 
-        async function savePromes(button) {
+        function submitPromes(button) {
+            if (confirm('Anda yakin ingin mengunci dan mengajukan Buku Kerja ini? Anda tidak dapat mengubahnya lagi setelah diajukan, kecuali dengan membukanya kembali.')) {
+                savePromes(button, 'submit');
+            }
+        }
+
+        async function savePromes(button, action = 'save') {
             const widget = button.closest('.promes-widget');
             const widgetId = widget.dataset.widgetId;
             const subject = widget.querySelector(`#promesSubject-${widgetId}`).value.trim();
             const grade = widget.querySelector(`#promesGrade-${widgetId}`).value.trim();
 
             if (!subject || !grade) {
-                alert('Mata Pelajaran dan Kelas harus diisi untuk menyimpan.');
+                alert('Mata Pelajaran dan Kelas harus diisi.');
                 return;
             }
-            const originalHTML = button.innerHTML;
-            button.disabled = true;
-            button.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Menyimpan...`;
+
+            const saveBtn = widget.querySelector(`#savePromesBtn-${widgetId}`);
+            const submitBtn = widget.querySelector(`#submitPromesBtn-${widgetId}`);
+            const originalSaveHTML = saveBtn.innerHTML;
+            const originalSubmitHTML = submitBtn.innerHTML;
+            saveBtn.disabled = true; submitBtn.disabled = true;
+            button.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Proses...`;
             lucide.createIcons();
 
             const scrapeTable = (tbodyId) => {
@@ -616,6 +666,7 @@
             const dataToSave = {
                 subject,
                 grade,
+                action,
                 promes_data: {
                     ganjil: scrapeTable(`promesGanjilBody-${widgetId}`),
                     genap: scrapeTable(`promesGenapBody-${widgetId}`)
@@ -630,15 +681,42 @@
                 });
                 const result = await res.json();
                 alert(result.message);
-                
-                localStorage.setItem(`promesWidget-${widgetId}`, JSON.stringify({ subject, grade }));
-                widget.querySelector('.widget-title').textContent = `Buku Kerja ${widgetId}: ${subject} - Kelas ${grade}`;
+                if (result.success) {
+                    localStorage.setItem(`promesWidget-${widgetId}`, JSON.stringify({ subject, grade }));
+                    widget.querySelector('.widget-title').textContent = `Buku Kerja ${widgetId}: ${subject} - Kelas ${grade}`;
+                    updateWidgetUI(widget, action === 'submit' ? 'submitted' : 'draft');
+                }
             } catch (err) {
                 alert('Gagal menyimpan: ' + err.message);
             } finally {
-                button.disabled = false;
-                button.innerHTML = originalHTML;
+                saveBtn.disabled = false; submitBtn.disabled = false;
+                saveBtn.innerHTML = originalSaveHTML;
+                submitBtn.innerHTML = originalSubmitHTML;
                 lucide.createIcons();
+            }
+        }
+
+        async function unlockPromes(button) {
+            if (!confirm('Membuka kunci akan mengizinkan Anda mengedit kembali Buku Kerja ini. Lanjutkan?')) return;
+
+            const widget = button.closest('.promes-widget');
+            const widgetId = widget.dataset.widgetId;
+            const subject = widget.querySelector(`#promesSubject-${widgetId}`).value.trim();
+            const grade = widget.querySelector(`#promesGrade-${widgetId}`).value.trim();
+
+            try {
+                const res = await fetch('sadigs_api_v3/saved_promes_api.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ subject, grade, action: 'unlock' })
+                });
+                const result = await res.json();
+                alert(result.message);
+                if (result.success) {
+                    updateWidgetUI(widget, 'draft');
+                }
+            } catch (err) {
+                alert('Gagal membuka kunci: ' + err.message);
             }
         }
 

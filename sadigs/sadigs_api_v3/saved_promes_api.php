@@ -21,12 +21,12 @@ try {
             sendJSONResponse(['success' => false, 'message' => 'Mata Pelajaran dan Kelas wajib diisi.'], 400);
         }
 
-        $stmt = $pdo->prepare("SELECT promes_data FROM saved_promes WHERE user_id = ? AND subject = ? AND grade = ? AND academic_year = ?");
+        $stmt = $pdo->prepare("SELECT promes_data, status FROM saved_promes WHERE user_id = ? AND subject = ? AND grade = ? AND academic_year = ?");
         $stmt->execute([$user_id, $subject, $grade, $academic_year]);
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($data) {
-            sendJSONResponse(['success' => true, 'data' => json_decode($data['promes_data'], true)]);
+            sendJSONResponse(['success' => true, 'data' => json_decode($data['promes_data'], true), 'status' => $data['status']]);
         } else {
             sendJSONResponse(['success' => false, 'message' => 'Data Promes belum tersimpan.'], 404);
         }
@@ -36,21 +36,32 @@ try {
         $subject = isset($input['subject']) ? trim($input['subject']) : null;
         $grade = isset($input['grade']) ? trim($input['grade']) : null;
         $promes_data = $input['promes_data'] ?? null;
+        $action = $input['action'] ?? 'save'; // 'save', 'submit', 'unlock'
 
-        if (!$subject || !$grade || !$promes_data) {
+        if (!$subject || !$grade) {
             sendJSONResponse(['success' => false, 'message' => 'Data tidak lengkap.'], 400);
         }
 
+        if ($action === 'unlock') {
+            $stmt = $pdo->prepare("UPDATE saved_promes SET status = 'draft' WHERE user_id = ? AND subject = ? AND grade = ? AND academic_year = ?");
+            $stmt->execute([$user_id, $subject, $grade, $academic_year]);
+            sendJSONResponse(['success' => true, 'message' => 'Buku Kerja telah dibuka.']);
+            exit;
+        }
+
+        if (!$promes_data) sendJSONResponse(['success' => false, 'message' => 'Data Promes tidak boleh kosong.'], 400);
+
+        $status = ($action === 'submit') ? 'submitted' : 'draft';
         $promes_data_json = json_encode($promes_data);
 
         $stmt = $pdo->prepare(
-            "INSERT INTO saved_promes (user_id, subject, grade, academic_year, promes_data) 
-             VALUES (?, ?, ?, ?, ?) 
-             ON DUPLICATE KEY UPDATE promes_data = VALUES(promes_data)"
+            "INSERT INTO saved_promes (user_id, subject, grade, academic_year, promes_data, status) 
+             VALUES (?, ?, ?, ?, ?, ?) 
+             ON DUPLICATE KEY UPDATE promes_data = VALUES(promes_data), status = VALUES(status)"
         );
-        $stmt->execute([$user_id, $subject, $grade, $academic_year, $promes_data_json]);
+        $stmt->execute([$user_id, $subject, $grade, $academic_year, $promes_data_json, $status]);
 
-        sendJSONResponse(['success' => true, 'message' => 'Program Semester berhasil disimpan!']);
+        sendJSONResponse(['success' => true, 'message' => 'Program Semester berhasil disimpan sebagai ' . $status . '.']);
 
     } elseif ($method === 'DELETE') {
         $input = json_decode(file_get_contents('php://input'), true);
