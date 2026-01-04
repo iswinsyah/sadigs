@@ -26,12 +26,12 @@ function generateWithGemini($subject, $grade, $custom_prompt) {
     $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' . $apiKey;
     
     // Gunakan prompt dari user jika ada, jika tidak gunakan default
-    $base_prompt = $custom_prompt ? $custom_prompt : 
-                   "Bertindaklah sebagai ahli kurikulum. Buatkan daftar Tujuan Pembelajaran (TP) yang ringkas dan operasional untuk mata pelajaran '$subject' kelas $grade (Fase D/E/F) sesuai Kurikulum Merdeka. Pisahkan output untuk Semester Ganjil dan Genap.";
+    $base_prompt = $custom_prompt && strlen(trim($custom_prompt)) > 10 ? $custom_prompt :
+                   "Bertindaklah sebagai ahli kurikulum. Untuk mata pelajaran '$subject' kelas $grade (Kurikulum Merdeka), cantumkan teks CP yang ada di kurikulum merdeka, dan buatkan daftar Materi Pokok/Topik beserta Tujuan Pembelajarannya (TP) yang ringkas dan operasional. Pisahkan output untuk Semester Ganjil dan Genap.";
 
     // Tambahkan instruksi format JSON di akhir agar output konsisten
     $prompt = $base_prompt . 
-              "Format output WAJIB JSON murni tanpa markdown: { \"ganjil\": [\"TP 1...\", \"TP 2...\"], \"genap\": [\"TP 3...\", \"TP 4...\"] }";
+              " Format output WAJIB JSON murni tanpa markdown: {\"cp_text\": \"Teks CP resmi di sini...\", \"ganjil\": [{\"topic\": \"Materi Pokok 1\", \"tp\": \"Tujuan Pembelajaran 1.1\"}], \"genap\": [{\"topic\": \"Materi Pokok 2\", \"tp\": \"Tujuan Pembelajaran 2.1\"}]}";
 
     $data = ['contents' => [['parts' => [['text' => $prompt]]]]];
     
@@ -59,6 +59,7 @@ function getMockPromesSyllabus($subject, $grade) {
     if (strpos($subject_lower, 'biologi') !== false || strpos($subject_lower, 'ipa') !== false) {
         if ($grade == '12' || $grade == 'XII') {
             return [
+                'cp_text' => "Pada akhir fase F, peserta didik memiliki kemampuan mendeskripsikan bioproses yang terjadi dalam sel, dan menganalisis keterkaitan struktur organ pada sistem organ dengan fungsinya serta kelainan atau gangguan yang muncul pada sistem organ tersebut. Selanjutnya peserta didik memiliki kemampuan menerapkan konsep pewarisan sifat, evolusi dan bioteknologi dalam kehidupan sehari-hari.",
                 'ganjil' => [
                     ['topic' => 'Pertumbuhan dan Perkembangan', 'tp' => 'Menjelaskan konsep pertumbuhan dan perkembangan pada tumbuhan.'],
                     ['topic' => 'Metabolisme Sel', 'tp' => 'Menganalisis proses katabolisme dan anabolisme karbohidrat.'],
@@ -72,6 +73,7 @@ function getMockPromesSyllabus($subject, $grade) {
             ];
         } elseif ($grade == '10' || $grade == 'X') {
             return [
+                'cp_text' => "Pada akhir fase E, peserta didik memiliki kemampuan untuk mendeskripsikan ciri-ciri, replikasi dan peran virus dalam kehidupan, serta menerapkan prinsip-prinsip pengelompokan mahluk hidup untuk mengkaji keanekaragaman hayati. Peserta didik dapat menganalisis hubungan antar komponen ekosistem dan peran manusia dalam menjaga keseimbangan ekosistem.",
                 'ganjil' => [
                     ['topic' => 'Ruang Lingkup Biologi', 'tp' => 'Menjelaskan ruang lingkup biologi dan metode ilmiah.'],
                     ['topic' => 'Keanekaragaman Hayati', 'tp' => 'Menganalisis berbagai tingkat keanekaragaman hayati di Indonesia.'],
@@ -89,6 +91,7 @@ function getMockPromesSyllabus($subject, $grade) {
     // Data Mock Default Lama
     if (strpos($subject_lower, 'fiqih') !== false) {
         return [
+            'cp_text' => "Pada akhir fase D, peserta didik dapat melaksanakan bersuci, salat fardu, zikir dan doa setelah salat. Peserta didik juga dapat mempraktikkan puasa wajib dan salat sunah (tarawih dan witir).",
             'ganjil' => [
                 ['topic' => 'Thaharah', 'tp' => 'Memahami konsep Thaharah (bersuci) dari hadas dan najis.'],
                 ['topic' => 'Thaharah', 'tp' => 'Menganalisis tata cara wudhu, tayamum, dan mandi wajib.'],
@@ -108,6 +111,7 @@ function getMockPromesSyllabus($subject, $grade) {
 
     // Respons cerdas untuk mapel umum lainnya
     return [
+        'cp_text' => "Capaian Pembelajaran untuk {$subject} kelas {$grade} belum terdefinisi secara spesifik dalam data mock. AI akan mencoba membuatnya berdasarkan mata pelajaran.",
         'ganjil' => [
             ['topic' => "Dasar-dasar {$subject}", 'tp' => "Memahami konsep dasar dan ruang lingkup {$subject}."],
             ['topic' => "Dasar-dasar {$subject}", 'tp' => "Menganalisis fenomena {$subject} dalam kehidupan sehari-hari."],

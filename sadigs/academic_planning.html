@@ -555,6 +555,9 @@
                     throw new Error(result.message);
                 }
                 
+                // SECARA OTOMATIS MENGISI KOLOM CP DARI HASIL GENERATE AI
+                widget.querySelector(`#promesCP-${widgetId}`).value = result.data.cp_text || '';
+
                 const ganjilData = result.data.ganjil.map(item => ({ topic: item.topic, tp_text: item.tp, allocation_jp: '', checked_weeks: [] }));
                 const genapData = result.data.genap.map(item => ({ topic: item.topic, tp_text: item.tp, allocation_jp: '', checked_weeks: [] }));
 
