@@ -61,7 +61,7 @@ try {
         'navBukuIndukSantri' => 'Buku Induk Santri',
         'navTabelPembayaran' => 'Data Pembayaran',
         'navTabelTransaksi' => 'Buku Transaksi Harian',
-        'navRppGenerator' => 'Modul Ajar Generator',
+        'navRppGenerator' => 'Generator Modul Ajar',
         'navYayasanWidget' => 'Ringkasan Manajemen',
         'navMusyrifWidget' => 'Ringkasan Musyrif',
         'navPerencanaanAkademik' => 'Buku Kerja Ustadz',

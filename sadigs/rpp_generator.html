@@ -52,7 +52,7 @@
             <header class="mb-8">
                 <h2 class="text-2xl lg:text-3xl font-bold text-gray-800 flex items-center gap-3">
                     <i data-lucide="brain-circuit" class="w-8 h-8 text-utama"></i>
-                    Modul Ajar Generator
+                    Generator Modul Ajar
                 </h2>
                 <p class="text-gray-500 text-sm mt-1">Buat draf Modul Ajar dengan bantuan kecerdasan buatan.</p>
             </header>
@@ -88,7 +88,7 @@
                 <!-- Kolom Hasil -->
                 <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-100 min-h-[400px]">
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-bold text-gray-800">Hasil Generasi Modul Ajar</h3>
+                        <h3 class="text-lg font-bold text-gray-800">Modul Ajar Siap Pakai</h3>
                         <button id="saveToAlbumBtn" class="hidden bg-green-100 text-green-700 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-green-200 transition flex items-center gap-2">
                             <i data-lucide="book-plus" class="w-4 h-4"></i> Simpan ke Album
                         </button>
@@ -132,7 +132,7 @@
 
         function renderSidebar(allowedMenus) {
             const nav = document.getElementById('sidebarNav');
-            nav.innerHTML = `<div class="bg-gray-50 rounded-lg p-2"><h3 class="px-2 mb-2 text-xs font-bold text-gray-400">KEPEGAWAIAN</h3><a id="navRppGenerator" href="rpp_generator.html" class="flex items-center gap-3 px-3 py-2.5 text-utama bg-white rounded-md transition font-semibold text-sm shadow-sm"><i data-lucide="brain-circuit" class="w-5 h-5"></i> Modul Ajar Generator</a><a id="navRppAlbum" href="rpp_album.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="book-copy" class="w-5 h-5"></i> Album Modul Ajar</a></div>`;
+            nav.innerHTML = `<div class="bg-gray-50 rounded-lg p-2"><h3 class="px-2 mb-2 text-xs font-bold text-gray-400">KEPEGAWAIAN</h3><a id="navRppGenerator" href="rpp_generator.html" class="flex items-center gap-3 px-3 py-2.5 text-utama bg-white rounded-md transition font-semibold text-sm shadow-sm"><i data-lucide="brain-circuit" class="w-5 h-5"></i> Generator Modul Ajar</a><a id="navRppAlbum" href="rpp_album.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="book-copy" class="w-5 h-5"></i> Album Modul Ajar</a></div>`;
             allowedMenus.forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.classList.remove('hidden');
