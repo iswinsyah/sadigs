@@ -117,29 +117,44 @@ if ($method === 'GET') {
         // Daftar Menu (Single Source of Truth)
         $categories = [
             'Form' => [
-                'label' => 'Formulir',
-                'menus' => ['navAbsensi', 'navBiodataPegawai', 'navBiodataSantri', 'navCalendarSettings', 'navIbadahHarian', 'navInputTahfizh', 'navInputNilai', 'navBuatPeraturan', 'navProfil', 'navQuota', 'navRapat', 'navIzinPegawai', 'navFormulirPembayaran', 'navFormulirTransaksi', 'navIzinWalisantri', 'navRppGenerator', 'navPocketMoneyDeposit', 'navMenuManagement', 'navPerencanaanAkademik'],
+                'label' => '1. Formulir (Input Data)',
+                'menus' => [
+                    'navAbsensi', 'navBiodataPegawai', 'navBiodataSantri', 'navBuatPeraturan', 
+                    'navIbadahHarian', 'navInputTahfizh', 'navInputNilai', 'navIzinPegawai', 
+                    'navIzinWalisantri', 'navRapat', 'navFormulirPembayaran', 'navFormulirTransaksi', 
+                    'navPocketMoneyDeposit', 'navRppGenerator', 'navProfil', 'navPerencanaanAkademik'
+                ],
                 'icon' => 'file-pen-line'
             ],
             'Val' => [
-                'label' => 'Validasi',
-                'menus' => ['navValidasiIbadah', 'navVerifikasi', 'navValidasiPembayaran', 'navValidasiIzin', 'navGuardianLeaveValidation', 'navPocketMoneyValidation', 'navMusyrifWithdrawalValidation', 'navValidasiPeraturan'],
+                'label' => '2. Validasi & Persetujuan',
+                'menus' => [
+                    'navValidasiIbadah', 'navValidasiIzin', 'navValidasiPembayaran', 'navValidasiPeraturan', 
+                    'navVerifikasi', 'navGuardianLeaveValidation', 'navPocketMoneyValidation', 
+                    'navMusyrifWithdrawalValidation'
+                ],
                 'icon' => 'check-square'
             ],
             'Tab' => [
-                'label' => 'Tabel Data',
-                'menus' => ['navDashboard', 'navKalender', 'navJadwalRapat', 'navDaftarIzin', 'navBukuIndukPegawai', 'navBukuIndukSantri', 'navMentoring', 'navTabelPembayaran', 'navTabelTransaksi', 'navRekapIbadahAnak', 'navViewTahfizh', 'navOnLeaveList', 'navRppAlbum', 'navMusyrifPocketMoney', 'navSantriPocketMoney', 'navMonitoringAnak'],
+                'label' => '3. Tabel & Laporan',
+                'menus' => [
+                    'navDashboard', 'navKalender', 'navJadwalRapat', 'navDaftarIzin', 
+                    'navBukuIndukPegawai', 'navBukuIndukSantri', 'navMentoring', 'navTabelPembayaran', 
+                    'navTabelTransaksi', 'navRekapIbadahAnak', 'navViewTahfizh', 'navOnLeaveList', 
+                    'navRppAlbum', 'navMusyrifPocketMoney', 'navSantriPocketMoney', 'navMonitoringAnak',
+                    'navYayasanWidget', 'navMusyrifWidget'
+                ],
                 'icon' => 'table'
             ],
             'Grf' => [
-                'label' => 'Grafik',
+                'label' => '4. Grafik & Rekap',
                 'menus' => ['navRekapPembayaran'],
                 'icon' => 'bar-chart-2'
             ],
-            'Wgt' => [
-                'label' => 'Ringkasan Dasbor',
-                'menus' => ['navYayasanWidget', 'navMusyrifWidget'],
-                'icon' => 'layout-grid'
+            'Sys' => [
+                'label' => '5. Pengaturan Sistem',
+                'menus' => ['navMenuManagement', 'navQuota', 'navCalendarSettings'],
+                'icon' => 'settings'
             ]
         ];
 
