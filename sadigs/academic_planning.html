@@ -375,7 +375,10 @@
                                     <tbody id="promesGanjilBody-${widgetId}"></tbody>
                                 </table>
                             </div>
-                            <button onclick="addRow(this, 'ganjil')" class="mt-4 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold py-2 px-4 rounded-lg transition">+ Tambah Baris</button>
+                            <div class="mt-4 flex items-center gap-2">
+                                <button onclick="addRow(this, 'ganjil')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold py-2 px-4 rounded-lg transition">+ Tambah Baris</button>
+                                <button onclick="deleteSemester(this, 'ganjil')" class="bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold py-2 px-4 rounded-lg transition flex items-center gap-1"><i data-lucide="trash-2" class="w-3 h-3"></i> Hapus Semester</button>
+                            </div>
                         </div>
                         <div>
                             <h3 class="text-base font-bold text-gray-800 mb-4">Semester Genap</h3>
@@ -388,7 +391,10 @@
                                     <tbody id="promesGenapBody-${widgetId}"></tbody>
                                 </table>
                             </div>
-                            <button onclick="addRow(this, 'genap')" class="mt-4 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold py-2 px-4 rounded-lg transition">+ Tambah Baris</button>
+                            <div class="mt-4 flex items-center gap-2">
+                                <button onclick="addRow(this, 'genap')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold py-2 px-4 rounded-lg transition">+ Tambah Baris</button>
+                                <button onclick="deleteSemester(this, 'genap')" class="bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold py-2 px-4 rounded-lg transition flex items-center gap-1"><i data-lucide="trash-2" class="w-3 h-3"></i> Hapus Semester</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -567,7 +573,12 @@
             }
 
             items.forEach((item, index) => {
-                addRow(null, semester, item.tp_text, item.allocation_jp, item.checked_weeks, widgetId);
+                // Gracefully handle old data (item is an object with tp_text) and very old data (item is a string)
+                const topic = item.topic || '';
+                const tp = item.tp_text || (typeof item === 'string' ? item : '');
+                const jp = item.allocation_jp || '';
+                const checkedWeeks = item.checked_weeks || [];
+                addRow(null, semester, topic, tp, jp, checkedWeeks, widgetId);
             });
         }
 
@@ -591,7 +602,23 @@
             });
         }
 
-        function addRow(button, semester, content = '', jp = '', checkedWeeks = [], widgetId = null) {
+        function deleteSemester(button, semester) {
+            if (!confirm(`Anda yakin ingin menghapus semua data di semester ${semester}? Perubahan akan permanen setelah Anda menekan tombol 'Simpan'.`)) {
+                return;
+            }
+
+            const widget = button.closest('.promes-widget');
+            const widgetId = widget.dataset.widgetId;
+            const tbodyId = semester === 'ganjil' ? `promesGanjilBody-${widgetId}` : `promesGenapBody-${widgetId}`;
+            const tbody = document.getElementById(tbodyId);
+
+            if (tbody) {
+                tbody.innerHTML = `<tr><td colspan="33" class="p-4 text-center text-gray-400 italic">Data semester ini telah dihapus. Klik 'Simpan' untuk menyimpan perubahan.</td></tr>`;
+            }
+            lucide.createIcons();
+        }
+
+        function addRow(button, semester, topic = '', content = '', jp = '', checkedWeeks = [], widgetId = null) {
             if (button) {
                 const widget = button.closest('.promes-widget');
                 widgetId = widget.dataset.widgetId;
