@@ -14,8 +14,8 @@ $academic_year = '2024/2025'; // Hardcoded for now
 
 try {
     if ($method === 'GET') {
-        $subject = $_GET['subject'] ?? null;
-        $grade = $_GET['grade'] ?? null;
+        $subject = isset($_GET['subject']) ? trim($_GET['subject']) : null;
+        $grade = isset($_GET['grade']) ? trim($_GET['grade']) : null;
 
         if (!$subject || !$grade) {
             sendJSONResponse(['success' => false, 'message' => 'Mata Pelajaran dan Kelas wajib diisi.'], 400);
@@ -33,8 +33,8 @@ try {
 
     } elseif ($method === 'POST') {
         $input = json_decode(file_get_contents('php://input'), true);
-        $subject = $input['subject'] ?? null;
-        $grade = $input['grade'] ?? null;
+        $subject = isset($input['subject']) ? trim($input['subject']) : null;
+        $grade = isset($input['grade']) ? trim($input['grade']) : null;
         $promes_data = $input['promes_data'] ?? null;
 
         if (!$subject || !$grade || !$promes_data) {
