@@ -7,7 +7,7 @@ try {
 
     $sql = "CREATE TABLE IF NOT EXISTS `saved_promes` (
       `id` INT AUTO_INCREMENT PRIMARY KEY,
-      `user_id` INT NOT NULL,
+      `user_id` INT UNSIGNED NOT NULL,
       `subject` VARCHAR(255) NOT NULL,
       `grade` VARCHAR(50) NOT NULL,
       `academic_year` VARCHAR(20) NOT NULL,
