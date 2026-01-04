@@ -303,7 +303,7 @@
                     widget.querySelector(`#promesGrade-${i}`).value = state.grade;
                     
                     const title = widget.querySelector('.widget-title');
-                    title.textContent = `Buku Kerja ${i}: ${state.subject} - Kelas ${state.grade}`;
+                    title.textContent = `Alur Tujuan Pembelajaran ${i}: ${state.subject} - Kelas ${state.grade}`;
 
                     const showBtn = widget.querySelector('button[onclick^="loadOrGeneratePromes"]');
                     loadOrGeneratePromes(showBtn, false);
@@ -318,7 +318,7 @@
             return `
             <div id="widget-${widgetId}" class="promes-widget bg-white rounded-xl shadow-sm border border-gray-100" data-widget-id="${widgetId}">
                 <div class="widget-header p-4 border-b flex justify-between items-center cursor-pointer bg-gray-50 rounded-t-xl" onclick="toggleWidget(this)">
-                    <h3 class="widget-title text-lg font-bold text-gray-800">Buku Kerja ${widgetId}: Baru</h3>
+                    <h3 class="widget-title text-lg font-bold text-gray-800">Alur Tujuan Pembelajaran ${widgetId}: Baru</h3>
                     <div class="flex items-center gap-2">
                         <button onclick="event.stopPropagation(); clearWidget(this)" class="p-1 text-gray-400 hover:text-red-500" title="Bersihkan Buku Kerja Ini">
                             <i data-lucide="trash-2" class="w-4 h-4"></i>
@@ -355,14 +355,14 @@
                             </div>
                         </div>
                         <div>
-                            <label for="promesCP-${widgetId}" class="block text-sm font-medium text-gray-500">Capaian Pembelajaran (CP)</label>
-                            <textarea id="promesCP-${widgetId}" oninput="updateAiPrompt(${widgetId})" rows="2" class="w-full p-2 border border-gray-300 rounded-lg mt-1 text-sm" placeholder="Contoh: Di akhir fase E, peserta didik memiliki kemampuan untuk responsif terhadap isu-isu global..."></textarea>
-                        </div>
-                        <div>
                             <label for="promesPrompt-${widgetId}" class="block text-sm font-medium text-gray-500">Instruksi untuk AI (Otomatis/Edit)</label>
                             <textarea id="promesPrompt-${widgetId}" rows="2" class="w-full p-2 border border-gray-300 rounded-lg mt-1 text-sm bg-gray-50 focus:bg-white transition" placeholder="Prompt akan terisi otomatis..."></textarea>
                         </div>
                         <button onclick="loadOrGeneratePromes(this, true)" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition shadow-md flex justify-center items-center gap-2" title="Tampilkan data tersimpan atau generate baru"><i data-lucide="play" class="w-5 h-5"></i> Tampilkan / Generate</button>
+                        <div>
+                            <label for="promesCP-${widgetId}" class="block text-sm font-medium text-gray-500">Capaian Pembelajaran (CP)</label>
+                            <textarea id="promesCP-${widgetId}" oninput="updateAiPrompt(${widgetId})" rows="2" class="w-full p-2 border border-gray-300 rounded-lg mt-1 text-sm" placeholder="Contoh: Di akhir fase E, peserta didik memiliki kemampuan untuk responsif terhadap isu-isu global..."></textarea>
+                        </div>
                     </div>
 
                     <div class="flex justify-end items-center gap-3">
@@ -454,9 +454,8 @@
             widget.querySelector(`#promesPrompt-${widgetId}`).value = '';
             widget.querySelector(`#promesGanjilBody-${widgetId}`).innerHTML = '';
             widget.querySelector(`#promesGenapBody-${widgetId}`).innerHTML = '';
-            widget.querySelector(`#tablesContainer-${widgetId}`).classList.add('hidden');
             widget.querySelector(`#savePromesBtn-${widgetId}`).classList.add('hidden');
-            widget.querySelector('.widget-title').textContent = `Buku Kerja ${widgetId}: Baru`;
+            widget.querySelector('.widget-title').textContent = `Alur Tujuan Pembelajaran ${widgetId}: Baru`;
 
             // Clear storage
             localStorage.removeItem(`promesWidget-${widgetId}`);
@@ -512,7 +511,7 @@
                         populatePromesTable(widgetId, 'genap', promesData.genap || []);
                         tablesContainer.classList.remove('hidden');
                         localStorage.setItem(`promesWidget-${widgetId}`, JSON.stringify({ subject, fase, grade }));
-                        widget.querySelector('.widget-title').textContent = `Buku Kerja ${widgetId}: ${subject} - Kelas ${grade}`;
+                        widget.querySelector('.widget-title').textContent = `Alur Tujuan Pembelajaran ${widgetId}: ${subject} - Kelas ${grade}`;
                         
                         updateWidgetUI(widget, status);
                         return;
@@ -564,7 +563,7 @@
                 widget.querySelector(`#savePromesBtn-${widgetId}`).classList.remove('hidden');
                 widget.querySelector(`#submitPromesBtn-${widgetId}`).classList.remove('hidden');
                 widget.querySelector(`#tablesContainer-${widgetId}`).classList.remove('hidden');
-                widget.querySelector('.widget-title').textContent = `Buku Kerja ${widgetId}: ${subject} - Kelas ${grade}`;
+                widget.querySelector('.widget-title').textContent = `Alur Tujuan Pembelajaran ${widgetId}: ${subject} - Kelas ${grade}`;
 
             } catch (err) {
                 alert('Gagal generate Promes: ' + err.message);
@@ -740,7 +739,7 @@
                 alert(result.message);
                 if (result.success) {
                     localStorage.setItem(`promesWidget-${widgetId}`, JSON.stringify({ subject, fase, grade }));
-                    widget.querySelector('.widget-title').textContent = `Buku Kerja ${widgetId}: ${subject} - Kelas ${grade}`;
+                    widget.querySelector('.widget-title').textContent = `Alur Tujuan Pembelajaran ${widgetId}: ${subject} - Kelas ${grade}`;
                     updateWidgetUI(widget, action === 'submit' ? 'submitted' : 'draft');
                 }
             } catch (err) {
