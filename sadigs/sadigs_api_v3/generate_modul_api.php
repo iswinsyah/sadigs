@@ -23,7 +23,7 @@ if (!$subject || !$topic) {
 // --- FUNGSI AI GEMINI ---
 function generateModulWithGemini($subject, $grade, $fase, $topic, $tp, $model, $time) {
     require 'ai_config.php';
-    if (empty($apiKey)) return "Simulasi: Modul Ajar untuk $topic ($subject Kelas $grade) berhasil dibuat.\n\n(Harap pasang API Key untuk hasil AI sungguhan)";
+    if (empty($apiKey)) return "Simulasi: Modul Ajar untuk $topic ($subject Kelas $grade) berhasil dibuat.\n\n(Harap pasang API Key Anda di dalam file 'sadigs_api_v3/ai_config.php' untuk hasil AI sungguhan)";
 
     $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' . $apiKey;
     
@@ -48,14 +48,21 @@ function generateModulWithGemini($subject, $grade, $fase, $topic, $tp, $model, $
     curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
     
     $response = curl_exec($ch);
-    if (curl_errno($ch)) return 'Error koneksi AI: ' . curl_error($ch);
+    if (curl_errno($ch)) {
+        $error_msg = curl_error($ch);
+        curl_close($ch);
+        throw new Exception('Error koneksi ke AI: ' . $error_msg);
+    }
     curl_close($ch);
     
     $result = json_decode($response, true);
     $text = $result['candidates'][0]['content']['parts'][0]['text'] ?? 'Maaf, AI tidak memberikan respons. Cek kuota atau API Key Anda.';
     return $text;
 }
-
-$result = generateModulWithGemini($subject, $grade, $fase, $topic, $tp, $model, $time);
-sendJSONResponse(['success' => true, 'data' => $result]);
+try {
+    $result = generateModulWithGemini($subject, $grade, $fase, $topic, $tp, $model, $time);
+    sendJSONResponse(['success' => true, 'data' => $result]);
+} catch (Exception $e) {
+    sendJSONResponse(['success' => false, 'message' => $e->getMessage()], 500);
+}
 ?>
