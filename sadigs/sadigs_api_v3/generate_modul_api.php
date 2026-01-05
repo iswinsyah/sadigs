@@ -22,7 +22,7 @@ if (!$subject || !$topic) {
 
 // --- FUNGSI AI GEMINI ---
 function generateModulWithGemini($subject, $grade, $fase, $topic, $tp, $model, $time) {
-    $apiKey = ''; // Masukkan API Key Gemini Anda
+    require 'ai_config.php';
     if (empty($apiKey)) return "Simulasi: Modul Ajar untuk $topic ($subject Kelas $grade) berhasil dibuat.\n\n(Harap pasang API Key untuk hasil AI sungguhan)";
 
     $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' . $apiKey;

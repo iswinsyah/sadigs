@@ -20,7 +20,7 @@ if (!$subject || !$topic) {
 }
 
 function generateLKPDWithGemini($subject, $grade, $fase, $topic, $tp, $activity_type) {
-    $apiKey = ''; // Masukkan API Key Gemini Anda di sini
+    require 'ai_config.php';
     if (empty($apiKey)) return "Simulasi: LKPD untuk $topic ($subject Kelas $grade) berhasil dibuat.\n\n(Harap pasang API Key di file generate_lkpd_api.php untuk hasil AI sungguhan)";
 
     $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' . $apiKey;

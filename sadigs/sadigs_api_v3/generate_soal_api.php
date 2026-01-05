@@ -21,7 +21,7 @@ if (!$subject || !$topic) {
 }
 
 function generateSoalWithGemini($subject, $grade, $fase, $topic, $tp, $type, $count) {
-    $apiKey = ''; // Masukkan API Key Gemini Anda di sini
+    require 'ai_config.php';
     if (empty($apiKey)) return "Simulasi: $count Soal $type untuk $topic ($subject Kelas $grade) berhasil dibuat.\n\n(Harap pasang API Key di file generate_soal_api.php untuk hasil AI sungguhan)";
 
     $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' . $apiKey;

@@ -18,8 +18,7 @@ if (!$subject || !$grade) {
 
 // --- FUNGSI PANGGIL AI GEMINI (SIAP PAKAI) ---
 function generateWithGemini($subject, $grade, $custom_prompt) {
-    // Masukkan API Key Gemini Anda di sini nanti
-    $apiKey = ''; 
+    require 'ai_config.php';
     
     if (empty($apiKey)) return null; // Fallback ke mock jika tidak ada key
 
