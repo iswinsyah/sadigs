@@ -79,6 +79,7 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmtUser = $pdo->prepare("UPDATE users SET full_name = ?, email = ? WHERE user_id = ?");
         $stmtUser->execute([$_POST['full_name'], $_POST['email'], $user_id]);
 
+        // CACHE BUSTER v1.1
         // 3. Update/Insert Tabel Employee Details
         $sql = "INSERT INTO employee_details (
                     user_id, nik, npwp, birth_place, birth_date, marital_status, phone, address,
