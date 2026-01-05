@@ -435,9 +435,43 @@
                     </div>
 
                     <!-- TAB CONTENT: MODUL AJAR -->
-                    <div id="tab-content-modul-${widgetId}" class="hidden space-y-4 p-4 bg-gray-50 rounded-lg border border-dashed border-gray-300 text-center">
-                        <i data-lucide="construction" class="w-10 h-10 text-gray-400 mx-auto mb-2"></i>
-                        <p class="text-gray-500">Fitur Generator Modul Ajar akan segera hadir di sini.</p>
+                    <div id="tab-content-modul-${widgetId}" class="hidden space-y-4">
+                        <div class="bg-blue-50 p-4 rounded-lg border border-blue-100 text-left">
+                            <h4 class="font-bold text-blue-800 mb-2 flex items-center gap-2"><i data-lucide="info" class="w-4 h-4"></i> Generator Modul Ajar</h4>
+                            <p class="text-sm text-blue-600 mb-3">Pilih Topik/TP dari tabel ATP di sebelah, lalu generate Modul Ajar secara otomatis.</p>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-gray-600 mb-1">Pilih Topik / Tujuan Pembelajaran</label>
+                                    <select id="modulTopic-${widgetId}" class="w-full p-2 border border-gray-300 rounded-lg text-sm bg-white">
+                                        <option value="">-- Silakan isi tabel ATP terlebih dahulu --</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-600 mb-1">Model Pembelajaran</label>
+                                    <select id="modulModel-${widgetId}" class="w-full p-2 border border-gray-300 rounded-lg text-sm bg-white">
+                                        <option value="Problem Based Learning (PBL)">Problem Based Learning (PBL)</option>
+                                        <option value="Project Based Learning (PjBL)">Project Based Learning (PjBL)</option>
+                                        <option value="Discovery Learning">Discovery Learning</option>
+                                        <option value="Inquiry Learning">Inquiry Learning</option>
+                                        <option value="Cooperative Learning">Cooperative Learning</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-600 mb-1">Alokasi Waktu</label>
+                                    <input type="text" id="modulTime-${widgetId}" value="2 JP (2 x 45 Menit)" class="w-full p-2 border border-gray-300 rounded-lg text-sm">
+                                </div>
+                            </div>
+                            
+                            <button onclick="generateModulAjar(${widgetId})" class="mt-4 w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition shadow-md flex justify-center items-center gap-2">
+                                <i data-lucide="sparkles" class="w-4 h-4"></i> Generate Modul Ajar dengan AI
+                            </button>
+                        </div>
+
+                        <div id="modulResultArea-${widgetId}" class="hidden">
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Hasil Modul Ajar</label>
+                            <textarea id="modulContent-${widgetId}" rows="15" class="w-full p-4 border border-gray-300 rounded-lg text-sm font-mono bg-gray-50 focus:bg-white transition"></textarea>
+                        </div>
                     </div>
 
                     <!-- TAB CONTENT: LKPD -->
@@ -479,6 +513,93 @@
             if (selectedBtn) {
                 selectedBtn.classList.remove('border-transparent', 'text-gray-500');
                 selectedBtn.classList.add('border-blue-500', 'text-blue-600');
+            }
+
+            // Special logic for Modul tab
+            if (tabName === 'modul') {
+                populateModulTopics(widgetId);
+            }
+        }
+
+        function populateModulTopics(widgetId) {
+            const select = document.getElementById(`modulTopic-${widgetId}`);
+            const currentVal = select.value;
+            select.innerHTML = '<option value="">-- Pilih Topik / TP --</option>';
+
+            const processRow = (row, semester) => {
+                if (row.cells.length < 3) return;
+                const topic = row.cells[1].innerText.trim();
+                const tpDiv = row.cells[2].querySelector('div[contenteditable]');
+                const tp = tpDiv ? tpDiv.innerText.trim() : '';
+                
+                if (topic && tp) {
+                    const option = document.createElement('option');
+                    option.value = JSON.stringify({ topic, tp }); // Store both as JSON
+                    option.textContent = `[${semester}] ${topic} - ${tp.substring(0, 60)}...`;
+                    select.appendChild(option);
+                }
+            };
+
+            document.querySelectorAll(`#promesGanjilBody-${widgetId} tr`).forEach(row => processRow(row, 'Ganjil'));
+            document.querySelectorAll(`#promesGenapBody-${widgetId} tr`).forEach(row => processRow(row, 'Genap'));
+            
+            if (select.options.length <= 1) {
+                select.innerHTML = '<option value="">(Data ATP Kosong - Silakan Generate ATP Dulu)</option>';
+            } else {
+                select.value = currentVal; // Restore selection if possible
+            }
+        }
+
+        async function generateModulAjar(widgetId) {
+            const widget = document.getElementById(`widget-${widgetId}`);
+            const subject = widget.querySelector(`#promesSubject-${widgetId}`).value;
+            const grade = widget.querySelector(`#promesGrade-${widgetId}`).value;
+            const fase = widget.querySelector(`#promesFase-${widgetId}`).value;
+            const topicDataStr = widget.querySelector(`#modulTopic-${widgetId}`).value;
+            const model = widget.querySelector(`#modulModel-${widgetId}`).value;
+            const time = widget.querySelector(`#modulTime-${widgetId}`).value;
+
+            if (!topicDataStr) {
+                alert('Pilih Topik/TP terlebih dahulu.');
+                return;
+            }
+            const topicData = JSON.parse(topicDataStr);
+
+            const btn = widget.querySelector(`button[onclick="generateModulAjar(${widgetId})"]`);
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Sedang Membuat Modul...';
+            lucide.createIcons();
+
+            try {
+                const res = await fetch('sadigs_api_v3/generate_modul_api.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        subject, grade, fase,
+                        topic: topicData.topic,
+                        tp: topicData.tp,
+                        model, time
+                    })
+                });
+                const result = await res.json();
+                
+                if (result.success) {
+                    const resultArea = widget.querySelector(`#modulResultArea-${widgetId}`);
+                    const contentArea = widget.querySelector(`#modulContent-${widgetId}`);
+                    resultArea.classList.remove('hidden');
+                    contentArea.value = result.data;
+                    // Scroll to result
+                    resultArea.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    alert('Gagal: ' + result.message);
+                }
+            } catch (e) {
+                alert('Error: ' + e.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+                lucide.createIcons();
             }
         }
 
