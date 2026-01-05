@@ -72,9 +72,13 @@ function generateLKPDWithGemini($subject, $grade, $fase, $topic, $tp, $activity_
     
     $result = json_decode($response, true);
 
-    if (json_last_error() !== JSON_ERROR_NONE || !isset($result['candidates'])) {
-        $errorText = "Gagal memproses respons dari AI. Kemungkinan API Key tidak valid atau ada masalah jaringan.\n\nRaw Response dari Server Google:\n" . substr(strip_tags($response), 0, 500);
-        throw new Exception($errorText);
+    // Perbaikan: Cek jika ada pesan error spesifik dari Google
+    if (isset($result['error'])) {
+        $google_error_message = $result['error']['message'] ?? 'Pesan error tidak ditemukan.';
+        throw new Exception("Error dari Google AI: " . $google_error_message . " (Pastikan API telah diaktifkan di Google Cloud Console dan billing telah di-setup).");
+    }
+    if (!isset($result['candidates'])) {
+        throw new Exception("Gagal memproses respons dari AI. Respons tidak mengandung data 'candidates'.\n\nRaw Response:\n" . substr(strip_tags($response), 0, 500));
     }
 
     return $result['candidates'][0]['content']['parts'][0]['text'] ?? 'Maaf, AI memberikan respons kosong. Coba generate ulang.';

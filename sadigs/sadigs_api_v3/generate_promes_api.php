@@ -20,12 +20,13 @@ if (!$subject || !$grade) {
 function generateWithGemini($subject, $grade, $custom_prompt) {
     $configPath = __DIR__ . '/ai_config.php';
     if (!file_exists($configPath)) {
-        // Jangan throw exception, cukup fallback ke mock data
-        return null; 
+        return null; // Fallback ke mock jika file config tidak ada
     }
     require $configPath;
     
-    if (empty($apiKey) || strlen(trim($apiKey)) < 10) return null; // Fallback ke mock jika tidak ada key
+    if (empty(trim($apiKey)) || strlen(trim($apiKey)) < 30) {
+        return null; // Fallback ke mock jika API key kosong atau tidak valid
+    }
 
     $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' . $apiKey;
     
@@ -47,8 +48,18 @@ function generateWithGemini($subject, $grade, $custom_prompt) {
     
     $response = curl_exec($ch);
     curl_close($ch);
-    
+
     $result = json_decode($response, true);
+
+    // Perbaikan: Cek jika ada pesan error spesifik dari Google
+    if (isset($result['error'])) {
+        $google_error_message = $result['error']['message'] ?? 'Pesan error tidak ditemukan.';
+        throw new Exception("Error dari Google AI: " . $google_error_message . " (Pastikan API telah diaktifkan di Google Cloud Console dan billing telah di-setup).");
+    }
+    if (!isset($result['candidates'])) {
+        throw new Exception("Gagal memproses respons dari AI untuk ATP. Respons tidak mengandung data 'candidates'.\n\nRaw Response:\n" . substr(strip_tags($response), 0, 500));
+    }
+
     $text = $result['candidates'][0]['content']['parts'][0]['text'] ?? '';
     // Bersihkan markdown ```json jika ada
     $text = str_replace(['```json', '```'], '', $text);

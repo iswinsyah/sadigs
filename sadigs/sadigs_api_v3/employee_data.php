@@ -81,19 +81,19 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // 3. Update/Insert Tabel Employee Details
         $sql = "INSERT INTO employee_details (
-                    user_id, nik, birth_place, birth_date, marital_status, phone, address,
+                    user_id, nik, npwp, birth_place, birth_date, marital_status, phone, address,
                     last_education, graduation_year,
                     entry_date,
                     facebook_url, instagram_url, tiktok_url, threads_url, youtube_url,
                     application_letter_path, cv_path, ijazah_path, kk_path, ktp_path, certificate_skill_path, certificate_award_path
                 ) VALUES (
-                    :uid, :nik, :bplace, :bdate, :mstatus, :phone, :addr,
+                    :uid, :nik, :npwp, :bplace, :bdate, :mstatus, :phone, :addr,
                     :edu, :grad_year, :entry_date,
                     :fb, :ig, :tt, :th, :yt,
                     :path1, :path2, :path3, :path4, :path5, :path6, :path7
                 )
                 ON DUPLICATE KEY UPDATE
-                    nik = VALUES(nik), birth_place = VALUES(birth_place), birth_date = VALUES(birth_date),
+                    nik = VALUES(nik), npwp = VALUES(npwp), birth_place = VALUES(birth_place), birth_date = VALUES(birth_date),
                     marital_status = VALUES(marital_status), phone = VALUES(phone), address = VALUES(address),
                     last_education = VALUES(last_education), graduation_year = VALUES(graduation_year),
                     entry_date = VALUES(entry_date),
@@ -107,6 +107,7 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute([
             'uid' => $user_id,
             'nik' => $_POST['nik'] ?? '',
+            'npwp' => $_POST['npwp'] ?? null,
             'bplace' => $_POST['birth_place'] ?? '',
             'bdate' => !empty($_POST['birth_date']) ? $_POST['birth_date'] : null,
             'mstatus' => $_POST['marital_status'] ?? null,
