@@ -475,15 +475,83 @@
                     </div>
 
                     <!-- TAB CONTENT: LKPD -->
-                    <div id="tab-content-lkpd-${widgetId}" class="hidden space-y-4 p-4 bg-gray-50 rounded-lg border border-dashed border-gray-300 text-center">
-                        <i data-lucide="construction" class="w-10 h-10 text-gray-400 mx-auto mb-2"></i>
-                        <p class="text-gray-500">Fitur Generator LKPD akan segera hadir di sini.</p>
+                    <div id="tab-content-lkpd-${widgetId}" class="hidden space-y-4">
+                        <div class="bg-orange-50 p-4 rounded-lg border border-orange-100 text-left">
+                            <h4 class="font-bold text-orange-800 mb-2 flex items-center gap-2"><i data-lucide="file-text" class="w-4 h-4"></i> Generator LKPD</h4>
+                            <p class="text-sm text-orange-600 mb-3">Buat Lembar Kerja Peserta Didik berdasarkan TP yang ada.</p>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-gray-600 mb-1">Pilih Topik / TP</label>
+                                    <select id="lkpdTopic-${widgetId}" class="w-full p-2 border border-gray-300 rounded-lg text-sm bg-white">
+                                        <option value="">-- Silakan isi tabel ATP terlebih dahulu --</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-600 mb-1">Jenis Aktivitas</label>
+                                    <select id="lkpdActivity-${widgetId}" class="w-full p-2 border border-gray-300 rounded-lg text-sm bg-white">
+                                        <option value="Diskusi Kelompok">Diskusi Kelompok</option>
+                                        <option value="Eksperimen / Praktikum">Eksperimen / Praktikum</option>
+                                        <option value="Studi Kasus">Studi Kasus</option>
+                                        <option value="Observasi Lapangan">Observasi Lapangan</option>
+                                        <option value="Literasi & Resume">Literasi & Resume</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <button onclick="generateLKPD(${widgetId})" class="mt-4 w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-lg transition shadow-md flex justify-center items-center gap-2">
+                                <i data-lucide="zap" class="w-4 h-4"></i> Generate LKPD dengan AI
+                            </button>
+                        </div>
+
+                        <div id="lkpdResultArea-${widgetId}" class="hidden">
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Hasil LKPD</label>
+                            <textarea id="lkpdContent-${widgetId}" rows="15" class="w-full p-4 border border-gray-300 rounded-lg text-sm font-mono bg-gray-50 focus:bg-white transition"></textarea>
+                        </div>
                     </div>
 
                     <!-- TAB CONTENT: SOAL -->
-                    <div id="tab-content-soal-${widgetId}" class="hidden space-y-4 p-4 bg-gray-50 rounded-lg border border-dashed border-gray-300 text-center">
-                        <i data-lucide="construction" class="w-10 h-10 text-gray-400 mx-auto mb-2"></i>
-                        <p class="text-gray-500">Fitur Generator Soal Asesmen akan segera hadir di sini.</p>
+                    <div id="tab-content-soal-${widgetId}" class="hidden space-y-4">
+                        <div class="bg-purple-50 p-4 rounded-lg border border-purple-100 text-left">
+                            <h4 class="font-bold text-purple-800 mb-2 flex items-center gap-2"><i data-lucide="help-circle" class="w-4 h-4"></i> Generator Soal Asesmen</h4>
+                            <p class="text-sm text-purple-600 mb-3">Buat instrumen penilaian (Sumatif/Formatif) secara instan.</p>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="md:col-span-3">
+                                    <label class="block text-sm font-medium text-gray-600 mb-1">Pilih Topik / TP</label>
+                                    <select id="soalTopic-${widgetId}" class="w-full p-2 border border-gray-300 rounded-lg text-sm bg-white">
+                                        <option value="">-- Silakan isi tabel ATP terlebih dahulu --</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-600 mb-1">Jenis Soal</label>
+                                    <select id="soalType-${widgetId}" class="w-full p-2 border border-gray-300 rounded-lg text-sm bg-white">
+                                        <option value="Pilihan Ganda">Pilihan Ganda (PG)</option>
+                                        <option value="Essay / Uraian">Essay / Uraian</option>
+                                        <option value="Campuran (PG & Essay)">Campuran (PG & Essay)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-600 mb-1">Jumlah Soal</label>
+                                    <select id="soalCount-${widgetId}" class="w-full p-2 border border-gray-300 rounded-lg text-sm bg-white">
+                                        <option value="5">5 Butir</option>
+                                        <option value="10">10 Butir</option>
+                                        <option value="15">15 Butir</option>
+                                        <option value="20">20 Butir</option>
+                                    </select>
+                                </div>
+                                <div class="flex items-end">
+                                    <button onclick="generateSoal(${widgetId})" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg transition shadow-md flex justify-center items-center gap-2 h-[38px]">
+                                        <i data-lucide="wand-2" class="w-4 h-4"></i> Generate Soal
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="soalResultArea-${widgetId}" class="hidden">
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Hasil Asesmen</label>
+                            <textarea id="soalContent-${widgetId}" rows="15" class="w-full p-4 border border-gray-300 rounded-lg text-sm font-mono bg-gray-50 focus:bg-white transition"></textarea>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -519,6 +587,14 @@
             if (tabName === 'modul') {
                 populateModulTopics(widgetId);
             }
+            // Special logic for LKPD tab
+            if (tabName === 'lkpd') {
+                populateLKPDTopics(widgetId);
+            }
+            // Special logic for Soal tab
+            if (tabName === 'soal') {
+                populateSoalTopics(widgetId);
+            }
         }
 
         function populateModulTopics(widgetId) {
@@ -547,6 +623,64 @@
                 select.innerHTML = '<option value="">(Data ATP Kosong - Silakan Generate ATP Dulu)</option>';
             } else {
                 select.value = currentVal; // Restore selection if possible
+            }
+        }
+
+        function populateLKPDTopics(widgetId) {
+            const select = document.getElementById(`lkpdTopic-${widgetId}`);
+            const currentVal = select.value;
+            select.innerHTML = '<option value="">-- Pilih Topik / TP --</option>';
+
+            const processRow = (row, semester) => {
+                if (row.cells.length < 3) return;
+                const topic = row.cells[1].innerText.trim();
+                const tpDiv = row.cells[2].querySelector('div[contenteditable]');
+                const tp = tpDiv ? tpDiv.innerText.trim() : '';
+                
+                if (topic && tp) {
+                    const option = document.createElement('option');
+                    option.value = JSON.stringify({ topic, tp });
+                    option.textContent = `[${semester}] ${topic} - ${tp.substring(0, 60)}...`;
+                    select.appendChild(option);
+                }
+            };
+
+            document.querySelectorAll(`#promesGanjilBody-${widgetId} tr`).forEach(row => processRow(row, 'Ganjil'));
+            document.querySelectorAll(`#promesGenapBody-${widgetId} tr`).forEach(row => processRow(row, 'Genap'));
+            
+            if (select.options.length <= 1) {
+                select.innerHTML = '<option value="">(Data ATP Kosong - Silakan Generate ATP Dulu)</option>';
+            } else {
+                select.value = currentVal;
+            }
+        }
+
+        function populateSoalTopics(widgetId) {
+            const select = document.getElementById(`soalTopic-${widgetId}`);
+            const currentVal = select.value;
+            select.innerHTML = '<option value="">-- Pilih Topik / TP --</option>';
+
+            const processRow = (row, semester) => {
+                if (row.cells.length < 3) return;
+                const topic = row.cells[1].innerText.trim();
+                const tpDiv = row.cells[2].querySelector('div[contenteditable]');
+                const tp = tpDiv ? tpDiv.innerText.trim() : '';
+                
+                if (topic && tp) {
+                    const option = document.createElement('option');
+                    option.value = JSON.stringify({ topic, tp });
+                    option.textContent = `[${semester}] ${topic} - ${tp.substring(0, 60)}...`;
+                    select.appendChild(option);
+                }
+            };
+
+            document.querySelectorAll(`#promesGanjilBody-${widgetId} tr`).forEach(row => processRow(row, 'Ganjil'));
+            document.querySelectorAll(`#promesGenapBody-${widgetId} tr`).forEach(row => processRow(row, 'Genap'));
+            
+            if (select.options.length <= 1) {
+                select.innerHTML = '<option value="">(Data ATP Kosong - Silakan Generate ATP Dulu)</option>';
+            } else {
+                select.value = currentVal;
             }
         }
 
@@ -590,6 +724,109 @@
                     resultArea.classList.remove('hidden');
                     contentArea.value = result.data;
                     // Scroll to result
+                    resultArea.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    alert('Gagal: ' + result.message);
+                }
+            } catch (e) {
+                alert('Error: ' + e.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+                lucide.createIcons();
+            }
+        }
+
+        async function generateLKPD(widgetId) {
+            const widget = document.getElementById(`widget-${widgetId}`);
+            const subject = widget.querySelector(`#promesSubject-${widgetId}`).value;
+            const grade = widget.querySelector(`#promesGrade-${widgetId}`).value;
+            const fase = widget.querySelector(`#promesFase-${widgetId}`).value;
+            const topicDataStr = widget.querySelector(`#lkpdTopic-${widgetId}`).value;
+            const activityType = widget.querySelector(`#lkpdActivity-${widgetId}`).value;
+
+            if (!topicDataStr) {
+                alert('Pilih Topik/TP terlebih dahulu.');
+                return;
+            }
+            const topicData = JSON.parse(topicDataStr);
+
+            const btn = widget.querySelector(`button[onclick="generateLKPD(${widgetId})"]`);
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Sedang Membuat LKPD...';
+            lucide.createIcons();
+
+            try {
+                const res = await fetch('sadigs_api_v3/generate_lkpd_api.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        subject, grade, fase,
+                        topic: topicData.topic,
+                        tp: topicData.tp,
+                        activity_type: activityType
+                    })
+                });
+                const result = await res.json();
+                
+                if (result.success) {
+                    const resultArea = widget.querySelector(`#lkpdResultArea-${widgetId}`);
+                    const contentArea = widget.querySelector(`#lkpdContent-${widgetId}`);
+                    resultArea.classList.remove('hidden');
+                    contentArea.value = result.data;
+                    resultArea.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    alert('Gagal: ' + result.message);
+                }
+            } catch (e) {
+                alert('Error: ' + e.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+                lucide.createIcons();
+            }
+        }
+
+        async function generateSoal(widgetId) {
+            const widget = document.getElementById(`widget-${widgetId}`);
+            const subject = widget.querySelector(`#promesSubject-${widgetId}`).value;
+            const grade = widget.querySelector(`#promesGrade-${widgetId}`).value;
+            const fase = widget.querySelector(`#promesFase-${widgetId}`).value;
+            const topicDataStr = widget.querySelector(`#soalTopic-${widgetId}`).value;
+            const type = widget.querySelector(`#soalType-${widgetId}`).value;
+            const count = widget.querySelector(`#soalCount-${widgetId}`).value;
+
+            if (!topicDataStr) {
+                alert('Pilih Topik/TP terlebih dahulu.');
+                return;
+            }
+            const topicData = JSON.parse(topicDataStr);
+
+            const btn = widget.querySelector(`button[onclick="generateSoal(${widgetId})"]`);
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Sedang Membuat Soal...';
+            lucide.createIcons();
+
+            try {
+                const res = await fetch('sadigs_api_v3/generate_soal_api.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        subject, grade, fase,
+                        topic: topicData.topic,
+                        tp: topicData.tp,
+                        type, count
+                    })
+                });
+                const result = await res.json();
+                
+                if (result.success) {
+                    const resultArea = widget.querySelector(`#soalResultArea-${widgetId}`);
+                    const contentArea = widget.querySelector(`#soalContent-${widgetId}`);
+                    resultArea.classList.remove('hidden');
+                    contentArea.value = result.data;
                     resultArea.scrollIntoView({ behavior: 'smooth' });
                 } else {
                     alert('Gagal: ' + result.message);
