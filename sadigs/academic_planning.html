@@ -296,10 +296,11 @@
         function loadAllWidgetsState() {
             for (let i = 1; i <= 3; i++) {
                 const state = JSON.parse(localStorage.getItem(`promesWidget-${i}`));
-                if (state && state.subject && state.grade && state.fase) {
+                // PERBAIKAN: Cukup cek subject dan grade agar data lama (sebelum ada Fase) tetap muncul
+                if (state && state.subject && state.grade) {
                     const widget = document.getElementById(`widget-${i}`);
                     widget.querySelector(`#promesSubject-${i}`).value = state.subject;
-                    widget.querySelector(`#promesFase-${i}`).value = state.fase;
+                    if (state.fase) widget.querySelector(`#promesFase-${i}`).value = state.fase; // Muat fase jika ada
                     widget.querySelector(`#promesGrade-${i}`).value = state.grade;
                     
                     const title = widget.querySelector('.widget-title');
@@ -547,7 +548,8 @@
             const grade = widget.querySelector(`#promesGrade-${widgetId}`).value.trim();
 
             if (!subject || !grade || !fase) {
-                alert('Mata Pelajaran, Fase, dan Kelas harus diisi.');
+                // PERBAIKAN: Jangan alert jika dipanggil otomatis saat loading halaman
+                if (isManualClick) alert('Mata Pelajaran, Fase, dan Kelas harus diisi. Silakan lengkapi data di bagian atas.');
                 return;
             }
 
