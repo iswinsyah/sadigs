@@ -18,9 +18,14 @@ if (!$subject || !$grade) {
 
 // --- FUNGSI PANGGIL AI GEMINI (SIAP PAKAI) ---
 function generateWithGemini($subject, $grade, $custom_prompt) {
-    require 'ai_config.php';
+    $configPath = __DIR__ . '/ai_config.php';
+    if (!file_exists($configPath)) {
+        // Jangan throw exception, cukup fallback ke mock data
+        return null; 
+    }
+    require $configPath;
     
-    if (empty($apiKey)) return null; // Fallback ke mock jika tidak ada key
+    if (empty($apiKey) || strlen(trim($apiKey)) < 10) return null; // Fallback ke mock jika tidak ada key
 
     $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' . $apiKey;
     

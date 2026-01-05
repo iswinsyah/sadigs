@@ -20,8 +20,23 @@ if (!$subject || !$topic) {
 }
 
 function generateLKPDWithGemini($subject, $grade, $fase, $topic, $tp, $activity_type) {
-    require 'ai_config.php';
-    if (empty($apiKey)) return "Simulasi: LKPD untuk $topic ($subject Kelas $grade) berhasil dibuat.\n\n(Harap pasang API Key Anda di dalam file 'sadigs_api_v3/ai_config.php' untuk hasil AI sungguhan)";
+    $configPath = __DIR__ . '/ai_config.php';
+    if (!file_exists($configPath)) {
+        throw new Exception("DEBUG: File 'ai_config.php' TIDAK DITEMUKAN di server. Pastikan file tersebut sudah di-upload ke folder 'sadigs_api_v3'.");
+    }
+    require $configPath;
+
+    if (!isset($apiKey)) {
+        throw new Exception("DEBUG: Variabel \$apiKey TIDAK DITEMUKAN setelah memuat 'ai_config.php'. Cek isi file tersebut, pastikan ada baris `\$apiKey = '...';`");
+    }
+
+    if (empty(trim($apiKey))) {
+        throw new Exception("DEBUG: API Key di 'ai_config.php' terdeteksi KOSONG. Harap isi dengan API Key dari Google AI Studio.");
+    }
+
+    if (strlen(trim($apiKey)) < 30) {
+        throw new Exception("DEBUG: API Key terdeteksi, tapi TERLALU PENDEK dan tidak valid. Cek kembali hasil copy-paste Anda.");
+    }
 
     $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' . $apiKey;
     
@@ -56,7 +71,13 @@ function generateLKPDWithGemini($subject, $grade, $fase, $topic, $tp, $activity_
     curl_close($ch);
     
     $result = json_decode($response, true);
-    return $result['candidates'][0]['content']['parts'][0]['text'] ?? 'Maaf, AI tidak memberikan respons.';
+
+    if (json_last_error() !== JSON_ERROR_NONE || !isset($result['candidates'])) {
+        $errorText = "Gagal memproses respons dari AI. Kemungkinan API Key tidak valid atau ada masalah jaringan.\n\nRaw Response dari Server Google:\n" . substr(strip_tags($response), 0, 500);
+        throw new Exception($errorText);
+    }
+
+    return $result['candidates'][0]['content']['parts'][0]['text'] ?? 'Maaf, AI memberikan respons kosong. Coba generate ulang.';
 }
 
 try {
