@@ -1,5 +1,10 @@
 <?php
 header('Content-Type: application/json');
+
+// --- TEMPORARY DEBUGGING: Force display of all PHP errors ---
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
 require_once 'db_connect.php';
 
 if (session_status() === PHP_SESSION_NONE) session_start();
