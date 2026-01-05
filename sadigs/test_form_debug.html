@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Debug POST</title>
+</head>
+<body>
+    <h1>Test Debug POST ke employee_data_test.php</h1>
+    <p>Klik tombol di bawah untuk mengirim data tes ke server. Jika berhasil, layar akan menampilkan pesan JSON sukses.</p>
+    <form action="sadigs_api_v3/employee_data_test.php" method="POST" enctype="multipart/form-data">
+        <label>Data Tes:</label>
+        <input type="text" name="debug_data" value="Cek ModSecurity Hostinger" readonly>
+        <br><br>
+        <button type="submit" style="padding:10px 20px; background:blue; color:white; border:none; cursor:pointer; border-radius: 5px;">Kirim Test POST</button>
+    </form>
+</body>
+</html>
