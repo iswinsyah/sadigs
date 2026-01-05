@@ -1,10 +1,6 @@
 <?php
 header('Content-Type: application/json');
 
-// --- TEMPORARY DEBUGGING: Force display of all PHP errors ---
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-
 require_once 'db_connect.php';
 
 if (session_status() === PHP_SESSION_NONE) session_start();
@@ -35,11 +31,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
 // --- POST: Simpan Data & Upload File ---
 elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // --- ADVANCED DEBUGGING ---
-    $log_file = __DIR__ . '/debug_employee_save.log';
-    $log_entry = "\n--- [ " . date('Y-m-d H:i:s') . " ] --- \n";
-    $log_entry .= "Received POST data: " . print_r($_POST, true) . "\n";
-    $log_entry .= "Received FILES data: " . print_r($_FILES, true) . "\n";
     
     try {
         // 1. Handle Upload File
@@ -90,7 +81,6 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmtUser = $pdo->prepare("UPDATE users SET full_name = ?, email = ? WHERE user_id = ?");
         $stmtUser->execute([$_POST['full_name'], $_POST['email'], $user_id]);
 
-        $log_entry .= "Step 1: Successfully updated 'users' table.\n";
         // CACHE BUSTER v1.1
         // 3. Update/Insert Tabel Employee Details
         $sql = "INSERT INTO employee_details (
@@ -143,20 +133,14 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'path7' => $uploaded_paths['certificate_award_path']
         ];
         
-        $log_entry .= "Step 2: Preparing to execute 'employee_details' update. NPWP value sent: " . ($params_to_execute['npwp'] ?? 'NULL') . "\n";
         $stmt->execute($params_to_execute);
-        $log_entry .= "Step 3: Successfully executed 'employee_details' update.\n";
 
         $pdo->commit();
-        $log_entry .= "Step 4: Commit successful. Process finished.\n";
-        file_put_contents($log_file, $log_entry, FILE_APPEND);
         sendJSONResponse(['success' => true, 'message' => 'Biodata pegawai berhasil disimpan.']);
 
     } catch (Exception $e) {
         if ($pdo->inTransaction()) $pdo->rollBack();
-        $error_message = 'Gagal menyimpan: ' . $e->getMessage() . ' (Line: ' . $e->getLine() . ')';
-        file_put_contents($log_file, $log_entry . "ERROR: " . $error_message . "\n", FILE_APPEND);
-        sendJSONResponse(['success' => false, 'message' => $error_message], 500);
+        sendJSONResponse(['success' => false, 'message' => 'Gagal menyimpan: ' . $e->getMessage()], 500);
     }
 }
 ?>
