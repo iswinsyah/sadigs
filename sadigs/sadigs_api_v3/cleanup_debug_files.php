@@ -12,6 +12,7 @@ $files_to_delete = [
     __DIR__ . '/test_curl_google.log',
     __DIR__ . '/test_employee.log',
     __DIR__ . '/employee_data_test.php',
+    __DIR__ . '/../test_form_debug.html',
 ];
 
 foreach ($files_to_delete as $file) {
