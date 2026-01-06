@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Album Modul Ajar | SADIGS 3.0</title>
+    <title>Bank Data Kurikulum | SADIGS 3.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -86,11 +86,26 @@
 
     <script>
         lucide.createIcons();
+        let currentUserId = null;
+        let currentScope = 'mine'; // 'mine' or 'all'
+
+        // Mobile Menu Logic
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        function toggleSidebar() { sidebar.classList.toggle('-translate-x-full'); sidebarOverlay.classList.toggle('hidden'); }
+        mobileMenuBtn.addEventListener('click', toggleSidebar);
+        sidebarOverlay.addEventListener('click', toggleSidebar);
 
         async function initPage() {
             const sessionRes = await fetch('sadigs_api_v3/session_check.php');
             const sessionData = await sessionRes.json();
             if (!sessionData.success) { window.location.href = 'index.html'; return; }
+            
+            document.getElementById('sidebarUsername').textContent = sessionData.username;
+            document.getElementById('userInitial').textContent = sessionData.username.charAt(0).toUpperCase();
+            const rawRoles = sessionData.raw_roles || [];
+            document.getElementById('sidebarRole').textContent = rawRoles.length > 0 ? rawRoles.map(r => r.role_name).join(', ') : 'User';
 
             try {
                 const permRes = await fetch('sadigs_api_v3/get_menu_permissions.php');
@@ -103,98 +118,183 @@
                     return;
                 }
                 renderSidebar(allowedMenus);
-                loadAlbum();
+                loadRepository();
             } catch (e) { 
                 alert('Gagal memuat data.');
             }
         }
 
         function renderSidebar(allowedMenus) {
+            // Template Sidebar yang sama dengan academic_planning.html
             const nav = document.getElementById('sidebarNav');
-            nav.innerHTML = `<div class="bg-gray-50 rounded-lg p-2"><h3 class="px-2 mb-2 text-xs font-bold text-gray-400">KEPEGAWAIAN</h3><a id="navRppGenerator" href="rpp_generator.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="brain-circuit" class="w-5 h-5"></i> Generator Modul Ajar</a><a id="navRppAlbum" href="rpp_album.html" class="flex items-center gap-3 px-3 py-2.5 text-utama bg-white rounded-md transition font-semibold text-sm shadow-sm"><i data-lucide="book-copy" class="w-5 h-5"></i> Album Modul Ajar</a></div>`;
-            allowedMenus.forEach(id => { const el = document.getElementById(id); if (el) el.classList.remove('hidden'); });
+            nav.innerHTML = `
+                <div class="bg-gray-50 rounded-lg p-2">
+                    <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">UMUM</h3>
+                    <a id="navDashboard" href="dashboard.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard</a>
+                    <a id="navProfil" href="profile.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="user" class="w-5 h-5"></i> Profil Saya</a>
+                </div>
+                <div id="groupKepegawaian" class="hidden bg-gray-50 rounded-lg p-2 mt-2">
+                    <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KEPEGAWAIAN</h3>
+                    <a id="navAbsensi" href="attendance.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="map-pin" class="w-5 h-5"></i> Absensi Pegawai</a>
+                    <a id="navIzinPegawai" href="leave_request.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="file-edit" class="w-5 h-5"></i> Formulir Izin</a>
+                    <a id="navRppAlbum" href="rpp_album.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-utama bg-white rounded-md transition font-semibold text-sm shadow-sm"><i data-lucide="book-copy" class="w-5 h-5"></i> Bank Data Kurikulum</a>
+                    <a id="navPerencanaanAkademik" href="academic_planning.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="book-check" class="w-5 h-5"></i> Buku Kerja Ustadz</a>
+                </div>
+                <div class="pt-2">
+                    <button onclick="if(confirm('Keluar aplikasi?')) window.location.href='sadigs_api_v3/logout.php'" class="w-full flex items-center gap-3 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition font-medium"><i data-lucide="log-out" class="w-5 h-5"></i> Keluar</button>
+                </div>
+            `;
+            
+            allowedMenus.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.remove('hidden');
+            });
+            
+            if (document.querySelector('#groupKepegawaian a:not(.hidden)')) {
+                document.getElementById('groupKepegawaian').classList.remove('hidden');
+            }
             lucide.createIcons();
         }
 
-        async function loadAlbum() {
-            const container = document.getElementById('albumContainer');
+        function switchTab(scope) {
+            currentScope = scope;
+            
+            // Update UI Tabs
+            const tabMine = document.getElementById('tab-mine');
+            const tabAll = document.getElementById('tab-all');
+            
+            if (scope === 'mine') {
+                tabMine.className = "border-b-2 border-utama text-utama whitespace-nowrap pb-4 px-1 font-bold text-sm flex items-center gap-2";
+                tabAll.className = "border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap pb-4 px-1 font-medium text-sm flex items-center gap-2";
+            } else {
+                tabAll.className = "border-b-2 border-utama text-utama whitespace-nowrap pb-4 px-1 font-bold text-sm flex items-center gap-2";
+                tabMine.className = "border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap pb-4 px-1 font-medium text-sm flex items-center gap-2";
+            }
+            
+            loadRepository();
+        }
+
+        async function loadRepository() {
+            const grade = document.getElementById('filterGrade').value;
+            const subject = document.getElementById('filterSubject').value;
+            const type = document.getElementById('filterType').value;
+            
+            const grid = document.getElementById('albumContainer');
+            const loading = document.getElementById('loading');
+            const emptyState = document.getElementById('emptyState');
+
+            grid.innerHTML = '';
+            loading.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+
             try {
-                const res = await fetch('sadigs_api_v3/get_rpp_album.php');
+                const res = await fetch(`sadigs_api_v3/get_repository_api.php?scope=${currentScope}&grade=${encodeURIComponent(grade)}&subject=${encodeURIComponent(subject)}&type=${encodeURIComponent(type)}`);
                 const result = await res.json();
 
-                if (result.success && result.data.length > 0) {
-                    container.innerHTML = '';
-                    result.data.forEach(item => {
-                        const card = document.createElement('div');
-                        card.className = 'bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition flex flex-col';
-                        card.innerHTML = `
-                            <div class="flex justify-between items-start mb-2">
-                                <span class="bg-teal-50 text-teal-700 text-xs font-bold px-2 py-1 rounded uppercase tracking-wide">${item.subject}</span>
-                                <span class="text-xs text-gray-400">${item.created_at_formatted}</span>
-                            </div>
-                            <h3 class="font-bold text-lg text-gray-800 mb-1 line-clamp-2">${item.topic}</h3>
-                            <p class="text-sm text-gray-500 mb-4">Kelas ${item.grade}</p>
-                            <div class="mt-auto pt-4 border-t border-gray-100 flex gap-2">
-                                <button onclick="viewModule(${item.id})" class="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-700 py-2 rounded-lg text-sm font-bold transition">Lihat</button>
-                                <button onclick="deleteModule(${item.id})" class="px-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition" title="Hapus"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                            </div>
-                        `;
-                        container.appendChild(card);
+                if (result.success) {
+                    currentUserId = result.current_user_id;
+                    
+                    // Update Filters Dropdown (Only if empty to prevent reset loop)
+                    const gradeSelect = document.getElementById('filterGrade');
+                    if (gradeSelect.options.length <= 1) {
+                        result.filters.classes.forEach(c => { if(c) gradeSelect.innerHTML += `<option value="${c}">Kelas ${c}</option>`; });
+                    }
+                    const subjectSelect = document.getElementById('filterSubject');
+                    if (subjectSelect.options.length <= 1) {
+                        result.filters.subjects.forEach(s => { if(s) subjectSelect.innerHTML += `<option value="${s}">${s}</option>`; });
+                    }
+
+                    // Render Items
+                    if (result.data.length === 0) {
+                        emptyState.classList.remove('hidden');
+                    } else {
+                        result.data.forEach(item => {
+                            grid.innerHTML += createCard(item);
+                        });
                         lucide.createIcons();
-                    });
-                } else {
-                    container.innerHTML = `<div class="col-span-full flex flex-col items-center justify-center py-12 text-gray-400"><i data-lucide="book-open" class="w-12 h-12 mb-3 opacity-20"></i><p>Belum ada Modul Ajar yang disimpan.</p></div>`;
-                    lucide.createIcons();
+                    }
                 }
             } catch (e) {
-                container.innerHTML = `<div class="col-span-full text-center py-12 text-red-400">Gagal memuat data album.</div>`;
+                console.error(e);
+                alert('Gagal memuat data repository.');
+            } finally {
+                loading.classList.add('hidden');
             }
+        }
+
+        function createCard(item) {
+            const typeColors = { 'modul': 'bg-blue-100 text-blue-700 border-blue-200', 'lkpd': 'bg-orange-100 text-orange-700 border-orange-200', 'soal': 'bg-purple-100 text-purple-700 border-purple-200' };
+            const typeLabels = { 'modul': 'Modul Ajar', 'lkpd': 'LKPD', 'soal': 'Asesmen' };
+            const badgeClass = typeColors[item.type] || 'bg-gray-100 text-gray-700';
+            const label = typeLabels[item.type] || item.type.toUpperCase();
+            const date = new Date(item.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+            
+            // Tombol Hapus hanya muncul jika user adalah pemilik
+            const deleteBtn = (parseInt(item.user_id) === parseInt(currentUserId)) 
+                ? `<button onclick="deleteItem(${item.id}, event)" class="text-gray-400 hover:text-red-500 p-1" title="Hapus"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` 
+                : '';
+
+            return `
+            <div class="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition cursor-pointer group flex flex-col h-full" onclick="openModal(this)" data-content="${encodeURIComponent(item.content)}" data-title="${item.topic}" data-author="${item.author_name || 'Anonim'}">
+                <div class="p-5 flex-1">
+                    <div class="flex justify-between items-start mb-3">
+                        <span class="text-xs font-bold px-2.5 py-1 rounded-full border ${badgeClass}">${label}</span>
+                        ${deleteBtn}
+                    </div>
+                    <h4 class="font-bold text-gray-800 mb-1 line-clamp-2 group-hover:text-utama transition">${item.topic || 'Tanpa Topik'}</h4>
+                    <p class="text-sm text-gray-500 mb-4">${item.subject} - Kelas ${item.grade}</p>
+                    
+                    <div class="flex items-center gap-2 text-xs text-gray-400 mt-auto pt-3 border-t border-gray-100">
+                        <div class="flex items-center gap-1">
+                            <i data-lucide="user" class="w-3 h-3"></i>
+                            <span>${item.author_name || 'Anonim'}</span>
+                        </div>
+                        <span class="mx-1">•</span>
+                        <span>${date}</span>
+                    </div>
+                </div>
+            </div>
+            `;
+        }
+
+        function openModal(card) {
+            const content = decodeURIComponent(card.dataset.content);
+            const title = card.dataset.title;
+            const author = card.dataset.author;
+
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalSubtitle').textContent = `Dibuat oleh: ${author}`;
+            document.getElementById('modalContent').value = content;
+            document.getElementById('viewModal').classList.remove('hidden');
         }
 
         function closeModal() {
             document.getElementById('viewModal').classList.add('hidden');
         }
 
-        async function viewModule(id) {
-            const modal = document.getElementById('viewModal');
-            const modalTitle = document.getElementById('modalTitle');
-            const modalContent = document.getElementById('modalContent');
-
-            modal.classList.remove('hidden');
-            modalTitle.textContent = 'Memuat...';
-            modalContent.innerHTML = '<p class="text-center text-gray-400">Mengambil data modul ajar...</p>';
-
-            try {
-                const res = await fetch(`sadigs_api_v3/get_rpp_album.php?id=${id}`);
-                const result = await res.json();
-                if (result.success) {
-                    modalTitle.textContent = result.data.topic;
-                    // Mengganti newline menjadi <br> dan format bold
-                    const formattedContent = result.data.rpp_content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
-                    modalContent.innerHTML = formattedContent;
-                } else {
-                    throw new Error(result.message);
-                }
-            } catch (e) {
-                modalContent.innerHTML = `<p class="text-red-500">Gagal memuat detail: ${e.message}</p>`;
-            }
+        function copyModalContent() {
+            const el = document.getElementById('modalContent');
+            el.select();
+            navigator.clipboard.writeText(el.value).then(() => alert('Konten berhasil disalin!'));
         }
 
-        async function deleteModule(id) {
-            if (!confirm('Anda yakin ingin menghapus Modul Ajar ini dari album?')) return;
+        async function deleteItem(id, event) {
+            event.stopPropagation(); // Mencegah modal terbuka
+            if(!confirm('Hapus arsip ini? Tindakan ini tidak dapat dibatalkan.')) return;
 
             try {
-                const res = await fetch('sadigs_api_v3/get_rpp_album.php', {
-                    method: 'DELETE',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id: id })
+                const res = await fetch('sadigs_api_v3/delete_artifact_api.php', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({id})
                 });
                 const result = await res.json();
-                alert(result.message);
-                if (result.success) loadAlbum(); // Muat ulang album
-            } catch (e) {
-                alert('Gagal menghapus: ' + e.message);
-            }
+                if(result.success) {
+                    loadRepository(); // Refresh grid
+                } else {
+                    alert('Gagal menghapus: ' + result.message);
+                }
+            } catch(e) { alert('Error koneksi.'); }
         }
 
         initPage();
