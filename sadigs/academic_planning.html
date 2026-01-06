@@ -1324,6 +1324,33 @@
             }
         }
         
+        function updateArtifactUI(widgetId, type, status) {
+            const widget = document.getElementById(`widget-${widgetId}`);
+            const isSubmitted = status === 'submitted';
+
+            // UI elements
+            const contentArea = widget.querySelector(`#${type}Content-${widgetId}`);
+            const saveBtn = widget.querySelector(`#saveArtifactBtn-${type}-${widgetId}`);
+            const submitBtn = widget.querySelector(`#submitArtifactBtn-${type}-${widgetId}`);
+            const unlockBtn = widget.querySelector(`#unlockArtifactBtn-${type}-${widgetId}`);
+            const statusBadge = widget.querySelector(`#artifactStatusBadge-${type}-${widgetId}`);
+
+            // Toggle buttons visibility
+            if (saveBtn) saveBtn.classList.toggle('hidden', isSubmitted);
+            if (submitBtn) submitBtn.classList.toggle('hidden', isSubmitted);
+            if (unlockBtn) unlockBtn.classList.toggle('hidden', !isSubmitted);
+            if (statusBadge) {
+                statusBadge.classList.toggle('hidden', !isSubmitted);
+                statusBadge.classList.toggle('flex', isSubmitted);
+            }
+
+            // Disable/Enable textarea
+            if (contentArea) {
+                contentArea.readOnly = isSubmitted;
+                contentArea.classList.toggle('bg-gray-100', isSubmitted);
+            }
+        }
+
         function updateWidgetUI(widget, status) {
             const widgetId = widget.dataset.widgetId;
             const isSubmitted = status === 'submitted';
