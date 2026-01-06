@@ -323,9 +323,23 @@
                     const title = widget.querySelector('.widget-title');
                     title.innerHTML = `Perangkat Ajar ${i} <span class="text-xs bg-teal-100 text-teal-800 px-2 py-0.5 rounded-full ml-2">v3.1</span>: ${state.subject} - Kelas ${state.grade}`;
 
-                    const showBtn = widget.querySelector('button[onclick^="loadOrGeneratePromes"]');
-                    loadOrGeneratePromes(showBtn, false);
+                    loadOrGeneratePromes(i, false);
                 }
+            }
+        }
+
+        function handleWidgetInputChange(widgetId) {
+            updateAiPrompt(widgetId); // Keep existing AI prompt functionality
+
+            const widget = document.getElementById(`widget-${widgetId}`);
+            const subject = widget.querySelector(`#promesSubject-${widgetId}`).value.trim();
+            const fase = widget.querySelector(`#promesFase-${widgetId}`).value.trim();
+            const grade = widget.querySelector(`#promesGrade-${widgetId}`).value.trim();
+
+            // If all three main fields are filled, activate the ATP table area
+            if (subject && fase && grade) {
+                widget.querySelector(`#tablesContainer-${widgetId}`).classList.remove('hidden');
+                loadOrGeneratePromes(widgetId, false);
             }
         }
 
@@ -353,11 +367,11 @@
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
                             <div class="md:col-span-1">
                                 <label for="promesSubject-${widgetId}" class="block text-sm font-medium text-gray-500">Mata Pelajaran</label>
-                                <input type="text" id="promesSubject-${widgetId}" oninput="updateAiPrompt(${widgetId})" class="w-full p-2 border border-gray-300 rounded-lg mt-1" placeholder="Contoh: Biologi">
+                                <input type="text" id="promesSubject-${widgetId}" onchange="handleWidgetInputChange(${widgetId})" class="w-full p-2 border border-gray-300 rounded-lg mt-1" placeholder="Contoh: Biologi">
                             </div>
                             <div>
                                 <label for="promesFase-${widgetId}" class="block text-sm font-medium text-gray-500">Fase</label>
-                                <select id="promesFase-${widgetId}" onchange="updateAiPrompt(${widgetId})" class="w-full p-2 border border-gray-300 rounded-lg mt-1 bg-white">
+                                <select id="promesFase-${widgetId}" onchange="handleWidgetInputChange(${widgetId})" class="w-full p-2 border border-gray-300 rounded-lg mt-1 bg-white">
                                     <option value="">Pilih Fase</option>
                                     <option value="D">D</option>
                                     <option value="E">E</option>
@@ -366,7 +380,7 @@
                             </div>
                             <div>
                                 <label for="promesGrade-${widgetId}" class="block text-sm font-medium text-gray-500">Kelas</label>
-                                <select id="promesGrade-${widgetId}" onchange="updateAiPrompt(${widgetId})" class="w-full p-2 border border-gray-300 rounded-lg mt-1 bg-white">
+                                <select id="promesGrade-${widgetId}" onchange="handleWidgetInputChange(${widgetId})" class="w-full p-2 border border-gray-300 rounded-lg mt-1 bg-white">
                                     <option value="">Pilih Kelas</option>
                                     <option value="7">7</option><option value="8">8</option><option value="9">9</option>
                                     <option value="10">10</option><option value="11">11</option><option value="12">12</option>
@@ -415,7 +429,7 @@
 
                         <div>
                             <label for="promesCP-${widgetId}" class="block text-sm font-medium text-gray-500">Capaian Pembelajaran (CP)</label>
-                            <textarea id="promesCP-${widgetId}" oninput="updateAiPrompt(${widgetId})" rows="2" class="w-full p-2 border border-gray-300 rounded-lg mt-1 text-sm" placeholder="Contoh: Di akhir fase E, peserta didik memiliki kemampuan untuk responsif terhadap isu-isu global..."></textarea>
+                            <textarea id="promesCP-${widgetId}" oninput="updateAiPrompt(${widgetId})" rows="2" class="w-full p-2 border border-gray-300 rounded-lg mt-1 text-sm" placeholder="Opsional. Bisa diisi manual atau otomatis dari hasil AI."></textarea>
                         </div>
 
                         <div class="flex justify-end items-center gap-3 pt-2">
@@ -434,7 +448,7 @@
                             </button>
                         </div>
 
-                        <div id="tablesContainer-${widgetId}" class="space-y-8">
+                        <div id="tablesContainer-${widgetId}" class="hidden space-y-8">
                             <div>
                                 <h3 class="text-base font-bold text-gray-800 mb-4">Semester Ganjil</h3>
                                 <div class="overflow-x-auto custom-scrollbar pb-2">
@@ -1270,23 +1284,13 @@
             }
         }
 
-        async function loadOrGeneratePromes(button, isManualClick = true) {
-            const widget = button.closest('.promes-widget');
-            const widgetId = widget.dataset.widgetId;
+        async function loadOrGeneratePromes(widgetId, isManualClick = true) {
+            const widget = document.getElementById(`widget-${widgetId}`);
             const subject = widget.querySelector(`#promesSubject-${widgetId}`).value.trim();
             const fase = widget.querySelector(`#promesFase-${widgetId}`).value.trim();
             const grade = widget.querySelector(`#promesGrade-${widgetId}`).value.trim();
 
-            if (!subject || !grade || !fase) {
-                // PERBAIKAN: Jangan alert jika dipanggil otomatis saat loading halaman
-                if (isManualClick) alert('Mata Pelajaran, Fase, dan Kelas harus diisi. Silakan lengkapi data di bagian atas.');
-                return;
-            }
-
-            // Jika dipanggil manual (bukan saat load page), kita hanya load data saved, tidak generate baru
-            // karena generate baru sekarang pakai metode Copy-Paste manual.
-            if (isManualClick) return; 
-
+            // This function is now only for loading existing data or showing empty tables for new data.
 
             const tablesContainer = widget.querySelector(`#tablesContainer-${widgetId}`);
             const ganjilBody = widget.querySelector(`#promesGanjilBody-${widgetId}`);
@@ -1317,10 +1321,15 @@
                     }
                 }
 
-                // Jika data tidak ditemukan, biarkan tabel kosong agar user bisa paste dari AI
-                ganjilBody.innerHTML = '<tr><td colspan="33" class="p-4 text-center text-gray-400 italic">Belum ada data. Silakan gunakan fitur AI di atas untuk membuat baru.</td></tr>';
+                // If no data found on server, show empty tables and enable saving
+                ganjilBody.innerHTML = '<tr><td colspan="33" class="p-4 text-center text-gray-400 italic">Belum ada data. Silakan isi manual atau gunakan fitur AI.</td></tr>';
+                genapBody.innerHTML = '<tr><td colspan="33" class="p-4 text-center text-gray-400 italic">Belum ada data. Silakan isi manual atau gunakan fitur AI.</td></tr>';
+                updateWidgetUI(widget, 'draft'); // Show save buttons
+                widget.querySelector('.widget-title').innerHTML = `Perangkat Ajar ${widgetId} <span class="text-xs bg-teal-100 text-teal-800 px-2 py-0.5 rounded-full ml-2">v3.1</span>: ${subject} - Kelas ${grade}`;
 
             } finally {
+                // Ensure tables are visible
+                tablesContainer.classList.remove('hidden');
             }
         }
         

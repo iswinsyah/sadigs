@@ -12,6 +12,23 @@ $user_id = $_SESSION['user_id'];
 $method = $_SERVER['REQUEST_METHOD'];
 $academic_year = '2024/2025'; // Hardcoded for now
 
+// Jaring Pengaman: Pastikan tabel ada sebelum melakukan operasi apapun
+$pdo->exec("CREATE TABLE IF NOT EXISTS `saved_promes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `subject` varchar(255) NOT NULL,
+  `fase` varchar(5) NOT NULL,
+  `grade` varchar(10) NOT NULL,
+  `cp` text DEFAULT NULL,
+  `academic_year` varchar(10) NOT NULL,
+  `promes_data` longtext NOT NULL,
+  `status` enum('draft','submitted') NOT NULL DEFAULT 'draft',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_subject_grade_year` (`user_id`,`subject`,`fase`,`grade`,`academic_year`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+
 try {
     if ($method === 'GET') {
         $subject = isset($_GET['subject']) ? trim($_GET['subject']) : null;
