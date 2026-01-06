@@ -35,7 +35,7 @@
                 <!-- FORM TAMBAH -->
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mb-8">
                     <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><i data-lucide="plus-circle" class="w-5 h-5 text-teal-600"></i> Tambah / Update Data</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
                         <div>
                             <label class="block text-xs font-bold text-gray-500 mb-1">Kelas</label>
                             <select id="gradeInput" class="w-full p-2 border border-gray-300 rounded-lg bg-white">
@@ -50,6 +50,13 @@
                         <div class="md:col-span-2">
                             <label class="block text-xs font-bold text-gray-500 mb-1">Mata Pelajaran</label>
                             <input type="text" id="subjectInput" class="w-full p-2 border border-gray-300 rounded-lg" placeholder="Contoh: Matematika">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 mb-1">Jenis Mapel</label>
+                            <select id="typeInput" class="w-full p-2 border border-gray-300 rounded-lg bg-white">
+                                <option value="Diknas">Diknas</option>
+                                <option value="Diniyah">Diniyah</option>
+                            </select>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-gray-500 mb-1">JP / Minggu</label>
@@ -68,12 +75,13 @@
                             <tr>
                                 <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Kelas</th>
                                 <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Mata Pelajaran</th>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Jenis</th>
                                 <th class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">JP / Minggu</th>
                                 <th class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="curriculumTableBody" class="bg-white divide-y divide-gray-200">
-                            <tr><td colspan="4" class="p-4 text-center text-gray-400">Memuat data...</td></tr>
+                            <tr><td colspan="5" class="p-4 text-center text-gray-400">Memuat data...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -95,9 +103,13 @@
                 if(result.success && result.data.length > 0) {
                     result.data.forEach(item => {
                         const tr = document.createElement('tr');
+                        const typeBadge = item.subject_type === 'Diniyah' 
+                            ? '<span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-bold">Diniyah</span>' 
+                            : '<span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-bold">Diknas</span>';
                         tr.innerHTML = `
                             <td class="px-6 py-4 whitespace-nowrap font-bold text-gray-700">Kelas ${item.grade}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-gray-600">${item.subject}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">${typeBadge}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-center font-bold text-blue-600">${item.hours_per_week} JP</td>
                             <td class="px-6 py-4 whitespace-nowrap text-center">
                                 <button onclick="deleteItem(${item.id})" class="text-red-500 hover:text-red-700"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
@@ -107,7 +119,7 @@
                     });
                     lucide.createIcons();
                 } else {
-                    tbody.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-gray-400 italic">Belum ada data kurikulum. Silakan tambah di atas.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-gray-400 italic">Belum ada data kurikulum. Silakan tambah di atas.</td></tr>';
                 }
             } catch(e) {
                 console.error(e);
@@ -117,6 +129,7 @@
         async function saveItem() {
             const grade = document.getElementById('gradeInput').value;
             const subject = document.getElementById('subjectInput').value.trim();
+            const subjectType = document.getElementById('typeInput').value;
             const hours = document.getElementById('hoursInput').value;
 
             if(!subject || !hours) { alert("Mohon lengkapi data."); return; }
@@ -125,7 +138,7 @@
                 const res = await fetch('sadigs_api_v3/schedule_api.php?action=save_curriculum_item', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ grade, subject, hours })
+                    body: JSON.stringify({ grade, subject, hours, subject_type: subjectType })
                 });
                 const result = await res.json();
                 if(result.success) {

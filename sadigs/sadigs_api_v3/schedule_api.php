@@ -26,10 +26,18 @@ $pdo->exec("CREATE TABLE IF NOT EXISTS curriculum_requirements (
     id INT AUTO_INCREMENT PRIMARY KEY,
     grade VARCHAR(20),
     subject VARCHAR(100),
+    subject_type ENUM('Diniyah', 'Diknas') DEFAULT 'Diknas',
     hours_per_week INT,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     UNIQUE KEY unique_req (grade, subject)
 )");
+
+// Migration: Add subject_type column if not exists
+try {
+    $pdo->query("SELECT subject_type FROM curriculum_requirements LIMIT 1");
+} catch (Exception $e) {
+    $pdo->exec("ALTER TABLE curriculum_requirements ADD COLUMN subject_type ENUM('Diniyah', 'Diknas') DEFAULT 'Diknas' AFTER subject");
+}
 // --------------------------------------------------
 
 try {
@@ -78,14 +86,15 @@ try {
         $input = json_decode(file_get_contents('php://input'), true);
         $grade = $input['grade'];
         $subject = $input['subject'];
+        $subject_type = $input['subject_type'] ?? 'Diknas';
         $hours = (int)$input['hours'];
 
         if (!$grade || !$subject || $hours <= 0) {
             sendJSONResponse(['success' => false, 'message' => 'Data tidak valid.'], 400);
         }
 
-        $stmt = $pdo->prepare("INSERT INTO curriculum_requirements (grade, subject, hours_per_week) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE hours_per_week = VALUES(hours_per_week)");
-        $stmt->execute([$grade, $subject, $hours]);
+        $stmt = $pdo->prepare("INSERT INTO curriculum_requirements (grade, subject, subject_type, hours_per_week) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE hours_per_week = VALUES(hours_per_week), subject_type = VALUES(subject_type)");
+        $stmt->execute([$grade, $subject, $subject_type, $hours]);
 
         sendJSONResponse(['success' => true, 'message' => 'Data kurikulum disimpan.']);
     }
