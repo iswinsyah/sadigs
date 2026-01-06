@@ -26,6 +26,7 @@ $pdo->exec("CREATE TABLE IF NOT EXISTS curriculum_requirements (
     id INT AUTO_INCREMENT PRIMARY KEY,
     grade VARCHAR(20),
     subject VARCHAR(100),
+    method ENUM('Daring', 'Luring') DEFAULT 'Luring',
     subject_type ENUM('Diniyah', 'Diknas') DEFAULT 'Diknas',
     hours_per_week INT,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -37,6 +38,13 @@ try {
     $pdo->query("SELECT subject_type FROM curriculum_requirements LIMIT 1");
 } catch (Exception $e) {
     $pdo->exec("ALTER TABLE curriculum_requirements ADD COLUMN subject_type ENUM('Diniyah', 'Diknas') DEFAULT 'Diknas' AFTER subject");
+}
+
+// Migration: Add method column if not exists
+try {
+    $pdo->query("SELECT method FROM curriculum_requirements LIMIT 1");
+} catch (Exception $e) {
+    $pdo->exec("ALTER TABLE curriculum_requirements ADD COLUMN method ENUM('Daring', 'Luring') DEFAULT 'Luring' AFTER subject_type");
 }
 // --------------------------------------------------
 
@@ -86,6 +94,7 @@ try {
         $input = json_decode(file_get_contents('php://input'), true);
         $grade = $input['grade'];
         $subject = $input['subject'];
+        $method = $input['method'] ?? 'Luring';
         $subject_type = $input['subject_type'] ?? 'Diknas';
         $hours = (int)$input['hours'];
 
@@ -93,8 +102,8 @@ try {
             sendJSONResponse(['success' => false, 'message' => 'Data tidak valid.'], 400);
         }
 
-        $stmt = $pdo->prepare("INSERT INTO curriculum_requirements (grade, subject, subject_type, hours_per_week) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE hours_per_week = VALUES(hours_per_week), subject_type = VALUES(subject_type)");
-        $stmt->execute([$grade, $subject, $subject_type, $hours]);
+        $stmt = $pdo->prepare("INSERT INTO curriculum_requirements (grade, subject, subject_type, method, hours_per_week) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE hours_per_week = VALUES(hours_per_week), subject_type = VALUES(subject_type), method = VALUES(method)");
+        $stmt->execute([$grade, $subject, $subject_type, $method, $hours]);
 
         sendJSONResponse(['success' => true, 'message' => 'Data kurikulum disimpan.']);
     }
