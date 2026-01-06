@@ -510,15 +510,21 @@
 
                         <div>
                             <label class="block text-sm font-medium text-gray-600 mb-1">Langkah 2: Paste Hasil Modul Ajar Di Sini</label>
+                            <input type="hidden" id="modulArtifactId-${widgetId}" value="">
                             <textarea id="modulContent-${widgetId}" rows="15" class="w-full p-4 border border-gray-300 rounded-lg text-sm font-mono bg-gray-50 focus:bg-white transition" placeholder="Paste hasil dari AI di sini..."></textarea>
                         </div>
 
-                        <div class="flex justify-end pt-2 gap-3">
-                            <button onclick="downloadAsPDF(${widgetId}, 'modul')" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-md flex items-center gap-2">
-                                <i data-lucide="download-cloud" class="w-4 h-4"></i> Download PDF
+                        <div class="flex justify-end items-center pt-2 gap-3">
+                            <div id="artifactStatusBadge-modul-${widgetId}" class="hidden items-center gap-2 text-sm font-semibold text-green-600 bg-green-100 px-3 py-1.5 rounded-full"><i data-lucide="check-circle-2" class="w-4 h-4"></i><span>Telah Diajukan</span></div>
+                            <button onclick="unlockArtifact(${widgetId}, 'modul')" id="unlockArtifactBtn-modul-${widgetId}" class="hidden bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg transition shadow-md flex items-center gap-2"><i data-lucide="unlock" class="w-4 h-4"></i> Buka Kunci</button>
+                            <button onclick="saveArtifact(${widgetId}, 'modul', 'save')" id="saveArtifactBtn-modul-${widgetId}" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition shadow-md flex items-center gap-2">
+                                <i data-lucide="save" class="w-4 h-4"></i> Simpan Draft
                             </button>
-                            <button onclick="saveArtifact(${widgetId}, 'modul')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-md flex items-center gap-2">
-                                <i data-lucide="save" class="w-4 h-4"></i> Simpan ke Album
+                            <button onclick="saveArtifact(${widgetId}, 'modul', 'submit')" id="submitArtifactBtn-modul-${widgetId}" class="bg-blue-800 hover:bg-blue-900 text-white font-bold py-2 px-4 rounded-lg transition shadow-md flex items-center gap-2">
+                                <i data-lucide="lock" class="w-4 h-4"></i> Ajukan
+                            </button>
+                            <button onclick="downloadAsPDF(${widgetId}, 'modul')" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition shadow-md flex items-center gap-2" title="Download PDF">
+                                <i data-lucide="download-cloud" class="w-4 h-4"></i> Download PDF
                             </button>
                         </div>
 
@@ -566,15 +572,21 @@
 
                         <div>
                             <label class="block text-sm font-medium text-gray-600 mb-1">Langkah 2: Paste Hasil LKPD Di Sini</label>
+                            <input type="hidden" id="lkpdArtifactId-${widgetId}" value="">
                             <textarea id="lkpdContent-${widgetId}" rows="15" class="w-full p-4 border border-gray-300 rounded-lg text-sm font-mono bg-gray-50 focus:bg-white transition" placeholder="Paste hasil dari AI di sini..."></textarea>
                         </div>
 
-                        <div class="flex justify-end pt-2 gap-3">
-                            <button onclick="downloadAsPDF(${widgetId}, 'lkpd')" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-md flex items-center gap-2">
-                                <i data-lucide="download-cloud" class="w-4 h-4"></i> Download PDF
+                        <div class="flex justify-end items-center pt-2 gap-3">
+                            <div id="artifactStatusBadge-lkpd-${widgetId}" class="hidden items-center gap-2 text-sm font-semibold text-green-600 bg-green-100 px-3 py-1.5 rounded-full"><i data-lucide="check-circle-2" class="w-4 h-4"></i><span>Telah Diajukan</span></div>
+                            <button onclick="unlockArtifact(${widgetId}, 'lkpd')" id="unlockArtifactBtn-lkpd-${widgetId}" class="hidden bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg transition shadow-md flex items-center gap-2"><i data-lucide="unlock" class="w-4 h-4"></i> Buka Kunci</button>
+                            <button onclick="saveArtifact(${widgetId}, 'lkpd', 'save')" id="saveArtifactBtn-lkpd-${widgetId}" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition shadow-md flex items-center gap-2">
+                                <i data-lucide="save" class="w-4 h-4"></i> Simpan Draft
                             </button>
-                            <button onclick="saveArtifact(${widgetId}, 'lkpd')" class="bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-md flex items-center gap-2">
-                                <i data-lucide="save" class="w-4 h-4"></i> Simpan ke Album
+                            <button onclick="saveArtifact(${widgetId}, 'lkpd', 'submit')" id="submitArtifactBtn-lkpd-${widgetId}" class="bg-blue-800 hover:bg-blue-900 text-white font-bold py-2 px-4 rounded-lg transition shadow-md flex items-center gap-2">
+                                <i data-lucide="lock" class="w-4 h-4"></i> Ajukan
+                            </button>
+                            <button onclick="downloadAsPDF(${widgetId}, 'lkpd')" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition shadow-md flex items-center gap-2" title="Download PDF">
+                                <i data-lucide="download-cloud" class="w-4 h-4"></i> Download PDF
                             </button>
                         </div>
 
@@ -629,15 +641,21 @@
 
                         <div>
                             <label class="block text-sm font-medium text-gray-600 mb-1">Langkah 2: Paste Hasil Soal Di Sini</label>
+                            <input type="hidden" id="soalArtifactId-${widgetId}" value="">
                             <textarea id="soalContent-${widgetId}" rows="15" class="w-full p-4 border border-gray-300 rounded-lg text-sm font-mono bg-gray-50 focus:bg-white transition" placeholder="Paste hasil dari AI di sini..."></textarea>
                         </div>
 
-                        <div class="flex justify-end pt-2 gap-3">
-                            <button onclick="downloadAsPDF(${widgetId}, 'soal')" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-md flex items-center gap-2">
-                                <i data-lucide="download-cloud" class="w-4 h-4"></i> Download PDF
+                        <div class="flex justify-end items-center pt-2 gap-3">
+                            <div id="artifactStatusBadge-soal-${widgetId}" class="hidden items-center gap-2 text-sm font-semibold text-green-600 bg-green-100 px-3 py-1.5 rounded-full"><i data-lucide="check-circle-2" class="w-4 h-4"></i><span>Telah Diajukan</span></div>
+                            <button onclick="unlockArtifact(${widgetId}, 'soal')" id="unlockArtifactBtn-soal-${widgetId}" class="hidden bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg transition shadow-md flex items-center gap-2"><i data-lucide="unlock" class="w-4 h-4"></i> Buka Kunci</button>
+                            <button onclick="saveArtifact(${widgetId}, 'soal', 'save')" id="saveArtifactBtn-soal-${widgetId}" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition shadow-md flex items-center gap-2">
+                                <i data-lucide="save" class="w-4 h-4"></i> Simpan Draft
                             </button>
-                            <button onclick="saveArtifact(${widgetId}, 'soal')" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-md flex items-center gap-2">
-                                <i data-lucide="save" class="w-4 h-4"></i> Simpan ke Album
+                            <button onclick="saveArtifact(${widgetId}, 'soal', 'submit')" id="submitArtifactBtn-soal-${widgetId}" class="bg-blue-800 hover:bg-blue-900 text-white font-bold py-2 px-4 rounded-lg transition shadow-md flex items-center gap-2">
+                                <i data-lucide="lock" class="w-4 h-4"></i> Ajukan
+                            </button>
+                            <button onclick="downloadAsPDF(${widgetId}, 'soal')" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition shadow-md flex items-center gap-2" title="Download PDF">
+                                <i data-lucide="download-cloud" class="w-4 h-4"></i> Download PDF
                             </button>
                         </div>
 
@@ -963,12 +981,13 @@
 
         // --- LOGIKA ALBUM / PENYIMPANAN ARTIFAK ---
 
-        async function saveArtifact(widgetId, type) {
+        async function saveArtifact(widgetId, type, action) {
             const widget = document.getElementById(`widget-${widgetId}`);
             const subject = widget.querySelector(`#promesSubject-${widgetId}`).value;
             const grade = widget.querySelector(`#promesGrade-${widgetId}`).value;
             const fase = widget.querySelector(`#promesFase-${widgetId}`).value;
             const content = widget.querySelector(`#${type}Content-${widgetId}`).value;
+            const artifactId = widget.querySelector(`#${type}ArtifactId-${widgetId}`).value;
             
             // Ambil Topik & TP dari dropdown
             const topicSelect = widget.querySelector(`#${type}Topic-${widgetId}`);
@@ -991,18 +1010,27 @@
                 return;
             }
 
-            if(!confirm(`Simpan ${type.toUpperCase()} ini ke Album?`)) return;
+            const confirmationMessage = action === 'submit' 
+                ? `Anda yakin ingin mengajukan ${type.toUpperCase()} ini? Konten tidak dapat diubah lagi setelah diajukan.`
+                : `Simpan perubahan pada ${type.toUpperCase()} ini?`;
+
+            if(!confirm(confirmationMessage)) return;
 
             try {
                 const res = await fetch('sadigs_api_v3/save_artifact_api.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ subject, grade, fase, type, topic, tp, content })
+                    body: JSON.stringify({ id: artifactId, subject, grade, fase, type, topic, tp, content, action })
                 });
                 const result = await res.json();
                 alert(result.message);
                 if (result.success) {
+                    // Jika ini adalah penyimpanan baru, API akan mengembalikan ID baru
+                    if (result.new_id) {
+                        widget.querySelector(`#${type}ArtifactId-${widgetId}`).value = result.new_id;
+                    }
                     loadArtifacts(widgetId, type); // Refresh list
+                    updateArtifactUI(widgetId, type, action === 'submit' ? 'submitted' : 'draft');
                 }
             } catch (e) {
                 alert("Gagal menyimpan: " + e.message);
@@ -1027,12 +1055,13 @@
                 if (result.success && result.data.length > 0) {
                     listContainer.innerHTML = result.data.map(item => `
                         <div class="bg-white p-3 rounded border border-gray-200 shadow-sm flex justify-between items-start gap-2">
-                            <div class="overflow-hidden">
+                            <div class="overflow-hidden flex-1">
                                 <p class="font-bold text-gray-800 text-sm truncate">${item.topic || 'Tanpa Topik'}</p>
                                 <p class="text-xs text-gray-500">${new Date(item.created_at).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute:'2-digit'})}</p>
+                                ${item.status === 'submitted' ? '<span class="text-xs font-bold text-green-600">Diajukan</span>' : '<span class="text-xs font-bold text-yellow-600">Draft</span>'}
                             </div>
                             <div class="flex gap-1 flex-shrink-0">
-                                <button onclick="viewArtifact(${widgetId}, '${type}', this)" data-content="${encodeURIComponent(item.content)}" class="bg-blue-50 text-blue-600 hover:bg-blue-100 p-1.5 rounded text-xs font-bold" title="Lihat/Muat"><i data-lucide="eye" class="w-4 h-4"></i></button>
+                                <button onclick="viewArtifact(${widgetId}, '${type}', this)" data-id="${item.id}" data-status="${item.status}" data-content="${encodeURIComponent(item.content)}" class="bg-blue-50 text-blue-600 hover:bg-blue-100 p-1.5 rounded text-xs font-bold" title="Lihat/Muat"><i data-lucide="eye" class="w-4 h-4"></i></button>
                                 <button onclick="deleteArtifact(${widgetId}, '${type}', ${item.id})" class="bg-red-50 text-red-600 hover:bg-red-100 p-1.5 rounded text-xs font-bold" title="Hapus"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                             </div>
                         </div>
@@ -1049,8 +1078,43 @@
 
         function viewArtifact(widgetId, type, btn) {
             const content = decodeURIComponent(btn.dataset.content);
+            const artifactId = btn.dataset.id;
+            const status = btn.dataset.status;
+
             document.getElementById(`${type}Content-${widgetId}`).value = content;
+            document.getElementById(`${type}ArtifactId-${widgetId}`).value = artifactId;
+            
+            updateArtifactUI(widgetId, type, status);
+
             alert("Konten berhasil dimuat ke area editor di atas.");
+        }
+
+        async function unlockArtifact(widgetId, type) {
+            if (!confirm('Membuka kunci akan mengizinkan Anda mengedit kembali. Lanjutkan?')) return;
+            
+            const widget = document.getElementById(`widget-${widgetId}`);
+            const artifactId = widget.querySelector(`#${type}ArtifactId-${widgetId}`).value;
+
+            if (!artifactId) {
+                alert('Tidak ada item yang dipilih untuk dibuka kuncinya.');
+                return;
+            }
+
+            try {
+                const res = await fetch('sadigs_api_v3/save_artifact_api.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: artifactId, action: 'unlock' })
+                });
+                const result = await res.json();
+                alert(result.message);
+                if (result.success) {
+                    updateArtifactUI(widgetId, type, 'draft');
+                    loadArtifacts(widgetId, type); // Refresh list to show updated status
+                }
+            } catch (err) {
+                alert('Gagal membuka kunci: ' + err.message);
+            }
         }
 
         async function deleteArtifact(widgetId, type, id) {
@@ -1058,6 +1122,14 @@
             try {
                 await fetch('sadigs_api_v3/delete_artifact_api.php', { method: 'POST', body: JSON.stringify({id}) });
                 loadArtifacts(widgetId, type);
+
+                // Jika item yang dihapus sedang dimuat di form, bersihkan form
+                const currentId = document.getElementById(`${type}ArtifactId-${widgetId}`).value;
+                if (currentId == id) {
+                    document.getElementById(`${type}Content-${widgetId}`).value = '';
+                    document.getElementById(`${type}ArtifactId-${widgetId}`).value = '';
+                    updateArtifactUI(widgetId, type, 'draft'); // Reset UI ke state awal
+                }
             } catch(e) { alert("Gagal menghapus."); }
         }
 
@@ -1096,6 +1168,10 @@
 
                 populatePromesTable(widgetId, 'ganjil', ganjilData);
                 populatePromesTable(widgetId, 'genap', genapData);
+
+                // Show the save/submit buttons
+                const widget = document.getElementById(`widget-${widgetId}`);
+                updateWidgetUI(widget, 'draft');
 
                 alert("Berhasil! Data telah dimasukkan ke tabel. Silakan periksa dan klik 'Simpan ATP'.");
             } catch (e) {
