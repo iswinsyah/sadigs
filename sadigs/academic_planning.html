@@ -378,10 +378,23 @@
                     <!-- TAB CONTENT: ATP (PROMES) -->
                     <div id="tab-content-atp-${widgetId}" class="space-y-4">
                         <div>
-                            <label for="promesPrompt-${widgetId}" class="block text-sm font-medium text-gray-500">Instruksi untuk AI (Otomatis/Edit)</label>
-                            <textarea id="promesPrompt-${widgetId}" rows="2" class="w-full p-2 border border-gray-300 rounded-lg mt-1 text-sm bg-gray-50 focus:bg-white transition" placeholder="Prompt akan terisi otomatis..."></textarea>
+                            <label for="promesPrompt-${widgetId}" class="block text-sm font-medium text-gray-500">Langkah 1: Copy Instruksi ini</label>
+                            <textarea id="promesPrompt-${widgetId}" rows="4" class="w-full p-2 border border-gray-300 rounded-lg mt-1 text-xs bg-gray-50 focus:bg-white transition font-mono" placeholder="Prompt akan terisi otomatis..."></textarea>
+                            <div class="flex flex-wrap gap-2 mt-2">
+                                <button onclick="copyPrompt(${widgetId})" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1.5 rounded text-sm font-medium flex items-center gap-1"><i data-lucide="copy" class="w-4 h-4"></i> Copy Prompt</button>
+                                <a href="https://chat.openai.com/" target="_blank" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded text-sm font-medium flex items-center gap-1"><i data-lucide="external-link" class="w-4 h-4"></i> Buka ChatGPT</a>
+                                <a href="https://gemini.google.com/" target="_blank" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-sm font-medium flex items-center gap-1"><i data-lucide="external-link" class="w-4 h-4"></i> Buka Gemini</a>
+                            </div>
                         </div>
-                        <button onclick="loadOrGeneratePromes(this, true)" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition shadow-md flex justify-center items-center gap-2" title="Tampilkan data tersimpan atau generate baru"><i data-lucide="play" class="w-5 h-5"></i> Tampilkan / Generate ATP</button>
+
+                        <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                            <label for="pasteArea-${widgetId}" class="block text-sm font-medium text-yellow-800 mb-1">Langkah 2: Paste Hasil JSON dari AI di sini</label>
+                            <textarea id="pasteArea-${widgetId}" rows="3" class="w-full p-2 border border-yellow-300 rounded-lg text-xs font-mono focus:ring-2 focus:ring-yellow-500 focus:border-transparent" placeholder='Paste hasil JSON dari ChatGPT/Gemini di sini...'></textarea>
+                            <button onclick="processAiResponse(${widgetId})" class="mt-2 w-full bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-lg transition shadow-sm flex justify-center items-center gap-2">
+                                <i data-lucide="arrow-down-circle" class="w-4 h-4"></i> Masukkan ke Tabel & Simpan CP
+                            </button>
+                        </div>
+
                         <div>
                             <label for="promesCP-${widgetId}" class="block text-sm font-medium text-gray-500">Capaian Pembelajaran (CP)</label>
                             <textarea id="promesCP-${widgetId}" oninput="updateAiPrompt(${widgetId})" rows="2" class="w-full p-2 border border-gray-300 rounded-lg mt-1 text-sm" placeholder="Contoh: Di akhir fase E, peserta didik memiliki kemampuan untuk responsif terhadap isu-isu global..."></textarea>
@@ -403,7 +416,7 @@
                             </button>
                         </div>
 
-                        <div id="tablesContainer-${widgetId}" class="hidden space-y-8">
+                        <div id="tablesContainer-${widgetId}" class="space-y-8">
                             <div>
                                 <h3 class="text-base font-bold text-gray-800 mb-4">Semester Ganjil</h3>
                                 <div class="overflow-x-auto custom-scrollbar pb-2">
@@ -845,13 +858,66 @@
             const fase = document.getElementById(`promesFase-${widgetId}`).value;
             const cp = document.getElementById(`promesCP-${widgetId}`).value;
             const promptBox = document.getElementById(`promesPrompt-${widgetId}`);
+
+            // Format JSON yang diharapkan
+            const jsonFormat = `{
+  "cp_text": "Teks CP resmi...",
+  "ganjil": [
+    {"topic": "Topik A", "tp": "Tujuan Pembelajaran 1"},
+    {"topic": "Topik A", "tp": "Tujuan Pembelajaran 2"}
+  ],
+  "genap": [
+    {"topic": "Topik B", "tp": "Tujuan Pembelajaran 3"}
+  ]
+}`;
             
             if(subject && grade && fase) {
-                let basePrompt = `Bertindaklah sebagai ahli kurikulum. Untuk mata pelajaran '${subject}' kelas ${grade} (Fase ${fase}, Kurikulum Merdeka), cantumkan teks CP yang ada di kurikulum merdeka, dan buatkan daftar Materi Pokok/Topik beserta Tujuan Pembelajarannya (TP) yang ringkas dan operasional. Pisahkan output untuk Semester Ganjil dan Genap.`;
+                let basePrompt = `Bertindaklah sebagai ahli kurikulum. Untuk mata pelajaran '${subject}' kelas ${grade} (Fase ${fase}, Kurikulum Merdeka), cantumkan teks CP yang ada di kurikulum merdeka, dan buatkan daftar Materi Pokok/Topik beserta Tujuan Pembelajarannya (TP) yang ringkas dan operasional. Pisahkan output untuk Semester Ganjil dan Genap.\n\nFormat output WAJIB JSON murni tanpa markdown (hapus \`\`\`json):\n${jsonFormat}`;
                 if (cp && cp.trim() !== '') {
                     basePrompt += ` Pastikan TP yang dibuat merupakan turunan dari Capaian Pembelajaran berikut: "${cp}"`;
                 }
                 promptBox.value = basePrompt;
+            }
+        }
+
+        function copyPrompt(widgetId) {
+            const promptText = document.getElementById(`promesPrompt-${widgetId}`);
+            promptText.select();
+            navigator.clipboard.writeText(promptText.value).then(() => {
+                alert("Prompt berhasil disalin! Silakan paste di ChatGPT atau Gemini.");
+            });
+        }
+
+        function processAiResponse(widgetId) {
+            const pasteArea = document.getElementById(`pasteArea-${widgetId}`);
+            let rawText = pasteArea.value.trim();
+
+            if (!rawText) {
+                alert("Silakan paste hasil JSON dari AI terlebih dahulu.");
+                return;
+            }
+
+            // Bersihkan markdown code block jika user mengcopy-nya
+            rawText = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
+
+            try {
+                const data = JSON.parse(rawText);
+                
+                // 1. Isi CP
+                if (data.cp_text) {
+                    document.getElementById(`promesCP-${widgetId}`).value = data.cp_text;
+                }
+
+                // 2. Isi Tabel
+                const ganjilData = (data.ganjil || []).map(item => ({ topic: item.topic, tp_text: item.tp, allocation_jp: '', checked_weeks: [] }));
+                const genapData = (data.genap || []).map(item => ({ topic: item.topic, tp_text: item.tp, allocation_jp: '', checked_weeks: [] }));
+
+                populatePromesTable(widgetId, 'ganjil', ganjilData);
+                populatePromesTable(widgetId, 'genap', genapData);
+
+                alert("Berhasil! Data telah dimasukkan ke tabel. Silakan periksa dan klik 'Simpan ATP'.");
+            } catch (e) {
+                alert("Gagal memproses data: Format JSON tidak valid. Pastikan Anda hanya mengcopy bagian JSON-nya saja.\n\nError: " + e.message);
             }
         }
 
@@ -910,10 +976,10 @@
                 return;
             }
 
-            const originalHTML = button.innerHTML;
-            button.disabled = true;
-            button.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Loading...`;
-            lucide.createIcons();
+            // Jika dipanggil manual (bukan saat load page), kita hanya load data saved, tidak generate baru
+            // karena generate baru sekarang pakai metode Copy-Paste manual.
+            if (isManualClick) return; 
+
 
             const tablesContainer = widget.querySelector(`#tablesContainer-${widgetId}`);
             const ganjilBody = widget.querySelector(`#promesGanjilBody-${widgetId}`);
@@ -944,59 +1010,10 @@
                     }
                 }
 
-                if (!isManualClick) {
-                    ganjilBody.innerHTML = '<tr><td colspan="33" class="p-4 text-center text-gray-400 italic">Data tidak ditemukan.</td></tr>';
-                    return;
-                }
-                
-                if (!confirm('Data Promes untuk mapel ini belum ada. Buat baru dengan AI?')) {
-                    ganjilBody.innerHTML = '<tr><td colspan="33" class="p-4 text-center text-gray-400 italic">Dibatalkan.</td></tr>';
-                    return;
-                }
-                await generateNewPromes(widget, subject, grade, widget.querySelector(`#promesPrompt-${widgetId}`).value.trim());
+                // Jika data tidak ditemukan, biarkan tabel kosong agar user bisa paste dari AI
+                ganjilBody.innerHTML = '<tr><td colspan="33" class="p-4 text-center text-gray-400 italic">Belum ada data. Silakan gunakan fitur AI di atas untuk membuat baru.</td></tr>';
 
             } finally {
-                button.disabled = false;
-                button.innerHTML = originalHTML;
-                lucide.createIcons();
-            }
-        }
-
-        async function generateNewPromes(widget, subject, grade, customPrompt) {
-            const widgetId = widget.dataset.widgetId;
-            const ganjilBody = widget.querySelector(`#promesGanjilBody-${widgetId}`);
-            const genapBody = widget.querySelector(`#promesGenapBody-${widgetId}`);
-            ganjilBody.innerHTML = '<tr><td colspan="33" class="p-4 text-center text-gray-400">AI sedang bekerja...</td></tr>';
-            genapBody.innerHTML = '';
-
-            try {
-                const res = await fetch('sadigs_api_v3/generate_promes_api.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ subject, grade, custom_prompt: customPrompt })
-                });
-
-                const result = await res.json();
-                if (!result.success) {
-                    throw new Error(result.message);
-                }
-                
-                // SECARA OTOMATIS MENGISI KOLOM CP DARI HASIL GENERATE AI
-                widget.querySelector(`#promesCP-${widgetId}`).value = result.data.cp_text || '';
-
-                const ganjilData = result.data.ganjil.map(item => ({ topic: item.topic, tp_text: item.tp, allocation_jp: '', checked_weeks: [] }));
-                const genapData = result.data.genap.map(item => ({ topic: item.topic, tp_text: item.tp, allocation_jp: '', checked_weeks: [] }));
-
-                populatePromesTable(widgetId, 'ganjil', ganjilData);
-                populatePromesTable(widgetId, 'genap', genapData);
-                widget.querySelector(`#savePromesBtn-${widgetId}`).classList.remove('hidden');
-                widget.querySelector(`#submitPromesBtn-${widgetId}`).classList.remove('hidden');
-                widget.querySelector(`#tablesContainer-${widgetId}`).classList.remove('hidden');
-                widget.querySelector('.widget-title').textContent = `Perangkat Ajar ${widgetId}: ${subject} - Kelas ${grade}`;
-
-            } catch (err) {
-                alert('Gagal generate Promes: ' + err.message);
-                ganjilBody.innerHTML = '<tr><td colspan="33" class="p-4 text-center text-red-500">Gagal.</td></tr>';
             }
         }
         
