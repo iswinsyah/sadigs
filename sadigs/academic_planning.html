@@ -1290,12 +1290,20 @@
             const fase = widget.querySelector(`#promesFase-${widgetId}`).value.trim();
             const grade = widget.querySelector(`#promesGrade-${widgetId}`).value.trim();
 
-            // This function is now only for loading existing data or showing empty tables for new data.
+            // Guard Clause: Jangan lanjutkan jika data penting (Mapel/Fase/Kelas) belum ada.
+            if (!subject || !fase || !grade) {
+                return;
+            }
+
+            // JURUS PAMUNGKAS V2: Panggil pemuatan album di sini, SEBELUM mencoba memuat ATP.
+            loadArtifacts(widgetId, 'modul');
+            loadArtifacts(widgetId, 'lkpd');
+            loadArtifacts(widgetId, 'soal');
 
             const tablesContainer = widget.querySelector(`#tablesContainer-${widgetId}`);
             const ganjilBody = widget.querySelector(`#promesGanjilBody-${widgetId}`);
             const genapBody = widget.querySelector(`#promesGenapBody-${widgetId}`);
-            ganjilBody.innerHTML = '<tr><td colspan="33" class="p-4 text-center text-gray-400">Mencari data...</td></tr>';
+            ganjilBody.innerHTML = '<tr><td colspan="33" class="p-4 text-center text-gray-400">Mencari data ATP...</td></tr>';
             genapBody.innerHTML = '';
 
             try {
@@ -1317,11 +1325,6 @@
                         widget.querySelector('.widget-title').innerHTML = `Perangkat Ajar ${widgetId} <span class="text-xs bg-teal-100 text-teal-800 px-2 py-0.5 rounded-full ml-2">v3.1</span>: ${subject} - Kelas ${grade}`;
                         
                         updateWidgetUI(widget, status);
-
-                        // JURUS PAMUNGKAS: Panggil pemuatan album setelah data ATP berhasil dimuat
-                        loadArtifacts(widgetId, 'modul');
-                        loadArtifacts(widgetId, 'lkpd');
-                        loadArtifacts(widgetId, 'soal');
                         return;
                     }
                 }

@@ -32,25 +32,36 @@ try {
         exit;
     }
 
-    // 2. Ambil jumlah Buku Kerja (Promes) yang sudah 'submitted'
-    $sql_promes = "SELECT user_id, COUNT(*) as promes_count FROM saved_promes WHERE status = 'submitted' GROUP BY user_id";
-    $stmt_promes = $pdo->query($sql_promes);
-    $promes_counts = $stmt_promes->fetchAll(PDO::FETCH_KEY_PAIR);
+    // 2. Ambil jumlah artefak (Modul, LKPD, Soal) untuk semua user dalam satu query
+    $artifact_counts = [];
+    try {
+        $sql_artifacts = "SELECT 
+                            user_id, 
+                            SUM(CASE WHEN type = 'modul' THEN 1 ELSE 0 END) as modul_count,
+                            SUM(CASE WHEN type = 'lkpd' THEN 1 ELSE 0 END) as lkpd_count,
+                            SUM(CASE WHEN type = 'soal' THEN 1 ELSE 0 END) as soal_count
+                          FROM teaching_artifacts
+                          GROUP BY user_id";
+        $stmt_artifacts = $pdo->query($sql_artifacts);
+        while ($row = $stmt_artifacts->fetch(PDO::FETCH_ASSOC)) {
+            $artifact_counts[$row['user_id']] = $row;
+        }
+    } catch (Exception $e) {
+        // Jaring pengaman jika tabel 'teaching_artifacts' belum ada. Biarkan $artifact_counts kosong.
+    }
 
-    // 3. Ambil jumlah Modul Ajar (RPP) yang sudah dibuat
-    $sql_rpp = "SELECT user_id, COUNT(*) as rpp_count FROM rpp_album GROUP BY user_id";
-    $stmt_rpp = $pdo->query($sql_rpp);
-    $rpp_counts = $stmt_rpp->fetchAll(PDO::FETCH_KEY_PAIR);
-
-    // 4. Gabungkan data
+    // 3. Gabungkan data
     foreach ($teachers as &$teacher) {
-        $teacher['promes_count'] = $promes_counts[$teacher['user_id']] ?? 0;
-        $teacher['rpp_count'] = $rpp_counts[$teacher['user_id']] ?? 0;
+        $user_id = $teacher['user_id'];
+        $teacher['modul_count'] = $artifact_counts[$user_id]['modul_count'] ?? 0;
+        $teacher['lkpd_count'] = $artifact_counts[$user_id]['lkpd_count'] ?? 0;
+        $teacher['soal_count'] = $artifact_counts[$user_id]['soal_count'] ?? 0;
     }
 
     sendJSONResponse(['success' => true, 'data' => $teachers]);
 
 } catch (Exception $e) {
-    sendJSONResponse(['success' => false, 'message' => $e->getMessage()], 500);
+    // Tangani error utama (misal: gagal konek DB atau query 'users' gagal)
+    sendJSONResponse(['success' => false, 'message' => 'Error Server: ' . $e->getMessage()], 500);
 }
 ?>
