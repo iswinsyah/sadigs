@@ -1317,6 +1317,11 @@
                         widget.querySelector('.widget-title').innerHTML = `Perangkat Ajar ${widgetId} <span class="text-xs bg-teal-100 text-teal-800 px-2 py-0.5 rounded-full ml-2">v3.1</span>: ${subject} - Kelas ${grade}`;
                         
                         updateWidgetUI(widget, status);
+
+                        // JURUS PAMUNGKAS: Panggil pemuatan album setelah data ATP berhasil dimuat
+                        loadArtifacts(widgetId, 'modul');
+                        loadArtifacts(widgetId, 'lkpd');
+                        loadArtifacts(widgetId, 'soal');
                         return;
                     }
                 }
