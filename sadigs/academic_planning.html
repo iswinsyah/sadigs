@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buku Kerja Ustadz | SADIGS</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Buku Kerja Ustadz | SADIGS v3.1</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
@@ -169,6 +172,8 @@
     </div>
 
     <script>
+        // Cache Buster v1.1
+        console.log("SADIGS Academic Planning v3.1 Loaded");
         lucide.createIcons();
         let initialEffectiveWeeks = { ganjil: 0, genap: 0 };
 
@@ -186,34 +191,45 @@
         // Session Check & Sidebar Init
         async function initSidebar() {
             try {
+                // 1. Cek Sesi
                 const sessionRes = await fetch('sadigs_api_v3/session_check.php');
                 const sessionData = await sessionRes.json();
                 if (!sessionData.success) { window.location.href = 'index.html'; return; }
 
+                // 2. Update Info User di Sidebar
                 document.getElementById('sidebarUsername').textContent = sessionData.username;
                 document.getElementById('userInitial').textContent = sessionData.username.charAt(0).toUpperCase();
                 const rawRoles = sessionData.raw_roles || [];
                 document.getElementById('sidebarRole').textContent = rawRoles.length > 0 ? rawRoles.map(r => r.role_name).join(', ') : 'User';
 
-                // --- LOGIKA MENU DINAMIS (DATABASE) ---
+                // 3. Ambil dan Terapkan Hak Akses Menu
                 const permRes = await fetch('sadigs_api_v3/get_menu_permissions.php');
                 const permData = await permRes.json();
                 if (permData.success) {
                     const allowedMenus = permData.permissions || [];
-                    // 1. Tampilkan menu yang diizinkan
+                    
+                    // Tampilkan menu yang diizinkan
                     allowedMenus.forEach(id => {
                         const el = document.getElementById(id);
                         if (el) el.classList.remove('hidden');
                     });
                 
-                    // 2. Tampilkan grup menu jika memiliki item yang terlihat
-                    const menuGroups = ['groupKepegawaian', 'groupKhusus'];
+                    // Tampilkan grup menu jika ada item di dalamnya yang aktif
+                    const menuGroups = ['groupKepegawaian', 'groupKhusus']; // Tambahkan grup lain jika ada
                     menuGroups.forEach(groupId => {
                         const group = document.getElementById(groupId);
+                        // Cek apakah ada link 'a' di dalam grup ini yang TIDAK memiliki class 'hidden'
                         if (group && group.querySelector('a:not(.hidden)')) {
                             group.classList.remove('hidden');
                         }
                     });
+
+                    // Pastikan menu aktif saat ini disorot
+                    const currentMenu = document.getElementById('navPerencanaanAkademik');
+                    if(currentMenu) {
+                        currentMenu.classList.add('text-teal-700', 'bg-white', 'shadow-sm', 'font-semibold');
+                        currentMenu.classList.remove('text-gray-600', 'hover:bg-white', 'hover:text-teal-600', 'font-medium');
+                    }
                 }
             } catch (e) { console.error(e); }
         }
@@ -303,7 +319,7 @@
                     widget.querySelector(`#promesGrade-${i}`).value = state.grade;
                     
                     const title = widget.querySelector('.widget-title');
-                    title.textContent = `Perangkat Ajar ${i}: ${state.subject} - Kelas ${state.grade}`;
+                    title.innerHTML = `Perangkat Ajar ${i} <span class="text-xs bg-teal-100 text-teal-800 px-2 py-0.5 rounded-full ml-2">v3.1</span>: ${state.subject} - Kelas ${state.grade}`;
 
                     const showBtn = widget.querySelector('button[onclick^="loadOrGeneratePromes"]');
                     loadOrGeneratePromes(showBtn, false);
@@ -318,7 +334,7 @@
             return `
             <div id="widget-${widgetId}" class="promes-widget bg-white rounded-xl shadow-sm border border-gray-100" data-widget-id="${widgetId}">
                 <div class="widget-header p-4 border-b flex justify-between items-center cursor-pointer bg-gray-50 rounded-t-xl" onclick="toggleWidget(this)">
-                    <h3 class="widget-title text-lg font-bold text-gray-800">Perangkat Ajar ${widgetId}: Baru</h3>
+                    <h3 class="widget-title text-lg font-bold text-gray-800">Perangkat Ajar ${widgetId} <span class="text-xs bg-teal-100 text-teal-800 px-2 py-0.5 rounded-full ml-2">v3.1</span>: Baru</h3>
                     <div class="flex items-center gap-2">
                         <button onclick="event.stopPropagation(); clearWidget(this)" class="p-1 text-gray-400 hover:text-red-500" title="Bersihkan Buku Kerja Ini">
                             <i data-lucide="trash-2" class="w-4 h-4"></i>
@@ -455,13 +471,13 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div class="md:col-span-2">
                                     <label class="block text-sm font-medium text-gray-600 mb-1">Pilih Topik / Tujuan Pembelajaran</label>
-                                    <select id="modulTopic-${widgetId}" class="w-full p-2 border border-gray-300 rounded-lg text-sm bg-white">
+                                    <select id="modulTopic-${widgetId}" onchange="updateModulPrompt(${widgetId})" class="w-full p-2 border border-gray-300 rounded-lg text-sm bg-white">
                                         <option value="">-- Silakan isi tabel ATP terlebih dahulu --</option>
                                     </select>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-600 mb-1">Model Pembelajaran</label>
-                                    <select id="modulModel-${widgetId}" class="w-full p-2 border border-gray-300 rounded-lg text-sm bg-white">
+                                    <select id="modulModel-${widgetId}" onchange="updateModulPrompt(${widgetId})" class="w-full p-2 border border-gray-300 rounded-lg text-sm bg-white">
                                         <option value="Problem Based Learning (PBL)">Problem Based Learning (PBL)</option>
                                         <option value="Project Based Learning (PjBL)">Project Based Learning (PjBL)</option>
                                         <option value="Discovery Learning">Discovery Learning</option>
@@ -471,18 +487,28 @@
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-600 mb-1">Alokasi Waktu</label>
-                                    <input type="text" id="modulTime-${widgetId}" value="2 JP (2 x 45 Menit)" class="w-full p-2 border border-gray-300 rounded-lg text-sm">
+                                    <input type="text" id="modulTime-${widgetId}" oninput="updateModulPrompt(${widgetId})" value="2 JP (2 x 45 Menit)" class="w-full p-2 border border-gray-300 rounded-lg text-sm">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-gray-600 mb-1">Instruksi Tambahan (Opsional)</label>
+                                    <textarea id="modulAdditional-${widgetId}" oninput="updateModulPrompt(${widgetId})" rows="2" class="w-full p-2 border border-gray-300 rounded-lg text-sm" placeholder="Contoh: Tekankan pada kegiatan praktikum..."></textarea>
                                 </div>
                             </div>
-                            
-                            <button onclick="generateModulAjar(${widgetId})" class="mt-4 w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition shadow-md flex justify-center items-center gap-2">
-                                <i data-lucide="sparkles" class="w-4 h-4"></i> Generate Modul Ajar dengan AI
-                            </button>
                         </div>
 
-                        <div id="modulResultArea-${widgetId}" class="hidden">
-                            <label class="block text-sm font-medium text-gray-600 mb-1">Hasil Modul Ajar</label>
-                            <textarea id="modulContent-${widgetId}" rows="15" class="w-full p-4 border border-gray-300 rounded-lg text-sm font-mono bg-gray-50 focus:bg-white transition"></textarea>
+                        <div class="space-y-2">
+                            <label class="block text-sm font-medium text-gray-600">Langkah 1: Copy Instruksi ini</label>
+                            <textarea id="modulPromptText-${widgetId}" rows="4" class="w-full p-2 border border-indigo-200 rounded-lg text-xs bg-indigo-50 font-mono" placeholder="Pilih topik di atas untuk membuat prompt otomatis..."></textarea>
+                            <div class="flex flex-wrap gap-2">
+                                <button onclick="copyToClipboard('modulPromptText-${widgetId}')" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1.5 rounded text-sm font-medium flex items-center gap-1"><i data-lucide="copy" class="w-4 h-4"></i> Copy</button>
+                                <a href="https://chat.openai.com/" target="_blank" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded text-sm font-medium flex items-center gap-1"><i data-lucide="external-link" class="w-4 h-4"></i> ChatGPT</a>
+                                <a href="https://gemini.google.com/" target="_blank" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-sm font-medium flex items-center gap-1"><i data-lucide="external-link" class="w-4 h-4"></i> Gemini</a>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Langkah 2: Paste Hasil Modul Ajar Di Sini</label>
+                            <textarea id="modulContent-${widgetId}" rows="15" class="w-full p-4 border border-gray-300 rounded-lg text-sm font-mono bg-gray-50 focus:bg-white transition" placeholder="Paste hasil dari AI di sini..."></textarea>
                         </div>
                     </div>
 
@@ -495,13 +521,13 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div class="md:col-span-2">
                                     <label class="block text-sm font-medium text-gray-600 mb-1">Pilih Topik / TP</label>
-                                    <select id="lkpdTopic-${widgetId}" class="w-full p-2 border border-gray-300 rounded-lg text-sm bg-white">
+                                    <select id="lkpdTopic-${widgetId}" onchange="updateLKPDPrompt(${widgetId})" class="w-full p-2 border border-gray-300 rounded-lg text-sm bg-white">
                                         <option value="">-- Silakan isi tabel ATP terlebih dahulu --</option>
                                     </select>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-600 mb-1">Jenis Aktivitas</label>
-                                    <select id="lkpdActivity-${widgetId}" class="w-full p-2 border border-gray-300 rounded-lg text-sm bg-white">
+                                    <select id="lkpdActivity-${widgetId}" onchange="updateLKPDPrompt(${widgetId})" class="w-full p-2 border border-gray-300 rounded-lg text-sm bg-white">
                                         <option value="Diskusi Kelompok">Diskusi Kelompok</option>
                                         <option value="Eksperimen / Praktikum">Eksperimen / Praktikum</option>
                                         <option value="Studi Kasus">Studi Kasus</option>
@@ -510,15 +536,21 @@
                                     </select>
                                 </div>
                             </div>
-                            
-                            <button onclick="generateLKPD(${widgetId})" class="mt-4 w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-lg transition shadow-md flex justify-center items-center gap-2">
-                                <i data-lucide="zap" class="w-4 h-4"></i> Generate LKPD dengan AI
-                            </button>
                         </div>
 
-                        <div id="lkpdResultArea-${widgetId}" class="hidden">
-                            <label class="block text-sm font-medium text-gray-600 mb-1">Hasil LKPD</label>
-                            <textarea id="lkpdContent-${widgetId}" rows="15" class="w-full p-4 border border-gray-300 rounded-lg text-sm font-mono bg-gray-50 focus:bg-white transition"></textarea>
+                        <div class="space-y-2">
+                            <label class="block text-sm font-medium text-gray-600">Langkah 1: Copy Instruksi ini</label>
+                            <textarea id="lkpdPromptText-${widgetId}" rows="4" class="w-full p-2 border border-orange-200 rounded-lg text-xs bg-orange-50 font-mono" placeholder="Pilih topik di atas untuk membuat prompt otomatis..."></textarea>
+                            <div class="flex flex-wrap gap-2">
+                                <button onclick="copyToClipboard('lkpdPromptText-${widgetId}')" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1.5 rounded text-sm font-medium flex items-center gap-1"><i data-lucide="copy" class="w-4 h-4"></i> Copy</button>
+                                <a href="https://chat.openai.com/" target="_blank" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded text-sm font-medium flex items-center gap-1"><i data-lucide="external-link" class="w-4 h-4"></i> ChatGPT</a>
+                                <a href="https://gemini.google.com/" target="_blank" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-sm font-medium flex items-center gap-1"><i data-lucide="external-link" class="w-4 h-4"></i> Gemini</a>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Langkah 2: Paste Hasil LKPD Di Sini</label>
+                            <textarea id="lkpdContent-${widgetId}" rows="15" class="w-full p-4 border border-gray-300 rounded-lg text-sm font-mono bg-gray-50 focus:bg-white transition" placeholder="Paste hasil dari AI di sini..."></textarea>
                         </div>
                     </div>
 
@@ -531,13 +563,13 @@
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div class="md:col-span-3">
                                     <label class="block text-sm font-medium text-gray-600 mb-1">Pilih Topik / TP</label>
-                                    <select id="soalTopic-${widgetId}" class="w-full p-2 border border-gray-300 rounded-lg text-sm bg-white">
+                                    <select id="soalTopic-${widgetId}" onchange="updateSoalPrompt(${widgetId})" class="w-full p-2 border border-gray-300 rounded-lg text-sm bg-white">
                                         <option value="">-- Silakan isi tabel ATP terlebih dahulu --</option>
                                     </select>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-600 mb-1">Jenis Soal</label>
-                                    <select id="soalType-${widgetId}" class="w-full p-2 border border-gray-300 rounded-lg text-sm bg-white">
+                                    <select id="soalType-${widgetId}" onchange="updateSoalPrompt(${widgetId})" class="w-full p-2 border border-gray-300 rounded-lg text-sm bg-white">
                                         <option value="Pilihan Ganda">Pilihan Ganda (PG)</option>
                                         <option value="Essay / Uraian">Essay / Uraian</option>
                                         <option value="Campuran (PG & Essay)">Campuran (PG & Essay)</option>
@@ -545,24 +577,29 @@
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-600 mb-1">Jumlah Soal</label>
-                                    <select id="soalCount-${widgetId}" class="w-full p-2 border border-gray-300 rounded-lg text-sm bg-white">
+                                    <select id="soalCount-${widgetId}" onchange="updateSoalPrompt(${widgetId})" class="w-full p-2 border border-gray-300 rounded-lg text-sm bg-white">
                                         <option value="5">5 Butir</option>
                                         <option value="10">10 Butir</option>
                                         <option value="15">15 Butir</option>
                                         <option value="20">20 Butir</option>
                                     </select>
                                 </div>
-                                <div class="flex items-end">
-                                    <button onclick="generateSoal(${widgetId})" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg transition shadow-md flex justify-center items-center gap-2 h-[38px]">
-                                        <i data-lucide="wand-2" class="w-4 h-4"></i> Generate Soal
-                                    </button>
-                                </div>
                             </div>
                         </div>
 
-                        <div id="soalResultArea-${widgetId}" class="hidden">
-                            <label class="block text-sm font-medium text-gray-600 mb-1">Hasil Asesmen</label>
-                            <textarea id="soalContent-${widgetId}" rows="15" class="w-full p-4 border border-gray-300 rounded-lg text-sm font-mono bg-gray-50 focus:bg-white transition"></textarea>
+                        <div class="space-y-2">
+                            <label class="block text-sm font-medium text-gray-600">Langkah 1: Copy Instruksi ini</label>
+                            <textarea id="soalPromptText-${widgetId}" rows="4" class="w-full p-2 border border-purple-200 rounded-lg text-xs bg-purple-50 font-mono" placeholder="Pilih topik di atas untuk membuat prompt otomatis..."></textarea>
+                            <div class="flex flex-wrap gap-2">
+                                <button onclick="copyToClipboard('soalPromptText-${widgetId}')" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1.5 rounded text-sm font-medium flex items-center gap-1"><i data-lucide="copy" class="w-4 h-4"></i> Copy</button>
+                                <a href="https://chat.openai.com/" target="_blank" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded text-sm font-medium flex items-center gap-1"><i data-lucide="external-link" class="w-4 h-4"></i> ChatGPT</a>
+                                <a href="https://gemini.google.com/" target="_blank" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-sm font-medium flex items-center gap-1"><i data-lucide="external-link" class="w-4 h-4"></i> Gemini</a>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Langkah 2: Paste Hasil Soal Di Sini</label>
+                            <textarea id="soalContent-${widgetId}" rows="15" class="w-full p-4 border border-gray-300 rounded-lg text-sm font-mono bg-gray-50 focus:bg-white transition" placeholder="Paste hasil dari AI di sini..."></textarea>
                         </div>
                     </div>
                 </div>
@@ -696,7 +733,7 @@
             }
         }
 
-        async function generateModulAjar(widgetId) {
+        function updateModulPrompt(widgetId) {
             const widget = document.getElementById(`widget-${widgetId}`);
             const subject = widget.querySelector(`#promesSubject-${widgetId}`).value;
             const grade = widget.querySelector(`#promesGrade-${widgetId}`).value;
@@ -704,52 +741,36 @@
             const topicDataStr = widget.querySelector(`#modulTopic-${widgetId}`).value;
             const model = widget.querySelector(`#modulModel-${widgetId}`).value;
             const time = widget.querySelector(`#modulTime-${widgetId}`).value;
+            const additional = widget.querySelector(`#modulAdditional-${widgetId}`).value;
 
-            if (!topicDataStr) {
-                alert('Pilih Topik/TP terlebih dahulu.');
-                return;
+            let topic = "";
+            let tp = "";
+
+            if (topicDataStr) {
+                try {
+                    const topicData = JSON.parse(topicDataStr);
+                    topic = topicData.topic;
+                    tp = topicData.tp;
+                } catch(e) {}
             }
-            const topicData = JSON.parse(topicDataStr);
 
-            const btn = widget.querySelector(`button[onclick="generateModulAjar(${widgetId})"]`);
-            const originalText = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Sedang Membuat Modul...';
-            lucide.createIcons();
+            const prompt = `Buatkan Modul Ajar Lengkap (RPP Plus) untuk mata pelajaran '${subject}' Kelas ${grade} (Fase ${fase}). \n` +
+                          `Topik: ${topic} \n` +
+                          `Tujuan Pembelajaran (TP): ${tp} \n` +
+                          `Model Pembelajaran: ${model} \n` +
+                          `Alokasi Waktu: ${time} \n\n` +
+                          `Struktur Modul Ajar harus mencakup:\n` +
+                          `1. Informasi Umum (Identitas, Kompetensi Awal, Profil Pelajar Pancasila, Sarana Prasarana, Target Peserta Didik)\n` +
+                          `2. Komponen Inti (Tujuan Pembelajaran, Pemahaman Bermakna, Pertanyaan Pemantik, Kegiatan Pembelajaran Pendahuluan-Inti-Penutup)\n` +
+                          `3. Asesmen (Formatif & Sumatif)\n` +
+                          `4. Lampiran (LKPD singkat, Bahan Bacaan, Glosarium, Daftar Pustaka)\n\n` +
+                          `Gunakan bahasa Indonesia yang formal dan operasional.` +
+                          (additional ? `\n\nInstruksi Tambahan: ${additional}` : ``);
 
-            try {
-                const res = await fetch('sadigs_api_v3/generate_modul_api.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        subject, grade, fase,
-                        topic: topicData.topic,
-                        tp: topicData.tp,
-                        model, time
-                    })
-                });
-                const result = await res.json();
-                
-                if (result.success) {
-                    const resultArea = widget.querySelector(`#modulResultArea-${widgetId}`);
-                    const contentArea = widget.querySelector(`#modulContent-${widgetId}`);
-                    resultArea.classList.remove('hidden');
-                    contentArea.value = result.data;
-                    // Scroll to result
-                    resultArea.scrollIntoView({ behavior: 'smooth' });
-                } else {
-                    alert('Gagal: ' + result.message);
-                }
-            } catch (e) {
-                alert('Error: ' + e.message);
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = originalText;
-                lucide.createIcons();
-            }
+            widget.querySelector(`#modulPromptText-${widgetId}`).value = prompt;
         }
 
-        async function generateLKPD(widgetId) {
+        function updateLKPDPrompt(widgetId) {
             const widget = document.getElementById(`widget-${widgetId}`);
             const subject = widget.querySelector(`#promesSubject-${widgetId}`).value;
             const grade = widget.querySelector(`#promesGrade-${widgetId}`).value;
@@ -757,50 +778,35 @@
             const topicDataStr = widget.querySelector(`#lkpdTopic-${widgetId}`).value;
             const activityType = widget.querySelector(`#lkpdActivity-${widgetId}`).value;
 
-            if (!topicDataStr) {
-                alert('Pilih Topik/TP terlebih dahulu.');
-                return;
-            }
-            const topicData = JSON.parse(topicDataStr);
+            let topic = "";
+            let tp = "";
 
-            const btn = widget.querySelector(`button[onclick="generateLKPD(${widgetId})"]`);
-            const originalText = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Sedang Membuat LKPD...';
-            lucide.createIcons();
-
-            try {
-                const res = await fetch('sadigs_api_v3/generate_lkpd_api.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        subject, grade, fase,
-                        topic: topicData.topic,
-                        tp: topicData.tp,
-                        activity_type: activityType
-                    })
-                });
-                const result = await res.json();
-                
-                if (result.success) {
-                    const resultArea = widget.querySelector(`#lkpdResultArea-${widgetId}`);
-                    const contentArea = widget.querySelector(`#lkpdContent-${widgetId}`);
-                    resultArea.classList.remove('hidden');
-                    contentArea.value = result.data;
-                    resultArea.scrollIntoView({ behavior: 'smooth' });
-                } else {
-                    alert('Gagal: ' + result.message);
-                }
-            } catch (e) {
-                alert('Error: ' + e.message);
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = originalText;
-                lucide.createIcons();
+            if (topicDataStr) {
+                try {
+                    const topicData = JSON.parse(topicDataStr);
+                    topic = topicData.topic;
+                    tp = topicData.tp;
+                } catch(e) {}
             }
+
+            const prompt = `Buatkan Lembar Kerja Peserta Didik (LKPD) untuk mata pelajaran '${subject}' Kelas ${grade} (Fase ${fase}). \n` +
+                          `Topik: ${topic} \n` +
+                          `Tujuan Pembelajaran (TP): ${tp} \n` +
+                          `Jenis Aktivitas: ${activityType} \n\n` +
+                          `Struktur LKPD harus mencakup:\n` +
+                          `1. Identitas (Nama Kelompok, Kelas, Tanggal)\n` +
+                          `2. Judul Aktivitas\n` +
+                          `3. Tujuan Aktivitas\n` +
+                          `4. Alat dan Bahan (jika ada)\n` +
+                          `5. Langkah-Langkah Kegiatan (Instruksi jelas)\n` +
+                          `6. Pertanyaan Diskusi / Isian / Tugas\n` +
+                          `7. Kesimpulan\n\n` +
+                          `Gunakan bahasa yang mudah dipahami siswa.`;
+
+            widget.querySelector(`#lkpdPromptText-${widgetId}`).value = prompt;
         }
 
-        async function generateSoal(widgetId) {
+        function updateSoalPrompt(widgetId) {
             const widget = document.getElementById(`widget-${widgetId}`);
             const subject = widget.querySelector(`#promesSubject-${widgetId}`).value;
             const grade = widget.querySelector(`#promesGrade-${widgetId}`).value;
@@ -809,47 +815,36 @@
             const type = widget.querySelector(`#soalType-${widgetId}`).value;
             const count = widget.querySelector(`#soalCount-${widgetId}`).value;
 
-            if (!topicDataStr) {
-                alert('Pilih Topik/TP terlebih dahulu.');
-                return;
-            }
-            const topicData = JSON.parse(topicDataStr);
+            let topic = "";
+            let tp = "";
 
-            const btn = widget.querySelector(`button[onclick="generateSoal(${widgetId})"]`);
-            const originalText = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Sedang Membuat Soal...';
-            lucide.createIcons();
-
-            try {
-                const res = await fetch('sadigs_api_v3/generate_soal_api.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        subject, grade, fase,
-                        topic: topicData.topic,
-                        tp: topicData.tp,
-                        type, count
-                    })
-                });
-                const result = await res.json();
-                
-                if (result.success) {
-                    const resultArea = widget.querySelector(`#soalResultArea-${widgetId}`);
-                    const contentArea = widget.querySelector(`#soalContent-${widgetId}`);
-                    resultArea.classList.remove('hidden');
-                    contentArea.value = result.data;
-                    resultArea.scrollIntoView({ behavior: 'smooth' });
-                } else {
-                    alert('Gagal: ' + result.message);
-                }
-            } catch (e) {
-                alert('Error: ' + e.message);
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = originalText;
-                lucide.createIcons();
+            if (topicDataStr) {
+                try {
+                    const topicData = JSON.parse(topicDataStr);
+                    topic = topicData.topic;
+                    tp = topicData.tp;
+                } catch(e) {}
             }
+
+            const prompt = `Buatkan Soal Asesmen untuk mata pelajaran '${subject}' Kelas ${grade} (Fase ${fase}). \n` +
+                          `Topik: ${topic} \n` +
+                          `Tujuan Pembelajaran (TP): ${tp} \n` +
+                          `Jenis Soal: ${type} \n` +
+                          `Jumlah Soal: ${count} butir \n\n` +
+                          `Instruksi:\n` +
+                          `1. Sajikan soal dengan jelas dan operasional.\n` +
+                          `2. Jika Pilihan Ganda, sertakan 5 opsi (A,B,C,D,E) dan Kunci Jawaban di akhir.\n` +
+                          `3. Jika Essay, sertakan rubrik penilaian singkat atau kunci jawaban.\n` +
+                          `4. Soal harus mengukur pemahaman siswa terhadap TP di atas.\n\n` +
+                          `Format Output: Langsung daftar soal dan kunci jawaban.`;
+
+            widget.querySelector(`#soalPromptText-${widgetId}`).value = prompt;
+        }
+
+        function copyToClipboard(elementId) {
+            const el = document.getElementById(elementId);
+            el.select();
+            navigator.clipboard.writeText(el.value).then(() => alert('Teks berhasil disalin!'));
         }
 
         function updateAiPrompt(widgetId) {
@@ -899,9 +894,18 @@
 
             // Bersihkan markdown code block jika user mengcopy-nya
             rawText = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
+            // Perbaikan: Cari blok JSON secara cerdas, abaikan teks lain di luar blok.
+            const firstBrace = rawText.indexOf('{');
+            const lastBrace = rawText.lastIndexOf('}');
+
+            if (firstBrace === -1 || lastBrace === -1 || lastBrace < firstBrace) {
+                 alert("Gagal memproses data: Tidak ditemukan format JSON yang valid ({...}). Pastikan Anda mengcopy seluruh blok JSON dari AI.");
+                 return;
+            }
+            const jsonString = rawText.substring(firstBrace, lastBrace + 1);
 
             try {
-                const data = JSON.parse(rawText);
+                const data = JSON.parse(jsonString);
                 
                 // 1. Isi CP
                 if (data.cp_text) {
@@ -946,7 +950,7 @@
             widget.querySelector(`#promesGanjilBody-${widgetId}`).innerHTML = '';
             widget.querySelector(`#promesGenapBody-${widgetId}`).innerHTML = '';
             widget.querySelector(`#savePromesBtn-${widgetId}`).classList.add('hidden');
-            widget.querySelector('.widget-title').textContent = `Perangkat Ajar ${widgetId}: Baru`;
+            widget.querySelector('.widget-title').innerHTML = `Perangkat Ajar ${widgetId} <span class="text-xs bg-teal-100 text-teal-800 px-2 py-0.5 rounded-full ml-2">v3.1</span>: Baru`;
 
             // Clear storage
             localStorage.removeItem(`promesWidget-${widgetId}`);
@@ -1003,7 +1007,7 @@
                         populatePromesTable(widgetId, 'genap', promesData.genap || []);
                         tablesContainer.classList.remove('hidden');
                         localStorage.setItem(`promesWidget-${widgetId}`, JSON.stringify({ subject, fase, grade }));
-                        widget.querySelector('.widget-title').textContent = `Perangkat Ajar ${widgetId}: ${subject} - Kelas ${grade}`;
+                        widget.querySelector('.widget-title').innerHTML = `Perangkat Ajar ${widgetId} <span class="text-xs bg-teal-100 text-teal-800 px-2 py-0.5 rounded-full ml-2">v3.1</span>: ${subject} - Kelas ${grade}`;
                         
                         updateWidgetUI(widget, status);
                         return;
@@ -1185,7 +1189,7 @@
                 alert(result.message);
                 if (result.success) {
                     localStorage.setItem(`promesWidget-${widgetId}`, JSON.stringify({ subject, fase, grade }));
-                    widget.querySelector('.widget-title').textContent = `Perangkat Ajar ${widgetId}: ${subject} - Kelas ${grade}`;
+                    widget.querySelector('.widget-title').innerHTML = `Perangkat Ajar ${widgetId} <span class="text-xs bg-teal-100 text-teal-800 px-2 py-0.5 rounded-full ml-2">v3.1</span>: ${subject} - Kelas ${grade}`;
                     updateWidgetUI(widget, action === 'submit' ? 'submitted' : 'draft');
                 }
             } catch (err) {
