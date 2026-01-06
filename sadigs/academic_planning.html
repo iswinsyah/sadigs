@@ -8,6 +8,8 @@
     <meta http-equiv="Expires" content="0">
     <title>Buku Kerja Ustadz | SADIGS v3.1</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Library untuk Generate PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
@@ -511,9 +513,12 @@
                             <textarea id="modulContent-${widgetId}" rows="15" class="w-full p-4 border border-gray-300 rounded-lg text-sm font-mono bg-gray-50 focus:bg-white transition" placeholder="Paste hasil dari AI di sini..."></textarea>
                         </div>
 
-                        <div class="flex justify-end pt-2">
+                        <div class="flex justify-end pt-2 gap-3">
+                            <button onclick="downloadAsPDF(${widgetId}, 'modul')" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-md flex items-center gap-2">
+                                <i data-lucide="download-cloud" class="w-4 h-4"></i> Download PDF
+                            </button>
                             <button onclick="saveArtifact(${widgetId}, 'modul')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-md flex items-center gap-2">
-                                <i data-lucide="save" class="w-4 h-4"></i> Simpan ke Album Modul
+                                <i data-lucide="save" class="w-4 h-4"></i> Simpan ke Album
                             </button>
                         </div>
 
@@ -564,9 +569,12 @@
                             <textarea id="lkpdContent-${widgetId}" rows="15" class="w-full p-4 border border-gray-300 rounded-lg text-sm font-mono bg-gray-50 focus:bg-white transition" placeholder="Paste hasil dari AI di sini..."></textarea>
                         </div>
 
-                        <div class="flex justify-end pt-2">
+                        <div class="flex justify-end pt-2 gap-3">
+                            <button onclick="downloadAsPDF(${widgetId}, 'lkpd')" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-md flex items-center gap-2">
+                                <i data-lucide="download-cloud" class="w-4 h-4"></i> Download PDF
+                            </button>
                             <button onclick="saveArtifact(${widgetId}, 'lkpd')" class="bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-md flex items-center gap-2">
-                                <i data-lucide="save" class="w-4 h-4"></i> Simpan ke Album LKPD
+                                <i data-lucide="save" class="w-4 h-4"></i> Simpan ke Album
                             </button>
                         </div>
 
@@ -624,9 +632,12 @@
                             <textarea id="soalContent-${widgetId}" rows="15" class="w-full p-4 border border-gray-300 rounded-lg text-sm font-mono bg-gray-50 focus:bg-white transition" placeholder="Paste hasil dari AI di sini..."></textarea>
                         </div>
 
-                        <div class="flex justify-end pt-2">
+                        <div class="flex justify-end pt-2 gap-3">
+                            <button onclick="downloadAsPDF(${widgetId}, 'soal')" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-md flex items-center gap-2">
+                                <i data-lucide="download-cloud" class="w-4 h-4"></i> Download PDF
+                            </button>
                             <button onclick="saveArtifact(${widgetId}, 'soal')" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-md flex items-center gap-2">
-                                <i data-lucide="save" class="w-4 h-4"></i> Simpan ke Album Soal
+                                <i data-lucide="save" class="w-4 h-4"></i> Simpan ke Album
                             </button>
                         </div>
 
@@ -917,6 +928,37 @@
             navigator.clipboard.writeText(promptText.value).then(() => {
                 alert("Prompt berhasil disalin! Silakan paste di ChatGPT atau Gemini.");
             });
+        }
+
+        function downloadAsPDF(widgetId, type) {
+            const { jsPDF } = window.jspdf;
+            const widget = document.getElementById(`widget-${widgetId}`);
+            const content = widget.querySelector(`#${type}Content-${widgetId}`).value;
+            const subject = widget.querySelector(`#promesSubject-${widgetId}`).value;
+            const grade = widget.querySelector(`#promesGrade-${widgetId}`).value;
+
+            if (!content.trim()) {
+                alert('Tidak ada konten untuk di-download. Silakan buat atau muat konten terlebih dahulu.');
+                return;
+            }
+
+            const doc = new jsPDF({
+                orientation: 'p',
+                unit: 'mm',
+                format: 'a4'
+            });
+            
+            const title = `${type.toUpperCase()} - ${subject} Kelas ${grade}`;
+            doc.setFontSize(16);
+            doc.text(title, 14, 22);
+
+            doc.setFontSize(10);
+            // Split text into lines that fit the page width (A4 width is 210mm, minus margins)
+            const textLines = doc.splitTextToSize(content, 180); 
+            doc.text(textLines, 14, 32);
+
+            const filename = `${type}_${subject.replace(/ /g, '_')}_${grade}.pdf`;
+            doc.save(filename);
         }
 
         // --- LOGIKA ALBUM / PENYIMPANAN ARTIFAK ---
