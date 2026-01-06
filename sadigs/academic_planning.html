@@ -1022,18 +1022,29 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ id: artifactId, subject, grade, fase, type, topic, tp, content, action })
                 });
-                const result = await res.json();
-                alert(result.message);
-                if (result.success) {
-                    // Jika ini adalah penyimpanan baru, API akan mengembalikan ID baru
-                    if (result.new_id) {
-                        widget.querySelector(`#${type}ArtifactId-${widgetId}`).value = result.new_id;
-                    }
-                    loadArtifacts(widgetId, type); // Refresh list
-                    updateArtifactUI(widgetId, type, action === 'submit' ? 'submitted' : 'draft');
+                
+                const responseText = await res.text();
+                let result;
+                try {
+                    result = JSON.parse(responseText);
+                } catch (jsonError) {
+                    console.error("Server Response (Not JSON):", responseText);
+                    throw new Error("Server memberikan respons yang tidak valid. Kemungkinan ada error di server PHP.");
                 }
+
+                if (!result.success) {
+                    throw new Error(result.message || 'Operasi gagal di server.');
+                }
+
+                alert(result.message);
+                if (result.new_id) {
+                    widget.querySelector(`#${type}ArtifactId-${widgetId}`).value = result.new_id;
+                }
+                loadArtifacts(widgetId, type);
+                updateArtifactUI(widgetId, type, action === 'submit' ? 'submitted' : 'draft');
             } catch (e) {
                 alert("Gagal menyimpan: " + e.message);
+                console.error("Save Artifact Error:", e);
             }
         }
 
@@ -1106,21 +1117,47 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ id: artifactId, action: 'unlock' })
                 });
-                const result = await res.json();
-                alert(result.message);
-                if (result.success) {
-                    updateArtifactUI(widgetId, type, 'draft');
-                    loadArtifacts(widgetId, type); // Refresh list to show updated status
+                
+                const responseText = await res.text();
+                let result;
+                try {
+                    result = JSON.parse(responseText);
+                } catch (jsonError) {
+                    console.error("Server Response (Not JSON):", responseText);
+                    throw new Error("Server memberikan respons yang tidak valid. Kemungkinan ada error di server PHP.");
                 }
+
+                if (!result.success) {
+                    throw new Error(result.message || 'Operasi gagal di server.');
+                }
+
+                alert(result.message);
+                updateArtifactUI(widgetId, type, 'draft');
+                loadArtifacts(widgetId, type); // Refresh list to show updated status
+                
             } catch (err) {
                 alert('Gagal membuka kunci: ' + err.message);
+                console.error("Unlock Artifact Error:", err);
             }
         }
 
         async function deleteArtifact(widgetId, type, id) {
-            if(!confirm("Hapus item ini dari album?")) return;
+            if(!confirm("Hapus item ini dari album? Tindakan ini tidak dapat dibatalkan.")) return;
             try {
-                await fetch('sadigs_api_v3/delete_artifact_api.php', { method: 'POST', body: JSON.stringify({id}) });
+                const res = await fetch('sadigs_api_v3/delete_artifact_api.php', { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({id}) 
+                });
+                
+                const responseText = await res.text();
+                const result = JSON.parse(responseText);
+
+                if (!result.success) {
+                    throw new Error(result.message || 'Operasi gagal di server.');
+                }
+
+                alert(result.message || 'Item berhasil dihapus.');
                 loadArtifacts(widgetId, type);
 
                 // Jika item yang dihapus sedang dimuat di form, bersihkan form
@@ -1130,7 +1167,10 @@
                     document.getElementById(`${type}ArtifactId-${widgetId}`).value = '';
                     updateArtifactUI(widgetId, type, 'draft'); // Reset UI ke state awal
                 }
-            } catch(e) { alert("Gagal menghapus."); }
+            } catch(e) { 
+                alert("Gagal menghapus: " + e.message); 
+                console.error("Delete Artifact Error:", e);
+            }
         }
 
         function processAiResponse(widgetId) {
@@ -1212,12 +1252,21 @@
             // Clear from server if subject and grade exist
             if (subject && grade) {
                 try {
-                    await fetch('sadigs_api_v3/saved_promes_api.php', {
+                    const res = await fetch('sadigs_api_v3/saved_promes_api.php', {
                         method: 'DELETE',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ subject, grade, fase: widget.querySelector(`#promesFase-${widgetId}`).value.trim() })
                     });
-                } catch (e) { console.error("Gagal menghapus data di server:", e); }
+                    const responseText = await res.text();
+                    const result = JSON.parse(responseText); // Assume it returns JSON on success/fail
+                    if (!result.success) {
+                        console.error("Gagal menghapus data di server:", result.message);
+                    } else {
+                        console.log("Data ATP di server berhasil dihapus.");
+                    }
+                } catch (e) { 
+                    console.error("Gagal menghapus data di server (request failed):", e); 
+                }
             }
         }
 
@@ -1439,15 +1488,27 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(dataToSave)
                 });
-                const result = await res.json();
-                alert(result.message);
-                if (result.success) {
-                    localStorage.setItem(`promesWidget-${widgetId}`, JSON.stringify({ subject, fase, grade }));
-                    widget.querySelector('.widget-title').innerHTML = `Perangkat Ajar ${widgetId} <span class="text-xs bg-teal-100 text-teal-800 px-2 py-0.5 rounded-full ml-2">v3.1</span>: ${subject} - Kelas ${grade}`;
-                    updateWidgetUI(widget, action === 'submit' ? 'submitted' : 'draft');
+                
+                const responseText = await res.text();
+                let result;
+                try {
+                    result = JSON.parse(responseText);
+                } catch (jsonError) {
+                    console.error("Server Response (Not JSON):", responseText);
+                    throw new Error("Server memberikan respons yang tidak valid. Kemungkinan ada error di server PHP.");
                 }
+
+                if (!result.success) {
+                    throw new Error(result.message || 'Operasi gagal di server.');
+                }
+
+                alert(result.message);
+                localStorage.setItem(`promesWidget-${widgetId}`, JSON.stringify({ subject, fase, grade }));
+                widget.querySelector('.widget-title').innerHTML = `Perangkat Ajar ${widgetId} <span class="text-xs bg-teal-100 text-teal-800 px-2 py-0.5 rounded-full ml-2">v3.1</span>: ${subject} - Kelas ${grade}`;
+                updateWidgetUI(widget, action === 'submit' ? 'submitted' : 'draft');
             } catch (err) {
-                alert('Gagal menyimpan: ' + err.message);
+                alert('Gagal menyimpan ATP: ' + err.message);
+                console.error("Save Promes Error:", err);
             } finally {
                 saveBtn.disabled = false; submitBtn.disabled = false;
                 saveBtn.innerHTML = originalSaveHTML;
@@ -1457,7 +1518,7 @@
         }
 
         async function unlockPromes(button) {
-            if (!confirm('Membuka kunci akan mengizinkan Anda mengedit kembali Buku Kerja ini. Lanjutkan?')) return;
+            if (!confirm('Membuka kunci akan mengizinkan Anda mengedit kembali ATP ini. Lanjutkan?')) return;
 
             const widget = button.closest('.promes-widget');
             const widgetId = widget.dataset.widgetId;
@@ -1471,13 +1532,25 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ subject, fase, grade, action: 'unlock' })
                 });
-                const result = await res.json();
-                alert(result.message);
-                if (result.success) {
-                    updateWidgetUI(widget, 'draft');
+                
+                const responseText = await res.text();
+                let result;
+                try {
+                    result = JSON.parse(responseText);
+                } catch (jsonError) {
+                    console.error("Server Response (Not JSON):", responseText);
+                    throw new Error("Server memberikan respons yang tidak valid. Kemungkinan ada error di server PHP.");
                 }
+
+                if (!result.success) {
+                    throw new Error(result.message || 'Operasi gagal di server.');
+                }
+
+                alert(result.message);
+                updateWidgetUI(widget, 'draft');
             } catch (err) {
                 alert('Gagal membuka kunci: ' + err.message);
+                console.error("Unlock Promes Error:", err);
             }
         }
 
