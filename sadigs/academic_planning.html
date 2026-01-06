@@ -510,6 +510,17 @@
                             <label class="block text-sm font-medium text-gray-600 mb-1">Langkah 2: Paste Hasil Modul Ajar Di Sini</label>
                             <textarea id="modulContent-${widgetId}" rows="15" class="w-full p-4 border border-gray-300 rounded-lg text-sm font-mono bg-gray-50 focus:bg-white transition" placeholder="Paste hasil dari AI di sini..."></textarea>
                         </div>
+
+                        <div class="flex justify-end pt-2">
+                            <button onclick="saveArtifact(${widgetId}, 'modul')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-md flex items-center gap-2">
+                                <i data-lucide="save" class="w-4 h-4"></i> Simpan ke Album Modul
+                            </button>
+                        </div>
+
+                        <div class="border-t pt-4 mt-6">
+                            <h4 class="font-bold text-gray-700 mb-3 flex items-center gap-2"><i data-lucide="library" class="w-4 h-4"></i> Album Modul Ajar (Tersimpan)</h4>
+                            <div id="albumList-modul-${widgetId}" class="space-y-2 text-sm text-gray-500 italic">Memuat data...</div>
+                        </div>
                     </div>
 
                     <!-- TAB CONTENT: LKPD -->
@@ -551,6 +562,17 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-600 mb-1">Langkah 2: Paste Hasil LKPD Di Sini</label>
                             <textarea id="lkpdContent-${widgetId}" rows="15" class="w-full p-4 border border-gray-300 rounded-lg text-sm font-mono bg-gray-50 focus:bg-white transition" placeholder="Paste hasil dari AI di sini..."></textarea>
+                        </div>
+
+                        <div class="flex justify-end pt-2">
+                            <button onclick="saveArtifact(${widgetId}, 'lkpd')" class="bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-md flex items-center gap-2">
+                                <i data-lucide="save" class="w-4 h-4"></i> Simpan ke Album LKPD
+                            </button>
+                        </div>
+
+                        <div class="border-t pt-4 mt-6">
+                            <h4 class="font-bold text-gray-700 mb-3 flex items-center gap-2"><i data-lucide="library" class="w-4 h-4"></i> Album LKPD (Tersimpan)</h4>
+                            <div id="albumList-lkpd-${widgetId}" class="space-y-2 text-sm text-gray-500 italic">Memuat data...</div>
                         </div>
                     </div>
 
@@ -601,6 +623,17 @@
                             <label class="block text-sm font-medium text-gray-600 mb-1">Langkah 2: Paste Hasil Soal Di Sini</label>
                             <textarea id="soalContent-${widgetId}" rows="15" class="w-full p-4 border border-gray-300 rounded-lg text-sm font-mono bg-gray-50 focus:bg-white transition" placeholder="Paste hasil dari AI di sini..."></textarea>
                         </div>
+
+                        <div class="flex justify-end pt-2">
+                            <button onclick="saveArtifact(${widgetId}, 'soal')" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-md flex items-center gap-2">
+                                <i data-lucide="save" class="w-4 h-4"></i> Simpan ke Album Soal
+                            </button>
+                        </div>
+
+                        <div class="border-t pt-4 mt-6">
+                            <h4 class="font-bold text-gray-700 mb-3 flex items-center gap-2"><i data-lucide="library" class="w-4 h-4"></i> Album Soal (Tersimpan)</h4>
+                            <div id="albumList-soal-${widgetId}" class="space-y-2 text-sm text-gray-500 italic">Memuat data...</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -635,14 +668,17 @@
             // Special logic for Modul tab
             if (tabName === 'modul') {
                 populateModulTopics(widgetId);
+                loadArtifacts(widgetId, 'modul');
             }
             // Special logic for LKPD tab
             if (tabName === 'lkpd') {
                 populateLKPDTopics(widgetId);
+                loadArtifacts(widgetId, 'lkpd');
             }
             // Special logic for Soal tab
             if (tabName === 'soal') {
                 populateSoalTopics(widgetId);
+                loadArtifacts(widgetId, 'soal');
             }
         }
 
@@ -881,6 +917,106 @@
             navigator.clipboard.writeText(promptText.value).then(() => {
                 alert("Prompt berhasil disalin! Silakan paste di ChatGPT atau Gemini.");
             });
+        }
+
+        // --- LOGIKA ALBUM / PENYIMPANAN ARTIFAK ---
+
+        async function saveArtifact(widgetId, type) {
+            const widget = document.getElementById(`widget-${widgetId}`);
+            const subject = widget.querySelector(`#promesSubject-${widgetId}`).value;
+            const grade = widget.querySelector(`#promesGrade-${widgetId}`).value;
+            const fase = widget.querySelector(`#promesFase-${widgetId}`).value;
+            const content = widget.querySelector(`#${type}Content-${widgetId}`).value;
+            
+            // Ambil Topik & TP dari dropdown
+            const topicSelect = widget.querySelector(`#${type}Topic-${widgetId}`);
+            let topic = "";
+            let tp = "";
+            if (topicSelect && topicSelect.value) {
+                try {
+                    const tData = JSON.parse(topicSelect.value);
+                    topic = tData.topic;
+                    tp = tData.tp;
+                } catch(e) {}
+            }
+
+            if (!content.trim()) {
+                alert("Konten masih kosong. Silakan paste hasil dari AI terlebih dahulu.");
+                return;
+            }
+            if (!subject || !grade) {
+                alert("Data Mata Pelajaran/Kelas belum lengkap.");
+                return;
+            }
+
+            if(!confirm(`Simpan ${type.toUpperCase()} ini ke Album?`)) return;
+
+            try {
+                const res = await fetch('sadigs_api_v3/save_artifact_api.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ subject, grade, fase, type, topic, tp, content })
+                });
+                const result = await res.json();
+                alert(result.message);
+                if (result.success) {
+                    loadArtifacts(widgetId, type); // Refresh list
+                }
+            } catch (e) {
+                alert("Gagal menyimpan: " + e.message);
+            }
+        }
+
+        async function loadArtifacts(widgetId, type) {
+            const widget = document.getElementById(`widget-${widgetId}`);
+            const subject = widget.querySelector(`#promesSubject-${widgetId}`).value;
+            const grade = widget.querySelector(`#promesGrade-${widgetId}`).value;
+            const listContainer = widget.querySelector(`#albumList-${type}-${widgetId}`);
+
+            if (!subject || !grade) {
+                listContainer.innerHTML = '<p class="text-gray-400">Silakan isi Mapel dan Kelas terlebih dahulu.</p>';
+                return;
+            }
+
+            try {
+                const res = await fetch(`sadigs_api_v3/get_artifacts_api.php?subject=${encodeURIComponent(subject)}&grade=${encodeURIComponent(grade)}&type=${type}`);
+                const result = await res.json();
+                
+                if (result.success && result.data.length > 0) {
+                    listContainer.innerHTML = result.data.map(item => `
+                        <div class="bg-white p-3 rounded border border-gray-200 shadow-sm flex justify-between items-start gap-2">
+                            <div class="overflow-hidden">
+                                <p class="font-bold text-gray-800 text-sm truncate">${item.topic || 'Tanpa Topik'}</p>
+                                <p class="text-xs text-gray-500">${new Date(item.created_at).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute:'2-digit'})}</p>
+                            </div>
+                            <div class="flex gap-1 flex-shrink-0">
+                                <button onclick="viewArtifact(${widgetId}, '${type}', this)" data-content="${encodeURIComponent(item.content)}" class="bg-blue-50 text-blue-600 hover:bg-blue-100 p-1.5 rounded text-xs font-bold" title="Lihat/Muat"><i data-lucide="eye" class="w-4 h-4"></i></button>
+                                <button onclick="deleteArtifact(${widgetId}, '${type}', ${item.id})" class="bg-red-50 text-red-600 hover:bg-red-100 p-1.5 rounded text-xs font-bold" title="Hapus"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            </div>
+                        </div>
+                    `).join('');
+                    lucide.createIcons();
+                } else {
+                    listContainer.innerHTML = '<p class="text-gray-400 italic">Belum ada item tersimpan di album ini.</p>';
+                }
+            } catch (e) {
+                console.error(e);
+                listContainer.innerHTML = '<p class="text-red-400">Gagal memuat album.</p>';
+            }
+        }
+
+        function viewArtifact(widgetId, type, btn) {
+            const content = decodeURIComponent(btn.dataset.content);
+            document.getElementById(`${type}Content-${widgetId}`).value = content;
+            alert("Konten berhasil dimuat ke area editor di atas.");
+        }
+
+        async function deleteArtifact(widgetId, type, id) {
+            if(!confirm("Hapus item ini dari album?")) return;
+            try {
+                await fetch('sadigs_api_v3/delete_artifact_api.php', { method: 'POST', body: JSON.stringify({id}) });
+                loadArtifacts(widgetId, type);
+            } catch(e) { alert("Gagal menghapus."); }
         }
 
         function processAiResponse(widgetId) {
