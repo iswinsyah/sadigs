@@ -39,7 +39,7 @@ function generateSoalWithGemini($subject, $grade, $fase, $topic, $tp, $type, $co
         throw new Exception("DEBUG: API Key terdeteksi, tapi TERLALU PENDEK dan tidak valid. Cek kembali hasil copy-paste Anda.");
     }
 
-    $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' . $apiKey;
+    $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-001:generateContent?key=' . $apiKey;
     
     $prompt = "Buatkan Soal Asesmen untuk mata pelajaran '$subject' Kelas $grade (Fase $fase). \n" .
               "Topik: $topic \n" .
