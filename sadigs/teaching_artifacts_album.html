@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Album Perangkat Ajar | SADIGS 3.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>body{font-family:'Inter',sans-serif;}</style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+
+    <div class="flex h-screen overflow-hidden">
+        <!-- SIDEBAR (Sama seperti halaman lain) -->
+        <aside id="sidebar" class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col hidden lg:flex">
+            <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-teal-600 text-white">
+                <h1 class="text-2xl font-extrabold tracking-wider">SADIGS</h1>
+            </div>
+            <div class="p-6">
+                <a href="dashboard.html" class="flex items-center gap-2 text-gray-600 hover:text-teal-600 transition">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i> Kembali ke Dashboard
+                </a>
+            </div>
+            <nav id="sidebarNav" class="flex-1 overflow-y-auto py-4 px-3 space-y-2">
+                <!-- Menu akan di-inject via JS jika perlu, atau statis -->
+            </nav>
+        </aside>
+
+        <!-- KONTEN UTAMA -->
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">Album Perangkat Ajar</h1>
+                        <p class="text-sm text-gray-500">Kumpulan Modul Ajar, LKPD, dan Asesmen yang telah Anda buat.</p>
+                    </div>
+                    <a href="academic_planning.html" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2 shadow-sm">
+                        <i data-lucide="plus-circle" class="w-4 h-4"></i> Buat Baru
+                    </a>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 text-sm">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left font-bold text-gray-600 uppercase tracking-wider">Tanggal</th>
+                                    <th class="px-6 py-3 text-left font-bold text-gray-600 uppercase tracking-wider">Jenis</th>
+                                    <th class="px-6 py-3 text-left font-bold text-gray-600 uppercase tracking-wider">Mapel & Kelas</th>
+                                    <th class="px-6 py-3 text-left font-bold text-gray-600 uppercase tracking-wider">Topik</th>
+                                    <th class="px-6 py-3 text-center font-bold text-gray-600 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-3 text-center font-bold text-gray-600 uppercase tracking-wider">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="albumTableBody" class="bg-white divide-y divide-gray-100">
+                                <tr>
+                                    <td colspan="6" class="px-6 py-10 text-center text-gray-400">
+                                        <i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-2"></i>
+                                        Memuat data album...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal View Content -->
+    <div id="viewModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+            <div class="p-4 border-b flex justify-between items-center bg-gray-50 rounded-t-xl">
+                <h3 class="font-bold text-lg text-gray-800">Detail Perangkat Ajar</h3>
+                <button onclick="closeModal()" class="text-gray-500 hover:text-red-500"><i data-lucide="x" class="w-6 h-6"></i></button>
+            </div>
+            <div class="p-6 overflow-y-auto flex-1 bg-gray-50">
+                <textarea id="modalContent" class="w-full h-full min-h-[400px] p-4 border border-gray-300 rounded-lg font-mono text-sm bg-white" readonly></textarea>
+            </div>
+            <div class="p-4 border-t bg-white rounded-b-xl flex justify-end gap-2">
+                <button onclick="closeModal()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-bold hover:bg-gray-300">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        async function initPage() {
+            const sessionRes = await fetch('sadigs_api_v3/session_check.php');
+            const sessionData = await sessionRes.json();
+            if (!sessionData.success) { window.location.href = 'index.html'; return; }
+            
+            loadAlbum();
+        }
+
+        async function loadAlbum() {
+            const tbody = document.getElementById('albumTableBody');
+            try {
+                const res = await fetch('sadigs_api_v3/get_all_artifacts_api.php');
+                const result = await res.json();
+
+                if (result.success && result.data.length > 0) {
+                    tbody.innerHTML = '';
+                    result.data.forEach(item => {
+                        const tr = document.createElement('tr');
+                        tr.className = 'hover:bg-gray-50 transition';
+                        
+                        let typeBadge = '';
+                        if(item.type === 'modul') typeBadge = '<span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-bold">Modul Ajar</span>';
+                        else if(item.type === 'lkpd') typeBadge = '<span class="bg-orange-100 text-orange-800 px-2 py-1 rounded text-xs font-bold">LKPD</span>';
+                        else if(item.type === 'soal') typeBadge = '<span class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs font-bold">Asesmen</span>';
+
+                        const statusBadge = item.status === 'submitted' 
+                            ? '<span class="text-green-600 font-bold text-xs flex items-center justify-center gap-1"><i data-lucide="check-circle" class="w-3 h-3"></i> Diajukan</span>' 
+                            : '<span class="text-yellow-600 font-bold text-xs flex items-center justify-center gap-1"><i data-lucide="edit-3" class="w-3 h-3"></i> Draft</span>';
+
+                        const dateStr = new Date(item.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+
+                        tr.innerHTML = `
+                            <td class="px-6 py-4 whitespace-nowrap text-gray-500">${dateStr}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">${typeBadge}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="font-bold text-gray-800">${item.subject}</div>
+                                <div class="text-xs text-gray-500">Kelas ${item.grade} (Fase ${item.fase})</div>
+                            </td>
+                            <td class="px-6 py-4 text-gray-600 max-w-xs truncate" title="${item.topic}">${item.topic || '-'}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center">${statusBadge}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                <button onclick="viewContent(this)" data-content="${encodeURIComponent(item.content)}" class="text-blue-600 hover:text-blue-800 font-bold text-xs mr-3">Lihat</button>
+                                <button onclick="deleteItem(${item.id})" class="text-red-600 hover:text-red-800 font-bold text-xs">Hapus</button>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                    lucide.createIcons();
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-10 text-center text-gray-500 italic">Belum ada perangkat ajar yang disimpan.</td></tr>';
+                }
+            } catch (e) {
+                tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-10 text-center text-red-500">Gagal memuat data.</td></tr>';
+                console.error(e);
+            }
+        }
+
+        function viewContent(btn) {
+            const content = decodeURIComponent(btn.dataset.content);
+            document.getElementById('modalContent').value = content;
+            document.getElementById('viewModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('viewModal').classList.add('hidden');
+        }
+
+        async function deleteItem(id) {
+            if(!confirm("Hapus item ini secara permanen?")) return;
+            try {
+                const res = await fetch('sadigs_api_v3/delete_artifact_api.php', { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({id}) 
+                });
+                const result = await res.json();
+                if(result.success) {
+                    alert("Berhasil dihapus.");
+                    loadAlbum();
+                } else {
+                    alert("Gagal menghapus: " + result.message);
+                }
+            } catch(e) {
+                alert("Error koneksi.");
+            }
+        }
+
+        initPage();
+    </script>
+</body>
+</html>
