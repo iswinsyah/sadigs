@@ -57,7 +57,8 @@ try {
         'navKetersediaanMengajar' => ['label' => 'Kesediaan Mengajar', 'roles' => ['Ustadz', 'Ustadzah', 'Kepala Sekolah', 'Musyrif', 'Musyrifah']],
         'navAturKurikulum' => ['label' => 'Atur Kurikulum', 'roles' => ['Kepala Sekolah', 'Ketua Yayasan', 'Sekretaris Sekolah']],
         'navJadwalPelajaran' => ['label' => 'Jadwal Pelajaran', 'roles' => ['Kepala Sekolah', 'Ketua Yayasan', 'Sekretaris Sekolah', 'Ustadz', 'Ustadzah', 'Musyrif', 'Musyrifah']],
-        'navPenilaianKinerja' => ['label' => 'Penilaian Kinerja', 'roles' => ['Kepala Sekolah', 'Ketua Yayasan']]
+        'navPenilaianKinerja' => ['label' => 'Penilaian Kinerja', 'roles' => ['Kepala Sekolah', 'Ketua Yayasan']],
+        'navUserCredentials' => ['label' => 'Data Akun Pengguna', 'roles' => ['Ketua Yayasan']]
     ];
 
     foreach ($new_menus_setup as $id => $conf) {
