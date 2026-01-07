@@ -34,6 +34,15 @@
 </head>
 <body class="bg-white text-gray-800 font-sans antialiased">
 
+    <!-- BANNER IMPERSONATE (Hanya muncul jika login sebagai user lain) -->
+    <div id="impersonateBanner" class="hidden bg-red-600 text-white px-4 py-3 shadow-md flex justify-between items-center sticky top-0 z-[60]">
+        <div class="flex items-center gap-2 font-bold text-sm">
+            <i data-lucide="eye" class="w-5 h-5"></i>
+            <span>MODE PENYAMARAN: Anda sedang login sebagai <span id="impersonatedName" class="underline">User</span></span>
+        </div>
+        <button onclick="stopImpersonate()" class="bg-white text-red-600 px-3 py-1 rounded text-xs font-bold hover:bg-gray-100 transition">Kembali ke Admin</button>
+    </div>
+
     <!-- HEADER MOBILE (Hanya muncul di layar kecil) -->
     <div class="lg:hidden flex items-center gap-4 bg-kedua text-white p-4 shadow-md sticky top-0 z-50">
         <button id="mobileMenuBtn" class="focus:outline-none p-1 rounded hover:bg-kedua/80 transition">
@@ -665,6 +674,26 @@
             } catch (err) {
                 alert("Gagal menghubungi server: " + err);
             }
+        }
+
+        // CEK STATUS IMPERSONATE
+        fetch('sadigs_api_v3/get_impersonation_status.php')
+            .then(res => res.json())
+            .then(data => {
+                if(data.is_impersonating) {
+                    document.getElementById('impersonateBanner').classList.remove('hidden');
+                    document.getElementById('impersonatedName').textContent = document.getElementById('sidebarUsername').textContent;
+                }
+            });
+
+        async function stopImpersonate() {
+            try {
+                const res = await fetch('sadigs_api_v3/stop_impersonate.php');
+                const result = await res.json();
+                if(result.success) {
+                    window.location.reload();
+                }
+            } catch(e) { alert('Gagal kembali ke admin.'); }
         }
     </script>
 </body>
