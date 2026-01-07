@@ -112,6 +112,11 @@
                     <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">BENDAHARA YAYASAN</h3>
                 </div>
 
+                <!-- MANAJEMEN YAYASAN -->
+                <div id="groupManajemenYayasan" class="hidden bg-gray-50 rounded-lg p-2 mt-2">
+                    <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">MANAJEMEN YAYASAN</h3>
+                </div>
+
                 <!-- 2. KEPEGAWAIAN -->
                 <div id="groupKepegawaian" class="hidden bg-gray-50 rounded-lg p-2 mt-2">
                     <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KEPEGAWAIAN</h3>
@@ -533,7 +538,7 @@
                                 });
                             
                                 // 2. Tampilkan grup menu jika memiliki item yang terlihat
-                                const menuGroups = ['groupUmum', 'groupKetuaYayasan', 'groupSekretarisYayasan', 'groupBendaharaYayasan', 'groupKepegawaian', 'groupKepalaSekolah', 'groupSekretaris', 'groupBendahara', 'groupAdminSekolah', 'groupKepalaAsrama', 'groupMusyrif', 'groupUstadz', 'groupKesantrian', 'groupWalisantri'];
+                                const menuGroups = ['groupUmum', 'groupKetuaYayasan', 'groupSekretarisYayasan', 'groupBendaharaYayasan', 'groupManajemenYayasan', 'groupKepegawaian', 'groupKepalaSekolah', 'groupSekretaris', 'groupBendahara', 'groupAdminSekolah', 'groupKepalaAsrama', 'groupMusyrif', 'groupUstadz', 'groupKesantrian', 'groupWalisantri'];
                                 menuGroups.forEach(groupId => {
                                     const group = document.getElementById(groupId);
                                     if (group && group.querySelector('a:not(.hidden)')) {

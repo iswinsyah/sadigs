@@ -132,44 +132,48 @@ if ($method === 'GET') {
                 'label' => '4. BENDAHARA YAYASAN',
                 'menus' => []
             ],
+            'ManajemenYayasan' => [
+                'label' => '5. MANAJEMEN YAYASAN',
+                'menus' => ['navYayasanWidget']
+            ],
             'Kepegawaian' => [
-                'label' => '5. KEPEGAWAIAN',
+                'label' => '6. KEPEGAWAIAN',
                 'menus' => ['navAbsensi', 'navBiodataPegawai', 'navIzinPegawai', 'navBukuIndukPegawai', 'navRapat', 'navJadwalRapat']
             ],
             'KepalaSekolah' => [
-                'label' => '6. KEPALA SEKOLAH',
+                'label' => '7. KEPALA SEKOLAH',
                 'menus' => ['navPenilaianKinerja', 'navMonitoringAkademik', 'navValidasiIzin', 'navDaftarIzin', 'navValidasiPeraturan', 'navBuatPeraturan', 'navAturKurikulum']
             ],
             'SekretarisSekolah' => [
-                'label' => '7. SEKRETARIS SEKOLAH',
+                'label' => '8. SEKRETARIS SEKOLAH',
                 'menus' => []
             ],
             'BendaharaSekolah' => [
-                'label' => '8. BENDAHARA SEKOLAH',
+                'label' => '9. BENDAHARA SEKOLAH',
                 'menus' => ['navValidasiPembayaran', 'navTabelPembayaran', 'navRekapPembayaran', 'navPocketMoneyValidation', 'navFormulirTransaksi', 'navTabelTransaksi']
             ],
             'AdminSekolah' => [
-                'label' => '9. ADMIN SEKOLAH',
+                'label' => '10. ADMIN SEKOLAH',
                 'menus' => ['navBukuIndukSantri']
             ],
             'KepalaAsrama' => [
-                'label' => '10. KEPALA ASRAMA',
+                'label' => '11. KEPALA ASRAMA',
                 'menus' => ['navOnLeaveList']
             ],
             'Musyrif' => [
-                'label' => '11. MUSYRIF',
+                'label' => '12. MUSYRIF',
                 'menus' => ['navMentoring', 'navInputTahfizh', 'navValidasiIbadah', 'navGuardianLeaveValidation', 'navMusyrifPocketMoney', 'navMusyrifWithdrawalValidation']
             ],
             'Ustadz' => [
-                'label' => '12. USTADZ',
+                'label' => '13. USTADZ',
                 'menus' => ['navRppGenerator', 'navRppAlbum', 'navPerencanaanAkademik', 'navKetersediaanMengajar', 'navInputNilai']
             ],
             'Kesantrian' => [
-                'label' => '13. KESANTRIAN',
+                'label' => '14. KESANTRIAN',
                 'menus' => ['navBiodataSantri', 'navIbadahHarian', 'navSantriPocketMoney']
             ],
             'Walisantri' => [
-                'label' => '14. WALISANTRI',
+                'label' => '15. WALISANTRI',
                 'menus' => ['navRekapIbadahAnak', 'navViewTahfizh', 'navIzinWalisantri', 'navPocketMoneyDeposit', 'navMonitoringAnak', 'navFormulirPembayaran']
             ]
         ];
