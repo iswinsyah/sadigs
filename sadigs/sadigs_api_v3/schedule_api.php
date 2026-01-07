@@ -54,6 +54,16 @@ try {
         $stmt = $pdo->prepare("SELECT subjects, availability FROM teacher_availability WHERE user_id = ?");
         $stmt->execute([$user_id]);
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // Ambil juga jadwal yang sudah FIX (assigned) dari hasil generate
+        $assigned_slots = [];
+        try {
+            $stmtSched = $pdo->prepare("SELECT day, period_index, subject, grade FROM schedule_assignments WHERE teacher_id = ?");
+            $stmtSched->execute([$user_id]);
+            $assigned_slots = $stmtSched->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            // Tabel mungkin belum ada jika belum pernah generate, abaikan
+        }
         
         if ($data) {
             $data['subjects'] = json_decode($data['subjects'], true);
@@ -61,6 +71,8 @@ try {
         } else {
             $data = ['subjects' => [], 'availability' => []];
         }
+        
+        $data['assigned_schedule'] = $assigned_slots; // Kirim data jadwal fix
         sendJSONResponse(['success' => true, 'data' => $data]);
     }
 

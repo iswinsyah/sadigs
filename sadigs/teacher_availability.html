@@ -113,6 +113,13 @@
                         <button onclick="uncheckAll()" class="text-red-600 hover:underline">Hapus Semua Centang</button>
                     </div>
                 </div>
+
+                <!-- LEGENDA -->
+                <div class="mt-4 flex gap-6 text-sm text-gray-600">
+                    <div class="flex items-center gap-2"><div class="w-4 h-4 border border-gray-300 rounded bg-white"></div> Kosong (Tidak Bersedia)</div>
+                    <div class="flex items-center gap-2"><div class="w-4 h-4 border border-teal-500 rounded bg-teal-600"></div> Bersedia Mengajar</div>
+                    <div class="flex items-center gap-2"><div class="w-4 h-4 border border-green-600 rounded bg-green-100 flex justify-center items-center"><i data-lucide="check" class="w-3 h-3 text-green-700"></i></div> <span class="font-bold text-green-700">Sudah Terjadwal (Fix)</span></div>
+                </div>
             </div>
         </main>
     </div>
@@ -122,6 +129,7 @@
         const days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
         const periods = 10;
         let selectedSubjects = [];
+        let assignedSchedule = []; // Data jadwal fix
 
         // Init Table
         const tbody = document.getElementById('availabilityBody');
@@ -129,7 +137,7 @@
             let row = `<tr class="hover:bg-gray-50"><td class="p-3 border font-bold text-gray-700">${day}</td>`;
             for(let i=1; i<=periods; i++) {
                 row += `<td class="p-3 border text-center">
-                            <input type="checkbox" data-day="${day}" data-period="${i}" class="w-5 h-5 text-teal-600 rounded focus:ring-teal-500 cursor-pointer transition">
+                            <div id="slot-${day}-${i}" class="flex justify-center"></div>
                         </td>`;
             }
             row += `</tr>`;
@@ -190,15 +198,41 @@
                         selectedSubjects = Array.isArray(result.data.subjects) ? result.data.subjects : [];
                         renderSubjects();
                     }
+                    
+                    assignedSchedule = result.data.assigned_schedule || [];
 
                     // Load Checkboxes
                     const avail = result.data.availability || {};
-                    for (const [day, slots] of Object.entries(avail)) {
-                        slots.forEach(period => {
-                            const cb = document.querySelector(`input[data-day="${day}"][data-period="${period}"]`);
-                            if(cb) cb.checked = true;
-                        });
-                    }
+                    
+                    // Render ulang semua slot dengan logika baru
+                    days.forEach(day => {
+                        for(let i=1; i<=periods; i++) {
+                            const container = document.getElementById(`slot-${day}-${i}`);
+                            
+                            // Cek apakah slot ini sudah ada jadwal FIX dari generator
+                            const fixSchedule = assignedSchedule.find(s => s.day === day && s.period_index == i);
+                            
+                            if (fixSchedule) {
+                                // JIKA SUDAH TERJADWAL: Tampilkan kotak hijau terkunci + Info
+                                container.innerHTML = `
+                                    <div class="w-full h-full p-1 bg-green-100 border border-green-300 rounded text-xs text-green-800 font-bold flex flex-col items-center justify-center cursor-not-allowed" title="Anda sudah dijadwalkan mengajar ${fixSchedule.subject} di Kelas ${fixSchedule.grade}">
+                                        <i data-lucide="check-circle" class="w-4 h-4 mb-1"></i>
+                                        <span class="text-[10px]">${fixSchedule.grade}</span>
+                                    </div>
+                                    <input type="hidden" class="avail-checkbox" data-day="${day}" data-period="${i}" value="1"> 
+                                `;
+                                // Hidden input value=1 agar saat disimpan tetap dianggap "Bersedia" (karena memang sedang mengajar)
+                            } else {
+                                // JIKA BELUM TERJADWAL: Tampilkan checkbox biasa
+                                const isChecked = (avail[day] && avail[day].includes(i)) ? 'checked' : '';
+                                container.innerHTML = `
+                                    <input type="checkbox" class="avail-checkbox w-6 h-6 text-teal-600 rounded focus:ring-teal-500 cursor-pointer transition" 
+                                    data-day="${day}" data-period="${i}" ${isChecked}>
+                                `;
+                            }
+                        }
+                    });
+                    lucide.createIcons();
                 }
             } catch(e) {
                 console.error("Gagal memuat data:", e);
@@ -212,8 +246,11 @@
             days.forEach(day => {
                 availability[day] = [];
                 for(let i=1; i<=periods; i++) {
-                    const cb = document.querySelector(`input[data-day="${day}"][data-period="${i}"]`);
-                    if(cb && cb.checked) {
+                    // Cek checkbox biasa
+                    const cb = document.querySelector(`input.avail-checkbox[data-day="${day}"][data-period="${i}"]`);
+                    
+                    // Logika: Simpan jika dicentang ATAU jika itu adalah hidden input (jadwal fix)
+                    if(cb && (cb.checked || cb.type === 'hidden')) {
                         availability[day].push(i);
                     }
                 }
@@ -233,10 +270,10 @@
         }
 
         function checkAll() {
-            document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = true);
+            document.querySelectorAll('input.avail-checkbox[type="checkbox"]').forEach(cb => cb.checked = true);
         }
         function uncheckAll() {
-            document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+            document.querySelectorAll('input.avail-checkbox[type="checkbox"]').forEach(cb => cb.checked = false);
         }
 
         loadData();

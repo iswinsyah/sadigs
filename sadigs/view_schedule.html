@@ -47,6 +47,19 @@
                     </div>
                 </div>
 
+                <!-- KOTAK LAPORAN KONFLIK (Muncul jika ada mapel yang gagal dijadwalkan) -->
+                <div id="conflictAlert" class="hidden mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-r shadow-sm">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0"><i data-lucide="alert-circle" class="h-5 w-5 text-red-500"></i></div>
+                        <div class="ml-3 w-full">
+                            <h3 class="text-sm font-bold text-red-800">Laporan Konflik / Gagal Jadwal</h3>
+                            <p class="text-sm text-red-700 mt-1">Mata pelajaran berikut tidak dapat dijadwalkan karena Guru tidak tersedia atau jadwal bentrok:</p>
+                            <ul id="conflictList" class="list-disc list-inside text-sm text-red-600 mt-2 space-y-1 max-h-40 overflow-y-auto font-medium"></ul>
+                        </div>
+                        <button onclick="document.getElementById('conflictAlert').classList.add('hidden')" class="ml-auto pl-3"><i data-lucide="x" class="h-4 w-4 text-red-400 hover:text-red-600"></i></button>
+                    </div>
+                </div>
+
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                     <div class="overflow-x-auto">
                         <table class="min-w-full border-collapse text-sm">
@@ -184,8 +197,14 @@
                 
                 if(result.success) {
                     alert(result.message);
+                    const conflictAlert = document.getElementById('conflictAlert');
+                    const conflictList = document.getElementById('conflictList');
+                    
                     if(result.unassigned && result.unassigned.length > 0) {
-                        alert("Beberapa mapel belum dapat jadwal (cek konsol/log): \n" + result.unassigned.join('\n'));
+                        conflictList.innerHTML = result.unassigned.map(item => `<li>${item}</li>`).join('');
+                        conflictAlert.classList.remove('hidden');
+                    } else {
+                        conflictAlert.classList.add('hidden');
                     }
                     loadSchedule();
                 } else {
