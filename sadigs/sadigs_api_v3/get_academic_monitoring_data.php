@@ -18,10 +18,9 @@ $pdo = getDBConnection();
 
 try {
     // 1. Ambil semua user yang memiliki peran Ustadz atau Ustadzah
-    $sql_teachers = "SELECT u.user_id, u.username, ud.full_name 
+    $sql_teachers = "SELECT u.user_id, u.username, u.full_name 
                      FROM users u
                      JOIN user_roles ur ON u.user_id = ur.user_id
-                     LEFT JOIN user_details ud ON u.user_id = ud.user_id
                      WHERE ur.role_name IN ('Ustadz', 'Ustadzah') AND ur.status = 'approved'
                      GROUP BY u.user_id";
     $stmt_teachers = $pdo->query($sql_teachers);

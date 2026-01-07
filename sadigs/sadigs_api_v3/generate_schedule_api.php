@@ -35,10 +35,9 @@ try {
         
         // 2. Data Guru (Siapa yang bisa mengajar apa & kapan)
         $teachersRaw = $pdo->query("
-            SELECT t.user_id, u.username, ud.full_name, t.subjects, t.availability 
+            SELECT t.user_id, u.username, u.full_name, t.subjects, t.availability 
             FROM teacher_availability t
             JOIN users u ON t.user_id = u.user_id
-            LEFT JOIN user_details ud ON t.user_id = ud.user_id
         ")->fetchAll(PDO::FETCH_ASSOC);
 
         $teachers = [];
