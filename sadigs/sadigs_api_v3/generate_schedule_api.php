@@ -29,22 +29,54 @@ try {
         // A. BERSIHKAN JADWAL LAMA
         $pdo->exec("TRUNCATE TABLE schedule_assignments");
 
-        // B. AMBIL DATA GURU (URUTKAN DARI YANG PERTAMA SUBMIT)
-        // Ini kunci "Siapa Cepat Dia Dapat". Kita proses guru satu per satu.
-        $teachersRaw = $pdo->query("
-            SELECT t.user_id, u.username, u.full_name, t.subjects, t.availability 
-            FROM teacher_availability t
-            JOIN users u ON t.user_id = u.user_id
-            ORDER BY t.updated_at ASC
-        ")->fetchAll(PDO::FETCH_ASSOC);
+        // B. AMBIL DATA GURU & KLASIFIKASI (LOGIKA BARU)
+        // 1. Ambil data guru beserta role-nya, urutkan berdasarkan waktu submit (FCFS)
+        $sql = "SELECT t.user_id, u.username, u.full_name, t.subjects, t.availability, t.updated_at,
+                       GROUP_CONCAT(ur.role_name) as roles_str
+                FROM teacher_availability t
+                JOIN users u ON t.user_id = u.user_id
+                LEFT JOIN user_roles ur ON t.user_id = ur.user_id
+                GROUP BY t.user_id
+                ORDER BY t.updated_at ASC";
+        
+        $teachersRaw = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
 
-        $teachers = [];
+        $ustadzTamu = [];
+        $ustadzTetap = [];
+
+        // Definisi Peran Pegawai Tetap (Selain Ustadz & Walisantri)
+        // Jika user punya salah satu peran ini, dia masuk kategori 'Ustadz Tetap' (Prioritas Kedua)
+        $employeeRoles = [
+            'Kepala Sekolah', 'Sekretaris Sekolah', 'Bendahara Sekolah',
+            'Musyrif', 'Musyrifah', 
+            'Kepala Asrama Putra', 'Kepala Asrama Putri', "Kepala Ma'had",
+            'Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan'
+        ];
+
         foreach ($teachersRaw as $t) {
             $t['subjects'] = json_decode($t['subjects'], true) ?? [];
             $t['availability'] = json_decode($t['availability'], true) ?? [];
             $t['name'] = $t['full_name'] ?: $t['username'];
-            $teachers[] = $t;
+            
+            $userRoles = explode(',', $t['roles_str'] ?? '');
+            $isTetap = false;
+            
+            foreach ($userRoles as $r) {
+                if (in_array(trim($r), $employeeRoles)) {
+                    $isTetap = true;
+                    break;
+                }
+            }
+
+            if ($isTetap) {
+                $ustadzTetap[] = $t;
+            } else {
+                $ustadzTamu[] = $t;
+            }
         }
+
+        // GABUNGKAN: Prioritas Ustadz Tamu, baru Ustadz Tetap
+        $teachers = array_merge($ustadzTamu, $ustadzTetap);
 
         // C. AMBIL KEBUTUHAN KURIKULUM
         // Kita butuh ID untuk tracking mana yang sudah terisi
@@ -136,7 +168,7 @@ try {
 
         echo json_encode([
             'success' => true, 
-            'message' => 'Jadwal berhasil digenerate otomatis!',
+            'message' => 'Jadwal berhasil digenerate dengan logika prioritas baru!',
             'unassigned' => $unassigned
         ]);
 
