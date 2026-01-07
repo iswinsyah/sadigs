@@ -54,7 +54,7 @@ try {
     // --- AUTO-SETUP: JADWAL PELAJARAN (Agar tidak perlu file setup terpisah) ---
     // Ini menjamin menu langsung muncul tanpa error 404
     $new_menus_setup = [
-        'navKetersediaanMengajar' => ['label' => 'Ketersediaan Mengajar', 'roles' => ['Ustadz', 'Ustadzah', 'Kepala Sekolah', 'Musyrif', 'Musyrifah']],
+        'navKetersediaanMengajar' => ['label' => 'Kesediaan Mengajar', 'roles' => ['Ustadz', 'Ustadzah', 'Kepala Sekolah', 'Musyrif', 'Musyrifah']],
         'navAturKurikulum' => ['label' => 'Atur Kurikulum', 'roles' => ['Kepala Sekolah', 'Ketua Yayasan', 'Sekretaris Sekolah']],
         'navJadwalPelajaran' => ['label' => 'Jadwal Pelajaran', 'roles' => ['Kepala Sekolah', 'Ketua Yayasan', 'Sekretaris Sekolah', 'Ustadz', 'Ustadzah', 'Musyrif', 'Musyrifah']]
     ];
@@ -62,6 +62,8 @@ try {
     foreach ($new_menus_setup as $id => $conf) {
         // 1. Insert ke tabel menus (IGNORE jika sudah ada)
         $pdo->prepare("INSERT IGNORE INTO menus (menu_id, menu_name) VALUES (?, ?)")->execute([$id, $conf['label']]);
+        // Update nama menu jika sudah ada (untuk rename Ketersediaan -> Kesediaan)
+        $pdo->prepare("UPDATE menus SET menu_name = ? WHERE menu_id = ?")->execute([$conf['label'], $id]);
 
         // 2. Insert ke menu_permissions (IGNORE jika sudah ada)
         foreach ($conf['roles'] as $role) {

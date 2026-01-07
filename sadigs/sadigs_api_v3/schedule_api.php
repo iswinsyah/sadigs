@@ -51,15 +51,26 @@ try {
 try {
     // 1. GET AVAILABILITY (Untuk Ustadz)
     if ($action === 'get_availability') {
+        $target_id = $user_id;
+        
+        // Admin Override
+        if (isset($_GET['user_id']) && !empty($_GET['user_id'])) {
+            $allowed_roles = ['Kepala Sekolah', 'Sekretaris Sekolah'];
+            $user_roles = $_SESSION['roles'] ?? [];
+            if (count(array_intersect($allowed_roles, $user_roles)) > 0) {
+                $target_id = $_GET['user_id'];
+            }
+        }
+
         $stmt = $pdo->prepare("SELECT subjects, availability FROM teacher_availability WHERE user_id = ?");
-        $stmt->execute([$user_id]);
+        $stmt->execute([$target_id]);
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
 
         // Ambil juga jadwal yang sudah FIX (assigned) dari hasil generate
         $assigned_slots = [];
         try {
             $stmtSched = $pdo->prepare("SELECT day, period_index, subject, grade FROM schedule_assignments WHERE teacher_id = ?");
-            $stmtSched->execute([$user_id]);
+            $stmtSched->execute([$target_id]);
             $assigned_slots = $stmtSched->fetchAll(PDO::FETCH_ASSOC);
         } catch (Exception $e) {
             // Tabel mungkin belum ada jika belum pernah generate, abaikan
@@ -79,11 +90,22 @@ try {
     // 2. SAVE AVAILABILITY (Untuk Ustadz)
     elseif ($action === 'save_availability') {
         $input = json_decode(file_get_contents('php://input'), true);
+        $target_id = $user_id;
+
+        // Admin Override
+        if (isset($input['user_id']) && !empty($input['user_id'])) {
+            $allowed_roles = ['Kepala Sekolah', 'Sekretaris Sekolah'];
+            $user_roles = $_SESSION['roles'] ?? [];
+            if (count(array_intersect($allowed_roles, $user_roles)) > 0) {
+                $target_id = $input['user_id'];
+            }
+        }
+
         $subjects = json_encode($input['subjects'] ?? []);
         $availability = json_encode($input['availability'] ?? []);
 
         $stmt = $pdo->prepare("INSERT INTO teacher_availability (user_id, subjects, availability) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE subjects = VALUES(subjects), availability = VALUES(availability)");
-        $stmt->execute([$user_id, $subjects, $availability]);
+        $stmt->execute([$target_id, $subjects, $availability]);
         
         sendJSONResponse(['success' => true, 'message' => 'Ketersediaan mengajar berhasil disimpan.']);
     }

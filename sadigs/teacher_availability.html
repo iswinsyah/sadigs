@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ketersediaan Mengajar | SADIGS</title>
+    <title>Kesediaan Mengajar | SADIGS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
@@ -29,12 +29,20 @@
             <div class="max-w-5xl mx-auto">
                 <div class="flex items-center justify-between mb-6">
                     <div>
-                        <h1 class="text-2xl font-bold text-gray-800">Formulir Ketersediaan Mengajar</h1>
+                        <h1 class="text-2xl font-bold text-gray-800">Formulir Kesediaan Mengajar</h1>
                         <p class="text-sm text-gray-500">Silakan isi mata pelajaran yang Anda ampu dan jam ketersediaan Anda.</p>
                     </div>
                     <button onclick="saveAvailability()" class="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2 rounded-lg font-bold shadow-md flex items-center gap-2">
                         <i data-lucide="save" class="w-5 h-5"></i> Simpan Data
                     </button>
+                </div>
+
+                <!-- ADMIN CONTROLS (Hanya untuk Kepala Sekolah / Sekretaris) -->
+                <div id="adminControls" class="hidden bg-yellow-50 p-4 rounded-xl border border-yellow-200 mb-6">
+                    <label class="block text-sm font-bold text-yellow-800 mb-2">Mode Admin: Edit Kesediaan Guru Lain</label>
+                    <select id="teacherSelect" onchange="loadData()" class="w-full p-2 border border-yellow-300 rounded-lg bg-white text-sm">
+                        <option value="">-- Pilih Guru --</option>
+                    </select>
                 </div>
 
                 <!-- INPUT MAPEL -->
@@ -130,6 +138,7 @@
         const periods = 10;
         let selectedSubjects = [];
         let assignedSchedule = []; // Data jadwal fix
+        let currentTargetId = null; // ID user yang sedang diedit (null = diri sendiri)
 
         // Init Table
         const tbody = document.getElementById('availabilityBody');
@@ -187,9 +196,44 @@
             renderSubjects();
         }
 
-        async function loadData() {
+        async function initPage() {
+            // Cek Session & Role
             try {
-                const res = await fetch('sadigs_api_v3/schedule_api.php?action=get_availability');
+                const sessionRes = await fetch('sadigs_api_v3/session_check.php');
+                const sessionData = await sessionRes.json();
+                if (!sessionData.success) { window.location.href = 'index.html'; return; }
+
+                const roles = sessionData.roles || [];
+                if (roles.includes('Kepala Sekolah') || roles.includes('Sekretaris Sekolah')) {
+                    document.getElementById('adminControls').classList.remove('hidden');
+                    loadTeachers();
+                }
+                loadData();
+            } catch(e) { console.error(e); }
+        }
+
+        async function loadTeachers() {
+            try {
+                const res = await fetch('sadigs_api_v3/get_all_employees.php');
+                const result = await res.json();
+                if (result.success) {
+                    const select = document.getElementById('teacherSelect');
+                    result.data.forEach(t => {
+                        select.innerHTML += `<option value="${t.user_id}">${t.full_name || t.username}</option>`;
+                    });
+                }
+            } catch(e) {}
+        }
+
+        async function loadData() {
+            const teacherSelect = document.getElementById('teacherSelect');
+            currentTargetId = teacherSelect.value || null;
+            
+            let url = 'sadigs_api_v3/schedule_api.php?action=get_availability';
+            if (currentTargetId) url += `&user_id=${currentTargetId}`;
+
+            try {
+                const res = await fetch(url);
                 const result = await res.json();
                 
                 if(result.success) {
@@ -256,11 +300,13 @@
                 }
             });
 
+            let url = 'sadigs_api_v3/schedule_api.php?action=save_availability';
+            
             try {
-                const res = await fetch('sadigs_api_v3/schedule_api.php?action=save_availability', {
+                const res = await fetch(url, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ subjects, availability })
+                    body: JSON.stringify({ subjects, availability, user_id: currentTargetId })
                 });
                 const result = await res.json();
                 alert(result.message);
@@ -276,7 +322,7 @@
             document.querySelectorAll('input.avail-checkbox[type="checkbox"]').forEach(cb => cb.checked = false);
         }
 
-        loadData();
+        initPage();
     </script>
 </body>
 </html>
