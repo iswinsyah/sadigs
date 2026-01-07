@@ -34,10 +34,12 @@ try {
         $reqs = $pdo->query("SELECT * FROM curriculum_requirements ORDER BY hours_per_week DESC")->fetchAll(PDO::FETCH_ASSOC);
         
         // 2. Data Guru (Siapa yang bisa mengajar apa & kapan)
+        // UPDATE: Urutkan berdasarkan updated_at ASC (Siapa cepat dia dapat prioritas dicek duluan)
         $teachersRaw = $pdo->query("
             SELECT t.user_id, u.username, u.full_name, t.subjects, t.availability 
             FROM teacher_availability t
             JOIN users u ON t.user_id = u.user_id
+            ORDER BY t.updated_at ASC
         ")->fetchAll(PDO::FETCH_ASSOC);
 
         $teachers = [];
@@ -70,49 +72,57 @@ try {
                 continue;
             }
 
-            // Pilih guru (bisa di-random atau load balancing, di sini kita ambil yang pertama ketemu dulu)
-            $teacher = reset($candidates); 
-
-            // Coba pasang jadwal
-            $hoursAssigned = 0;
+            // UPDATE LOGIKA: Coba semua kandidat, jangan cuma yang pertama.
+            // Karena sudah diurutkan di query awal, ini otomatis menerapkan "Siapa Cepat Dia Dapat".
+            $is_assigned = false;
             
-            // Loop hari dan jam untuk mencari slot kosong
-            foreach ($days as $day) {
-                if ($hoursAssigned >= $hoursNeeded) break;
+            foreach ($candidates as $teacher) {
+                // Simulasi: Cek apakah guru ini bisa memenuhi kuota jam yang dibutuhkan?
+                $possible_slots = [];
+                
+                foreach ($days as $day) {
+                    if (count($possible_slots) >= $hoursNeeded) break;
+                    
+                    $teacherSlots = $teacher['availability'][$day] ?? [];
 
-                // Cek ketersediaan guru di hari ini
-                $teacherSlots = $teacher['availability'][$day] ?? [];
+                    for ($p = 1; $p <= $periods; $p++) {
+                        if (count($possible_slots) >= $hoursNeeded) break;
 
-                for ($p = 1; $p <= $periods; $p++) {
-                    if ($hoursAssigned >= $hoursNeeded) break;
+                        // SYARAT 1: Guru bersedia di jam ini?
+                        if (!in_array($p, $teacherSlots)) continue;
 
-                    // SYARAT 1: Guru bersedia di jam ini?
-                    if (!in_array($p, $teacherSlots)) continue;
+                        // SYARAT 2: Kelas ini sudah ada pelajaran belum di jam ini?
+                        $classKey = "{$grade}|{$day}|{$p}";
+                        if (isset($assignments[$classKey])) continue;
 
-                    // SYARAT 2: Kelas ini sudah ada pelajaran belum di jam ini?
-                    // Cek di database (tapi karena kita truncate, kita cek di array memory dulu biar cepat)
-                    // atau query DB setiap saat (lambat). Kita pakai array $assignments.
-                    // Format key: "GRADE|DAY|PERIOD"
-                    $classKey = "{$grade}|{$day}|{$p}";
-                    if (isset($assignments[$classKey])) continue;
+                        // SYARAT 3: Guru ini sudah mengajar di kelas LAIN belum di jam ini? (ANTI BENTROK)
+                        $teacherKey = "TEACHER|{$teacher['user_id']}|{$day}|{$p}";
+                        if (isset($assignments[$teacherKey])) continue;
 
-                    // SYARAT 3: Guru ini sudah mengajar di kelas LAIN belum di jam ini? (ANTI BENTROK)
-                    $teacherKey = "TEACHER|{$teacher['user_id']}|{$day}|{$p}";
-                    if (isset($assignments[$teacherKey])) continue;
+                        // Jika lolos, catat sebagai slot potensial
+                        $possible_slots[] = ['day' => $day, 'period' => $p];
+                    }
+                }
 
-                    // JIKA LOLOS SEMUA SYARAT -> ASSIGN!
+                // Jika guru ini bisa memenuhi kebutuhan jam (atau setidaknya sebagian besar), Assign!
+                // Di sini kita set strict: harus bisa memenuhi SEMUA jam yang diminta agar jadwal rapi.
+                // Jika ingin lebih longgar (partial), ubah kondisi ini.
+                if (count($possible_slots) == $hoursNeeded) {
                     $stmt = $pdo->prepare("INSERT INTO schedule_assignments (grade, day, period_index, subject, teacher_id, teacher_name) VALUES (?, ?, ?, ?, ?, ?)");
-                    $stmt->execute([$grade, $day, $p, $subject, $teacher['user_id'], $teacher['name']]);
-
-                    // Tandai slot terpakai
-                    $assignments[$classKey] = true;
-                    $assignments[$teacherKey] = true;
-                    $hoursAssigned++;
+                    
+                    foreach ($possible_slots as $slot) {
+                        $stmt->execute([$grade, $slot['day'], $slot['period'], $subject, $teacher['user_id'], $teacher['name']]);
+                        
+                        $assignments["{$grade}|{$slot['day']}|{$slot['period']}"] = true;
+                        $assignments["TEACHER|{$teacher['user_id']}|{$slot['day']}|{$slot['period']}"] = true;
+                    }
+                    $is_assigned = true;
+                    break; // Berhenti mencari guru lain untuk mapel ini
                 }
             }
 
-            if ($hoursAssigned < $hoursNeeded) {
-                $unassigned[] = "$subject Kelas $grade (Kurang " . ($hoursNeeded - $hoursAssigned) . " JP)";
+            if (!$is_assigned) {
+                $unassigned[] = "$subject Kelas $grade (Tidak ada guru yang cocok/tersedia untuk $hoursNeeded JP)";
             }
         }
 
