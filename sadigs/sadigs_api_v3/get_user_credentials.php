@@ -11,7 +11,7 @@ $pdo = getDBConnection();
 
 try {
     // Ambil data user dan role-nya
-    $sql = "SELECT u.user_id, u.username, u.full_name, u.email, 
+    $sql = "SELECT u.user_id, u.username, u.full_name, u.email, u.password_hash,
                    GROUP_CONCAT(ur.role_name SEPARATOR ', ') as roles
             FROM users u 
             LEFT JOIN user_roles ur ON u.user_id = ur.user_id 
