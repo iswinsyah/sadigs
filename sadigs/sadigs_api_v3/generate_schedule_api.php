@@ -31,6 +31,8 @@ try {
 
         // B. AMBIL DATA GURU & KLASIFIKASI (JURUS PAMUNGKAS - FIX)
         // Ambil data guru beserta role-nya, urutkan berdasarkan waktu submit (FCFS)
+        // B. AMBIL DATA GURU & KLASIFIKASI
+        // Urutkan berdasarkan waktu submit (FCFS) untuk memenuhi aturan "Siapa cepat dia dapat"
         $sql = "SELECT t.user_id, u.username, u.full_name, t.subjects, t.availability, t.updated_at,
                        GROUP_CONCAT(ur.role_name) as roles_str
                 FROM teacher_availability t
@@ -89,6 +91,7 @@ try {
         }
 
         // D. ALGORITMA PENJADWALAN (TEACHER-CENTRIC + PRIORITY)
+        // D. ALGORITMA PENJADWALAN (TEACHER-CENTRIC + PRIORITY + RULE 7)
         $assignments = []; // State jadwal global: "GRADE|DAY|PERIOD" => true, "TEACHER|ID|DAY|PERIOD" => true
 
         $days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
@@ -103,6 +106,7 @@ try {
                 foreach ($reqs as $req) {
                     // Cek kesamaan nama mapel (Case Insensitive)
                     if (strcasecmp($req['subject'], $subjName) !== 0) continue;
+                    if (strcasecmp(trim($req['subject']), trim($subjName)) !== 0) continue;
 
                     $reqId = $req['id'];
                     $needed = (int)$req['hours_per_week'];
@@ -162,12 +166,24 @@ try {
             $filled = $reqStatus[$req['id']];
             if ($filled < $needed) {
                 $unassigned[] = "{$req['subject']} Kelas {$req['grade']} (Kurang " . ($needed - $filled) . " JP)";
+                // Analisis penyebab kegagalan
+                $candidates = array_filter($teachers, function($t) use ($req) {
+                    return in_array(trim($req['subject']), array_map('trim', $t['subjects']));
+                });
+
+                if (empty($candidates)) {
+                    $reason = "Belum ada guru yang mengampu mapel ini.";
+                } else {
+                    $reason = "Guru tersedia (" . count($candidates) . " orang), tapi jam ketersediaan mereka habis atau bentrok dengan mapel lain di kelas ini.";
+                }
+
+                $unassigned[] = "{$req['subject']} Kelas {$req['grade']} (Kurang " . ($needed - $filled) . " JP) -> $reason";
             }
         }
 
         echo json_encode([
             'success' => true, 
-            'message' => 'Jadwal berhasil digenerate! Ustadz Tamu diprioritaskan.',
+            'message' => 'Jadwal berhasil digenerate! Ustadz Tamu prioritas, Ustadz Tetap fleksibel.',
             'unassigned' => $unassigned
         ]);
 
