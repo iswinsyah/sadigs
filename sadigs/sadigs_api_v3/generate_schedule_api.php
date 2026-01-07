@@ -29,29 +29,24 @@ try {
         // A. BERSIHKAN JADWAL LAMA
         $pdo->exec("TRUNCATE TABLE schedule_assignments");
 
-        // B. AMBIL DATA GURU & KLASIFIKASI (LOGIKA BARU)
-        // 1. Ambil data guru beserta role-nya, urutkan berdasarkan waktu submit (FCFS)
+        // B. AMBIL DATA GURU & KLASIFIKASI (JURUS PAMUNGKAS - FIX)
+        // Ambil data guru beserta role-nya, urutkan berdasarkan waktu submit (FCFS)
         $sql = "SELECT t.user_id, u.username, u.full_name, t.subjects, t.availability, t.updated_at,
                        GROUP_CONCAT(ur.role_name) as roles_str
                 FROM teacher_availability t
                 JOIN users u ON t.user_id = u.user_id
                 LEFT JOIN user_roles ur ON t.user_id = ur.user_id
                 GROUP BY t.user_id
-                ORDER BY t.updated_at ASC";
+                ORDER BY t.updated_at ASC"; // FCFS basis waktu submit
         
         $teachersRaw = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
 
         $ustadzTamu = [];
         $ustadzTetap = [];
 
-        // Definisi Peran Pegawai Tetap (Selain Ustadz & Walisantri)
-        // Jika user punya salah satu peran ini, dia masuk kategori 'Ustadz Tetap' (Prioritas Kedua)
-        $employeeRoles = [
-            'Kepala Sekolah', 'Sekretaris Sekolah', 'Bendahara Sekolah',
-            'Musyrif', 'Musyrifah', 
-            'Kepala Asrama Putra', 'Kepala Asrama Putri', "Kepala Ma'had",
-            'Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan'
-        ];
+        // Definisi Role yang dianggap "Tamu" (Hanya mengajar, tidak ada jabatan struktural)
+        // Walisantri dianggap netral/tamu jika mengajar.
+        $pureTeachingRoles = ['Ustadz', 'Ustadzah', 'Walisantri'];
 
         foreach ($teachersRaw as $t) {
             $t['subjects'] = json_decode($t['subjects'], true) ?? [];
@@ -59,11 +54,13 @@ try {
             $t['name'] = $t['full_name'] ?: $t['username'];
             
             $userRoles = explode(',', $t['roles_str'] ?? '');
-            $isTetap = false;
+            $userRoles = array_map('trim', $userRoles); // Bersihkan spasi
             
+            // Cek apakah punya role struktural (selain Ustadz/Walisantri)
+            $isTetap = false;
             foreach ($userRoles as $r) {
-                if (in_array(trim($r), $employeeRoles)) {
-                    $isTetap = true;
+                if (!empty($r) && !in_array($r, $pureTeachingRoles)) {
+                    $isTetap = true; // Punya jabatan lain (Kepsek, Musyrif, dll)
                     break;
                 }
             }
@@ -75,7 +72,9 @@ try {
             }
         }
 
-        // GABUNGKAN: Prioritas Ustadz Tamu, baru Ustadz Tetap
+        // GABUNGKAN: Prioritas Ustadz Tamu (FCFS), baru Ustadz Tetap (FCFS)
+        // Karena Tamu diproses duluan, mereka akan mengisi slot kosong lebih dulu.
+        // Jika Tetap menginginkan slot yang sudah diisi Tamu, Tetap akan kalah (karena slot sudah terisi).
         $teachers = array_merge($ustadzTamu, $ustadzTetap);
 
         // C. AMBIL KEBUTUHAN KURIKULUM
@@ -89,7 +88,7 @@ try {
             $reqStatus[$r['id']] = 0;
         }
 
-        // D. ALGORITMA PENJADWALAN (TEACHER-CENTRIC)
+        // D. ALGORITMA PENJADWALAN (TEACHER-CENTRIC + PRIORITY)
         $assignments = []; // State jadwal global: "GRADE|DAY|PERIOD" => true, "TEACHER|ID|DAY|PERIOD" => true
 
         $days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
@@ -168,7 +167,7 @@ try {
 
         echo json_encode([
             'success' => true, 
-            'message' => 'Jadwal berhasil digenerate dengan logika prioritas baru!',
+            'message' => 'Jadwal berhasil digenerate! Ustadz Tamu diprioritaskan.',
             'unassigned' => $unassigned
         ]);
 
