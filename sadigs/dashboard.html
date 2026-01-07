@@ -92,12 +92,6 @@
                     <a id="navJadwalPelajaran" href="view_schedule.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="calendar-days" class="w-5 h-5"></i> Jadwal Pelajaran</a>
                 </div>
 
-                <!-- MANAJEMEN YAYASAN (NEW) -->
-                <div id="groupManajemenYayasan" class="hidden bg-gray-50 rounded-lg p-2 mt-2">
-                    <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">MANAJEMEN YAYASAN</h3>
-                    <a id="navBukuIndukSantri" href="student_master_book.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="book" class="w-5 h-5"></i> Buku Induk Santri</a>
-                </div>
-
                 <!-- KETUA YAYASAN -->
                 <div id="groupKetuaYayasan" class="hidden bg-gray-50 rounded-lg p-2 mt-2">
                     <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KETUA YAYASAN</h3>
@@ -155,6 +149,12 @@
                     <a id="navPocketMoneyValidation" href="pocket_money_validation.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="check-circle-2" class="w-5 h-5"></i> Validasi Uang Saku</a>
                     <a id="navFormulirTransaksi" href="daily_transaction_form.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="pen-tool" class="w-5 h-5"></i> Form Transaksi Harian</a>
                     <a id="navTabelTransaksi" href="daily_transaction_list.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="book" class="w-5 h-5"></i> Buku Transaksi Harian</a>
+                </div>
+
+                <!-- ADMIN SEKOLAH (NEW) -->
+                <div id="groupAdminSekolah" class="hidden bg-gray-50 rounded-lg p-2 mt-2">
+                    <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">ADMIN SEKOLAH</h3>
+                    <a id="navBukuIndukSantri" href="student_master_book.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="book" class="w-5 h-5"></i> Buku Induk Santri</a>
                 </div>
 
                 <!-- 6. KEPALA ASRAMA -->
@@ -533,7 +533,7 @@
                                 });
                             
                                 // 2. Tampilkan grup menu jika memiliki item yang terlihat
-                                const menuGroups = ['groupUmum', 'groupManajemenYayasan', 'groupKetuaYayasan', 'groupSekretarisYayasan', 'groupBendaharaYayasan', 'groupKepegawaian', 'groupKepalaSekolah', 'groupSekretaris', 'groupBendahara', 'groupKepalaAsrama', 'groupMusyrif', 'groupUstadz', 'groupKesantrian', 'groupWalisantri'];
+                                const menuGroups = ['groupUmum', 'groupKetuaYayasan', 'groupSekretarisYayasan', 'groupBendaharaYayasan', 'groupKepegawaian', 'groupKepalaSekolah', 'groupSekretaris', 'groupBendahara', 'groupAdminSekolah', 'groupKepalaAsrama', 'groupMusyrif', 'groupUstadz', 'groupKesantrian', 'groupWalisantri'];
                                 menuGroups.forEach(groupId => {
                                     const group = document.getElementById(groupId);
                                     if (group && group.querySelector('a:not(.hidden)')) {

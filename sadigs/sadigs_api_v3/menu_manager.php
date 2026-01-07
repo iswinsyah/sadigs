@@ -116,46 +116,61 @@ if ($method === 'GET') {
 
         // Daftar Menu (Single Source of Truth)
         $categories = [
-            'Form' => [
-                'label' => '1. Formulir (Input Data)',
-                'menus' => [
-                    'navAbsensi', 'navBiodataPegawai', 'navBiodataSantri', 'navBuatPeraturan', 
-                    'navIbadahHarian', 'navInputTahfizh', 'navInputNilai', 'navIzinPegawai', 
-                    'navIzinWalisantri', 'navRapat', 'navFormulirPembayaran', 'navFormulirTransaksi', 
-                    'navPocketMoneyDeposit', 'navRppGenerator', 'navProfil', 'navPerencanaanAkademik'
-                ],
-                'icon' => 'file-pen-line'
+            'Umum' => [
+                'label' => '1. UMUM',
+                'menus' => ['navDashboard', 'navProfil', 'navKalender', 'navJadwalPelajaran']
             ],
-            'Val' => [
-                'label' => '2. Validasi & Persetujuan',
-                'menus' => [
-                    'navValidasiIbadah', 'navValidasiIzin', 'navValidasiPembayaran', 'navValidasiPeraturan', 
-                    'navVerifikasi', 'navGuardianLeaveValidation', 'navPocketMoneyValidation', 
-                    'navMusyrifWithdrawalValidation',
-                    'navMonitoringAkademik'
-                ],
-                'icon' => 'check-square'
+            'KetuaYayasan' => [
+                'label' => '2. KETUA YAYASAN',
+                'menus' => ['navMenuManagement', 'navUserCredentials']
             ],
-            'Tab' => [
-                'label' => '3. Tabel & Laporan',
-                'menus' => [
-                    'navDashboard', 'navKalender', 'navJadwalRapat', 'navDaftarIzin', 
-                    'navBukuIndukPegawai', 'navBukuIndukSantri', 'navMentoring', 'navTabelPembayaran', 
-                    'navTabelTransaksi', 'navRekapIbadahAnak', 'navViewTahfizh', 'navOnLeaveList', 
-                    'navRppAlbum', 'navMusyrifPocketMoney', 'navSantriPocketMoney', 'navMonitoringAnak',
-                    'navYayasanWidget', 'navMusyrifWidget'
-                ],
-                'icon' => 'table'
+            'SekretarisYayasan' => [
+                'label' => '3. SEKRETARIS YAYASAN',
+                'menus' => ['navVerifikasi', 'navQuota', 'navCalendarSettings']
             ],
-            'Grf' => [
-                'label' => '4. Grafik & Rekap',
-                'menus' => ['navRekapPembayaran'],
-                'icon' => 'bar-chart-2'
+            'BendaharaYayasan' => [
+                'label' => '4. BENDAHARA YAYASAN',
+                'menus' => []
             ],
-            'Sys' => [
-                'label' => '5. Pengaturan Sistem',
-                'menus' => ['navMenuManagement', 'navQuota', 'navCalendarSettings'],
-                'icon' => 'settings'
+            'Kepegawaian' => [
+                'label' => '5. KEPEGAWAIAN',
+                'menus' => ['navAbsensi', 'navBiodataPegawai', 'navIzinPegawai', 'navBukuIndukPegawai', 'navRapat', 'navJadwalRapat']
+            ],
+            'KepalaSekolah' => [
+                'label' => '6. KEPALA SEKOLAH',
+                'menus' => ['navPenilaianKinerja', 'navMonitoringAkademik', 'navValidasiIzin', 'navDaftarIzin', 'navValidasiPeraturan', 'navBuatPeraturan', 'navAturKurikulum']
+            ],
+            'SekretarisSekolah' => [
+                'label' => '7. SEKRETARIS SEKOLAH',
+                'menus' => []
+            ],
+            'BendaharaSekolah' => [
+                'label' => '8. BENDAHARA SEKOLAH',
+                'menus' => ['navValidasiPembayaran', 'navTabelPembayaran', 'navRekapPembayaran', 'navPocketMoneyValidation', 'navFormulirTransaksi', 'navTabelTransaksi']
+            ],
+            'AdminSekolah' => [
+                'label' => '9. ADMIN SEKOLAH',
+                'menus' => ['navBukuIndukSantri']
+            ],
+            'KepalaAsrama' => [
+                'label' => '10. KEPALA ASRAMA',
+                'menus' => ['navOnLeaveList']
+            ],
+            'Musyrif' => [
+                'label' => '11. MUSYRIF',
+                'menus' => ['navMentoring', 'navInputTahfizh', 'navValidasiIbadah', 'navGuardianLeaveValidation', 'navMusyrifPocketMoney', 'navMusyrifWithdrawalValidation']
+            ],
+            'Ustadz' => [
+                'label' => '12. USTADZ',
+                'menus' => ['navRppGenerator', 'navRppAlbum', 'navPerencanaanAkademik', 'navKetersediaanMengajar', 'navInputNilai']
+            ],
+            'Kesantrian' => [
+                'label' => '13. KESANTRIAN',
+                'menus' => ['navBiodataSantri', 'navIbadahHarian', 'navSantriPocketMoney']
+            ],
+            'Walisantri' => [
+                'label' => '14. WALISANTRI',
+                'menus' => ['navRekapIbadahAnak', 'navViewTahfizh', 'navIzinWalisantri', 'navPocketMoneyDeposit', 'navMonitoringAnak', 'navFormulirPembayaran']
             ]
         ];
 
