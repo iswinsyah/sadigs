@@ -87,9 +87,19 @@
                             <thead>
                                 <tr>
                                     <th class="p-3 border bg-gray-50 text-left w-32">Hari</th>
-                                    <!-- Generate Header Jam 1-8 -->
+                                    <!-- Generate Header Jam 1-10 dengan Waktu -->
                                     <script>
-                                        for(let i=1; i<=8; i++) document.write(`<th class="p-3 border bg-gray-50 text-center w-16">Jam ${i}</th>`);
+                                        const times = [
+                                            "04.30 - 05.15", "05.15 - 06.00", "07.30 - 08.15", "08.15 - 09.00", 
+                                            "09.15 - 10.00", "10.00 - 10.45", "10.45 - 11.15", "15.15 - 16.00", 
+                                            "16.00 - 16.45", "16.45 - 17.30"
+                                        ];
+                                        for(let i=1; i<=10; i++) {
+                                            document.write(`<th class="p-2 border bg-gray-50 text-center min-w-[80px]">
+                                                <div class="font-bold text-sm">Jam ${i}</div>
+                                                <div class="text-[10px] text-gray-500 font-normal mt-1 whitespace-nowrap">${times[i-1]}</div>
+                                            </th>`);
+                                        }
                                     </script>
                                 </tr>
                             </thead>
@@ -110,7 +120,7 @@
     <script>
         lucide.createIcons();
         const days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-        const periods = 8;
+        const periods = 10;
         let selectedSubjects = [];
 
         // Init Table
