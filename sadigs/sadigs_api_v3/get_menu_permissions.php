@@ -55,7 +55,8 @@ try {
     // Ini menjamin menu langsung muncul tanpa error 404
     $new_menus_setup = [
         'navKetersediaanMengajar' => ['label' => 'Ketersediaan Mengajar', 'roles' => ['Ustadz', 'Ustadzah', 'Kepala Sekolah', 'Musyrif', 'Musyrifah']],
-        'navAturKurikulum' => ['label' => 'Atur Kurikulum', 'roles' => ['Kepala Sekolah', 'Ketua Yayasan', 'Sekretaris Sekolah']]
+        'navAturKurikulum' => ['label' => 'Atur Kurikulum', 'roles' => ['Kepala Sekolah', 'Ketua Yayasan', 'Sekretaris Sekolah']],
+        'navJadwalPelajaran' => ['label' => 'Jadwal Pelajaran', 'roles' => ['Kepala Sekolah', 'Ketua Yayasan', 'Sekretaris Sekolah', 'Ustadz', 'Ustadzah', 'Musyrif', 'Musyrifah']]
     ];
 
     foreach ($new_menus_setup as $id => $conf) {
