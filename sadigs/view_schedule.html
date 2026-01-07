@@ -41,7 +41,7 @@
                             <option value="Jumat">Jumat</option>
                             <option value="Sabtu">Sabtu</option>
                         </select>
-                        <button onclick="alert('Fitur Generate Otomatis akan segera aktif di Fase berikutnya!')" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg font-bold shadow-sm flex items-center gap-2">
+                        <button onclick="generateSchedule()" id="genBtn" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg font-bold shadow-sm flex items-center gap-2">
                             <i data-lucide="wand-2" class="w-4 h-4"></i> Generate Jadwal
                         </button>
                     </div>
@@ -96,7 +96,9 @@
             { time: '16.45 - 17.30', activity: 'Jam ke 10', type: 'lesson' },
         ];
 
-        function renderTable() {
+        let scheduleData = {}; // Menyimpan data dari server
+
+        function renderTable(selectedDay) {
             const tbody = document.getElementById('scheduleBody');
             tbody.innerHTML = '';
 
@@ -127,9 +129,16 @@
                 } else {
                     // Jika jam pelajaran, buat sel kosong untuk diisi mapel
                     for(let i=7; i<=12; i++) {
+                        // Cek apakah ada jadwal di jam ini (index+1 karena jam mulai dari 1)
+                        // Logic jam pelajaran: Jam 1 ada di index 0, Jam 2 di index 1, dst.
+                        // Kita perlu mapping index baris ke "Jam Ke-X" yang sebenarnya.
+                        // Simplifikasi: Kita anggap row index yang type='lesson' adalah urutan jam.
+                        const periodNum = getPeriodNumber(index);
+                        const cellData = (scheduleData[selectedDay] && scheduleData[selectedDay][periodNum] && scheduleData[selectedDay][periodNum][i]) ? scheduleData[selectedDay][periodNum][i] : null;
+
                         html += `<td class="p-3 border border-gray-200 text-center text-gray-500 min-h-[40px]">
-                                    <div class="h-8 bg-white border border-dashed border-gray-300 rounded flex items-center justify-center text-xs text-gray-300">
-                                        -
+                                    <div class="min-h-[40px] flex flex-col items-center justify-center text-xs">
+                                        ${cellData ? `<span class="font-bold text-teal-700">${cellData.subject}</span><span class="text-[10px] text-gray-500">${cellData.teacher}</span>` : '<span class="text-gray-300">-</span>'}
                                     </div>
                                  </td>`;
                     }
@@ -140,7 +149,59 @@
             });
         }
 
-        renderTable();
+        // Helper untuk mengetahui ini Jam Pelajaran ke berapa berdasarkan baris tabel
+        function getPeriodNumber(rowIndex) {
+            // Mapping manual berdasarkan scheduleRows di atas
+            const map = {0:1, 1:2, 3:3, 4:4, 6:5, 7:6, 8:7, 12:8, 13:9, 14:10};
+            return map[rowIndex] || 0;
+        }
+
+        async function loadSchedule() {
+            try {
+                const res = await fetch('sadigs_api_v3/generate_schedule_api.php?action=get_schedule');
+                const result = await res.json();
+                if(result.success) {
+                    scheduleData = result.data;
+                    const currentDay = document.getElementById('daySelect').value;
+                    renderTable(currentDay);
+                }
+            } catch(e) {
+                console.error("Gagal memuat jadwal:", e);
+            }
+        }
+
+        async function generateSchedule() {
+            if(!confirm("Generate ulang jadwal? Jadwal lama akan dihapus dan dibuat baru berdasarkan ketersediaan guru.")) return;
+            
+            const btn = document.getElementById('genBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Proses...';
+            lucide.createIcons();
+
+            try {
+                const res = await fetch('sadigs_api_v3/generate_schedule_api.php?action=generate');
+                const result = await res.json();
+                
+                if(result.success) {
+                    alert(result.message);
+                    if(result.unassigned && result.unassigned.length > 0) {
+                        alert("Beberapa mapel belum dapat jadwal (cek konsol/log): \n" + result.unassigned.join('\n'));
+                    }
+                    loadSchedule();
+                } else {
+                    alert("Gagal: " + result.message);
+                }
+            } catch(e) {
+                alert("Terjadi kesalahan koneksi.");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i data-lucide="wand-2" class="w-4 h-4"></i> Generate Jadwal';
+                lucide.createIcons();
+            }
+        }
+
+        document.getElementById('daySelect').addEventListener('change', (e) => renderTable(e.target.value));
+        loadSchedule();
     </script>
 </body>
 </html>
