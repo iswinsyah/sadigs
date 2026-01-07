@@ -40,8 +40,43 @@
                 <!-- INPUT MAPEL -->
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mb-6">
                     <label class="block text-sm font-bold text-gray-700 mb-2">Mata Pelajaran yang Diampu</label>
-                    <p class="text-xs text-gray-500 mb-2">Pisahkan dengan koma jika lebih dari satu (Contoh: Matematika, Fisika)</p>
-                    <input type="text" id="subjectsInput" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500" placeholder="Masukkan mata pelajaran...">
+                    <p class="text-xs text-gray-500 mb-2">Pilih mata pelajaran lalu klik tombol <b>Tambah</b>.</p>
+                    
+                    <div class="flex gap-2 mb-3">
+                        <select id="subjectSelect" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-white">
+                            <option value="">-- Pilih Mata Pelajaran --</option>
+                            <option value="Al Quran">Al Quran</option>
+                            <option value="Lughohtul Quran">Lughohtul Quran</option>
+                            <option value="Syakhshiyah">Syakhshiyah</option>
+                            <option value="Fiqh">Fiqh</option>
+                            <option value="PKn">PKn</option>
+                            <option value="Bahasa">Bahasa</option>
+                            <option value="English">English</option>
+                            <option value="Matematika">Matematika</option>
+                            <option value="IPA">IPA</option>
+                            <option value="Biologi">Biologi</option>
+                            <option value="Fisika">Fisika</option>
+                            <option value="Kimia">Kimia</option>
+                            <option value="IPS">IPS</option>
+                            <option value="Sejarah">Sejarah</option>
+                            <option value="Ekonomi">Ekonomi</option>
+                            <option value="Geografi">Geografi</option>
+                            <option value="Sosiologi">Sosiologi</option>
+                            <option value="Pend. Jasmani">Pend. Jasmani</option>
+                            <option value="Kreator Konten">Kreator Konten</option>
+                            <option value="Digital Enterpreneur">Digital Enterpreneur</option>
+                            <option value="Mentoring">Mentoring</option>
+                            <option value="Panahan">Panahan</option>
+                        </select>
+                        <button onclick="addSubject()" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-1">
+                            <i data-lucide="plus" class="w-4 h-4"></i> Tambah
+                        </button>
+                    </div>
+
+                    <div id="selectedSubjectsContainer" class="flex flex-wrap gap-2 min-h-[50px] p-3 border border-gray-200 rounded-lg bg-gray-50 items-center">
+                        <span id="emptySubjectMsg" class="text-gray-400 text-sm italic w-full text-center">Belum ada mata pelajaran yang dipilih.</span>
+                        <!-- Tags mapel akan muncul di sini -->
+                    </div>
                 </div>
 
                 <!-- TABEL KETERSEDIAAN -->
@@ -76,6 +111,7 @@
         lucide.createIcons();
         const days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
         const periods = 8;
+        let selectedSubjects = [];
 
         // Init Table
         const tbody = document.getElementById('availabilityBody');
@@ -90,6 +126,49 @@
             tbody.innerHTML += row;
         });
 
+        function renderSubjects() {
+            const container = document.getElementById('selectedSubjectsContainer');
+            const emptyMsg = document.getElementById('emptySubjectMsg');
+            
+            // Hapus semua elemen kecuali pesan kosong
+            Array.from(container.children).forEach(child => {
+                if (child.id !== 'emptySubjectMsg') container.removeChild(child);
+            });
+
+            if (selectedSubjects.length === 0) {
+                emptyMsg.classList.remove('hidden');
+            } else {
+                emptyMsg.classList.add('hidden');
+                selectedSubjects.forEach(subj => {
+                    const tag = document.createElement('div');
+                    tag.className = 'bg-teal-100 text-teal-800 px-3 py-1 rounded-full text-sm font-bold flex items-center gap-2 shadow-sm border border-teal-200';
+                    tag.innerHTML = `
+                        ${subj}
+                        <button onclick="removeSubject('${subj}')" class="text-teal-600 hover:text-red-600 focus:outline-none transition">
+                            <i data-lucide="x" class="w-3 h-3"></i>
+                        </button>
+                    `;
+                    container.appendChild(tag);
+                });
+                lucide.createIcons();
+            }
+        }
+
+        function addSubject() {
+            const select = document.getElementById('subjectSelect');
+            const val = select.value;
+            if (val && !selectedSubjects.includes(val)) {
+                selectedSubjects.push(val);
+                renderSubjects();
+            }
+            select.value = ''; // Reset dropdown
+        }
+
+        function removeSubject(subj) {
+            selectedSubjects = selectedSubjects.filter(s => s !== subj);
+            renderSubjects();
+        }
+
         async function loadData() {
             try {
                 const res = await fetch('sadigs_api_v3/schedule_api.php?action=get_availability');
@@ -98,7 +177,8 @@
                 if(result.success) {
                     // Load Subjects
                     if(result.data.subjects) {
-                        document.getElementById('subjectsInput').value = result.data.subjects.join(', ');
+                        selectedSubjects = Array.isArray(result.data.subjects) ? result.data.subjects : [];
+                        renderSubjects();
                     }
 
                     // Load Checkboxes
@@ -116,7 +196,7 @@
         }
 
         async function saveAvailability() {
-            const subjects = document.getElementById('subjectsInput').value.split(',').map(s => s.trim()).filter(s => s !== '');
+            const subjects = selectedSubjects;
             const availability = {};
 
             days.forEach(day => {
