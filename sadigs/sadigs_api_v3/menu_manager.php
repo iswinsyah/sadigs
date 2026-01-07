@@ -120,56 +120,56 @@ if ($method === 'GET') {
                 'label' => '1. UMUM',
                 'menus' => ['navDashboard', 'navProfil', 'navKalender', 'navJadwalPelajaran']
             ],
+            'ManajemenYayasan' => [
+                'label' => '2. MANAJEMEN YAYASAN',
+                'menus' => ['navYayasanWidget']
+            ],
             'KetuaYayasan' => [
-                'label' => '2. KETUA YAYASAN',
+                'label' => '3. KETUA YAYASAN',
                 'menus' => ['navMenuManagement', 'navUserCredentials']
             ],
             'SekretarisYayasan' => [
-                'label' => '3. SEKRETARIS YAYASAN',
+                'label' => '4. SEKRETARIS YAYASAN',
                 'menus' => ['navVerifikasi', 'navQuota', 'navCalendarSettings']
             ],
             'BendaharaYayasan' => [
-                'label' => '4. BENDAHARA YAYASAN',
+                'label' => '5. BENDAHARA YAYASAN',
                 'menus' => []
             ],
-            'ManajemenYayasan' => [
-                'label' => '5. MANAJEMEN YAYASAN',
-                'menus' => ['navYayasanWidget']
-            ],
-            'Kepegawaian' => [
-                'label' => '6. KEPEGAWAIAN',
-                'menus' => ['navAbsensi', 'navBiodataPegawai', 'navIzinPegawai', 'navBukuIndukPegawai', 'navRapat', 'navJadwalRapat']
+            'ManajemenSekolah' => [
+                'label' => '6. MANAJEMEN SEKOLAH',
+                'menus' => ['navBukuIndukSantri', 'navAturKurikulum']
             ],
             'KepalaSekolah' => [
                 'label' => '7. KEPALA SEKOLAH',
-                'menus' => ['navPenilaianKinerja', 'navMonitoringAkademik', 'navValidasiIzin', 'navDaftarIzin', 'navValidasiPeraturan', 'navBuatPeraturan', 'navAturKurikulum']
+                'menus' => ['navPenilaianKinerja', 'navMonitoringAkademik', 'navValidasiIzin', 'navDaftarIzin', 'navValidasiPeraturan', 'navBuatPeraturan']
+            ],
+            'KepalaAsrama' => [
+                'label' => '8. KEPALA ASRAMA',
+                'menus' => ['navOnLeaveList']
             ],
             'SekretarisSekolah' => [
-                'label' => '8. SEKRETARIS SEKOLAH',
+                'label' => '9. SEKRETARIS SEKOLAH',
                 'menus' => []
             ],
             'BendaharaSekolah' => [
-                'label' => '9. BENDAHARA SEKOLAH',
+                'label' => '10. BENDAHARA SEKOLAH',
                 'menus' => ['navValidasiPembayaran', 'navTabelPembayaran', 'navRekapPembayaran', 'navPocketMoneyValidation', 'navFormulirTransaksi', 'navTabelTransaksi']
             ],
-            'AdminSekolah' => [
-                'label' => '10. ADMIN SEKOLAH',
-                'menus' => ['navBukuIndukSantri']
-            ],
-            'KepalaAsrama' => [
-                'label' => '11. KEPALA ASRAMA',
-                'menus' => ['navOnLeaveList']
-            ],
-            'Musyrif' => [
-                'label' => '12. MUSYRIF',
-                'menus' => ['navMentoring', 'navInputTahfizh', 'navValidasiIbadah', 'navGuardianLeaveValidation', 'navMusyrifPocketMoney', 'navMusyrifWithdrawalValidation']
+            'Kepegawaian' => [
+                'label' => '11. ADMINISTRASI PEGAWAI',
+                'menus' => ['navAbsensi', 'navBiodataPegawai', 'navIzinPegawai', 'navBukuIndukPegawai', 'navRapat', 'navJadwalRapat']
             ],
             'Ustadz' => [
-                'label' => '13. USTADZ',
+                'label' => '12. USTADZ',
                 'menus' => ['navRppGenerator', 'navRppAlbum', 'navPerencanaanAkademik', 'navKetersediaanMengajar', 'navInputNilai']
             ],
-            'Kesantrian' => [
-                'label' => '14. KESANTRIAN',
+            'Musyrif' => [
+                'label' => '13. MUSYRIF',
+                'menus' => ['navMentoring', 'navInputTahfizh', 'navValidasiIbadah', 'navGuardianLeaveValidation', 'navMusyrifPocketMoney', 'navMusyrifWithdrawalValidation']
+            ],
+            'Santri' => [
+                'label' => '14. SANTRI',
                 'menus' => ['navBiodataSantri', 'navIbadahHarian', 'navSantriPocketMoney']
             ],
             'Walisantri' => [
