@@ -226,54 +226,76 @@
             const container = document.getElementById('structureContainer');
             container.innerHTML = '';
 
-            // 1. Siapkan wadah kategori (Clone struktur kategori tanpa menu)
+            // 1. Siapkan wadah kategori & helper
             const tempCategories = JSON.parse(JSON.stringify(globalData.categories));
             Object.keys(tempCategories).forEach(k => tempCategories[k].menus = []);
-
-            // 2. Logika Pengelompokan Otomatis Berdasarkan Izin (Rules 1-5)
             const roles = globalData.roles;
             const matrix = globalData.matrix;
-            
-            // Helper: Cek apakah roles memiliki semua target
             const hasRoles = (allowed, targets) => targets.every(t => allowed.includes(t));
+            const arraysAreEqual = (a, b) => {
+                if (a.length !== b.length) return false;
+                const setA = new Set(a);
+                for (const item of b) {
+                    if (!setA.has(item)) return false;
+                }
+                return true;
+            };
 
+            // 2. Logika Pengelompokan Otomatis
             Object.keys(globalData.menu_names).forEach(menuId => {
                 // Ambil role yang diizinkan untuk menu ini
                 const allowed = roles.filter(r => matrix[menuId]?.[r] === 1);
                 
-                let targetCat = 'Umum'; // Default fallback
+                let targetCat = null;
 
-                // RULE 1: Umum (Semua peran dicentang)
-                if (allowed.length === roles.length && allowed.length > 0) {
-                    targetCat = 'Umum';
+                // ATURAN BARU: DIV KHUSUS (Akses Eksklusif)
+                if (arraysAreEqual(allowed, ['Ketua Yayasan'])) {
+                    targetCat = 'KetuaYayasan';
+                } else if (arraysAreEqual(allowed, ['Sekretaris Yayasan'])) {
+                    targetCat = 'SekretarisYayasan';
+                } else if (arraysAreEqual(allowed, ['Bendahara Yayasan'])) {
+                    targetCat = 'BendaharaYayasan';
+                } else if (arraysAreEqual(allowed, ['Kepala Sekolah'])) {
+                    targetCat = 'KepalaSekolah';
+                } else if (arraysAreEqual(allowed, ['Sekretaris Sekolah'])) {
+                    targetCat = 'SekretarisSekolah';
+                } else if (arraysAreEqual(allowed, ['Bendahara Sekolah'])) {
+                    targetCat = 'BendaharaSekolah';
+                } else if (arraysAreEqual(allowed, ['Kepala Asrama Putra', 'Kepala Asrama Putri'])) {
+                    targetCat = 'KepalaAsrama';
+                } else if (arraysAreEqual(allowed, ['Musyrif', 'Musyrifah'])) {
+                    targetCat = 'Musyrif';
+                } else if (arraysAreEqual(allowed, ['Ustadz', 'Ustadzah'])) {
+                    targetCat = 'Ustadz';
+                } else if (arraysAreEqual(allowed, ['Santri Rijal', 'Santri Nisa\''])) {
+                    targetCat = 'Santri';
+                } else if (arraysAreEqual(allowed, ['Walisantri'])) {
+                    targetCat = 'Walisantri';
                 }
-                // RULE 2: Manajemen Yayasan (Ketua, Sekretaris, Bendahara Yayasan)
-                else if (hasRoles(allowed, ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan'])) {
-                    targetCat = 'ManajemenYayasan';
-                }
-                // RULE 4: Kepegawaian (KS, SS, BS, KA Putra/i, Musyrif/ah, Ustadz/ah)
-                // Cek ini DULUAN sebelum Manajemen Sekolah karena ini superset (lebih banyak syaratnya)
-                else if (hasRoles(allowed, ['Kepala Sekolah', 'Sekretaris Sekolah', 'Bendahara Sekolah', 'Kepala Asrama Putra', 'Kepala Asrama Putri', 'Musyrif', 'Musyrifah', 'Ustadz', 'Ustadzah'])) {
-                    targetCat = 'Kepegawaian';
-                }
-                // RULE 3: Manajemen Sekolah (KS, SS, BS)
-                else if (hasRoles(allowed, ['Kepala Sekolah', 'Sekretaris Sekolah', 'Bendahara Sekolah'])) {
-                    targetCat = 'ManajemenSekolah';
-                }
-                // RULE 5: Sesuai Peran yang dicentang
-                else if (allowed.length > 0) {
-                    // Ambil role pertama sebagai acuan kategori
-                    const firstRole = allowed[0];
-                    // Normalisasi nama role ke ID Kategori (Hapus spasi, misal "Ketua Yayasan" -> "KetuaYayasan")
-                    const normalized = firstRole.replace(/\s+/g, '');
-                    
-                    // Cek mapping khusus jika nama role beda dengan ID kategori
-                    if (tempCategories[normalized]) targetCat = normalized;
-                    else if (firstRole.includes('Santri')) targetCat = 'Santri';
-                    else if (firstRole.includes('Walisantri')) targetCat = 'Walisantri';
-                    else if (firstRole.includes('Musyrif')) targetCat = 'Musyrif';
-                    else if (firstRole.includes('Ustadz')) targetCat = 'Ustadz';
-                    else targetCat = normalized; 
+
+                // Jika tidak ada aturan eksklusif yang cocok, gunakan aturan lama
+                if (!targetCat) {
+                    if (allowed.length === roles.length && allowed.length > 0) {
+                        targetCat = 'Umum';
+                    } else if (hasRoles(allowed, ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan'])) {
+                        targetCat = 'ManajemenYayasan';
+                    } else if (hasRoles(allowed, ['Kepala Sekolah', 'Sekretaris Sekolah', 'Bendahara Sekolah', 'Kepala Asrama Putra', 'Kepala Asrama Putri', 'Musyrif', 'Musyrifah', 'Ustadz', 'Ustadzah'])) {
+                        targetCat = 'Kepegawaian';
+                    } else if (hasRoles(allowed, ['Kepala Sekolah', 'Sekretaris Sekolah', 'Bendahara Sekolah'])) {
+                        targetCat = 'ManajemenSekolah';
+                    } else if (allowed.length > 0) {
+                        const firstRole = allowed[0];
+                        const normalized = firstRole.replace(/\s+/g, '');
+                        if (tempCategories[normalized]) targetCat = normalized;
+                        else if (firstRole.includes('Kepala Asrama')) targetCat = 'KepalaAsrama';
+                        else if (firstRole.includes('Musyrif')) targetCat = 'Musyrif';
+                        else if (firstRole.includes('Ustadz')) targetCat = 'Ustadz';
+                        else if (firstRole.includes('Santri')) targetCat = 'Santri';
+                        else if (firstRole.includes('Walisantri')) targetCat = 'Walisantri';
+                        else targetCat = 'Umum';
+                    } else {
+                        return; // Jangan tampilkan menu yang tidak punya izin sama sekali
+                    }
                 }
 
                 // Pastikan kategori target ada, jika tidak masukkan ke Umum
