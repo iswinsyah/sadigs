@@ -205,6 +205,17 @@ try {
         }
         $pdo->commit();
     }
+    
+    // 2.5. SYNC LINKS (FIX: Update link jika tabel sudah ada tapi kolom link masih default '#')
+    // Ini memastikan link dari master_structure masuk ke database meskipun data kategori sudah ada.
+    $stmtUpdateLink = $pdo->prepare("UPDATE menus SET link = ?, icon = ? WHERE menu_id = ?");
+    foreach ($master_structure as $cat_data) {
+        foreach ($cat_data['items'] as $item) {
+            $link = $item['link'] ?? '#';
+            $icon = $item['icon'] ?? 'circle';
+            $stmtUpdateLink->execute([$link, $icon, $item['id']]);
+        }
+    }
 
     // 3. AMBIL DATA DARI DATABASE
     // A. Struktur Menu
