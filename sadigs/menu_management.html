@@ -241,6 +241,10 @@
                 return true;
             };
 
+            // Prioritas Role untuk penentuan kategori (Hierarki Tertinggi ke Terendah)
+            // Jika menu dishare, akan ikut kategori role dengan prioritas lebih tinggi
+            const rolePriority = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan', 'Kepala Sekolah', 'Kepala Asrama Putra', 'Kepala Asrama Putri', 'Musyrif', 'Ustadz', 'Santri Rijal', 'Walisantri'];
+
             // 2. Logika Pengelompokan Otomatis
             Object.keys(globalData.menu_names).forEach(menuId => {
                 // Ambil role yang diizinkan untuk menu ini
@@ -284,7 +288,13 @@
                     } else if (hasRoles(allowed, ['Kepala Sekolah', 'Sekretaris Sekolah', 'Bendahara Sekolah'])) {
                         targetCat = 'ManajemenSekolah';
                     } else if (allowed.length > 0) {
-                        const firstRole = allowed[0];
+                        // Cari role dengan prioritas tertinggi yang punya akses
+                        // Agar menu shared tidak masuk ke kategori level bawah (misal: Menu Santri yang bisa dilihat Ketua Yayasan jangan masuk Div Santri)
+                        const firstRole = allowed.sort((a, b) => {
+                            const idxA = rolePriority.indexOf(a);
+                            const idxB = rolePriority.indexOf(b);
+                            return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB);
+                        })[0];
                         const normalized = firstRole.replace(/\s+/g, '');
                         if (tempCategories[normalized]) targetCat = normalized;
                         else if (firstRole.includes('Kepala Asrama')) targetCat = 'KepalaAsrama';
