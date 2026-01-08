@@ -3,178 +3,238 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manajemen Akses Menu | SADIGS</title>
+    <title>Manajemen Akses & Struktur Menu | SADIGS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- SortableJS untuk Drag & Drop -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        /* Bekukan baris header tabel */
-        thead th { 
-            position: sticky; 
-            top: 0; 
-            background-color: #f9fafb; /* Tailwind bg-gray-50 */
-            z-index: 10; 
-        }
-        /* Bekukan kolom pertama (Menu) */
-        thead th:first-child,
-        tbody td:first-child {
-            position: sticky;
-            left: 0;
-        }
-        tbody td:first-child {
-            background-color: #ffffff; /* Tailwind bg-white */
-        }
-        /* Pastikan pojok kiri atas selalu di paling depan */
-        thead th:first-child {
-            z-index: 20;
-        }
+        body{font-family:'Inter',sans-serif;}
+        .sortable-ghost { opacity: 0.4; background-color: #f3f4f6; border: 2px dashed #cbd5e1; }
+        .sortable-drag { cursor: grabbing; }
+        .menu-item { cursor: grab; }
+        .menu-item:active { cursor: grabbing; }
     </style>
 </head>
-<body class="bg-gray-50">
-    <div class="container mx-auto p-4 lg:p-8">
-        <div class="flex items-center gap-3 mb-6">
-            <a href="dashboard.html" class="p-2 bg-white rounded-full shadow-sm hover:bg-gray-100 transition"><i data-lucide="arrow-left" class="w-5 h-5 text-gray-600"></i></a>
-            <h1 class="text-2xl font-bold text-gray-800">Manajemen Akses Menu</h1>
-        </div>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased">
 
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-            <div class="p-4 bg-yellow-50 text-sm text-yellow-800 flex gap-2">
-                <i data-lucide="info" class="w-5 h-5 flex-shrink-0"></i>
-                <p>Atur menu mana saja yang dapat diakses oleh setiap peran. Perubahan akan langsung aktif setelah disimpan.</p>
+    <div class="flex h-screen overflow-hidden">
+        <!-- SIDEBAR -->
+        <aside class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col hidden lg:flex">
+            <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-teal-600 text-white">
+                <h1 class="text-2xl font-extrabold tracking-wider">SADIGS</h1>
             </div>
-            <div id="loading" class="text-center py-20">
-                <i data-lucide="loader-2" class="w-8 h-8 animate-spin mx-auto text-blue-500"></i>
-                <p class="text-gray-500 mt-2">Memuat data izin akses...</p>
+            <div class="p-6">
+                <a href="dashboard.html" class="flex items-center gap-2 text-gray-600 hover:text-teal-600 transition">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i> Kembali ke Dashboard
+                </a>
             </div>
-            <div id="tableContainer" class="hidden overflow-auto max-h-[70vh]">
-                <table class="w-full text-sm text-left">
-                    <thead id="tableHead" class="bg-gray-50 text-gray-600 uppercase text-xs"></thead>
-                    <tbody id="tableBody"></tbody>
-                </table>
+        </aside>
+
+        <!-- KONTEN UTAMA -->
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">Manajemen Akses & Menu</h1>
+                        <p class="text-sm text-gray-500">Atur izin akses peran dan susunan menu (Drag & Drop).</p>
+                    </div>
+                    <div class="flex gap-3">
+                        <button onclick="switchTab('permissions')" id="tabPerms" class="px-4 py-2 bg-teal-600 text-white rounded-lg font-bold shadow-sm transition">Izin Akses</button>
+                        <button onclick="switchTab('structure')" id="tabStruct" class="px-4 py-2 bg-white text-gray-600 border border-gray-300 hover:bg-gray-50 rounded-lg font-bold shadow-sm transition">Susunan Menu</button>
+                    </div>
+                </div>
+
+                <!-- TAB 1: IZIN AKSES (MATRIX) -->
+                <div id="viewPermissions" class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200" id="permsTable">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider sticky left-0 bg-gray-50 z-10">Menu / Fitur</th>
+                                    <!-- Role headers will be injected here -->
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200" id="permsBody">
+                                <tr><td class="p-8 text-center text-gray-400">Memuat data...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="p-4 border-t border-gray-100 bg-gray-50 flex justify-end">
+                        <button onclick="saveChanges()" class="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2 rounded-lg font-bold shadow-md transition flex items-center gap-2">
+                            <i data-lucide="save" class="w-4 h-4"></i> Simpan Perubahan Izin
+                        </button>
+                    </div>
+                </div>
+
+                <!-- TAB 2: STRUKTUR MENU (DRAG & DROP) -->
+                <div id="viewStructure" class="hidden">
+                    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 rounded-r-lg">
+                        <div class="flex">
+                            <div class="flex-shrink-0"><i data-lucide="info" class="h-5 w-5 text-yellow-400"></i></div>
+                            <div class="ml-3"><p class="text-sm text-yellow-700">Geser menu antar kotak untuk memindahkan kelompok. Perubahan akan langsung mengubah tampilan Sidebar Dashboard.</p></div>
+                        </div>
+                    </div>
+                    
+                    <div id="structureContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Categories will be injected here -->
+                    </div>
+
+                    <div class="fixed bottom-6 right-6">
+                        <button onclick="saveStructure()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full font-bold shadow-xl transition flex items-center gap-2 transform hover:scale-105">
+                            <i data-lucide="save" class="w-5 h-5"></i> Simpan Susunan
+                        </button>
+                    </div>
+                </div>
+
             </div>
-        </div>
-        
-        <div class="mt-6 flex justify-end">
-            <button id="saveBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition shadow-md flex items-center gap-2 disabled:opacity-50" disabled>
-                <i data-lucide="save" class="w-5 h-5"></i> Simpan Perubahan
-            </button>
-        </div>
+        </main>
     </div>
 
     <script>
-        lucide.createIcons();
-        let changes = [];
+        let globalData = null;
+        let pendingUpdates = [];
 
-        const loadingEl = document.getElementById('loading');
-        const tableContainer = document.getElementById('tableContainer');
-        const tableHead = document.getElementById('tableHead');
-        const tableBody = document.getElementById('tableBody');
-        const saveBtn = document.getElementById('saveBtn');
-
-        async function loadPermissions() {
-            try {
-                const res = await fetch('sadigs_api_v3/menu_manager.php');
-                const data = await res.json();
-
-                if (!data.success) {
-                    throw new Error(data.message);
-                }
-
-                const { roles, categories, matrix, menu_names } = data;
-                
-                // Build Header
-                let headerHtml = '<tr><th class="px-4 py-3">Menu</th>';
-                roles.forEach(role => {
-                    headerHtml += `<th class="px-4 py-3 text-center">${role}</th>`;
-                });
-                headerHtml += '</tr>';
-                tableHead.innerHTML = headerHtml;
-
-                // Build Body
-                tableBody.innerHTML = '';
-                for (const catKey in categories) {
-                    const category = categories[catKey];
-                    // Category Row
-                    const catRow = document.createElement('tr');
-                    catRow.className = 'bg-gray-100';
-                    catRow.innerHTML = `<td colspan="${roles.length + 1}" class="px-4 py-2 font-bold text-gray-700">${category.label}</td>`;
-                    tableBody.appendChild(catRow);
-
-                    // Menu Rows
-                    category.menus.forEach(menuId => {
-                        const menuRow = document.createElement('tr');
-                        menuRow.className = 'border-b hover:bg-gray-50';
-                        
-                        // Menu Name Cell - INI BAGIAN PERBAIKANNYA
-                        const menuName = menu_names[menuId] || menuId;
-                        menuRow.innerHTML = `<td class="px-4 py-3 font-medium text-gray-800">${menuName}</td>`;
-
-                        // Checkbox Cells
-                        roles.forEach(role => {
-                            const isAllowed = matrix[menuId] && matrix[menuId][role] ? 1 : 0;
-                            const td = document.createElement('td');
-                            td.className = 'text-center';
-                            td.innerHTML = `<input type="checkbox" data-role="${role}" data-menu="${menuId}" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" ${isAllowed ? 'checked' : ''}>`;
-                            menuRow.appendChild(td);
-                        });
-                        tableBody.appendChild(menuRow);
-                    });
-                }
-
-                loadingEl.classList.add('hidden');
-                tableContainer.classList.remove('hidden');
-                addEventListeners();
-
-            } catch (err) {
-                loadingEl.innerHTML = `<p class="text-red-500">Gagal memuat data: ${err.message}</p>`;
+        function switchTab(tab) {
+            if(tab === 'permissions') {
+                document.getElementById('viewPermissions').classList.remove('hidden');
+                document.getElementById('viewStructure').classList.add('hidden');
+                document.getElementById('tabPerms').className = "px-4 py-2 bg-teal-600 text-white rounded-lg font-bold shadow-sm transition";
+                document.getElementById('tabStruct').className = "px-4 py-2 bg-white text-gray-600 border border-gray-300 hover:bg-gray-50 rounded-lg font-bold shadow-sm transition";
+            } else {
+                document.getElementById('viewPermissions').classList.add('hidden');
+                document.getElementById('viewStructure').classList.remove('hidden');
+                document.getElementById('tabPerms').className = "px-4 py-2 bg-white text-gray-600 border border-gray-300 hover:bg-gray-50 rounded-lg font-bold shadow-sm transition";
+                document.getElementById('tabStruct').className = "px-4 py-2 bg-teal-600 text-white rounded-lg font-bold shadow-sm transition";
+                renderStructure(); // Render saat tab dibuka
             }
         }
 
-        function addEventListeners() {
-            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-                checkbox.addEventListener('change', (e) => {
-                    saveBtn.disabled = false;
-                    saveBtn.classList.remove('disabled:opacity-50');
+        async function loadData() {
+            const res = await fetch('sadigs_api_v3/menu_manager.php');
+            globalData = await res.json();
+            renderPermissions();
+        }
+
+        function renderPermissions() {
+            const thead = document.querySelector('#permsTable thead tr');
+            const tbody = document.getElementById('permsBody');
+            
+            // Render Headers
+            let headerHTML = '<th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider sticky left-0 bg-gray-50 z-10 shadow-sm border-r">Menu / Fitur</th>';
+            globalData.roles.forEach(role => {
+                headerHTML += `<th class="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider min-w-[100px]">${role}</th>`;
+            });
+            thead.innerHTML = headerHTML;
+
+            // Render Body
+            tbody.innerHTML = '';
+            for (const [catId, cat] of Object.entries(globalData.categories)) {
+                // Category Row
+                tbody.innerHTML += `<tr class="bg-gray-100"><td colspan="${globalData.roles.length + 1}" class="px-6 py-2 text-xs font-bold text-gray-600 uppercase tracking-wider sticky left-0 bg-gray-100 z-10">${cat.label}</td></tr>`;
+                
+                cat.menus.forEach(menuId => {
+                    const menuName = globalData.menu_names[menuId] || menuId;
+                    let rowHTML = `<tr class="hover:bg-gray-50 transition">
+                        <td class="px-6 py-3 text-sm font-medium text-gray-800 sticky left-0 bg-white z-10 border-r shadow-sm flex items-center gap-2">
+                            <i data-lucide="${globalData.menu_icons?.[menuId] || 'circle'}" class="w-4 h-4 text-gray-400"></i> ${menuName}
+                        </td>`;
                     
-                    const change = {
-                        role: e.target.dataset.role,
-                        menu: e.target.dataset.menu,
-                        state: e.target.checked ? 1 : 0
-                    };
-                    changes = changes.filter(c => !(c.role === change.role && c.menu === change.menu));
-                    changes.push(change);
+                    globalData.roles.forEach(role => {
+                        const isAllowed = globalData.matrix[menuId]?.[role] === 1;
+                        rowHTML += `
+                            <td class="px-4 py-3 text-center">
+                                <input type="checkbox" 
+                                    onchange="trackChange('${role}', '${menuId}', this.checked)"
+                                    ${isAllowed ? 'checked' : ''} 
+                                    class="w-5 h-5 text-teal-600 rounded border-gray-300 focus:ring-teal-500 cursor-pointer">
+                            </td>`;
+                    });
+                    rowHTML += '</tr>';
+                    tbody.innerHTML += rowHTML;
+                });
+            }
+            lucide.createIcons();
+        }
+
+        function trackChange(role, menu, isChecked) {
+            pendingUpdates.push({ role: role, menu: menu, state: isChecked ? 1 : 0 });
+        }
+
+        async function saveChanges() {
+            if(pendingUpdates.length === 0) return alert("Tidak ada perubahan.");
+            const res = await fetch('sadigs_api_v3/menu_manager.php', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ updates: pendingUpdates })
+            });
+            const result = await res.json();
+            if(result.success) { alert("Perubahan tersimpan!"); pendingUpdates = []; loadData(); }
+            else alert("Gagal menyimpan.");
+        }
+
+        // --- LOGIKA DRAG & DROP ---
+        function renderStructure() {
+            const container = document.getElementById('structureContainer');
+            container.innerHTML = '';
+
+            for (const [catId, cat] of Object.entries(globalData.categories)) {
+                const catDiv = document.createElement('div');
+                catDiv.className = "bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col";
+                catDiv.innerHTML = `
+                    <div class="p-3 bg-gray-50 border-b border-gray-200 font-bold text-xs text-gray-500 uppercase tracking-wider flex justify-between items-center">
+                        <span>${cat.label}</span>
+                        <span class="bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full text-[10px]">${cat.menus.length}</span>
+                    </div>
+                    <div class="p-2 flex-1 min-h-[50px] space-y-2 sortable-list" data-cat-id="${catId}">
+                        ${cat.menus.map(menuId => `
+                            <div class="menu-item bg-white border border-gray-200 p-2 rounded-lg shadow-sm text-sm flex items-center gap-2 hover:border-teal-400 transition" data-menu-id="${menuId}">
+                                <i data-lucide="${globalData.menu_icons?.[menuId] || 'circle'}" class="w-4 h-4 text-gray-400"></i>
+                                <span class="font-medium text-gray-700">${globalData.menu_names[menuId] || menuId}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                container.appendChild(catDiv);
+            }
+            lucide.createIcons();
+
+            // Init SortableJS
+            document.querySelectorAll('.sortable-list').forEach(el => {
+                new Sortable(el, {
+                    group: 'shared', // Allow dragging between lists
+                    animation: 150,
+                    ghostClass: 'sortable-ghost',
+                    dragClass: 'sortable-drag'
                 });
             });
         }
 
-        saveBtn.addEventListener('click', async () => {
-            if (changes.length === 0) return;
-            saveBtn.disabled = true;
-            saveBtn.innerHTML = 'Menyimpan...';
-
-            try {
-                const res = await fetch('sadigs_api_v3/menu_manager.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ updates: changes })
+        async function saveStructure() {
+            const updates = [];
+            document.querySelectorAll('.sortable-list').forEach(list => {
+                const catId = list.getAttribute('data-cat-id');
+                list.querySelectorAll('.menu-item').forEach((item, index) => {
+                    updates.push({
+                        menu_id: item.getAttribute('data-menu-id'),
+                        category_id: catId,
+                        sort_order: index + 1
+                    });
                 });
-                const result = await res.json();
-                if (result.success) {
-                    alert('Perubahan berhasil disimpan!');
-                    changes = [];
-                    saveBtn.innerHTML = '<i data-lucide="save" class="w-5 h-5"></i> Simpan Perubahan';
-                    lucide.createIcons();
-                } else { throw new Error(result.message || 'Gagal menyimpan.'); }
-            } catch (err) {
-                alert('Error: ' + err.message);
-                saveBtn.disabled = false;
-                saveBtn.innerHTML = '<i data-lucide="save" class="w-5 h-5"></i> Simpan Perubahan';
-                lucide.createIcons();
-            }
-        });
+            });
 
-        loadPermissions();
+            const res = await fetch('sadigs_api_v3/menu_manager.php', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ structure_updates: updates })
+            });
+            const result = await res.json();
+            if(result.success) { alert("Susunan menu berhasil disimpan! Sidebar akan diperbarui."); loadData(); }
+            else alert("Gagal menyimpan: " + result.message);
+        }
+
+        loadData();
     </script>
 </body>
 </html>

@@ -1,6 +1,6 @@
 <?php
 // API: Manage Menu Permissions (Get Matrix & Update)
-// Matikan error display agar tidak merusak JSON
+// Matikan error display agar tidak merusak JSON output
 ini_set('display_errors', 0);
 error_reporting(0);
 ob_start(); // Mulai buffer output
@@ -29,6 +29,13 @@ try {
 } catch (Exception $e) {
     // Abaikan error (misal tabel belum ada)
 }
+
+// --- AUTO-FIX: TAMBAH KOLOM UNTUK STRUKTUR DINAMIS ---
+// Menambahkan kolom category_id, sort_order, dan icon ke tabel menus
+try {
+    $pdo->exec("ALTER TABLE menus ADD COLUMN category_id VARCHAR(50) DEFAULT 'Umum', ADD COLUMN sort_order INT DEFAULT 0, ADD COLUMN icon VARCHAR(50) DEFAULT 'circle'");
+} catch (Exception $e) { /* Kolom mungkin sudah ada */ }
+
 // ---------------------------------------------
 
 // --- DARURAT: RESET IZIN VIA URL ---
@@ -60,6 +67,14 @@ $pdo->exec("CREATE TABLE IF NOT EXISTS menu_permissions (
     UNIQUE KEY unique_perm (role_name, menu_id)
 )");
 
+// 1.b Pastikan tabel categories ada
+$pdo->exec("CREATE TABLE IF NOT EXISTS menu_categories (
+    category_id VARCHAR(50) PRIMARY KEY,
+    label VARCHAR(100) NOT NULL,
+    sort_order INT DEFAULT 0
+)");
+
+
 // --- KUNCI PENGAMAN (FAILSAFE) ---
 // Pastikan Ketua Yayasan SELALU bisa mengakses halaman Manajemen Akses.
 $stmt_failsafe = $pdo->prepare("INSERT INTO menu_permissions (role_name, menu_id, is_allowed) VALUES ('Ketua Yayasan', 'navMenuManagement', 1) ON DUPLICATE KEY UPDATE is_allowed = 1");
@@ -67,19 +82,150 @@ $stmt_failsafe->execute();
 // --- AKHIR KUNCI PENGAMAN ---
 
 
-// 2. Seed Default Permission jika tabel kosong (Agar Ketua Yayasan tidak terkunci)
-$stmtCount = $pdo->query("SELECT COUNT(*) FROM menu_permissions");
-if ($stmtCount->fetchColumn() == 0) {
-    // Berikan akses vital ke Ketua Yayasan
-    $defaults = [
-        ['Ketua Yayasan', 'navMenuManagement'],
-        ['Ketua Yayasan', 'navDashboard'],
-        ['Ketua Yayasan', 'navVerifikasi'],
-        ['Ketua Yayasan', 'navQuota']
+// 2. SEEDING DATA AWAL (MIGRASI DARI HARDCODED KE DB)
+// Jika tabel kategori kosong, kita isi dengan struktur default yang ada sekarang.
+$stmtCatCount = $pdo->query("SELECT COUNT(*) FROM menu_categories");
+if ($stmtCatCount->fetchColumn() == 0) {
+    
+    // Definisi Struktur Default (Sesuai Dashboard Terakhir)
+    $initial_structure = [
+        'Umum' => [
+            'label' => '1. UMUM',
+            'items' => [
+                ['id' => 'navDashboard', 'label' => 'Dashboard', 'icon' => 'layout-dashboard'],
+                ['id' => 'navProfil', 'label' => 'Profil Saya', 'icon' => 'user'],
+                ['id' => 'navKalender', 'label' => 'Kalender Pendidikan', 'icon' => 'calendar'],
+                ['id' => 'navJadwalPelajaran', 'label' => 'Jadwal Pelajaran', 'icon' => 'calendar-days']
+            ]
+        ],
+        'ManajemenYayasan' => [
+            'label' => '2. MANAJEMEN YAYASAN',
+            'items' => [
+                ['id' => 'navYayasanWidget', 'label' => 'Ringkasan Manajemen', 'icon' => 'activity'] // Widget khusus
+            ]
+        ],
+        'KetuaYayasan' => [
+            'label' => '3. KETUA YAYASAN',
+            'items' => [
+                ['id' => 'navMenuManagement', 'label' => 'Manajemen Akses', 'icon' => 'lock'],
+                ['id' => 'navUserCredentials', 'label' => 'Data Akun Pengguna', 'icon' => 'key']
+            ]
+        ],
+        'SekretarisYayasan' => [
+            'label' => '4. SEKRETARIS YAYASAN',
+            'items' => [
+                ['id' => 'navVerifikasi', 'label' => 'Verifikasi Pengguna', 'icon' => 'user-check'],
+                ['id' => 'navQuota', 'label' => 'Atur Kuota Peran', 'icon' => 'users'],
+                ['id' => 'navCalendarSettings', 'label' => 'Atur Kalender', 'icon' => 'calendar-cog']
+            ]
+        ],
+        'BendaharaYayasan' => ['label' => '5. BENDAHARA YAYASAN', 'items' => []],
+        'ManajemenSekolah' => [
+            'label' => '6. MANAJEMEN SEKOLAH',
+            'items' => [
+                ['id' => 'navBukuIndukSantri', 'label' => 'Buku Induk Santri', 'icon' => 'book'],
+                ['id' => 'navAturKurikulum', 'label' => 'Atur Kurikulum', 'icon' => 'book-open-check']
+            ]
+        ],
+        'KepalaSekolah' => [
+            'label' => '7. KEPALA SEKOLAH',
+            'items' => [
+                ['id' => 'navPenilaianKinerja', 'label' => 'Penilaian Kinerja', 'icon' => 'award'],
+                ['id' => 'navMonitoringAkademik', 'label' => 'Monitoring Akademik', 'icon' => 'monitor-check'],
+                ['id' => 'navValidasiIzin', 'label' => 'Validasi Izin', 'icon' => 'check-square'],
+                ['id' => 'navDaftarIzin', 'label' => 'Daftar Izin', 'icon' => 'list-checks'],
+                ['id' => 'navValidasiPeraturan', 'label' => 'Validasi Peraturan', 'icon' => 'gavel'],
+                ['id' => 'navBuatPeraturan', 'label' => 'Terbitkan Peraturan', 'icon' => 'megaphone']
+            ]
+        ],
+        'KepalaAsrama' => [
+            'label' => '8. KEPALA ASRAMA',
+            'items' => [['id' => 'navOnLeaveList', 'label' => 'Santri Sedang Pulang', 'icon' => 'user-minus']]
+        ],
+        'SekretarisSekolah' => ['label' => '9. SEKRETARIS SEKOLAH', 'items' => []],
+        'BendaharaSekolah' => [
+            'label' => '10. BENDAHARA SEKOLAH',
+            'items' => [
+                ['id' => 'navValidasiPembayaran', 'label' => 'Validasi Pembayaran', 'icon' => 'check-circle-2'],
+                ['id' => 'navTabelPembayaran', 'label' => 'Data Pembayaran', 'icon' => 'banknote'],
+                ['id' => 'navRekapPembayaran', 'label' => 'Rekap Keuangan', 'icon' => 'pie-chart'],
+                ['id' => 'navPocketMoneyValidation', 'label' => 'Validasi Uang Saku', 'icon' => 'check-circle-2'],
+                ['id' => 'navFormulirTransaksi', 'label' => 'Form Transaksi Harian', 'icon' => 'pen-tool'],
+                ['id' => 'navTabelTransaksi', 'label' => 'Buku Transaksi Harian', 'icon' => 'book']
+            ]
+        ],
+        'Kepegawaian' => [
+            'label' => '11. ADMINISTRASI PEGAWAI',
+            'items' => [
+                ['id' => 'navAbsensi', 'label' => 'Absensi Pegawai', 'icon' => 'map-pin'],
+                ['id' => 'navBiodataPegawai', 'label' => 'Biodata Pegawai', 'icon' => 'file-badge'],
+                ['id' => 'navIzinPegawai', 'label' => 'Formulir Izin', 'icon' => 'file-edit'],
+                ['id' => 'navBukuIndukPegawai', 'label' => 'Buku Induk Pegawai', 'icon' => 'book-open'],
+                ['id' => 'navRapat', 'label' => 'Undang Rapat', 'icon' => 'mail'],
+                ['id' => 'navJadwalRapat', 'label' => 'Jadwal Rapat', 'icon' => 'calendar-clock']
+            ]
+        ],
+        'Ustadz' => [
+            'label' => '12. USTADZ',
+            'items' => [
+                ['id' => 'navRppGenerator', 'label' => 'Generator Modul Ajar', 'icon' => 'brain-circuit'],
+                ['id' => 'navRppAlbum', 'label' => 'Album Perangkat Ajar', 'icon' => 'folder-open'],
+                ['id' => 'navPerencanaanAkademik', 'label' => 'Buku Kerja Ustadz', 'icon' => 'book-check'],
+                ['id' => 'navKetersediaanMengajar', 'label' => 'Kesediaan Mengajar', 'icon' => 'clock'],
+                ['id' => 'navInputNilai', 'label' => 'Input Nilai Rapot', 'icon' => 'graduation-cap']
+            ]
+        ],
+        'Musyrif' => [
+            'label' => '13. MUSYRIF',
+            'items' => [
+                ['id' => 'navMentoring', 'label' => 'Kelompok Mentoring', 'icon' => 'users-round'],
+                ['id' => 'navInputTahfizh', 'label' => 'Input Tahfizh', 'icon' => 'book-marked'],
+                ['id' => 'navValidasiIbadah', 'label' => 'Validasi Ibadah', 'icon' => 'check-square'],
+                ['id' => 'navGuardianLeaveValidation', 'label' => 'Validasi Izin Walisantri', 'icon' => 'mail-check'],
+                ['id' => 'navMusyrifPocketMoney', 'label' => 'Riwayat Deposit Santri', 'icon' => 'archive'],
+                ['id' => 'navMusyrifWithdrawalValidation', 'label' => 'Validasi Penarikan', 'icon' => 'check-square']
+            ]
+        ],
+        'Santri' => [
+            'label' => '14. SANTRI',
+            'items' => [
+                ['id' => 'navBiodataSantri', 'label' => 'Biodata Santri', 'icon' => 'book-user'],
+                ['id' => 'navIbadahHarian', 'label' => 'Laporan Ibadah Harian', 'icon' => 'notebook-pen'],
+                ['id' => 'navSantriPocketMoney', 'label' => 'Uang Saku Saya', 'icon' => 'landmark']
+            ]
+        ],
+        'Walisantri' => [
+            'label' => '15. WALISANTRI',
+            'items' => [
+                ['id' => 'navRekapIbadahAnak', 'label' => 'Rekap Ibadah Anak', 'icon' => 'clipboard-check'],
+                ['id' => 'navViewTahfizh', 'label' => 'Laporan Tahfizh', 'icon' => 'book-open-check'],
+                ['id' => 'navIzinWalisantri', 'label' => 'Izin Walisantri', 'icon' => 'mail-question'],
+                ['id' => 'navPocketMoneyDeposit', 'label' => 'Deposit Uang Saku', 'icon' => 'wallet'],
+                ['id' => 'navMonitoringAnak', 'label' => 'Monitoring Perkembangan', 'icon' => 'activity'],
+                ['id' => 'navFormulirPembayaran', 'label' => 'Formulir Pembayaran', 'icon' => 'credit-card']
+            ]
+        ]
     ];
-    $stmtInsert = $pdo->prepare("INSERT INTO menu_permissions (role_name, menu_id, is_allowed) VALUES (?, ?, 1)");
-    foreach ($defaults as $d) {
-        $stmtInsert->execute($d);
+
+    $pdo->beginTransaction();
+    try {
+        $sort_cat = 1;
+        foreach ($initial_structure as $cat_id => $cat_data) {
+            // Insert Kategori
+            $pdo->prepare("INSERT INTO menu_categories (category_id, label, sort_order) VALUES (?, ?, ?)")
+                ->execute([$cat_id, $cat_data['label'], $sort_cat++]);
+            
+            $sort_menu = 1;
+            foreach ($cat_data['items'] as $item) {
+                // Insert/Update Menu dengan Kategori dan Icon
+                $pdo->prepare("INSERT INTO menus (menu_id, menu_name, category_id, sort_order, icon) VALUES (?, ?, ?, ?, ?) 
+                               ON DUPLICATE KEY UPDATE category_id = VALUES(category_id), sort_order = VALUES(sort_order), icon = VALUES(icon)")
+                    ->execute([$item['id'], $item['label'], $cat_id, $sort_menu++, $item['icon']]);
+            }
+        }
+        $pdo->commit();
+    } catch (Exception $e) {
+        $pdo->rollBack();
     }
 }
 
@@ -114,69 +260,23 @@ if ($method === 'GET') {
             return $pos_a - $pos_b;
         });
 
-        // Daftar Menu (Single Source of Truth)
-        $categories = [
-            'Umum' => [
-                'label' => '1. UMUM',
-                'menus' => ['navDashboard', 'navProfil', 'navKalender', 'navJadwalPelajaran']
-            ],
-            'ManajemenYayasan' => [
-                'label' => '2. MANAJEMEN YAYASAN',
-                'menus' => ['navYayasanWidget']
-            ],
-            'KetuaYayasan' => [
-                'label' => '3. KETUA YAYASAN',
-                'menus' => ['navMenuManagement', 'navUserCredentials']
-            ],
-            'SekretarisYayasan' => [
-                'label' => '4. SEKRETARIS YAYASAN',
-                'menus' => ['navVerifikasi', 'navQuota', 'navCalendarSettings']
-            ],
-            'BendaharaYayasan' => [
-                'label' => '5. BENDAHARA YAYASAN',
-                'menus' => []
-            ],
-            'ManajemenSekolah' => [
-                'label' => '6. MANAJEMEN SEKOLAH',
-                'menus' => ['navBukuIndukSantri', 'navAturKurikulum']
-            ],
-            'KepalaSekolah' => [
-                'label' => '7. KEPALA SEKOLAH',
-                'menus' => ['navPenilaianKinerja', 'navMonitoringAkademik', 'navValidasiIzin', 'navDaftarIzin', 'navValidasiPeraturan', 'navBuatPeraturan']
-            ],
-            'KepalaAsrama' => [
-                'label' => '8. KEPALA ASRAMA',
-                'menus' => ['navOnLeaveList']
-            ],
-            'SekretarisSekolah' => [
-                'label' => '9. SEKRETARIS SEKOLAH',
-                'menus' => []
-            ],
-            'BendaharaSekolah' => [
-                'label' => '10. BENDAHARA SEKOLAH',
-                'menus' => ['navValidasiPembayaran', 'navTabelPembayaran', 'navRekapPembayaran', 'navPocketMoneyValidation', 'navFormulirTransaksi', 'navTabelTransaksi']
-            ],
-            'Kepegawaian' => [
-                'label' => '11. ADMINISTRASI PEGAWAI',
-                'menus' => ['navAbsensi', 'navBiodataPegawai', 'navIzinPegawai', 'navBukuIndukPegawai', 'navRapat', 'navJadwalRapat']
-            ],
-            'Ustadz' => [
-                'label' => '12. USTADZ',
-                'menus' => ['navRppGenerator', 'navRppAlbum', 'navPerencanaanAkademik', 'navKetersediaanMengajar', 'navInputNilai']
-            ],
-            'Musyrif' => [
-                'label' => '13. MUSYRIF',
-                'menus' => ['navMentoring', 'navInputTahfizh', 'navValidasiIbadah', 'navGuardianLeaveValidation', 'navMusyrifPocketMoney', 'navMusyrifWithdrawalValidation']
-            ],
-            'Santri' => [
-                'label' => '14. SANTRI',
-                'menus' => ['navBiodataSantri', 'navIbadahHarian', 'navSantriPocketMoney']
-            ],
-            'Walisantri' => [
-                'label' => '15. WALISANTRI',
-                'menus' => ['navRekapIbadahAnak', 'navViewTahfizh', 'navIzinWalisantri', 'navPocketMoneyDeposit', 'navMonitoringAnak', 'navFormulirPembayaran']
-            ]
-        ];
+        // --- AMBIL STRUKTUR DARI DATABASE ---
+        $categories = [];
+        $stmtCats = $pdo->query("SELECT * FROM menu_categories ORDER BY sort_order ASC");
+        while ($cat = $stmtCats->fetch(PDO::FETCH_ASSOC)) {
+            $categories[$cat['category_id']] = [
+                'label' => $cat['label'],
+                'menus' => [] // Akan diisi di bawah
+            ];
+        }
+
+        // Ambil menu dan masukkan ke kategori yang sesuai
+        $stmtMenus = $pdo->query("SELECT menu_id, category_id, icon FROM menus ORDER BY sort_order ASC");
+        while ($menu = $stmtMenus->fetch(PDO::FETCH_ASSOC)) {
+            if (isset($categories[$menu['category_id']])) {
+                $categories[$menu['category_id']]['menus'][] = $menu['menu_id'];
+            }
+        }
 
         // Ambil data permission yang ada
         $stmt = $pdo->query("SELECT role_name, menu_id, is_allowed FROM menu_permissions");
@@ -191,12 +291,21 @@ if ($method === 'GET') {
         }
 
         // Ambil nama menu yang benar dari database
-        $stmt_names = $pdo->query("SELECT menu_id, menu_name FROM menus");
-        $menu_names = $stmt_names->fetchAll(PDO::FETCH_KEY_PAIR);
+        $stmt_names = $pdo->query("SELECT menu_id, menu_name, icon FROM menus");
+        $menu_details = $stmt_names->fetchAll(PDO::FETCH_ASSOC);
+        $menu_names = [];
+        $menu_icons = [];
+        foreach($menu_details as $md) {
+            $menu_names[$md['menu_id']] = $md['menu_name'];
+            $menu_icons[$md['menu_id']] = $md['icon'];
+        }
 
 
         ob_clean(); // Bersihkan buffer sebelum kirim JSON
-        sendJSONResponse(['success' => true, 'roles' => $allRoles, 'categories' => $categories, 'matrix' => $matrix, 'menu_names' => $menu_names]);
+        sendJSONResponse([
+            'success' => true, 'roles' => $allRoles, 'categories' => $categories, 
+            'matrix' => $matrix, 'menu_names' => $menu_names, 'menu_icons' => $menu_icons
+        ]);
 
 } elseif ($method === 'POST') {
     $input = json_decode(file_get_contents('php://input'), true);
@@ -206,6 +315,23 @@ if ($method === 'GET') {
         foreach ($updates as $update) {
             $stmt->execute([$update['role'], $update['menu'], $update['state']]);
         }
+
+        // HANDLE STRUKTUR UPDATE (DRAG & DROP)
+        if (isset($input['structure_updates'])) {
+            $pdo->beginTransaction();
+            try {
+                $stmtUpdateMenu = $pdo->prepare("UPDATE menus SET category_id = ?, sort_order = ? WHERE menu_id = ?");
+                foreach ($input['structure_updates'] as $item) {
+                    $stmtUpdateMenu->execute([$item['category_id'], $item['sort_order'], $item['menu_id']]);
+                }
+                $pdo->commit();
+            } catch (Exception $e) {
+                $pdo->rollBack();
+                ob_clean();
+                sendJSONResponse(['success' => false, 'message' => 'Gagal menyimpan struktur: ' . $e->getMessage()], 500);
+            }
+        }
+
         ob_clean();
         sendJSONResponse(['success' => true]);
 }
