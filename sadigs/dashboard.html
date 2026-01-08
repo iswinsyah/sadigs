@@ -384,24 +384,7 @@
                                 const categories = permData.categories || {};
                                 const menuNames = permData.menu_names || {};
                                 const menuIcons = permData.menu_icons || {};
-
-                                // Mapping ID Menu ke File HTML (Href)
-                                const hrefMap = {
-                                    'navDashboard': 'dashboard.html', 'navProfil': 'profile.html', 'navKalender': 'calendar_view.html', 'navJadwalPelajaran': 'view_schedule.html',
-                                    'navMenuManagement': 'menu_management.html', 'navUserCredentials': 'user_credentials.html',
-                                    'navVerifikasi': 'verification_management.html', 'navQuota': 'quota_management.html', 'navCalendarSettings': 'calendar_settings.html',
-                                    'navBukuIndukSantri': 'student_master_book.html', 'navAturKurikulum': 'curriculum_settings.html',
-                                    'navPenilaianKinerja': 'performance_assessment.html', 'navMonitoringAkademik': 'academic_monitoring.html', 'navValidasiIzin': 'leave_validation.html',
-                                    'navDaftarIzin': 'leave_list.html', 'navValidasiPeraturan': 'validate_regulation.html', 'navBuatPeraturan': 'create_regulation.html',
-                                    'navOnLeaveList': 'on_leave_list.html',
-                                    'navValidasiPembayaran': 'payment_validation.html', 'navTabelPembayaran': 'payment_list.html', 'navRekapPembayaran': 'payment_recap.html',
-                                    'navPocketMoneyValidation': 'pocket_money_validation.html', 'navFormulirTransaksi': 'daily_transaction_form.html', 'navTabelTransaksi': 'daily_transaction_list.html',
-                                    'navAbsensi': 'attendance.html', 'navBiodataPegawai': 'employee_data.html', 'navIzinPegawai': 'leave_request.html', 'navBukuIndukPegawai': 'employee_master_book.html', 'navRapat': 'meeting_invitation.html', 'navJadwalRapat': 'meeting_schedule.html',
-                                    'navRppGenerator': 'rpp_generator.html', 'navRppAlbum': 'teaching_artifacts_album.html', 'navPerencanaanAkademik': 'academic_planning.html', 'navKetersediaanMengajar': 'teacher_availability.html', 'navInputNilai': 'input_grades.html',
-                                    'navMentoring': 'mentoring_groups.html', 'navInputTahfizh': 'tahfizh_report_form.html', 'navValidasiIbadah': 'daily_worship_validation.html', 'navGuardianLeaveValidation': 'guardian_leave_validation.html', 'navMusyrifPocketMoney': 'musyrif_pocket_money_view.html', 'navMusyrifWithdrawalValidation': 'musyrif_withdrawal_validation.html',
-                                    'navBiodataSantri': 'student_data.html', 'navIbadahHarian': 'daily_worship_form.html', 'navSantriPocketMoney': 'santri_pocket_money.html',
-                                    'navRekapIbadahAnak': 'select_student.html', 'navViewTahfizh': 'tahfizh_student_view.html', 'navIzinWalisantri': 'guardian_leave_request.html', 'navPocketMoneyDeposit': 'pocket_money_deposit.html', 'navMonitoringAnak': 'guardian_monitoring.html', 'navFormulirPembayaran': 'payment_form.html'
-                                };
+                                const menuLinks = permData.menu_links || {};
 
                                 // Render Menu Dinamis
                                 for (const [catId, cat] of Object.entries(categories)) {
@@ -420,7 +403,7 @@
                                             if (menuId === 'navYayasanWidget' || menuId === 'navMusyrifWidget') return; // Skip widgets
 
                                             const link = document.createElement('a');
-                                            link.href = hrefMap[menuId] || '#';
+                                            link.href = menuLinks[menuId] || '#';
                                             const isActive = window.location.pathname.includes(link.href) && link.href !== '#';
                                             
                                             link.className = isActive 

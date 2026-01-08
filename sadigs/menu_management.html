@@ -48,11 +48,11 @@
 
                 <!-- TAB 1: IZIN AKSES (MATRIX) -->
                 <div id="viewPermissions" class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                    <div class="overflow-x-auto">
+                    <div class="overflow-auto max-h-[75vh]">
                         <table class="min-w-full divide-y divide-gray-200" id="permsTable">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider sticky left-0 bg-gray-50 z-10">Menu / Fitur</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider sticky left-0 top-0 bg-gray-50 z-20 shadow-sm border-r">Menu / Fitur</th>
                                     <!-- Role headers will be injected here -->
                                 </tr>
                             </thead>
@@ -122,9 +122,9 @@
             const tbody = document.getElementById('permsBody');
             
             // Render Headers
-            let headerHTML = '<th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider sticky left-0 bg-gray-50 z-10 shadow-sm border-r">Menu / Fitur</th>';
+            let headerHTML = '<th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider sticky left-0 top-0 bg-gray-50 z-20 shadow-sm border-r">Menu / Fitur</th>';
             globalData.roles.forEach(role => {
-                headerHTML += `<th class="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider min-w-[100px]">${role}</th>`;
+                headerHTML += `<th class="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider min-w-[100px] sticky top-0 bg-gray-50 z-10 shadow-sm">${role}</th>`;
             });
             thead.innerHTML = headerHTML;
 
