@@ -128,13 +128,60 @@
             });
             thead.innerHTML = headerHTML;
 
+            // Definisi Kelompok Widget
+            const widgetGroups = {
+                'formulir': { label: '1. FORMULIR & INPUT', menus: [] },
+                'validasi': { label: '2. VALIDASI / VERIFIKASI', menus: [] },
+                'tabel': { label: '3. TABEL DATA & ARSIP', menus: [] },
+                'grafik': { label: '4. GRAFIK & MONITORING', menus: [] },
+                'lainnya': { label: 'LAINNYA', menus: [] }
+            };
+
+            // Mapping Menu ke Kelompok
+            const menuMapping = {
+                // 1. Formulir
+                'navBuatPeraturan': 'formulir', 'navFormulirTransaksi': 'formulir', 'navIzinPegawai': 'formulir', 
+                'navRapat': 'formulir', 'navRppGenerator': 'formulir', 'navInputNilai': 'formulir', 
+                'navInputTahfizh': 'formulir', 'navIbadahHarian': 'formulir', 'navIzinWalisantri': 'formulir', 
+                'navPocketMoneyDeposit': 'formulir', 'navFormulirPembayaran': 'formulir', 'navAturKurikulum': 'formulir', 
+                'navCalendarSettings': 'formulir', 'navQuota': 'formulir', 'navKetersediaanMengajar': 'formulir',
+                'navMenuManagement': 'formulir',
+
+                // 2. Validasi
+                'navVerifikasi': 'validasi', 'navValidasiIzin': 'validasi', 'navValidasiPeraturan': 'validasi', 
+                'navValidasiPembayaran': 'validasi', 'navPocketMoneyValidation': 'validasi', 'navValidasiIbadah': 'validasi', 
+                'navGuardianLeaveValidation': 'validasi', 'navMusyrifWithdrawalValidation': 'validasi',
+
+                // 3. Tabel Data
+                'navUserCredentials': 'tabel', 'navBukuIndukSantri': 'tabel', 'navDaftarIzin': 'tabel', 
+                'navOnLeaveList': 'tabel', 'navTabelPembayaran': 'tabel', 'navTabelTransaksi': 'tabel', 
+                'navAbsensi': 'tabel', 'navBiodataPegawai': 'tabel', 'navBukuIndukPegawai': 'tabel', 
+                'navJadwalRapat': 'tabel', 'navRppAlbum': 'tabel', 'navPerencanaanAkademik': 'tabel', 
+                'navMentoring': 'tabel', 'navMusyrifPocketMoney': 'tabel', 'navBiodataSantri': 'tabel', 
+                'navSantriPocketMoney': 'tabel', 'navViewTahfizh': 'tabel', 'navJadwalPelajaran': 'tabel', 
+                'navKalender': 'tabel',
+
+                // 4. Grafik
+                'navDashboard': 'grafik', 'navYayasanWidget': 'grafik', 'navMusyrifWidget': 'grafik', 
+                'navProfil': 'grafik', 'navPenilaianKinerja': 'grafik', 'navMonitoringAkademik': 'grafik', 
+                'navRekapPembayaran': 'grafik', 'navRekapIbadahAnak': 'grafik', 'navMonitoringAnak': 'grafik'
+            };
+
+            // Kelompokkan Menu
+            Object.keys(globalData.menu_names).forEach(menuId => {
+                const groupKey = menuMapping[menuId] || 'lainnya';
+                widgetGroups[groupKey].menus.push(menuId);
+            });
+
             // Render Body
             tbody.innerHTML = '';
-            for (const [catId, cat] of Object.entries(globalData.categories)) {
+            for (const [key, group] of Object.entries(widgetGroups)) {
+                if (group.menus.length === 0) continue;
+
                 // Category Row
-                tbody.innerHTML += `<tr class="bg-gray-100"><td colspan="${globalData.roles.length + 1}" class="px-6 py-2 text-xs font-bold text-gray-600 uppercase tracking-wider sticky left-0 bg-gray-100 z-10">${cat.label}</td></tr>`;
+                tbody.innerHTML += `<tr class="bg-gray-100"><td colspan="${globalData.roles.length + 1}" class="px-6 py-2 text-xs font-bold text-gray-600 uppercase tracking-wider sticky left-0 bg-gray-100 z-10">${group.label}</td></tr>`;
                 
-                cat.menus.forEach(menuId => {
+                group.menus.forEach(menuId => {
                     const menuName = globalData.menu_names[menuId] || menuId;
                     let rowHTML = `<tr class="hover:bg-gray-50 transition">
                         <td class="px-6 py-3 text-sm font-medium text-gray-800 sticky left-0 bg-white z-10 border-r shadow-sm flex items-center gap-2">
