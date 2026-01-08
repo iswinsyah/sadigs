@@ -226,7 +226,66 @@
             const container = document.getElementById('structureContainer');
             container.innerHTML = '';
 
-            for (const [catId, cat] of Object.entries(globalData.categories)) {
+            // 1. Siapkan wadah kategori (Clone struktur kategori tanpa menu)
+            const tempCategories = JSON.parse(JSON.stringify(globalData.categories));
+            Object.keys(tempCategories).forEach(k => tempCategories[k].menus = []);
+
+            // 2. Logika Pengelompokan Otomatis Berdasarkan Izin (Rules 1-5)
+            const roles = globalData.roles;
+            const matrix = globalData.matrix;
+            
+            // Helper: Cek apakah roles memiliki semua target
+            const hasRoles = (allowed, targets) => targets.every(t => allowed.includes(t));
+
+            Object.keys(globalData.menu_names).forEach(menuId => {
+                // Ambil role yang diizinkan untuk menu ini
+                const allowed = roles.filter(r => matrix[menuId]?.[r] === 1);
+                
+                let targetCat = 'Umum'; // Default fallback
+
+                // RULE 1: Umum (Semua peran dicentang)
+                if (allowed.length === roles.length && allowed.length > 0) {
+                    targetCat = 'Umum';
+                }
+                // RULE 2: Manajemen Yayasan (Ketua, Sekretaris, Bendahara Yayasan)
+                else if (hasRoles(allowed, ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan'])) {
+                    targetCat = 'ManajemenYayasan';
+                }
+                // RULE 4: Kepegawaian (KS, SS, BS, KA Putra/i, Musyrif/ah, Ustadz/ah)
+                // Cek ini DULUAN sebelum Manajemen Sekolah karena ini superset (lebih banyak syaratnya)
+                else if (hasRoles(allowed, ['Kepala Sekolah', 'Sekretaris Sekolah', 'Bendahara Sekolah', 'Kepala Asrama Putra', 'Kepala Asrama Putri', 'Musyrif', 'Musyrifah', 'Ustadz', 'Ustadzah'])) {
+                    targetCat = 'Kepegawaian';
+                }
+                // RULE 3: Manajemen Sekolah (KS, SS, BS)
+                else if (hasRoles(allowed, ['Kepala Sekolah', 'Sekretaris Sekolah', 'Bendahara Sekolah'])) {
+                    targetCat = 'ManajemenSekolah';
+                }
+                // RULE 5: Sesuai Peran yang dicentang
+                else if (allowed.length > 0) {
+                    // Ambil role pertama sebagai acuan kategori
+                    const firstRole = allowed[0];
+                    // Normalisasi nama role ke ID Kategori (Hapus spasi, misal "Ketua Yayasan" -> "KetuaYayasan")
+                    const normalized = firstRole.replace(/\s+/g, '');
+                    
+                    // Cek mapping khusus jika nama role beda dengan ID kategori
+                    if (tempCategories[normalized]) targetCat = normalized;
+                    else if (firstRole.includes('Santri')) targetCat = 'Santri';
+                    else if (firstRole.includes('Walisantri')) targetCat = 'Walisantri';
+                    else if (firstRole.includes('Musyrif')) targetCat = 'Musyrif';
+                    else if (firstRole.includes('Ustadz')) targetCat = 'Ustadz';
+                    else targetCat = normalized; 
+                }
+
+                // Pastikan kategori target ada, jika tidak masukkan ke Umum
+                if (!tempCategories[targetCat]) {
+                    targetCat = 'Umum';
+                }
+
+                tempCategories[targetCat].menus.push(menuId);
+            });
+
+            // 3. Render ke HTML
+            for (const [catId, cat] of Object.entries(tempCategories)) {
                 const catDiv = document.createElement('div');
                 catDiv.className = "bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col";
                 catDiv.innerHTML = `
