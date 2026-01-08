@@ -84,11 +84,6 @@
             <nav id="sidebarNav" class="flex-1 overflow-y-auto py-4 px-3 space-y-2 no-scrollbar">
                 <!-- Menu akan dirender secara dinamis oleh JavaScript -->
                 <div id="sidebarLoading" class="p-4 text-center text-gray-400 text-sm">Memuat menu...</div>
-
-                <!-- Tombol Logout -->
-                <div class="pt-2">
-                    <button id="logoutBtn" class="w-full flex items-center gap-3 px-4 py-2 text-tombol-kedua hover:bg-tombol-kedua/10 rounded-lg transition font-medium"><i data-lucide="log-out" class="w-5 h-5"></i> Keluar</button>
-                </div>
             </nav>
         </aside>
 
@@ -282,7 +277,7 @@
                     
                     const rawRoles = data.raw_roles || [];
                     myRawRoles = rawRoles;
-                    const activeRoles = data.roles || []; // Safety check: pastikan selalu array
+                    const activeRoles = data.roles || [];
 
                     // --- UPDATE JUDUL WIDGET PERATURAN (AMANAH) ---
                     let regTitle = 'Papan Informasi & Peraturan';
@@ -298,7 +293,6 @@
                     let rolesText = 'User';
                     if (rawRoles.length > 0) {
                         rolesText = rawRoles.map(r => {
-                            // Handle jika format data lama (string) atau properti hilang
                             if (typeof r === 'string') return r;
                             return r.status === 'approved' ? r.role_name : `${r.role_name} (Pending)`;
                         }).join(', ');
@@ -315,15 +309,9 @@
                     } else {
                         // Jika punya peran tapi belum ada yang 'approved'
                         if (activeRoles.length === 0) {
-                            
-                            // Tampilkan Banner Pending
                             const banner = document.createElement('div');
                             banner.className = 'bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 rounded-r-lg';
-                            banner.innerHTML = `
-                                <div class="flex">
-                                    <div class="flex-shrink-0"><i data-lucide="clock" class="h-5 w-5 text-yellow-400"></i></div>
-                                    <div class="ml-3"><p class="text-sm text-yellow-700 font-medium">Akun Anda sedang menunggu aktivasi admin. Akses menu terbatas.</p></div>
-                                </div>`;
+                            banner.innerHTML = `<div class="flex"><div class="flex-shrink-0"><i data-lucide="clock" class="h-5 w-5 text-yellow-400"></i></div><div class="ml-3"><p class="text-sm text-yellow-700 font-medium">Akun Anda sedang menunggu aktivasi admin. Akses menu terbatas.</p></div></div>`;
                             const header = document.querySelector('header');
                             if (header) header.parentNode.insertBefore(banner, header.nextSibling);
                         }
@@ -335,43 +323,31 @@
                         .then(summaryData => {
                             if (summaryData.success) {
                                 const summary = summaryData.summary;
-                                // Update card verifikasi pengguna
                                 if (summary.pending_users_count !== undefined) {
-                                    const card = document.getElementById('pendingUsersCard');
-                                    card.querySelector('p:last-child').innerHTML = `${summary.pending_users_count} <span class="text-base font-medium">menunggu</span>`;
+                                    document.getElementById('pendingUsersCard').querySelector('p:last-child').innerHTML = `${summary.pending_users_count} <span class="text-base font-medium">menunggu</span>`;
                                 }
-                                // Update card validasi pembayaran
                                 if (summary.pending_payments_count !== undefined) {
-                                    const card = document.getElementById('pendingPaymentsCard');
-                                    card.querySelector('p:last-child').innerHTML = `${summary.pending_payments_count} <span class="text-base font-medium">menunggu</span>`;
+                                    document.getElementById('pendingPaymentsCard').querySelector('p:last-child').innerHTML = `${summary.pending_payments_count} <span class="text-base font-medium">menunggu</span>`;
                                 }
-                                // Update card validasi uang saku
                                 if (summary.pending_pocket_money_count !== undefined) {
-                                    const card = document.getElementById('pendingPocketMoneyCard');
-                                    card.querySelector('p:last-child').innerHTML = `${summary.pending_pocket_money_count} <span class="text-base font-medium">menunggu</span>`;
+                                    document.getElementById('pendingPocketMoneyCard').querySelector('p:last-child').innerHTML = `${summary.pending_pocket_money_count} <span class="text-base font-medium">menunggu</span>`;
                                 }
-                                // Update card validasi ibadah
                                 if (summary.pending_worship_validations !== undefined) {
-                                    const card = document.getElementById('pendingWorshipCard');
-                                    card.querySelector('p:last-child').innerHTML = `${summary.pending_worship_validations} <span class="text-base font-medium">laporan</span>`;
+                                    document.getElementById('pendingWorshipCard').querySelector('p:last-child').innerHTML = `${summary.pending_worship_validations} <span class="text-base font-medium">laporan</span>`;
                                 }
-                                // Update card validasi izin walisantri
                                 if (summary.pending_guardian_leaves !== undefined) {
-                                    const card = document.getElementById('pendingGuardianLeaveCard');
-                                    card.querySelector('p:last-child').innerHTML = `${summary.pending_guardian_leaves} <span class="text-base font-medium">izin</span>`;
+                                    document.getElementById('pendingGuardianLeaveCard').querySelector('p:last-child').innerHTML = `${summary.pending_guardian_leaves} <span class="text-base font-medium">izin</span>`;
                                 }
-                                // Update card validasi penarikan uang saku
                                 if (summary.pending_withdrawal_count !== undefined) {
-                                    const card = document.getElementById('pendingWithdrawalCard');
-                                    card.querySelector('p:last-child').innerHTML = `${summary.pending_withdrawal_count} <span class="text-base font-medium">request</span>`;
+                                    document.getElementById('pendingWithdrawalCard').querySelector('p:last-child').innerHTML = `${summary.pending_withdrawal_count} <span class="text-base font-medium">request</span>`;
                                 }
-                                // Update card santri pulang
                                 if (summary.on_leave_count !== undefined) {
                                     document.getElementById('onLeaveCardYayasan').querySelector('p:last-child').innerHTML = `${summary.on_leave_count} <span class="text-base font-medium">santri</span>`;
                                     document.getElementById('onLeaveCardMusyrif').querySelector('p:last-child').innerHTML = `${summary.on_leave_count} <span class="text-base font-medium">santri</span>`;
                                 }
                             }
-                        });
+                        })
+                        .catch(e => console.warn("Gagal memuat summary dashboard (mungkin tabel belum ada):", e));
                     
                     // --- LOAD WIDGET PERATURAN ---
                     fetch('sadigs_api_v3/get_regulations.php?action=list_active')
@@ -385,18 +361,11 @@
                                 regData.data.forEach(item => {
                                     const div = document.createElement('div');
                                     div.className = 'bg-white p-4 rounded-lg border-l-4 border-blue-500 shadow-sm hover:shadow-md transition';
-                                    div.innerHTML = `
-                                        <div class="flex justify-between items-start">
-                                            <h4 class="font-bold text-gray-800">${item.title}</h4>
-                                            <span class="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">${item.formatted_date}</span>
-                                        </div>
-                                        <p class="text-sm text-gray-600 mt-1 whitespace-pre-wrap">${item.content}</p>
-                                    `;
+                                    div.innerHTML = `<div class="flex justify-between items-start"><h4 class="font-bold text-gray-800">${item.title}</h4><span class="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">${item.formatted_date}</span></div><p class="text-sm text-gray-600 mt-1 whitespace-pre-wrap">${item.content}</p>`;
                                     regContainer.appendChild(div);
                                 });
                                 lucide.createIcons();
                             } else {
-                                // Tampilkan widget meski kosong agar judul 'Amanah' terlihat
                                 document.getElementById('regulationsWidget').classList.remove('hidden');
                                 document.getElementById('regulationsList').innerHTML = '<p class="text-center text-gray-500 text-sm py-4 italic">Belum ada amanah atau informasi baru.</p>';
                             }
@@ -407,21 +376,79 @@
                         .then(res => res.json())
                         .then(permData => {
                             if (permData.success) {
+                                const sidebarNav = document.getElementById('sidebarNav');
+                                // Bersihkan indikator loading dan tombol logout lama
+                                sidebarNav.innerHTML = '';
+
                                 const allowedMenus = permData.permissions || [];
-                                // 1. Tampilkan menu yang diizinkan
-                                allowedMenus.forEach(id => {
-                                    const el = document.getElementById(id);
-                                    if (el) el.classList.remove('hidden');
-                                });
-                            
-                                // 2. Tampilkan grup menu jika memiliki item yang terlihat
-                                const menuGroups = ['groupUmum', 'groupManajemenYayasan', 'groupKetuaYayasan', 'groupSekretarisYayasan', 'groupBendaharaYayasan', 'groupManajemenSekolah', 'groupKepalaSekolah', 'groupKepalaAsrama', 'groupSekretarisSekolah', 'groupBendaharaSekolah', 'groupKepegawaian', 'groupUstadz', 'groupMusyrif', 'groupSantri', 'groupWalisantri'];
-                                menuGroups.forEach(groupId => {
-                                    const group = document.getElementById(groupId);
-                                    if (group && group.querySelector('a:not(.hidden)')) {
-                                        group.classList.remove('hidden');
+                                const categories = permData.categories || {};
+                                const menuNames = permData.menu_names || {};
+                                const menuIcons = permData.menu_icons || {};
+
+                                // Mapping ID Menu ke File HTML (Href)
+                                const hrefMap = {
+                                    'navDashboard': 'dashboard.html', 'navProfil': 'profile.html', 'navKalender': 'calendar_view.html', 'navJadwalPelajaran': 'view_schedule.html',
+                                    'navMenuManagement': 'menu_management.html', 'navUserCredentials': 'user_credentials.html',
+                                    'navVerifikasi': 'verification_management.html', 'navQuota': 'quota_management.html', 'navCalendarSettings': 'calendar_settings.html',
+                                    'navBukuIndukSantri': 'student_master_book.html', 'navAturKurikulum': 'curriculum_settings.html',
+                                    'navPenilaianKinerja': 'performance_assessment.html', 'navMonitoringAkademik': 'academic_monitoring.html', 'navValidasiIzin': 'leave_validation.html',
+                                    'navDaftarIzin': 'leave_list.html', 'navValidasiPeraturan': 'validate_regulation.html', 'navBuatPeraturan': 'create_regulation.html',
+                                    'navOnLeaveList': 'on_leave_list.html',
+                                    'navValidasiPembayaran': 'payment_validation.html', 'navTabelPembayaran': 'payment_list.html', 'navRekapPembayaran': 'payment_recap.html',
+                                    'navPocketMoneyValidation': 'pocket_money_validation.html', 'navFormulirTransaksi': 'daily_transaction_form.html', 'navTabelTransaksi': 'daily_transaction_list.html',
+                                    'navAbsensi': 'attendance.html', 'navBiodataPegawai': 'employee_data.html', 'navIzinPegawai': 'leave_request.html', 'navBukuIndukPegawai': 'employee_master_book.html', 'navRapat': 'meeting_invitation.html', 'navJadwalRapat': 'meeting_schedule.html',
+                                    'navRppGenerator': 'rpp_generator.html', 'navRppAlbum': 'teaching_artifacts_album.html', 'navPerencanaanAkademik': 'academic_planning.html', 'navKetersediaanMengajar': 'teacher_availability.html', 'navInputNilai': 'input_grades.html',
+                                    'navMentoring': 'mentoring_groups.html', 'navInputTahfizh': 'tahfizh_report_form.html', 'navValidasiIbadah': 'daily_worship_validation.html', 'navGuardianLeaveValidation': 'guardian_leave_validation.html', 'navMusyrifPocketMoney': 'musyrif_pocket_money_view.html', 'navMusyrifWithdrawalValidation': 'musyrif_withdrawal_validation.html',
+                                    'navBiodataSantri': 'student_data.html', 'navIbadahHarian': 'daily_worship_form.html', 'navSantriPocketMoney': 'santri_pocket_money.html',
+                                    'navRekapIbadahAnak': 'select_student.html', 'navViewTahfizh': 'tahfizh_student_view.html', 'navIzinWalisantri': 'guardian_leave_request.html', 'navPocketMoneyDeposit': 'pocket_money_deposit.html', 'navMonitoringAnak': 'guardian_monitoring.html', 'navFormulirPembayaran': 'payment_form.html'
+                                };
+
+                                // Render Menu Dinamis
+                                for (const [catId, cat] of Object.entries(categories)) {
+                                    const visibleMenus = cat.menus.filter(mId => allowedMenus.includes(mId));
+                                    
+                                    if (visibleMenus.length > 0) {
+                                        const groupDiv = document.createElement('div');
+                                        groupDiv.className = "bg-gray-50 rounded-lg p-2 mt-2";
+                                        
+                                        const title = document.createElement('h3');
+                                        title.className = "px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider";
+                                        title.textContent = cat.label;
+                                        groupDiv.appendChild(title);
+                                        
+                                        visibleMenus.forEach(menuId => {
+                                            if (menuId === 'navYayasanWidget' || menuId === 'navMusyrifWidget') return; // Skip widgets
+
+                                            const link = document.createElement('a');
+                                            link.href = hrefMap[menuId] || '#';
+                                            const isActive = window.location.pathname.includes(link.href) && link.href !== '#';
+                                            
+                                            link.className = isActive 
+                                                ? "flex items-center gap-3 px-3 py-2.5 text-utama bg-white rounded-md transition font-semibold text-sm shadow-sm"
+                                                : "flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm";
+                                            
+                                            const iconName = menuIcons[menuId] || 'circle';
+                                            link.innerHTML = `<i data-lucide="${iconName}" class="w-5 h-5"></i> ${menuNames[menuId] || menuId}`;
+                                            groupDiv.appendChild(link);
+                                        });
+                                        sidebarNav.appendChild(groupDiv);
+                                    }
+                                }
+
+                                // Tambahkan Tombol Logout Kembali
+                                const logoutDiv = document.createElement('div');
+                                logoutDiv.className = "pt-2";
+                                logoutDiv.innerHTML = `<button id="logoutBtn" class="w-full flex items-center gap-3 px-4 py-2 text-tombol-kedua hover:bg-tombol-kedua/10 rounded-lg transition font-medium"><i data-lucide="log-out" class="w-5 h-5"></i> Keluar</button>`;
+                                sidebarNav.appendChild(logoutDiv);
+                                
+                                // Re-attach event listener logout
+                                document.getElementById('logoutBtn').addEventListener('click', () => {
+                                    if (confirm('Apakah Anda yakin ingin keluar?')) {
+                                        window.location.href = 'sadigs_api_v3/logout.php';
                                     }
                                 });
+                                
+                                lucide.createIcons();
 
                                 // --- LOGIKA BARU: TAMPILKAN WIDGET BERDASARKAN IZIN ---
                                 let isDashboardSet = false;
@@ -434,7 +461,6 @@
                                     if (el) { el.classList.remove('hidden'); isDashboardSet = true; }
                                 }
 
-                                // Jika tidak ada dashboard spesifik yang ditampilkan, tampilkan yang default
                                 if (!isDashboardSet) {
                                     document.getElementById('defaultDashboard').classList.remove('hidden');
                                 }
@@ -455,40 +481,31 @@
             loadAvailableRoles();
         });
 
-        // Fungsi Muat Peran untuk Form Seleksi
         function loadAvailableRoles() {
             const container = document.getElementById('roleSelectionList');
-            
-            // Fungsi helper untuk merender daftar
             const renderRoles = (quotas = {}) => {
                 container.innerHTML = '';
-                
-                // 1. Tambahkan opsi Default (Tanpa Kuota) - Selalu muncul (UPDATED)
                 const defaultRoles = ['Santri Rijal', 'Santri Nisa\'', 'Walisantri'];
                 defaultRoles.forEach(role => {
                     addRoleOption(container, role, null);
                 });
-
-                // 2. Tambahkan opsi Pegawai (Berdasarkan Kuota)
                 for (const [role, info] of Object.entries(quotas)) {
                     if (!info.is_full && info.max_limit > 0) {
                         addRoleOption(container, role, info);
                     }
                 }
             };
-
             fetch('sadigs_api_v3/quota.php?t=' + new Date().getTime())
                 .then(res => res.json())
                 .then(data => {
                     if (data.success && data.quotas) {
                         renderRoles(data.quotas);
                     } else {
-                        renderRoles({}); // Render default saja jika tidak ada data kuota
+                        renderRoles({});
                     }
                 })
                 .catch(err => {
                     console.error("Gagal memuat kuota:", err);
-                    // Fallback: Tetap tampilkan peran default jika server error
                     renderRoles({});
                 });
         }
@@ -497,66 +514,29 @@
             const isChecked = myRawRoles.some(r => (typeof r === 'string' ? r : r.role_name) === role);
             const div = document.createElement('div');
             const quotaText = info ? `<span class="text-xs text-utama font-medium bg-utama/10 px-2 py-1 rounded-full ml-auto">Sisa: ${info.max_limit - info.current_count}</span>` : '';
-            
-            div.innerHTML = `
-                <label class="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition">
-                    <input type="checkbox" name="selected_roles" value="${role}" class="w-5 h-5 text-utama border-gray-300 focus:ring-utama rounded" ${isChecked ? 'checked' : ''}>
-                    <span class="ml-3 font-medium text-gray-700">${role}</span>
-                    ${quotaText}
-                </label>
-            `;
+            div.innerHTML = `<label class="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition"><input type="checkbox" name="selected_roles" value="${role}" class="w-5 h-5 text-utama border-gray-300 focus:ring-utama rounded" ${isChecked ? 'checked' : ''}><span class="ml-3 font-medium text-gray-700">${role}</span>${quotaText}</label>`;
             container.appendChild(div);
         }
 
-        // Submit Peran
         document.getElementById('submitRoleBtn').addEventListener('click', async () => {
             const selectedCheckboxes = document.querySelectorAll('input[name="selected_roles"]:checked');
             const selectedRoles = Array.from(selectedCheckboxes).map(cb => cb.value);
-
             if (selectedRoles.length === 0) {
                 alert('Silakan pilih setidaknya satu peran.');
                 return;
             }
-
             if(!confirm('Anda yakin memilih peran-peran ini? Akun akan menunggu validasi Yayasan setelah ini.')) return;
-
             const res = await fetch('sadigs_api_v3/select_role.php', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ roles: selectedRoles })
             });
             const result = await res.json();
-            
             alert(result.message);
             if (result.success) {
                 window.location.reload();
             }
         });
-
-        // Logika Logout
-        document.getElementById('logoutBtn')?.addEventListener('click', () => {
-            if (confirm('Apakah Anda yakin ingin keluar?')) {
-                window.location.href = 'sadigs_api_v3/logout.php';
-            }
-        });
-
-        // FUNGSI DARURAT
-        async function emergencyReset() {
-            // Sembunyikan banner setelah diklik
-            const banner = document.getElementById('emergencyBanner');
-            if (banner) banner.style.display = 'none';
-
-            if (!confirm('Yakin ingin mereset semua izin akses ke pengaturan awal? Ini akan memperbaiki menu yang hilang.')) return;
-            
-            try {
-                const res = await fetch('sadigs_api_v3/session_check.php?reset_permissions=1');
-                const text = await res.text();
-                alert("Sistem Merespon: RESET BERHASIL!\n\nHalaman akan dimuat ulang sekarang.");
-                window.location.reload();
-            } catch (err) {
-                alert("Gagal menghubungi server: " + err);
-            }
-        }
 
         // CEK STATUS IMPERSONATE
         fetch('sadigs_api_v3/get_impersonation_status.php')

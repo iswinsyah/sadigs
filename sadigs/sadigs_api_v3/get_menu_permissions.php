@@ -253,6 +253,12 @@ if (empty($allowed_menus)) {
         $allowed_menus[] = 'navMenuManagement';
         $allowed_menus[] = 'navUserCredentials';
     }
+    
+    // JURUS PAMUNGKAS 2: Jika user belum punya role (User Baru), beri akses dasar
+    if (empty($allowed_menus)) {
+        $allowed_menus = ['navDashboard', 'navProfil'];
+    }
+    
     $allowed_menus = array_unique($allowed_menus);
 }
 
