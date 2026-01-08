@@ -350,26 +350,74 @@
         }
 
         async function saveStructure() {
-            const updates = [];
+            const structureUpdates = [];
+            const permissionUpdates = [];
+
+            // Mapping Kategori ke Role untuk Sinkronisasi Izin Otomatis
+            const categoryRoleMapping = {
+                'KetuaYayasan': ['Ketua Yayasan'],
+                'SekretarisYayasan': ['Sekretaris Yayasan'],
+                'BendaharaYayasan': ['Bendahara Yayasan'],
+                'KepalaSekolah': ['Kepala Sekolah'],
+                'SekretarisSekolah': ['Sekretaris Sekolah'],
+                'BendaharaSekolah': ['Bendahara Sekolah'],
+                'KepalaAsrama': ['Kepala Asrama Putra', 'Kepala Asrama Putri'],
+                'Musyrif': ['Musyrif', 'Musyrifah'],
+                'Ustadz': ['Ustadz', 'Ustadzah'],
+                'Santri': ['Santri Rijal', "Santri Nisa'"],
+                'Walisantri': ['Walisantri'],
+                'ManajemenYayasan': ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan'],
+                'ManajemenSekolah': ['Kepala Sekolah', 'Sekretaris Sekolah', 'Bendahara Sekolah'],
+                'Kepegawaian': ['Kepala Sekolah', 'Sekretaris Sekolah', 'Bendahara Sekolah', 'Kepala Asrama Putra', 'Kepala Asrama Putri', 'Musyrif', 'Musyrifah', 'Ustadz', 'Ustadzah'],
+                'Umum': globalData.roles // Semua role
+            };
+
             document.querySelectorAll('.sortable-list').forEach(list => {
                 const catId = list.getAttribute('data-cat-id');
+                const targetRoles = categoryRoleMapping[catId];
+
                 list.querySelectorAll('.menu-item').forEach((item, index) => {
-                    updates.push({
-                        menu_id: item.getAttribute('data-menu-id'),
+                    const menuId = item.getAttribute('data-menu-id');
+                    
+                    // 1. Update Struktur (Urutan & Kategori)
+                    structureUpdates.push({
+                        menu_id: menuId,
                         category_id: catId,
                         sort_order: index + 1
                     });
+
+                    // 2. Update Izin (Otomatis Centang/Hapus Centang)
+                    if (targetRoles) {
+                        globalData.roles.forEach(role => {
+                            const shouldHaveAccess = targetRoles.includes(role);
+                            permissionUpdates.push({
+                                role: role,
+                                menu: menuId,
+                                state: shouldHaveAccess ? 1 : 0
+                            });
+                        });
+                    }
                 });
             });
 
-            const res = await fetch('sadigs_api_v3/menu_manager.php', {
+            // Kirim Update Struktur
+            await fetch('sadigs_api_v3/menu_manager.php', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ structure_updates: updates })
+                body: JSON.stringify({ structure_updates: structureUpdates })
             });
-            const result = await res.json();
-            if(result.success) { alert("Susunan menu berhasil disimpan! Sidebar akan diperbarui."); loadData(); }
-            else alert("Gagal menyimpan: " + result.message);
+            
+            // Kirim Update Izin
+            if (permissionUpdates.length > 0) {
+                await fetch('sadigs_api_v3/menu_manager.php', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ updates: permissionUpdates })
+                });
+            }
+
+            alert("Susunan menu dan Izin Akses berhasil disimpan!");
+            loadData();
         }
 
         loadData();
