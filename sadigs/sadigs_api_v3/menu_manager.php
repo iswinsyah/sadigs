@@ -82,13 +82,10 @@ $stmt_failsafe->execute();
 // --- AKHIR KUNCI PENGAMAN ---
 
 
-// 2. SEEDING DATA AWAL (MIGRASI DARI HARDCODED KE DB)
-// Jika tabel kategori kosong, kita isi dengan struktur default yang ada sekarang.
-$stmtCatCount = $pdo->query("SELECT COUNT(*) FROM menu_categories");
-if ($stmtCatCount->fetchColumn() == 0) {
-    
-    // Definisi Struktur Default (Sesuai Dashboard Terakhir)
-    $initial_structure = [
+// --- DEFINISI STRUKTUR MASTER (SUMBER KEBENARAN) ---
+// Struktur ini akan selalu disinkronkan ke database setiap kali halaman dibuka.
+// Pastikan variabel ini bernama $master_structure dan berada di luar blok IF manapun.
+$master_structure = [
         'Umum' => [
             'label' => '1. UMUM',
             'items' => [
