@@ -124,6 +124,7 @@ if ($stmtCatCount->fetchColumn() == 0) {
             'label' => '6. MANAJEMEN SEKOLAH',
             'items' => [
                 ['id' => 'navBukuIndukSantri', 'label' => 'Buku Induk Santri', 'icon' => 'book'],
+                ['id' => 'navManajemenKelas', 'label' => 'Manajemen Kelas', 'icon' => 'users'],
                 ['id' => 'navAturKurikulum', 'label' => 'Atur Kurikulum', 'icon' => 'book-open-check']
             ]
         ],
