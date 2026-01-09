@@ -112,9 +112,14 @@
         }
 
         async function loadData() {
-            const res = await fetch('sadigs_api_v3/menu_manager.php');
-            globalData = await res.json();
-            renderPermissions();
+            try {
+                const res = await fetch('sadigs_api_v3/menu_manager.php');
+                globalData = await res.json();
+                if (!globalData.success && globalData.message) throw new Error(globalData.message);
+                renderPermissions();
+            } catch (e) {
+                document.getElementById('permsBody').innerHTML = `<tr><td colspan="100%" class="p-8 text-center text-red-500 font-bold">Gagal memuat data: ${e.message}<br><button onclick="location.reload()" class="mt-2 text-blue-600 underline">Coba Refresh</button></td></tr>`;
+            }
         }
 
         function renderPermissions() {
