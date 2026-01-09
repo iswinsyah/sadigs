@@ -37,7 +37,7 @@ try {
         'navValidasiIzin' => 'Izin Pegawai',
         'navValidasiPembayaran' => 'Pembayaran Keuangan',
         'navValidasiPeraturan' => 'Setujui Peraturan',
-        'navVerifikasi' => 'Verifikasi Peran Pegawai',
+        'navVerifikasi' => 'Verifikasi Pengguna',
         'navDaftarIzin' => 'Daftar Santri Izin Tidak Masuk',
         'navKalender' => 'Kalender Pendidikan',
         'navMentoring' => 'Daftar Kelompok Mentoring',

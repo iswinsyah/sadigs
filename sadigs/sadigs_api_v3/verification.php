@@ -3,9 +3,36 @@ header('Content-Type: application/json');
 require_once 'db_connect.php';
 
 if (session_status() === PHP_SESSION_NONE) session_start();
-// (Tambahkan cek role 'Ketua Yayasan'/'Sekretaris Yayasan' di sini untuk keamanan)
 
+if (!isset($_SESSION['user_id'])) {
+    sendJSONResponse(['success' => false, 'message' => 'Unauthorized'], 401);
+}
+
+$user_roles = $_SESSION['roles'] ?? [];
 $pdo = getDBConnection();
+
+// --- LOGIKA PEMISAHAN TUGAS VERIFIKASI ---
+$school_verifiers = ['Kepala Sekolah', 'Sekretaris Sekolah', 'Bendahara Sekolah'];
+$foundation_verifiers = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan'];
+$student_roles = ['Santri', 'Santri Rijal', "Santri Nisa'", 'Walisantri'];
+
+// Cek Peran User
+$is_foundation = !empty(array_intersect($foundation_verifiers, $user_roles));
+$is_school = !empty(array_intersect($school_verifiers, $user_roles));
+
+$filter_mode = 'none';
+
+if ($is_foundation) {
+    // Yayasan: Hanya lihat Pegawai (KECUALI Santri/Wali)
+    // Jika user punya kedua peran (Yayasan & Sekolah), prioritas Yayasan (sesuai request "Pisah Total")
+    $filter_mode = 'employees_only';
+} elseif ($is_school) {
+    // Sekolah: Hanya lihat Santri & Walisantri
+    $filter_mode = 'students_only';
+} else {
+    sendJSONResponse(['success' => false, 'message' => 'Akses ditolak. Anda tidak memiliki izin verifikasi.'], 403);
+}
+
 
 // --- GET: List Pending Users ---
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
@@ -15,10 +42,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                        GROUP_CONCAT(ur.role_name SEPARATOR ', ') as roles
                 FROM users u
                 JOIN user_roles ur ON u.user_id = ur.user_id
-                WHERE ur.status = 'pending'
-                GROUP BY u.user_id";
+                WHERE ur.status = 'pending' ";
+
+        // Terapkan Filter Query
+        $placeholders = implode(',', array_fill(0, count($student_roles), '?'));
+        if ($filter_mode === 'students_only') {
+            $sql .= " AND ur.role_name IN ($placeholders) ";
+        } else {
+            $sql .= " AND ur.role_name NOT IN ($placeholders) ";
+        }
+
+        $sql .= " GROUP BY u.user_id";
         
-        $stmt = $pdo->query($sql);
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($student_roles); // Parameter sama untuk IN maupun NOT IN
         $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
         sendJSONResponse(['success' => true, 'pending_users' => $users]);
