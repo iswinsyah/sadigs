@@ -472,8 +472,13 @@
                 defaultRoles.forEach(role => {
                     addRoleOption(container, role, null);
                 });
+
+                // Daftar peran khusus yang TIDAK BOLEH dipilih user biasa
+                const hiddenRoles = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan'];
+
                 for (const [role, info] of Object.entries(quotas)) {
-                    if (!info.is_full && info.max_limit > 0) {
+                    // Tampilkan hanya jika tidak disembunyikan, kuota ada, dan belum penuh
+                    if (!hiddenRoles.includes(role) && !info.is_full && info.max_limit > 0) {
                         addRoleOption(container, role, info);
                     }
                 }
