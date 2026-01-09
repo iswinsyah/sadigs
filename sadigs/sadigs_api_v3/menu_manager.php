@@ -208,27 +208,27 @@ if ($stmtCatCount->fetchColumn() == 0) {
         ]
     ];
 
+// --- SYNC DATABASE (AUTO-HEALING) ---
+// Memaksa database mengikuti struktur kodingan di atas
     $pdo->beginTransaction();
     try {
+        $stmtCat = $pdo->prepare("INSERT INTO menu_categories (category_id, label, sort_order) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE label=VALUES(label), sort_order=VALUES(sort_order)");
+        $stmtMenu = $pdo->prepare("INSERT INTO menus (menu_id, menu_name, category_id, sort_order, icon) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE menu_name=VALUES(menu_name), category_id=VALUES(category_id), sort_order=VALUES(sort_order), icon=VALUES(icon)");
+
         $sort_cat = 1;
-        foreach ($initial_structure as $cat_id => $cat_data) {
-            // Insert Kategori
-            $pdo->prepare("INSERT INTO menu_categories (category_id, label, sort_order) VALUES (?, ?, ?)")
-                ->execute([$cat_id, $cat_data['label'], $sort_cat++]);
+        foreach ($master_structure as $cat_id => $cat_data) {
+            $stmtCat->execute([$cat_id, $cat_data['label'], $sort_cat++]);
             
             $sort_menu = 1;
             foreach ($cat_data['items'] as $item) {
-                // Insert/Update Menu dengan Kategori dan Icon
-                $pdo->prepare("INSERT INTO menus (menu_id, menu_name, category_id, sort_order, icon) VALUES (?, ?, ?, ?, ?) 
-                               ON DUPLICATE KEY UPDATE category_id = VALUES(category_id), sort_order = VALUES(sort_order), icon = VALUES(icon)")
-                    ->execute([$item['id'], $item['label'], $cat_id, $sort_menu++, $item['icon']]);
+                $stmtMenu->execute([$item['id'], $item['label'], $cat_id, $sort_menu++, $item['icon']]);
             }
         }
         $pdo->commit();
     } catch (Exception $e) {
         $pdo->rollBack();
+        // Lanjut saja meski error sync, agar tidak memblokir tampilan
     }
-}
 
 $method = $_SERVER['REQUEST_METHOD'];
 
