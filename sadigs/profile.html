@@ -203,11 +203,16 @@
                          addRoleOption(roleListContainer, role, null);
                     });
 
+                    // Daftar peran khusus yang disembunyikan (kecuali sudah punya)
+                    const hiddenRoles = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan'];
+
                     // Add roles with quota
                     for (const [role, info] of Object.entries(quotas)) {
                         const isFull = info.max_limit > 0 && info.current_count >= info.max_limit;
-                        // Only show if not full, or if user already has this role (can't uncheck, but good to see)
-                        if (!isFull || myRawRoles.some(r => r.role_name === role)) {
+                        const userHasRole = myRawRoles.some(r => r.role_name === role);
+                        
+                        // Tampilkan jika: User sudah punya ATAU (Tidak disembunyikan DAN Belum penuh)
+                        if (userHasRole || (!hiddenRoles.includes(role) && !isFull)) {
                              addRoleOption(roleListContainer, role, info);
                         }
                     }
