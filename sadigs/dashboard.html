@@ -478,7 +478,7 @@
 
                 for (const [role, info] of Object.entries(quotas)) {
                     // Tampilkan hanya jika tidak disembunyikan, kuota ada, dan belum penuh
-                    if (!hiddenRoles.includes(role) && !info.is_full && info.max_limit > 0) {
+                    if (!hiddenRoles.includes(role.trim()) && !info.is_full && info.max_limit > 0) {
                         addRoleOption(container, role, info);
                     }
                 }

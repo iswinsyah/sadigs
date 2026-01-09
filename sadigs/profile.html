@@ -208,11 +208,16 @@
 
                     // Add roles with quota
                     for (const [role, info] of Object.entries(quotas)) {
+                        // Skip jika sudah ada di defaultRoles (mencegah duplikasi)
+                        if (['Santri Rijal', "Santri Nisa'", 'Walisantri'].includes(role)) continue;
+
                         const isFull = info.max_limit > 0 && info.current_count >= info.max_limit;
-                        const userHasRole = myRawRoles.some(r => r.role_name === role);
+                        // Fix: Handle format role object/string dan trim nama role
+                        const userHasRole = myRawRoles.some(r => (typeof r === 'string' ? r : r.role_name) === role);
                         
                         // Tampilkan jika: User sudah punya ATAU (Tidak disembunyikan DAN Belum penuh)
-                        if (userHasRole || (!hiddenRoles.includes(role) && !isFull)) {
+                        // Gunakan trim() untuk memastikan tidak ada spasi yang menyebabkan mismatch
+                        if (userHasRole || (!hiddenRoles.includes(role.trim()) && !isFull)) {
                              addRoleOption(roleListContainer, role, info);
                         }
                     }
