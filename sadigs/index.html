@@ -6,11 +6,23 @@
     <title>Login | SADIGS 3.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'utama': '#4FB7B3',
+                        'kedua': '#26667F',
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         body { font-family: 'Inter', sans-serif; }
     </style>
 </head>
-<body class="bg-gradient-to-br from-teal-500 to-blue-700 h-screen flex items-center justify-center px-4">
+<body class="bg-gradient-to-br from-utama to-kedua h-screen flex items-center justify-center px-4">
 
     <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-sm">
         <div class="text-center mb-8">
@@ -23,7 +35,7 @@
             <!-- Username -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
-                <input type="text" id="username" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition" required>
+                <input type="text" id="username" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-utama focus:border-utama outline-none transition" required>
             </div>
 
             <!-- Password -->
@@ -31,18 +43,18 @@
                 <div class="flex justify-between items-center mb-1">
                     <label class="block text-sm font-medium text-gray-700">Kata Sandi</label>
                 </div>
-                <input type="password" id="password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition" required>
+                <input type="password" id="password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-utama focus:border-utama outline-none transition" required>
             </div>
 
             <!-- Submit Button -->
-            <button type="submit" id="loginBtn" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 rounded-lg transition duration-200 shadow-md">
+            <button type="submit" id="loginBtn" class="w-full bg-utama hover:bg-utama/90 text-white font-bold py-3 rounded-lg transition duration-200 shadow-md">
                 Masuk
             </button>
         </form>
 
         <div class="mt-6 text-center text-sm text-gray-600">
             Belum punya akun? 
-            <a href="signup.html" class="text-teal-600 font-bold hover:underline">Daftar Sekarang</a>
+            <a href="signup.html" class="text-utama font-bold hover:underline">Daftar Sekarang</a>
         </div>
         
         <!-- Pesan Error -->
