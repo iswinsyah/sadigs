@@ -13,7 +13,7 @@ try {
 
     // Query Gabungan: Ambil User + Role + Status
     // Kita hitung berapa role yang 'pending' untuk menentukan status verifikasi
-    $sql = "SELECT u.user_id, u.username, u.full_name, u.email, u.is_active, u.password_hash,
+    $sql = "SELECT u.user_id, u.username, u.full_name, u.email, u.is_active,
                    GROUP_CONCAT(
                        CASE 
                            WHEN ur.status = 'pending' THEN CONCAT(ur.role_name, ' (Pending)')
@@ -25,8 +25,8 @@ try {
             LEFT JOIN user_roles ur ON u.user_id = ur.user_id
             GROUP BY u.user_id
             ORDER BY 
-                (pending_count > 0 OR u.is_active = 0) DESC, -- Prioritaskan yang butuh aksi
-                u.created_at DESC";
+                (SUM(CASE WHEN ur.status = 'pending' THEN 1 ELSE 0 END) > 0 OR u.is_active = 0) DESC, -- Prioritaskan yang butuh aksi
+                u.user_id DESC"; -- Gunakan user_id sebagai pengganti created_at agar lebih aman
 
     $stmt = $pdo->query($sql);
     $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
