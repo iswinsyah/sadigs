@@ -6,6 +6,7 @@ if (session_status() === PHP_SESSION_NONE) session_start();
 
 if (!isset($_SESSION['user_id'])) {
     sendJSONResponse(['success' => false, 'message' => 'Unauthorized'], 401);
+    exit;
 }
 
 $user_roles = $_SESSION['roles'] ?? [];
@@ -31,6 +32,7 @@ if ($is_foundation) {
     $filter_mode = 'students_only';
 } else {
     sendJSONResponse(['success' => false, 'message' => 'Akses ditolak. Anda tidak memiliki izin verifikasi.'], 403);
+    exit;
 }
 
 
@@ -102,6 +104,11 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->execute([$target_user_id, $role, 'pending']);
             }
             $msg = "Peran diperbarui. Silakan klik 'Aktifkan Akun' untuk memvalidasi.";
+        }
+        elseif ($action === 'reject') {
+            // Hapus role yang statusnya pending
+            $pdo->prepare("DELETE FROM user_roles WHERE user_id = ? AND status = 'pending'")->execute([$target_user_id]);
+            $msg = "Permohonan pendaftaran ditolak.";
         }
 
         $pdo->commit();

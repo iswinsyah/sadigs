@@ -3,129 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verifikasi Pegawai | SADIGS 3.0</title>
+    <title>Verifikasi Pengguna | SADIGS 3.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    </style>
+    <style>body { font-family: 'Inter', sans-serif; }</style>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans antialiased">
 
-    <!-- HEADER MOBILE -->
-    <div class="lg:hidden flex items-center gap-4 bg-teal-600 text-white p-4 shadow-md sticky top-0 z-50">
-        <button id="mobileMenuBtn" class="focus:outline-none p-1 rounded hover:bg-teal-700 transition"><i data-lucide="menu" class="w-7 h-7"></i></button>
-        <div class="font-bold text-xl flex items-center gap-2"><span>SADIGS 3.0</span></div>
-    </div>
-
     <div class="flex h-screen overflow-hidden">
-        
         <!-- SIDEBAR -->
-        <aside id="sidebar" class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col transition-transform transform -translate-x-full lg:translate-x-0 fixed lg:static h-full z-40 shadow-2xl lg:shadow-none">
+        <aside id="sidebar" class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col hidden lg:flex">
             <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-teal-600 text-white">
                 <h1 class="text-2xl font-extrabold tracking-wider">SADIGS</h1>
             </div>
-            <div class="p-6 border-b border-gray-100 bg-teal-50">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-teal-200 flex items-center justify-center text-teal-800 font-bold text-lg shadow-sm"><span id="userInitial">U</span></div>
-                    <div class="overflow-hidden">
-                        <p id="sidebarUsername" class="font-bold text-gray-800 text-sm truncate">Memuat...</p>
-                        <p id="sidebarRole" class="text-xs text-gray-500 truncate font-medium">Role...</p>
-                    </div>
-                </div>
+            <div class="p-6">
+                <a href="dashboard.html" class="flex items-center gap-2 text-gray-600 hover:text-teal-600 transition">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i> Kembali ke Dashboard
+                </a>
             </div>
-            <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-2 no-scrollbar">
-                
-                <!-- Div 1: UMUM -->
-                <div class="bg-gray-50 rounded-lg p-2">
-                    <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">UMUM</h3>
-                    <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm">
-                        <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard
-                    </a>
-                    <a href="calendar_view.html" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm">
-                        <i data-lucide="table" class="w-5 h-5"></i> Tabel Kalender
-                    </a>
-                    <a href="profile.html" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm">
-                        <i data-lucide="user" class="w-5 h-5"></i> Profil Saya
-                    </a>
-                </div>
-
-                <!-- Container untuk menu Yayasan -->
-                <div id="menuYayasan" class="hidden space-y-2">
-                    <!-- Div 2: KEPEGAWAIAN -->
-                    <div class="bg-gray-50 rounded-lg p-2">
-                        <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KEPEGAWAIAN</h3>
-                        <a id="navAbsensi" href="attendance.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="map-pin" class="w-5 h-5"></i> Absensi Pegawai</a>
-                        <a id="navRapat" href="meeting_invitation.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="mail" class="w-5 h-5"></i> Formulir Undang Rapat</a>
-                        <a id="navJadwalRapat" href="meeting_schedule.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="calendar-clock" class="w-5 h-5"></i> Jadwal Rapat</a>
-                    </div>
-
-                    <!-- Div 3: KHUSUS -->
-                    <div id="groupKhusus" class="hidden bg-gray-50 rounded-lg p-2">
-                        <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KHUSUS</h3>
-                        <a id="navVerifikasi" href="verification_management.html" class="flex items-center gap-3 px-3 py-2.5 text-teal-700 bg-white rounded-md transition font-semibold text-sm shadow-sm"><i data-lucide="users" class="w-5 h-5"></i> Verifikasi Pegawai</a>
-                        <a id="navQuota" href="quota_management.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="user-cog" class="w-5 h-5"></i> Atur Kuota</a>
-                        <a id="navCalendarSettings" href="calendar_settings.html" class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="calendar-cog" class="w-5 h-5"></i> Atur Kalender</a>
-                    </div>
-                </div>
-
-                <!-- Div 4: KESANTRIAN -->
-                <div id="groupSantri" class="hidden bg-gray-50 rounded-lg p-2 mt-2">
-                    <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KESANTRIAN</h3>
-                    <a id="navBiodataSantri" href="student_data.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="book-user" class="w-5 h-5"></i> Biodata Santri</a>
-                    <a id="navIbadahHarian" href="daily_worship_form.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="notebook-pen" class="w-5 h-5"></i> Ibadah Harian</a>
-                    <a id="navMentoring" href="mentoring_groups.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="users-round" class="w-5 h-5"></i> Kelompok Mentoring</a>
-                    <a id="navValidasiIbadah" href="daily_worship_validation.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="check-square" class="w-5 h-5"></i> Validasi Ibadah</a>
-                    <a id="navRekapIbadahAnak" href="select_student.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="clipboard-check" class="w-5 h-5"></i> Rekap Ibadah Anak</a>
-                </div>
-                
-                <!-- Tombol Logout -->
-                <div class="pt-2">
-                    <button id="logoutBtn" class="w-full flex items-center gap-3 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition font-medium"><i data-lucide="log-out" class="w-5 h-5"></i> Keluar</button>
-                </div>
+            <nav id="sidebarNav" class="flex-1 overflow-y-auto py-4 px-3 space-y-2">
+                <!-- Menu akan dimuat oleh JS -->
             </nav>
         </aside>
-        <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden lg:hidden backdrop-blur-sm"></div>
 
         <!-- KONTEN UTAMA -->
         <main class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative">
             <header class="mb-8">
-                <h2 class="text-2xl lg:text-3xl font-bold text-gray-800">Verifikasi Pegawai</h2>
-                <p class="text-gray-500 text-sm mt-1">Daftar pegawai baru yang menunggu persetujuan aktivasi akun.</p>
+                <h2 class="text-2xl lg:text-3xl font-bold text-gray-800">Verifikasi Pengguna Baru</h2>
+                <p class="text-gray-500 text-sm mt-1">Setujui atau tolak pendaftaran akun baru sesuai kewenangan Anda.</p>
             </header>
 
-            <div class="max-w-6xl">
-                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Username</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Email</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Peran yang Diajukan</th>
-                                    <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="userTableBody" class="bg-white divide-y divide-gray-200">
-                                <!-- Data akan dimuat di sini -->
-                                <tr>
-                                    <td colspan="4" class="px-6 py-10 text-center text-gray-500">Memuat data...</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <!-- Empty State -->
-                    <div id="emptyState" class="hidden flex flex-col items-center justify-center py-12 px-4 text-center">
-                        <div class="bg-green-50 p-4 rounded-full mb-3">
-                            <i data-lucide="check-circle" class="w-8 h-8 text-green-500"></i>
-                        </div>
-                        <h3 class="text-lg font-medium text-gray-900">Semua Beres!</h3>
-                        <p class="text-gray-500 mt-1">Tidak ada pendaftar baru yang perlu diverifikasi saat ini.</p>
-                    </div>
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 text-sm">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left font-bold text-gray-500 uppercase">Nama / Username</th>
+                                <th class="px-6 py-3 text-left font-bold text-gray-500 uppercase">Email</th>
+                                <th class="px-6 py-3 text-left font-bold text-gray-500 uppercase">Peran yang Diajukan</th>
+                                <th class="px-6 py-3 text-center font-bold text-gray-500 uppercase">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userTableBody" class="bg-white divide-y divide-gray-200">
+                            <tr><td colspan="4" class="px-6 py-10 text-center text-gray-500">Memuat data...</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </main>
@@ -134,253 +57,90 @@
     <script>
         lucide.createIcons();
 
-        // Mobile Menu Logic
-        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-        const sidebar = document.getElementById('sidebar');
-        const sidebarOverlay = document.getElementById('sidebarOverlay');
-        function toggleSidebar() {
-            sidebar.classList.toggle('-translate-x-full');
-            sidebarOverlay.classList.toggle('hidden');
+        // Render Sidebar Sederhana
+        function renderSidebar() {
+            const nav = document.getElementById('sidebarNav');
+            nav.innerHTML = `
+                <div class="bg-gray-50 rounded-lg p-2">
+                    <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">MENU</h3>
+                    <a href="verification_management.html" class="flex items-center gap-3 px-3 py-2.5 text-teal-700 bg-white rounded-md transition font-semibold text-sm shadow-sm">
+                        <i data-lucide="user-check" class="w-5 h-5"></i> Verifikasi Pengguna
+                    </a>
+                </div>`;
+            lucide.createIcons();
         }
-        mobileMenuBtn.addEventListener('click', toggleSidebar);
-        sidebarOverlay.addEventListener('click', toggleSidebar);
 
-        // Load Data
         async function initPage() {
-            // Reset sidebar state on page load to prevent UI lock
-            const sidebar = document.getElementById('sidebar');
-            const sidebarOverlay = document.getElementById('sidebarOverlay');
-            if (sidebar) sidebar.classList.add('-translate-x-full');
-            if (sidebarOverlay) sidebarOverlay.classList.add('hidden');
+            // Cek Sesi
+            const sessionRes = await fetch('sadigs_api_v3/session_check.php');
+            const sessionData = await sessionRes.json();
+            if (!sessionData.success) { window.location.href = 'index.html'; return; }
 
-            try {
-                // 1. Cek Sesi
-                const sessionRes = await fetch('sadigs_api_v3/session_check.php');
-                const sessionData = await sessionRes.json();
-
-                if (!sessionData.success) {
-                    window.location.href = 'index.html';
-                    return;
-                }
-
-                // ument.getElementById('sidebarRole').textContent = rolesText;
-                
-                // Cek Akses YayasaneK,
-                if (sessionData.roles.some(r => yayasanRoles.includes(r))) {
-                    document.getElementById('menuYayasan').classList.remove('hidden');
-                    document.getElementById('navQuota').classList.remove('hidden');
-                    document.getElementById('groupKhusus').classList.remove('hidden');
-                } else {
-                    alert('Akses ditolak. Halaman ini khusus Yayasan.');
-                    window.location.href = 'dashboard.html';
-                    return;
-                }
-                document.getElementById('groupSantri').classList.remove('hidden');
-                
-                // Menu Jadwal Rapat (Semua yang bisa diundang)
-                const viewMeetingRoles = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan', 'Kepala Sekolah', 'Kepala Asrama', 'Sekretaris Sekolah', 'Bendahara Sekolah', 'Musyrif', 'Ustadz'];
-                if (sessionData.roles.some(r => viewMeetingRoles.includes(r))) {
-                    document.getElementById('navJadwalRapat').classList.remove('hidden');
-                }
-
-                // Menu Formulir Undangan Rapat (Hanya Pembuat)
-                const createMeetingRoles = ['Ketua Yayasan', 'Kepala Sekolah', 'Kepala Asrama'];
-                if (sessionData.roles.some(r => createMeetingRoles.includes(r))) {
-                    document.getElementById('navRapat').classList.remove('hidden');
-                }
-
-                // 2. Ambil Data Pending Users
-                loadPendingUsers();
-
-            } catch (error) {
-                console.error(error);
-            }
+            renderSidebar();
+            loadData();
         }
 
-        async function loadPendingUsers() {
+        async function loadData() {
             const tbody = document.getElementById('userTableBody');
-            const emptyState = document.getElementById('emptyState');
-            
+            tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-10 text-center text-gray-500"><i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-2"></i>Memuat data...</td></tr>';
+            lucide.createIcons();
+
             try {
                 const res = await fetch('sadigs_api_v3/verification.php');
-                const data = await res.json();
-
-                if (data.success && data.pending_users && data.pending_users.length > 0) {
-                    tbody.innerHTML = '';
-                    emptyState.classList.add('hidden');
-                    
-                    data.pending_users.forEach(user => {
-                        const tr = document.createElement('tr');
-                        tr.innerHTML = `
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${user.username}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${user.email}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">${user.roles}</span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                                <button onclick="openEditModal(${user.user_id}, '${user.roles}')" class="text-teal-600 hover:text-teal-900 bg-teal-50 hover:bg-teal-100 px-3 py-1.5 rounded-md transition mr-2 text-xs font-bold border border-teal-200">
-                                    Edit Peran
-                                </button>
-                                <button onclick="activateUser(${user.user_id})" class="text-white bg-green-600 hover:bg-green-700 px-3 py-1.5 rounded-md transition shadow-sm text-xs font-bold">
-                                    Aktifkan Akun
-                                </button>
-                            </td>
-                        `;
-                        tbody.appendChild(tr);
-                    });
+                const result = await res.json();
+                
+                if (result.success) {
+                    if (result.pending_users.length > 0) {
+                        tbody.innerHTML = '';
+                        result.pending_users.forEach(user => {
+                            const tr = document.createElement('tr');
+                            tr.className = "hover:bg-gray-50 transition";
+                            tr.innerHTML = `
+                                <td class="px-6 py-4">
+                                    <div class="font-bold text-gray-900">${user.username}</div>
+                                </td>
+                                <td class="px-6 py-4 text-gray-600">${user.email}</td>
+                                <td class="px-6 py-4">
+                                    <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-bold border border-yellow-200">${user.roles}</span>
+                                </td>
+                                <td class="px-6 py-4 text-center space-x-2">
+                                    <button onclick="processUser(${user.user_id}, 'activate')" class="bg-green-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-green-700 transition shadow-sm">Setujui</button>
+                                    <button onclick="processUser(${user.user_id}, 'reject')" class="bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-red-700 transition shadow-sm">Tolak</button>
+                                </td>
+                            `;
+                            tbody.appendChild(tr);
+                        });
+                    } else {
+                        tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-10 text-center text-gray-500">Tidak ada pengguna baru yang perlu diverifikasi.</td></tr>';
+                    }
                 } else {
-                    tbody.innerHTML = '';
-                    emptyState.classList.remove('hidden');
+                    tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-10 text-center text-red-500">${result.message}</td></tr>`;
                 }
-            } catch (error) {
-                tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-red-500">Gagal memuat data.</td></tr>';
-            }
-        }
-
-        // --- LOGIKA EDIT ROLE ---
-        let currentEditingUserId = null;
-
-        async function openEditModal(userId, currentRolesString) {
-            currentEditingUserId = userId;
-            const modal = document.getElementById('editRoleModal');
-            const container = document.getElementById('modalRoleList');
-            const currentRoles = currentRolesString.split(', ');
-
-            // Reset & Show Modal
-            container.innerHTML = '<p class="text-center text-gray-500">Memuat peran...</p>';
-            modal.classList.remove('hidden');
-
-            // Load Roles dari Quota API (untuk dapat daftar lengkap)
-            try {
-                const res = await fetch('sadigs_api_v3/quota.php?t=' + new Date().getTime());
-                const data = await res.json();
-                
-                container.innerHTML = '';
-                
-                // Helper render checkbox
-                const addCheckbox = (role) => {
-                    const isChecked = currentRoles.includes(role) ? 'checked' : '';
-                    const div = document.createElement('div');
-                    div.innerHTML = `
-                        <label class="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
-                            <input type="checkbox" name="edit_roles" value="${role}" class="w-4 h-4 text-teal-600 rounded" ${isChecked}>
-                            <span class="ml-2 text-sm text-gray-700">${role}</span>
-                        </label>
-                    `;
-                    container.appendChild(div);
-                };
-
-                // 1. Default Roles (UPDATED)
-                ['Santri Rijal', 'Santri Nisa\'', 'Walisantri'].forEach(r => addCheckbox(r));
-
-                // 2. Pegawai Roles
-                if (data.success && data.quotas) {
-                    Object.keys(data.quotas).forEach(r => addCheckbox(r));
-                }
-
             } catch (e) {
-                container.innerHTML = '<p class="text-red-500">Gagal memuat daftar peran.</p>';
+                console.error(e);
+                tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-10 text-center text-red-500">Gagal memuat data. Periksa koneksi server.</td></tr>';
             }
         }
 
-        function closeEditModal() {
-            document.getElementById('editRoleModal').classList.add('hidden');
-            currentEditingUserId = null;
-        }
-
-        async function saveEditedRoles() {
-            if (!currentEditingUserId) return;
-
-            const checkboxes = document.querySelectorAll('input[name="edit_roles"]:checked');
-            const selectedRoles = Array.from(checkboxes).map(cb => cb.value);
-
-            if (selectedRoles.length === 0) {
-                alert('Pilih minimal satu peran.');
-                return;
-            }
-
-            const btn = document.getElementById('saveRoleBtn');
-            const originalText = btn.innerText;
-            btn.innerText = 'Menyimpan...';
-            btn.disabled = true;
+        async function processUser(userId, action) {
+            const actionText = action === 'activate' ? 'menyetujui' : 'menolak';
+            if (!confirm(`Anda yakin ingin ${actionText} pengguna ini?`)) return;
 
             try {
                 const res = await fetch('sadigs_api_v3/verification.php', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ 
-                        user_id: currentEditingUserId, 
-                        action: 'update_roles',
-                        roles: selectedRoles 
-                    })
+                    body: JSON.stringify({ user_id: userId, action: action })
                 });
                 const result = await res.json();
-
-                if (result.success) {
-                    alert('Peran berhasil diperbarui!');
-                    closeEditModal();
-                    loadPendingUsers(); // Refresh tabel utama
-                } else {
-                    alert('Gagal: ' + result.message);
-                }
-            } catch (error) {
-                alert('Terjadi kesalahan koneksi.');
-            } finally {
-                btn.innerText = originalText;
-                btn.disabled = false;
-            }
-        }
-
-        window.activateUser = async function(userId) {
-            if (!confirm('Apakah Anda yakin ingin mengaktifkan akun ini?')) return;
-
-            try {
-                const res = await fetch('sadigs_api_v3/verification.php', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ user_id: userId, action: 'activate' })
-                });
-                const result = await res.json();
-
-                if (result.success) {
-                    alert('Akun berhasil diaktifkan!');
-                    loadPendingUsers(); // Refresh tabel
-                } else {
-                    alert('Gagal: ' + result.message);
-                }
-            } catch (error) {
+                alert(result.message);
+                if (result.success) loadData();
+            } catch (e) {
                 alert('Terjadi kesalahan koneksi.');
             }
         }
-
-        // Logout
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            if(confirm('Keluar aplikasi?')) window.location.href = 'sadigs_api_v3/logout.php';
-        });
 
         initPage();
     </script>
-
-    <!-- MODAL EDIT ROLE -->
-    <div id="editRoleModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
-            <div class="bg-teal-600 px-6 py-4 flex justify-between items-center">
-                <h3 class="text-white font-bold text-lg">Edit Peran Pegawai</h3>
-                <button onclick="closeEditModal()" class="text-teal-100 hover:text-white">
-                    <i data-lucide="x" class="w-6 h-6"></i>
-                </button>
-            </div>
-            <div class="p-6">
-                <p class="text-sm text-gray-500 mb-4">Silakan koreksi peran untuk pengguna ini sebelum diaktifkan.</p>
-                <div id="modalRoleList" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar border border-gray-100 rounded-lg p-2">
-                    <!-- Checkbox dimuat via JS -->
-                </div>
-                <div class="mt-6 flex justify-end gap-3">
-                    <button onclick="closeEditModal()" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg text-sm font-medium transition">Batal</button>
-                    <button id="saveRoleBtn" onclick="saveEditedRoles()" class="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm font-bold shadow-md transition">Simpan Perubahan</button>
-                </div>
-            </div>
-        </div>
-    </div>
 </body>
 </html>
