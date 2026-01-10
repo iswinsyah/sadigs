@@ -11,6 +11,8 @@ header('Content-Type: application/json');
 // Fungsi cadangan
 if (!function_exists('sendJSONResponse')) {
     function sendJSONResponse($data, $code = 200) {
+        // Bersihkan semua buffer output sebelum kirim JSON
+        while (ob_get_level()) { ob_end_clean(); }
         http_response_code($code);
         echo json_encode($data);
         exit;
@@ -25,7 +27,13 @@ try {
         throw new Exception('Unauthorized', 401);
     }
 
-    $input = json_decode(file_get_contents('php://input'), true);
+    $rawInput = file_get_contents('php://input');
+    $input = json_decode($rawInput, true);
+    
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        throw new Exception('Invalid JSON input', 400);
+    }
+
     $roles = $input['roles'] ?? [];
     $user_id = $_SESSION['user_id'];
 
@@ -37,15 +45,23 @@ try {
 
     $pdo->beginTransaction();
 
-    // Siapkan statement insert
-    // LOGIKA BARU: Jika sedang Impersonate (Admin yang memilihkan), langsung 'approved'
-    // Jika user sendiri yang memilih, tetap 'pending'
+    // Tentukan status
     $status = isset($_SESSION['impersonator_user_id']) ? 'approved' : 'pending';
     
-    $stmt = $pdo->prepare("INSERT INTO user_roles (user_id, role_name, status) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE status = VALUES(status)");
+    // Gunakan pendekatan SELECT lalu INSERT/UPDATE (Lebih aman & kompatibel semua MySQL)
+    $stmtCheck = $pdo->prepare("SELECT id FROM user_roles WHERE user_id = ? AND role_name = ?");
+    $stmtInsert = $pdo->prepare("INSERT INTO user_roles (user_id, role_name, status) VALUES (?, ?, ?)");
+    $stmtUpdate = $pdo->prepare("UPDATE user_roles SET status = ? WHERE id = ?");
 
     foreach ($roles as $role) {
-        $stmt->execute([$user_id, $role, $status]);
+        $stmtCheck->execute([$user_id, $role]);
+        $existing = $stmtCheck->fetch(PDO::FETCH_ASSOC);
+
+        if ($existing) {
+            $stmtUpdate->execute([$status, $existing['id']]);
+        } else {
+            $stmtInsert->execute([$user_id, $role, $status]);
+        }
     }
 
     $pdo->commit();
@@ -55,7 +71,6 @@ try {
 
 } catch (Throwable $e) {
     if (isset($pdo) && $pdo->inTransaction()) $pdo->rollBack();
-    ob_clean();
-    sendJSONResponse(['success' => false, 'message' => 'Database error: ' . $e->getMessage()], 500);
+    sendJSONResponse(['success' => false, 'message' => 'Server Error: ' . $e->getMessage()], 500);
 }
 ?>
