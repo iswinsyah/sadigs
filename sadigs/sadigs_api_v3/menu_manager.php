@@ -177,6 +177,7 @@ $master_structure = [
         'Musyrif' => [
             'label' => '14. MUSYRIF',
             'items' => [
+                ['id' => 'navMusyrifWidget', 'label' => 'Ringkasan Musyrif', 'icon' => 'activity'], // Widget Dashboard
                 ['id' => 'navMentoring', 'label' => 'Kelompok Mentoring', 'icon' => 'users-round'],
                 ['id' => 'navInputTahfizh', 'label' => 'Input Tahfizh', 'icon' => 'book-marked'],
                 ['id' => 'navValidasiIbadah', 'label' => 'Validasi Ibadah', 'icon' => 'check-square'],
