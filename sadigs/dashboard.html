@@ -267,7 +267,8 @@
         document.getElementById('currentDate').textContent = new Date().toLocaleDateString('id-ID', options);
 
         // Cek Sesi & Muat Data User
-        fetch('sadigs_api_v3/session_check.php')
+        // Tambahkan timestamp (?t=...) agar browser tidak menggunakan cache lama
+        fetch('sadigs_api_v3/session_check.php?t=' + new Date().getTime())
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
