@@ -140,9 +140,10 @@ $master_structure = [
             'label' => '8. KEPALA ASRAMA',
             'items' => [['id' => 'navOnLeaveList', 'label' => 'Santri Sedang Pulang', 'icon' => 'user-minus']]
         ],
-        'SekretarisSekolah' => ['label' => '9. SEKRETARIS SEKOLAH', 'items' => []],
+        'AdminSekolah' => ['label' => '9. ADMIN SEKOLAH', 'items' => []],
+        'SekretarisSekolah' => ['label' => '10. SEKRETARIS SEKOLAH', 'items' => []],
         'BendaharaSekolah' => [
-            'label' => '10. BENDAHARA SEKOLAH',
+            'label' => '11. BENDAHARA SEKOLAH',
             'items' => [
                 ['id' => 'navValidasiPembayaran', 'label' => 'Validasi Pembayaran', 'icon' => 'check-circle-2'],
                 ['id' => 'navTabelPembayaran', 'label' => 'Data Pembayaran', 'icon' => 'banknote'],
@@ -153,7 +154,7 @@ $master_structure = [
             ]
         ],
         'Kepegawaian' => [
-            'label' => '11. ADMINISTRASI PEGAWAI',
+            'label' => '12. ADMINISTRASI PEGAWAI',
             'items' => [
                 ['id' => 'navAbsensi', 'label' => 'Absensi Pegawai', 'icon' => 'map-pin'],
                 ['id' => 'navBiodataPegawai', 'label' => 'Biodata Pegawai', 'icon' => 'file-badge'],
@@ -164,7 +165,7 @@ $master_structure = [
             ]
         ],
         'Ustadz' => [
-            'label' => '12. USTADZ',
+            'label' => '13. USTADZ',
             'items' => [
                 ['id' => 'navRppGenerator', 'label' => 'Generator Modul Ajar', 'icon' => 'brain-circuit'],
                 ['id' => 'navRppAlbum', 'label' => 'Album Perangkat Ajar', 'icon' => 'folder-open'],
@@ -174,7 +175,7 @@ $master_structure = [
             ]
         ],
         'Musyrif' => [
-            'label' => '13. MUSYRIF',
+            'label' => '14. MUSYRIF',
             'items' => [
                 ['id' => 'navMentoring', 'label' => 'Kelompok Mentoring', 'icon' => 'users-round'],
                 ['id' => 'navInputTahfizh', 'label' => 'Input Tahfizh', 'icon' => 'book-marked'],
@@ -185,7 +186,7 @@ $master_structure = [
             ]
         ],
         'Santri' => [
-            'label' => '14. SANTRI',
+            'label' => '15. SANTRI',
             'items' => [
                 ['id' => 'navBiodataSantri', 'label' => 'Biodata Santri', 'icon' => 'book-user'],
                 ['id' => 'navIbadahHarian', 'label' => 'Laporan Ibadah Harian', 'icon' => 'notebook-pen'],
@@ -193,7 +194,7 @@ $master_structure = [
             ]
         ],
         'Walisantri' => [
-            'label' => '15. WALISANTRI',
+            'label' => '16. WALISANTRI',
             'items' => [
                 ['id' => 'navRekapIbadahAnak', 'label' => 'Rekap Ibadah Anak', 'icon' => 'clipboard-check'],
                 ['id' => 'navViewTahfizh', 'label' => 'Laporan Tahfizh', 'icon' => 'book-open-check'],
@@ -238,7 +239,7 @@ if ($method === 'GET') {
         // Definisikan urutan custom untuk kolom peran
         $custom_order = [
             'Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan',
-            'Kepala Sekolah', 'Sekretaris Sekolah', 'Bendahara Sekolah',
+            'Kepala Sekolah', 'Admin Sekolah', 'Sekretaris Sekolah', 'Bendahara Sekolah',
             'Kepala Asrama Putra', 'Kepala Asrama Putri',
             'Musyrif', 'Musyrifah', 'Ustadz', 'Ustadzah',
             'Santri Rijal', 'Santri Nisa\'', 'Walisantri'

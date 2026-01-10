@@ -208,6 +208,10 @@
                                     <span class="text-sm text-gray-700">Kepala Asrama Putri</span>
                                 </label>
                                 <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-100 p-2 rounded transition">
+                                    <input type="checkbox" name="invited_roles" value="Admin Sekolah" class="w-4 h-4 text-teal-600 rounded focus:ring-teal-500 border-gray-300">
+                                    <span class="text-sm text-gray-700">Admin Sekolah</span>
+                                </label>
+                                <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-100 p-2 rounded transition">
                                     <input type="checkbox" name="invited_roles" value="Sekretaris Sekolah" class="w-4 h-4 text-teal-600 rounded focus:ring-teal-500 border-gray-300">
                                     <span class="text-sm text-gray-700">Sekretaris Sekolah</span>
                                 </label>
@@ -333,7 +337,7 @@
                 document.getElementById('groupSantri').classList.remove('hidden');
                 
                 // Menu Jadwal Rapat (Semua yang bisa diundang)
-                const viewMeetingRoles = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan', 'Kepala Sekolah', 'Kepala Asrama Putra', 'Kepala Asrama Putri', 'Sekretaris Sekolah', 'Bendahara Sekolah', 'Musyrif', 'Ustadz', 'Musyrifah', 'Ustadzah'];
+                const viewMeetingRoles = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan', 'Kepala Sekolah', 'Kepala Asrama Putra', 'Kepala Asrama Putri', 'Admin Sekolah', 'Sekretaris Sekolah', 'Bendahara Sekolah', 'Musyrif', 'Ustadz', 'Musyrifah', 'Ustadzah'];
                 if (sessionData.roles.some(r => viewMeetingRoles.includes(r))) {
                     document.getElementById('navJadwalRapat').classList.remove('hidden');
                 }

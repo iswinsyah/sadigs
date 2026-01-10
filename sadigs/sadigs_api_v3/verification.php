@@ -12,7 +12,7 @@ $user_roles = $_SESSION['roles'] ?? [];
 $pdo = getDBConnection();
 
 // --- LOGIKA PEMISAHAN TUGAS VERIFIKASI ---
-$school_verifiers = ['Kepala Sekolah', 'Sekretaris Sekolah', 'Bendahara Sekolah'];
+$school_verifiers = ['Kepala Sekolah', 'Admin Sekolah', 'Sekretaris Sekolah', 'Bendahara Sekolah'];
 $foundation_verifiers = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan'];
 $student_roles = ['Santri', 'Santri Rijal', "Santri Nisa'", 'Walisantri'];
 

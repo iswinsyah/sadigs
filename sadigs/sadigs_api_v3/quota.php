@@ -41,7 +41,7 @@ try {
     // 4. Daftar Peran yang Dikelola
     $allRoles = [
         'Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan',
-        'Kepala Sekolah', 'Sekretaris Sekolah', 'Bendahara Sekolah',
+        'Kepala Sekolah', 'Admin Sekolah', 'Sekretaris Sekolah', 'Bendahara Sekolah',
         'Kepala Ma\'had', 'Kepala Asrama Putra', 'Kepala Asrama Putri',
         'Musyrif', 'Musyrifah', 'Ustadz', 'Ustadzah'
     ];

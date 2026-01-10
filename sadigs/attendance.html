@@ -273,7 +273,7 @@
                 document.getElementById('sidebarRole').textContent = rolesText;
 
                 // Cek Peran Pegawai untuk akses halaman
-                const pegawaiRoles = ['Kepala Sekolah', 'Kepala Asrama', 'Sekretaris Sekolah', 'Bendahara Sekolah', 'Musyrif', 'Ustadz', 'Musyrifah', 'Ustadzah'];
+                const pegawaiRoles = ['Kepala Sekolah', 'Kepala Asrama', 'Admin Sekolah', 'Sekretaris Sekolah', 'Bendahara Sekolah', 'Musyrif', 'Ustadz', 'Musyrifah', 'Ustadzah'];
                 if (!sessionData.roles.some(r => pegawaiRoles.includes(r))) {
                     alert('Halaman ini khusus Pegawai.');
                     window.location.href = 'dashboard.html';
