@@ -520,10 +520,18 @@
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ roles: selectedRoles })
             });
-            const result = await res.json();
-            alert(result.message);
-            if (result.success) {
-                window.location.reload();
+            
+            // Baca sebagai text dulu untuk debug jika bukan JSON valid
+            const text = await res.text();
+            try {
+                const result = JSON.parse(text);
+                alert(result.message);
+                if (result.success) {
+                    window.location.reload();
+                }
+            } catch (e) {
+                console.error("Server Error:", text);
+                alert("Terjadi kesalahan pada server. Silakan coba lagi atau hubungi admin.\n\nDetail: " + text.substring(0, 100));
             }
         });
 
