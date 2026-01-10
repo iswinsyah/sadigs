@@ -34,9 +34,8 @@ try {
     }
 
     $pdo = getDBConnection();
-    $pdo->beginTransaction();
 
-    // --- AUTO MIGRATION: Buat tabel jika belum ada ---
+    // --- AUTO MIGRATION: Buat tabel jika belum ada (DILUAR TRANSAKSI) ---
     $pdo->exec("CREATE TABLE IF NOT EXISTS user_roles (
         id INT AUTO_INCREMENT PRIMARY KEY,
         user_id INT NOT NULL,
@@ -47,6 +46,8 @@ try {
         UNIQUE KEY unique_user_role (user_id, role_name)
     )");
     // ------------------------------------------------
+
+    $pdo->beginTransaction();
 
     // Siapkan statement insert
     // LOGIKA BARU: Jika sedang Impersonate (Admin yang memilihkan), langsung 'approved'

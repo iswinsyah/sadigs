@@ -111,6 +111,11 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pdo->prepare("DELETE FROM user_roles WHERE user_id = ? AND status = 'pending'")->execute([$target_user_id]);
             $msg = "Permohonan pendaftaran ditolak.";
         }
+        elseif ($action === 'deactivate') {
+            // Nonaktifkan user
+            $pdo->prepare("UPDATE users SET is_active = 0 WHERE user_id = ?")->execute([$target_user_id]);
+            $msg = "Akun berhasil dinonaktifkan.";
+        }
 
         $pdo->commit();
         sendJSONResponse(['success' => true, 'message' => $msg]);

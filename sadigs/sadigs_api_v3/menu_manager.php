@@ -111,7 +111,7 @@ $master_structure = [
         'SekretarisYayasan' => [
             'label' => '4. SEKRETARIS YAYASAN',
             'items' => [
-                ['id' => 'navVerifikasi', 'label' => 'Verifikasi Pengguna', 'icon' => 'user-check'],
+                ['id' => 'navUserCredentials', 'label' => 'Manajemen Pengguna', 'icon' => 'users'],
                 ['id' => 'navQuota', 'label' => 'Atur Kuota Peran', 'icon' => 'users'],
                 ['id' => 'navCalendarSettings', 'label' => 'Atur Kalender', 'icon' => 'calendar-cog']
             ]
