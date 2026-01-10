@@ -17,6 +17,15 @@
             <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-teal-600 text-white">
                 <img src="assets/img/logo.png" alt="Logo" class="h-9">
             </div>
+            <div class="p-6 border-b border-gray-100 bg-teal-50">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-teal-200 flex items-center justify-center text-teal-800 font-bold text-lg shadow-sm"><span id="userInitial">U</span></div>
+                    <div class="overflow-hidden">
+                        <p id="sidebarUsername" class="font-bold text-gray-800 text-sm truncate">Memuat...</p>
+                        <p id="sidebarRole" class="text-xs text-gray-500 truncate font-medium">Role...</p>
+                    </div>
+                </div>
+            </div>
             <div class="p-6">
                 <a href="dashboard.html" class="flex items-center gap-2 text-gray-600 hover:text-teal-600 transition">
                     <i data-lucide="arrow-left" class="w-5 h-5"></i> Kembali ke Dashboard
@@ -107,6 +116,34 @@
     <script>
         lucide.createIcons();
         let allStudents = [];
+
+        async function initPage() {
+            // 1. Cek Sesi & Load User Info
+            const sessionRes = await fetch('sadigs_api_v3/session_check.php');
+            const sessionData = await sessionRes.json();
+            if (!sessionData.success) { window.location.href = 'index.html'; return; }
+
+            document.getElementById('sidebarUsername').textContent = sessionData.username;
+            document.getElementById('userInitial').textContent = sessionData.username.charAt(0).toUpperCase();
+            const rawRoles = sessionData.raw_roles || [];
+            document.getElementById('sidebarRole').textContent = rawRoles.length > 0 ? rawRoles.map(r => r.role_name).join(', ') : 'User';
+
+            // 2. Cek Izin Akses (Manajemen Akses)
+            try {
+                const permRes = await fetch('sadigs_api_v3/get_menu_permissions.php');
+                const permData = await permRes.json();
+                if (permData.success) {
+                    const allowedMenus = permData.permissions || [];
+                    if (!allowedMenus.includes('navManajemenKelas')) {
+                        alert('Akses Ditolak. Anda tidak memiliki izin untuk mengakses halaman ini.');
+                        window.location.href = 'dashboard.html';
+                        return;
+                    }
+                }
+            } catch (e) { console.error("Gagal cek izin:", e); }
+
+            loadStudents();
+        }
 
         async function loadStudents() {
             try {
@@ -246,7 +283,7 @@
             }
         }
 
-        loadStudents();
+        initPage();
     </script>
 </body>
 </html>
