@@ -39,19 +39,20 @@ if ($is_foundation) {
 // --- GET: List Pending Users ---
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     try {
-        // Ambil user yang punya setidaknya satu role 'pending'
+        // Ambil user yang punya setidaknya satu role 'pending' ATAU belum punya role (untuk Yayasan)
         $sql = "SELECT u.user_id, u.username, u.email, 
-                       GROUP_CONCAT(ur.role_name SEPARATOR ', ') as roles
+                       IFNULL(GROUP_CONCAT(ur.role_name SEPARATOR ', '), '(Belum pilih peran)') as roles
                 FROM users u
-                JOIN user_roles ur ON u.user_id = ur.user_id
-                WHERE ur.status = 'pending' ";
+                LEFT JOIN user_roles ur ON u.user_id = ur.user_id
+                WHERE (ur.status = 'pending' OR ur.role_name IS NULL) ";
 
         // Terapkan Filter Query
         $placeholders = implode(',', array_fill(0, count($student_roles), '?'));
         if ($filter_mode === 'students_only') {
             $sql .= " AND ur.role_name IN ($placeholders) ";
         } else {
-            $sql .= " AND ur.role_name NOT IN ($placeholders) ";
+            // Yayasan melihat Non-Santri ATAU yang belum punya role
+            $sql .= " AND (ur.role_name NOT IN ($placeholders) OR ur.role_name IS NULL) ";
         }
 
         $sql .= " GROUP BY u.user_id";
