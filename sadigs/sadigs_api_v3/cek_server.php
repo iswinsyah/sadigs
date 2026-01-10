@@ -1,4 +1,5 @@
 <?php
+// Script Cek Server & File
 header('Content-Type: text/html; charset=utf-8');
 echo "<h1>🕵️‍♂️ Cek Status Server & File</h1>";
 

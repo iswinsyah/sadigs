@@ -1,4 +1,5 @@
 <?php
+// Script Debug Verifikasi User
 header('Content-Type: text/html; charset=utf-8');
 require_once 'db_connect.php';
 
