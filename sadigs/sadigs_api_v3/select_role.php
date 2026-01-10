@@ -49,18 +49,20 @@ try {
     // ------------------------------------------------
 
     // Siapkan statement insert
-    // Status default 'pending' agar menunggu validasi admin/yayasan
-    $stmt = $pdo->prepare("INSERT INTO user_roles (user_id, role_name, status) VALUES (?, ?, 'pending') ON DUPLICATE KEY UPDATE status = status");
+    // LOGIKA BARU: Jika sedang Impersonate (Admin yang memilihkan), langsung 'approved'
+    // Jika user sendiri yang memilih, tetap 'pending'
+    $status = isset($_SESSION['impersonator_user_id']) ? 'approved' : 'pending';
+    
+    $stmt = $pdo->prepare("INSERT INTO user_roles (user_id, role_name, status) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE status = VALUES(status)");
 
     foreach ($roles as $role) {
-        // Validasi nama role sederhana (opsional)
-        $stmt->execute([$user_id, $role]);
+        $stmt->execute([$user_id, $role, $status]);
     }
 
     $pdo->commit();
     
     ob_clean();
-    sendJSONResponse(['success' => true, 'message' => 'Peran berhasil diajukan. Mohon tunggu validasi admin.']);
+    sendJSONResponse(['success' => true, 'message' => ($status === 'approved' ? 'Peran berhasil ditambahkan (Auto-Approved).' : 'Peran berhasil diajukan. Mohon tunggu validasi admin.')]);
 
 } catch (Throwable $e) {
     if (isset($pdo) && $pdo->inTransaction()) $pdo->rollBack();
