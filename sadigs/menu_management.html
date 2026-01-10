@@ -113,7 +113,7 @@
 
         async function loadData() {
             try {
-                const res = await fetch('sadigs_api_v3/menu_manager.php');
+                const res = await fetch('sadigs_api_v3/menu_manager.php?t=' + new Date().getTime());
                 globalData = await res.json();
                 if (!globalData.success && globalData.message) throw new Error(globalData.message);
                 renderPermissions();
@@ -231,100 +231,12 @@
             const container = document.getElementById('structureContainer');
             container.innerHTML = '';
 
-            // 1. Siapkan wadah kategori & helper
-            const tempCategories = JSON.parse(JSON.stringify(globalData.categories));
-            Object.keys(tempCategories).forEach(k => tempCategories[k].menus = []);
-            const roles = globalData.roles;
-            const matrix = globalData.matrix;
-            const hasRoles = (allowed, targets) => targets.every(t => allowed.includes(t));
-            const arraysAreEqual = (a, b) => {
-                if (a.length !== b.length) return false;
-                const setA = new Set(a);
-                for (const item of b) {
-                    if (!setA.has(item)) return false;
-                }
-                return true;
-            };
-
-            // Prioritas Role untuk penentuan kategori (Hierarki Tertinggi ke Terendah)
-            // Jika menu dishare, akan ikut kategori role dengan prioritas lebih tinggi
-            const rolePriority = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan', 'Kepala Sekolah', 'Admin Sekolah', 'Sekretaris Sekolah', 'Bendahara Sekolah', 'Kepala Asrama Putra', 'Kepala Asrama Putri', 'Musyrif', 'Ustadz', 'Santri Rijal', 'Walisantri'];
-
-            // 2. Logika Pengelompokan Otomatis
-            Object.keys(globalData.menu_names).forEach(menuId => {
-                // Ambil role yang diizinkan untuk menu ini
-                const allowed = roles.filter(r => matrix[menuId]?.[r] === 1);
-                
-                let targetCat = null;
-
-                // ATURAN BARU: DIV KHUSUS (Akses Eksklusif)
-                if (arraysAreEqual(allowed, ['Ketua Yayasan'])) {
-                    targetCat = 'KetuaYayasan';
-                } else if (arraysAreEqual(allowed, ['Sekretaris Yayasan'])) {
-                    targetCat = 'SekretarisYayasan';
-                } else if (arraysAreEqual(allowed, ['Bendahara Yayasan'])) {
-                    targetCat = 'BendaharaYayasan';
-                } else if (arraysAreEqual(allowed, ['Kepala Sekolah'])) {
-                    targetCat = 'KepalaSekolah';
-                } else if (arraysAreEqual(allowed, ['Admin Sekolah'])) {
-                    targetCat = 'AdminSekolah';
-                } else if (arraysAreEqual(allowed, ['Sekretaris Sekolah'])) {
-                    targetCat = 'SekretarisSekolah';
-                } else if (arraysAreEqual(allowed, ['Bendahara Sekolah'])) {
-                    targetCat = 'BendaharaSekolah';
-                } else if (arraysAreEqual(allowed, ['Kepala Asrama Putra', 'Kepala Asrama Putri'])) {
-                    targetCat = 'KepalaAsrama';
-                } else if (arraysAreEqual(allowed, ['Musyrif', 'Musyrifah'])) {
-                    targetCat = 'Musyrif';
-                } else if (arraysAreEqual(allowed, ['Ustadz', 'Ustadzah'])) {
-                    targetCat = 'Ustadz';
-                } else if (arraysAreEqual(allowed, ['Santri Rijal', 'Santri Nisa\''])) {
-                    targetCat = 'Santri';
-                } else if (arraysAreEqual(allowed, ['Walisantri'])) {
-                    targetCat = 'Walisantri';
-                }
-
-                // Jika tidak ada aturan eksklusif yang cocok, gunakan aturan lama
-                if (!targetCat) {
-                    if (allowed.length === roles.length && allowed.length > 0) {
-                        targetCat = 'Umum';
-                    } else if (hasRoles(allowed, ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan'])) {
-                        targetCat = 'ManajemenYayasan';
-                    } else if (hasRoles(allowed, ['Kepala Sekolah', 'Admin Sekolah', 'Sekretaris Sekolah', 'Bendahara Sekolah', 'Kepala Asrama Putra', 'Kepala Asrama Putri', 'Musyrif', 'Musyrifah', 'Ustadz', 'Ustadzah'])) {
-                        targetCat = 'Kepegawaian';
-                    } else if (hasRoles(allowed, ['Kepala Sekolah', 'Admin Sekolah', 'Sekretaris Sekolah', 'Bendahara Sekolah'])) {
-                        targetCat = 'ManajemenSekolah';
-                    } else if (allowed.length > 0) {
-                        // Cari role dengan prioritas tertinggi yang punya akses
-                        // Agar menu shared tidak masuk ke kategori level bawah (misal: Menu Santri yang bisa dilihat Ketua Yayasan jangan masuk Div Santri)
-                        const firstRole = allowed.sort((a, b) => {
-                            const idxA = rolePriority.indexOf(a);
-                            const idxB = rolePriority.indexOf(b);
-                            return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB);
-                        })[0];
-                        const normalized = firstRole.replace(/\s+/g, '');
-                        if (tempCategories[normalized]) targetCat = normalized;
-                        else if (firstRole.includes('Kepala Asrama')) targetCat = 'KepalaAsrama';
-                        else if (firstRole.includes('Musyrif')) targetCat = 'Musyrif';
-                        else if (firstRole.includes('Ustadz')) targetCat = 'Ustadz';
-                        else if (firstRole.includes('Santri')) targetCat = 'Santri';
-                        else if (firstRole.includes('Walisantri')) targetCat = 'Walisantri';
-                        else targetCat = 'Umum';
-                    } else {
-                        return; // Jangan tampilkan menu yang tidak punya izin sama sekali
-                    }
-                }
-
-                // Pastikan kategori target ada, jika tidak masukkan ke Umum
-                if (!tempCategories[targetCat]) {
-                    targetCat = 'Umum';
-                }
-
-                tempCategories[targetCat].menus.push(menuId);
-            });
+            // GUNAKAN DATA ASLI DARI DATABASE (Bukan logika permission)
+            // Ini memastikan tampilan di sini SAMA PERSIS dengan Sidebar
+            const categories = globalData.categories;
 
             // 3. Render ke HTML
-            for (const [catId, cat] of Object.entries(tempCategories)) {
+            for (const [catId, cat] of Object.entries(categories)) {
                 const catDiv = document.createElement('div');
                 catDiv.className = "bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col";
                 catDiv.innerHTML = `

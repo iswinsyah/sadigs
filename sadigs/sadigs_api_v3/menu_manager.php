@@ -212,7 +212,7 @@ $master_structure = [
     $pdo->beginTransaction();
     try {
         $stmtCat = $pdo->prepare("INSERT INTO menu_categories (category_id, label, sort_order) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE label=VALUES(label), sort_order=VALUES(sort_order)");
-        $stmtMenu = $pdo->prepare("INSERT INTO menus (menu_id, menu_name, category_id, sort_order, icon) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE menu_name=VALUES(menu_name), category_id=VALUES(category_id), sort_order=VALUES(sort_order), icon=VALUES(icon)");
+        $stmtMenu = $pdo->prepare("INSERT INTO menus (menu_id, menu_name, category_id, sort_order, icon) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE menu_name=VALUES(menu_name), icon=VALUES(icon)");
 
         $sort_cat = 1;
         foreach ($master_structure as $cat_id => $cat_data) {
