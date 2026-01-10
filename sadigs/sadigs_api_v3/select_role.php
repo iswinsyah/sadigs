@@ -3,24 +3,37 @@
 ini_set('display_errors', 0);
 error_reporting(E_ALL);
 
+// --- PENANGKAP FATAL ERROR ---
+// Agar jika server crash, kita tetap dapat respon JSON berisi pesan errornya
+register_shutdown_function(function() {
+    $error = error_get_last();
+    if ($error && ($error['type'] === E_ERROR || $error['type'] === E_PARSE || $error['type'] === E_CORE_ERROR)) {
+        while (ob_get_level()) { ob_end_clean(); } // Bersihkan buffer
+        http_response_code(500);
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'message' => 'Fatal Error: ' . $error['message'] . ' di baris ' . $error['line']]);
+        exit;
+    }
+});
+
 // Mulai buffer output
 ob_start();
 
 header('Content-Type: application/json');
 
-// Fungsi cadangan
-if (!function_exists('sendJSONResponse')) {
-    function sendJSONResponse($data, $code = 200) {
-        // Bersihkan semua buffer output sebelum kirim JSON
-        while (ob_get_level()) { ob_end_clean(); }
-        http_response_code($code);
-        echo json_encode($data);
-        exit;
-    }
-}
-
 try {
+    // 1. INCLUDE DULU (PENTING: Agar tidak redeclare function)
     require_once 'db_connect.php';
+
+    // 2. Definisi fungsi helper jika belum ada (Safe Check)
+    if (!function_exists('sendJSONResponse')) {
+        function sendJSONResponse($data, $code = 200) {
+            while (ob_get_level()) { ob_end_clean(); }
+            http_response_code($code);
+            echo json_encode($data);
+            exit;
+        }
+    }
 
     if (session_status() === PHP_SESSION_NONE) session_start();
     if (!isset($_SESSION['user_id'])) {

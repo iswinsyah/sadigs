@@ -1,48 +1,33 @@
 <?php
 header('Content-Type: application/json');
+ini_set('display_errors', 0);
+error_reporting(E_ALL);
+
 require_once 'db_connect.php';
 
-if (session_status() === PHP_SESSION_NONE) session_start();
-if (!isset($_SESSION['user_id'])) sendJSONResponse(['success' => false, 'message' => 'Unauthorized'], 401);
-
-$action = $_GET['action'] ?? 'list_active';
-$pdo = getDBConnection();
-
 try {
-    if ($action === 'list_pending') {
-        // Untuk Ketua Yayasan: Lihat yang pending
-        if (!in_array('Ketua Yayasan', $_SESSION['roles'] ?? [])) {
-            sendJSONResponse(['success' => false, 'message' => 'Forbidden'], 403);
+    $action = $_GET['action'] ?? '';
+    
+    if ($action === 'list_active') {
+        $pdo = getDBConnection();
+        
+        // Cek apakah tabel ada (untuk mencegah Error 500 jika belum migrasi)
+        $check = $pdo->query("SHOW TABLES LIKE 'regulations'");
+        if ($check->rowCount() == 0) {
+            echo json_encode(['success' => true, 'data' => []]); // Return kosong aman
+            exit;
         }
-        $stmt = $pdo->query("SELECT r.*, u.full_name as creator_name FROM regulations r JOIN users u ON r.created_by = u.user_id WHERE r.status = 'pending' ORDER BY r.created_at DESC");
-        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        sendJSONResponse(['success' => true, 'data' => $data]);
 
-    } else {
-        // Untuk Widget Dashboard: Lihat yang approved & sesuai role
-        $user_roles = $_SESSION['roles'] ?? [];
-        
-        // Bangun query dinamis
-        // Tampilkan jika target_role = 'Semua' ATAU target_role ada di daftar role user
-        $placeholders = implode(',', array_fill(0, count($user_roles), '?'));
-        
-        $sql = "SELECT * FROM regulations 
-                WHERE status = 'approved' 
-                AND (target_role = 'Semua' OR target_role IN ($placeholders)) 
-                ORDER BY created_at DESC LIMIT 5";
-        
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute($user_roles);
+        // Ambil peraturan aktif
+        $stmt = $pdo->query("SELECT * FROM regulations WHERE is_active = 1 ORDER BY created_at DESC LIMIT 5");
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
-        // Format tanggal agar cantik
-        foreach ($data as &$row) {
-            $row['formatted_date'] = date('d M Y', strtotime($row['created_at']));
-        }
-        
-        sendJSONResponse(['success' => true, 'data' => $data]);
+        echo json_encode(['success' => true, 'data' => $data]);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Invalid action']);
     }
 } catch (Exception $e) {
-    sendJSONResponse(['success' => false, 'message' => $e->getMessage()], 500);
+    http_response_code(500);
+    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
 }
 ?>
