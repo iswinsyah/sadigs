@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                        IFNULL(GROUP_CONCAT(ur.role_name SEPARATOR ', '), '(Belum pilih peran)') as roles
                 FROM users u
                 LEFT JOIN user_roles ur ON u.user_id = ur.user_id
-                WHERE (ur.status = 'pending' OR ur.role_name IS NULL) ";
+                WHERE (ur.status = 'pending' OR (ur.role_name IS NULL AND COALESCE(u.is_active, 0) = 0)) ";
 
         // Terapkan Filter Query
         $placeholders = implode(',', array_fill(0, count($student_roles), '?'));
