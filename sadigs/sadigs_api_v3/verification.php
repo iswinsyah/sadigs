@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $sql .= " AND ur.role_name IN ($placeholders) ";
         } else {
             // Yayasan melihat Non-Santri ATAU yang belum punya role
-            $sql .= " AND (ur.role_name NOT IN ($placeholders) OR ur.role_name IS NULL) ";
+            $sql .= " AND (COALESCE(ur.role_name, '') NOT IN ($placeholders) OR ur.role_name IS NULL) ";
         }
 
         $sql .= " GROUP BY u.user_id";
