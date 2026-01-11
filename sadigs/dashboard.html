@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Oswald:wght@700&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Menggunakan Lucide Icons untuk ikon yang ringan dan modern -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <script>
@@ -29,7 +29,6 @@
         /* Sembunyikan scrollbar sidebar agar lebih rapi */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .font-marlin { font-family: 'Oswald', sans-serif; /* Placeholder for Marlin Condensed */ }
     </style>
 </head>
 <body class="bg-white text-gray-800 font-sans antialiased">
@@ -60,8 +59,9 @@
         <aside id="sidebar" class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col transition-transform transform -translate-x-full lg:translate-x-0 fixed lg:static h-full z-40 shadow-2xl lg:shadow-none">
             
             <!-- Sidebar Header -->
-            <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-utama text-white">
-                <h1 class="text-3xl font-marlin tracking-wide">SADIGS</h1>
+            <div class="h-16 flex items-center justify-center gap-3 border-b border-gray-200 bg-utama text-white">
+                <img src="assets/img/logo.png" alt="Logo" class="h-8 bg-white rounded-full p-0.5">
+                <h1 class="text-3xl tracking-wide" style="font-family: 'Marlin Condensed', sans-serif;">SADIGS</h1>
             </div>
 
             <!-- User Profile Summary -->
