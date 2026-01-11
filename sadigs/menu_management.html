@@ -234,48 +234,31 @@
             });
             thead.innerHTML = headerHTML;
 
-            // Definisi Kelompok Widget
+            // Definisi Kelompok Widget (Sesuai Request Baru)
             const widgetGroups = {
-                'formulir': { label: '1. FORMULIR & INPUT', menus: [] },
-                'validasi': { label: '2. VALIDASI / VERIFIKASI', menus: [] },
-                'tabel': { label: '3. TABEL DATA & ARSIP', menus: [] },
-                'grafik': { label: '4. GRAFIK & MONITORING', menus: [] },
+                'formulir': { label: '1. FORMULIR', menus: [] },
+                'validasi': { label: '2. VALIDASI', menus: [] },
+                'data_pribadi': { label: '3. DATA PRIBADI', menus: [] },
+                'tabel_data': { label: '4. TABEL DATA', menus: [] },
+                'grafik': { label: '5. GRAFIK', menus: [] },
                 'lainnya': { label: 'LAINNYA', menus: [] }
             };
 
-            // Mapping Menu ke Kelompok
-            const menuMapping = {
-                // 1. Formulir
-                'navBuatPeraturan': 'formulir', 'navFormulirTransaksi': 'formulir', 'navIzinPegawai': 'formulir', 
-                'navRapat': 'formulir', 'navRppGenerator': 'formulir', 'navInputNilai': 'formulir', 
-                'navInputTahfizh': 'formulir', 'navIbadahHarian': 'formulir', 'navIzinWalisantri': 'formulir', 
-                'navPocketMoneyDeposit': 'formulir', 'navFormulirPembayaran': 'formulir', 'navAturKurikulum': 'formulir', 
-                'navCalendarSettings': 'formulir', 'navQuota': 'formulir', 'navKetersediaanMengajar': 'formulir',
-                'navMenuManagement': 'formulir',
-
-                // 2. Validasi
-                'navVerifikasi': 'validasi', 'navValidasiIzin': 'validasi', 'navValidasiPeraturan': 'validasi', 
-                'navValidasiPembayaran': 'validasi', 'navPocketMoneyValidation': 'validasi', 'navValidasiIbadah': 'validasi', 
-                'navGuardianLeaveValidation': 'validasi', 'navMusyrifWithdrawalValidation': 'validasi',
-
-                // 3. Tabel Data
-                'navUserCredentials': 'tabel', 'navBukuIndukSantri': 'tabel', 'navDaftarIzin': 'tabel', 
-                'navOnLeaveList': 'tabel', 'navTabelPembayaran': 'tabel', 'navTabelTransaksi': 'tabel', 
-                'navAbsensi': 'tabel', 'navBiodataPegawai': 'tabel', 'navBukuIndukPegawai': 'tabel', 
-                'navJadwalRapat': 'tabel', 'navRppAlbum': 'tabel', 'navPerencanaanAkademik': 'tabel', 'navManajemenKelas': 'tabel',
-                'navMentoring': 'tabel', 'navMusyrifPocketMoney': 'tabel', 'navBiodataSantri': 'tabel', 
-                'navSantriPocketMoney': 'tabel', 'navViewTahfizh': 'tabel', 'navJadwalPelajaran': 'tabel', 
-                'navKalender': 'tabel',
-
-                // 4. Grafik
-                'navDashboard': 'grafik', 'navYayasanWidget': 'grafik', 'navMusyrifWidget': 'grafik', 
-                'navProfil': 'grafik', 'navPenilaianKinerja': 'grafik', 'navMonitoringAkademik': 'grafik', 
-                'navRekapPembayaran': 'grafik', 'navRekapIbadahAnak': 'grafik', 'navMonitoringAnak': 'grafik'
-            };
-
-            // Kelompokkan Menu
+            // Kelompokkan Menu Berdasarkan Kata Pertama
             Object.keys(globalData.menu_names).forEach(menuId => {
-                const groupKey = menuMapping[menuId] || 'lainnya';
+                const menuName = globalData.menu_names[menuId] || menuId;
+                // Ambil kata pertama, bersihkan spasi, jadikan lowercase
+                const firstWord = menuName.trim().split(/\s+/)[0].toLowerCase();
+                
+                let groupKey = 'lainnya';
+                
+                // Logika Pengelompokan Otomatis
+                if (firstWord === 'formulir') groupKey = 'formulir';
+                else if (firstWord === 'validasi') groupKey = 'validasi';
+                else if (firstWord === 'data') groupKey = 'data_pribadi';
+                else if (firstWord === 'tabel') groupKey = 'tabel_data';
+                else if (firstWord === 'grafik') groupKey = 'grafik';
+                
                 widgetGroups[groupKey].menus.push(menuId);
             });
 
