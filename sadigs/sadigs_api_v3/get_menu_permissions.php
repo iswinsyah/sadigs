@@ -211,7 +211,7 @@ try {
     
     // 2.5. SYNC MENUS (AUTO-HEALING)
     // Memastikan semua menu yang ada di kodingan ($master_structure) masuk ke database
-    $stmtSync = $pdo->prepare("INSERT INTO menus (menu_id, menu_name, category_id, icon, link) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE menu_name=VALUES(menu_name), icon=VALUES(icon), link=VALUES(link)");
+    $stmtSync = $pdo->prepare("INSERT INTO menus (menu_id, menu_name, category_id, icon, link) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE icon=VALUES(icon), link=VALUES(link)"); // Hapus menu_name agar edit manual user tetap ada
     
     foreach ($master_structure as $cat_id => $cat_data) {
         foreach ($cat_data['items'] as $item) {

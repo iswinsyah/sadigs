@@ -212,7 +212,7 @@ $master_structure = [
     $pdo->beginTransaction();
     try {
         $stmtCat = $pdo->prepare("INSERT INTO menu_categories (category_id, label, sort_order) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE label=VALUES(label), sort_order=VALUES(sort_order)");
-        $stmtMenu = $pdo->prepare("INSERT INTO menus (menu_id, menu_name, category_id, sort_order, icon) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE menu_name=VALUES(menu_name), icon=VALUES(icon)");
+        $stmtMenu = $pdo->prepare("INSERT INTO menus (menu_id, menu_name, category_id, sort_order, icon) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE icon=VALUES(icon)"); // Hapus menu_name=VALUES(menu_name) agar edit manual tidak tertimpa
 
         $sort_cat = 1;
         foreach ($master_structure as $cat_id => $cat_data) {
@@ -314,6 +314,18 @@ if ($method === 'GET') {
         $stmt = $pdo->prepare("INSERT INTO menu_permissions (role_name, menu_id, is_allowed) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE is_allowed = VALUES(is_allowed)");
         foreach ($updates as $update) {
             $stmt->execute([$update['role'], $update['menu'], $update['state']]);
+        }
+
+        // HANDLE RENAME MENU (Fitur Baru)
+        if (isset($input['rename_menu'])) {
+            $menu_id = $input['rename_menu']['id'];
+            $new_name = $input['rename_menu']['name'];
+            if ($menu_id && $new_name) {
+                $stmtRename = $pdo->prepare("UPDATE menus SET menu_name = ? WHERE menu_id = ?");
+                $stmtRename->execute([$new_name, $menu_id]);
+                ob_clean();
+                sendJSONResponse(['success' => true, 'message' => 'Nama menu berhasil diubah.']);
+            }
         }
 
         // HANDLE STRUKTUR UPDATE (DRAG & DROP)
