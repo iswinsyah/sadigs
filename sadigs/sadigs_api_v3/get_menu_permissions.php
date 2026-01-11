@@ -37,7 +37,7 @@ $master_structure = [
     'KetuaYayasan' => [
         'label' => '3. KETUA YAYASAN',
         'items' => [
-            ['id' => 'navMenuManagement', 'label' => 'Manajemen Akses', 'icon' => 'lock', 'link' => 'menu_management.html'],
+            ['id' => 'navMenuManagement', 'label' => 'Formulir Manajemen Akses', 'icon' => 'lock', 'link' => 'menu_management.html'],
             ['id' => 'navUserCredentials', 'label' => 'Data Akun Pengguna', 'icon' => 'key', 'link' => 'user_credentials.html']
         ]
     ],
@@ -45,8 +45,8 @@ $master_structure = [
         'label' => '4. SEKRETARIS YAYASAN',
         'items' => [
             ['id' => 'navVerifikasi', 'label' => 'Verifikasi Pengguna', 'icon' => 'user-check', 'link' => 'verification_management.html'],
-            ['id' => 'navQuota', 'label' => 'Atur Kuota Peran', 'icon' => 'users', 'link' => 'quota_management.html'],
-            ['id' => 'navCalendarSettings', 'label' => 'Atur Kalender', 'icon' => 'calendar-cog', 'link' => 'calendar_settings.html']
+            ['id' => 'navQuota', 'label' => 'Formulir Atur Kuota Peran', 'icon' => 'users', 'link' => 'quota_management.html'],
+            ['id' => 'navCalendarSettings', 'label' => 'Formulir Atur Kalender', 'icon' => 'calendar-cog', 'link' => 'calendar_settings.html']
         ]
     ],
     'BendaharaYayasan' => ['label' => '5. BENDAHARA YAYASAN', 'items' => []],
@@ -55,7 +55,7 @@ $master_structure = [
         'items' => [
             ['id' => 'navBukuIndukSantri', 'label' => 'Buku Induk Santri', 'icon' => 'book', 'link' => 'student_master_book.html'],
             ['id' => 'navManajemenKelas', 'label' => 'Manajemen Kelas', 'icon' => 'users', 'link' => 'class_management.html'],
-            ['id' => 'navAturKurikulum', 'label' => 'Atur Kurikulum', 'icon' => 'book-open-check', 'link' => 'curriculum_settings.html']
+            ['id' => 'navAturKurikulum', 'label' => 'Formulir Atur Kurikulum', 'icon' => 'book-open-check', 'link' => 'curriculum_settings.html']
         ]
     ],
     'KepalaSekolah' => [
@@ -66,7 +66,7 @@ $master_structure = [
             ['id' => 'navValidasiIzin', 'label' => 'Validasi Izin', 'icon' => 'check-square', 'link' => 'leave_validation.html'],
             ['id' => 'navDaftarIzin', 'label' => 'Daftar Izin', 'icon' => 'list-checks', 'link' => 'leave_list.html'],
             ['id' => 'navValidasiPeraturan', 'label' => 'Validasi Peraturan', 'icon' => 'gavel', 'link' => 'validate_regulation.html'],
-            ['id' => 'navBuatPeraturan', 'label' => 'Terbitkan Peraturan', 'icon' => 'megaphone', 'link' => 'create_regulation.html']
+            ['id' => 'navBuatPeraturan', 'label' => 'Formulir Terbitkan Peraturan', 'icon' => 'megaphone', 'link' => 'create_regulation.html']
         ]
     ],
     'KepalaAsrama' => [
@@ -81,7 +81,7 @@ $master_structure = [
             ['id' => 'navTabelPembayaran', 'label' => 'Data Pembayaran', 'icon' => 'banknote', 'link' => 'payment_list.html'],
             ['id' => 'navRekapPembayaran', 'label' => 'Rekap Keuangan', 'icon' => 'pie-chart', 'link' => 'payment_recap.html'],
             ['id' => 'navPocketMoneyValidation', 'label' => 'Validasi Uang Saku', 'icon' => 'check-circle-2', 'link' => 'pocket_money_validation.html'],
-            ['id' => 'navFormulirTransaksi', 'label' => 'Form Transaksi Harian', 'icon' => 'pen-tool', 'link' => 'daily_transaction_form.html'],
+            ['id' => 'navFormulirTransaksi', 'label' => 'Formulir Transaksi Harian', 'icon' => 'pen-tool', 'link' => 'daily_transaction_form.html'],
             ['id' => 'navTabelTransaksi', 'label' => 'Buku Transaksi Harian', 'icon' => 'book', 'link' => 'daily_transaction_list.html']
         ]
     ],
@@ -92,25 +92,25 @@ $master_structure = [
             ['id' => 'navBiodataPegawai', 'label' => 'Biodata Pegawai', 'icon' => 'file-badge', 'link' => 'employee_data.html'],
             ['id' => 'navIzinPegawai', 'label' => 'Formulir Izin', 'icon' => 'file-edit', 'link' => 'leave_request.html'],
             ['id' => 'navBukuIndukPegawai', 'label' => 'Buku Induk Pegawai', 'icon' => 'book-open', 'link' => 'employee_master_book.html'],
-            ['id' => 'navRapat', 'label' => 'Undang Rapat', 'icon' => 'mail', 'link' => 'meeting_invitation.html'],
+            ['id' => 'navRapat', 'label' => 'Formulir Undang Rapat', 'icon' => 'mail', 'link' => 'meeting_invitation.html'],
             ['id' => 'navJadwalRapat', 'label' => 'Jadwal Rapat', 'icon' => 'calendar-clock', 'link' => 'meeting_schedule.html']
         ]
     ],
     'Ustadz' => [
         'label' => '12. USTADZ',
         'items' => [
-            ['id' => 'navRppGenerator', 'label' => 'Generator Modul Ajar', 'icon' => 'brain-circuit', 'link' => 'rpp_generator.html'],
+            ['id' => 'navRppGenerator', 'label' => 'Formulir Generator Modul Ajar', 'icon' => 'brain-circuit', 'link' => 'rpp_generator.html'],
             ['id' => 'navRppAlbum', 'label' => 'Album Perangkat Ajar', 'icon' => 'folder-open', 'link' => 'teaching_artifacts_album.html'],
             ['id' => 'navPerencanaanAkademik', 'label' => 'Buku Kerja Ustadz', 'icon' => 'book-check', 'link' => 'academic_planning.html'],
-            ['id' => 'navKetersediaanMengajar', 'label' => 'Kesediaan Mengajar', 'icon' => 'clock', 'link' => 'teacher_availability.html'],
-            ['id' => 'navInputNilai', 'label' => 'Input Nilai Rapot', 'icon' => 'graduation-cap', 'link' => 'input_grades.html']
+            ['id' => 'navKetersediaanMengajar', 'label' => 'Formulir Kesediaan Mengajar', 'icon' => 'clock', 'link' => 'teacher_availability.html'],
+            ['id' => 'navInputNilai', 'label' => 'Formulir Input Nilai Rapot', 'icon' => 'graduation-cap', 'link' => 'input_grades.html']
         ]
     ],
     'Musyrif' => [
         'label' => '13. MUSYRIF',
         'items' => [
             ['id' => 'navMentoring', 'label' => 'Kelompok Mentoring', 'icon' => 'users-round', 'link' => 'mentoring_groups.html'],
-            ['id' => 'navInputTahfizh', 'label' => 'Input Tahfizh', 'icon' => 'book-marked', 'link' => 'tahfizh_report_form.html'],
+            ['id' => 'navInputTahfizh', 'label' => 'Formulir Input Tahfizh', 'icon' => 'book-marked', 'link' => 'tahfizh_report_form.html'],
             ['id' => 'navValidasiIbadah', 'label' => 'Validasi Ibadah', 'icon' => 'check-square', 'link' => 'daily_worship_validation.html'],
             ['id' => 'navGuardianLeaveValidation', 'label' => 'Validasi Izin Walisantri', 'icon' => 'mail-check', 'link' => 'guardian_leave_validation.html'],
             ['id' => 'navMusyrifPocketMoney', 'label' => 'Riwayat Deposit Santri', 'icon' => 'archive', 'link' => 'musyrif_pocket_money_view.html'],
@@ -121,7 +121,7 @@ $master_structure = [
         'label' => '14. SANTRI',
         'items' => [
             ['id' => 'navBiodataSantri', 'label' => 'Biodata Santri', 'icon' => 'book-user', 'link' => 'student_data.html'],
-            ['id' => 'navIbadahHarian', 'label' => 'Laporan Ibadah Harian', 'icon' => 'notebook-pen', 'link' => 'daily_worship_form.html'],
+            ['id' => 'navIbadahHarian', 'label' => 'Formulir Laporan Ibadah Harian', 'icon' => 'notebook-pen', 'link' => 'daily_worship_form.html'],
             ['id' => 'navSantriPocketMoney', 'label' => 'Uang Saku Saya', 'icon' => 'landmark', 'link' => 'santri_pocket_money.html']
         ]
     ],
@@ -130,8 +130,8 @@ $master_structure = [
         'items' => [
             ['id' => 'navRekapIbadahAnak', 'label' => 'Rekap Ibadah Anak', 'icon' => 'clipboard-check', 'link' => 'select_student.html'],
             ['id' => 'navViewTahfizh', 'label' => 'Laporan Tahfizh', 'icon' => 'book-open-check', 'link' => 'tahfizh_student_view.html'],
-            ['id' => 'navIzinWalisantri', 'label' => 'Izin Walisantri', 'icon' => 'mail-question', 'link' => 'guardian_leave_request.html'],
-            ['id' => 'navPocketMoneyDeposit', 'label' => 'Deposit Uang Saku', 'icon' => 'wallet', 'link' => 'pocket_money_deposit.html'],
+            ['id' => 'navIzinWalisantri', 'label' => 'Formulir Izin Walisantri', 'icon' => 'mail-question', 'link' => 'guardian_leave_request.html'],
+            ['id' => 'navPocketMoneyDeposit', 'label' => 'Formulir Deposit Uang Saku', 'icon' => 'wallet', 'link' => 'pocket_money_deposit.html'],
             ['id' => 'navMonitoringAnak', 'label' => 'Monitoring Perkembangan', 'icon' => 'activity', 'link' => 'guardian_monitoring.html'],
             ['id' => 'navFormulirPembayaran', 'label' => 'Formulir Pembayaran', 'icon' => 'credit-card', 'link' => 'payment_form.html']
         ]
