@@ -44,7 +44,7 @@ $master_structure = [
     'SekretarisYayasan' => [
         'label' => '4. SEKRETARIS YAYASAN',
         'items' => [
-            ['id' => 'navVerifikasi', 'label' => 'Verifikasi Pengguna', 'icon' => 'user-check', 'link' => 'verification_management.html'],
+            ['id' => 'navUserCredentials', 'label' => 'Manajemen Pengguna', 'icon' => 'users', 'link' => 'user_credentials.html'],
             ['id' => 'navQuota', 'label' => 'Formulir Atur Kuota Peran', 'icon' => 'users', 'link' => 'quota_management.html'],
             ['id' => 'navCalendarSettings', 'label' => 'Formulir Atur Kalender', 'icon' => 'calendar-cog', 'link' => 'calendar_settings.html']
         ]
@@ -73,9 +73,10 @@ $master_structure = [
         'label' => '8. KEPALA ASRAMA',
         'items' => [['id' => 'navOnLeaveList', 'label' => 'Santri Sedang Pulang', 'icon' => 'user-minus', 'link' => 'on_leave_list.html']]
     ],
-    'SekretarisSekolah' => ['label' => '9. SEKRETARIS SEKOLAH', 'items' => []],
+    'AdminSekolah' => ['label' => '9. ADMIN SEKOLAH', 'items' => []],
+    'SekretarisSekolah' => ['label' => '10. SEKRETARIS SEKOLAH', 'items' => []],
     'BendaharaSekolah' => [
-        'label' => '10. BENDAHARA SEKOLAH',
+        'label' => '11. BENDAHARA SEKOLAH',
         'items' => [
             ['id' => 'navValidasiPembayaran', 'label' => 'Validasi Pembayaran', 'icon' => 'check-circle-2', 'link' => 'payment_validation.html'],
             ['id' => 'navTabelPembayaran', 'label' => 'Data Pembayaran', 'icon' => 'banknote', 'link' => 'payment_list.html'],
@@ -86,7 +87,7 @@ $master_structure = [
         ]
     ],
     'Kepegawaian' => [
-        'label' => '11. ADMINISTRASI PEGAWAI',
+        'label' => '12. ADMINISTRASI PEGAWAI',
         'items' => [
             ['id' => 'navAbsensi', 'label' => 'Absensi Pegawai', 'icon' => 'map-pin', 'link' => 'attendance.html'],
             ['id' => 'navBiodataPegawai', 'label' => 'Biodata Pegawai', 'icon' => 'file-badge', 'link' => 'employee_data.html'],
@@ -97,18 +98,19 @@ $master_structure = [
         ]
     ],
     'Ustadz' => [
-        'label' => '12. USTADZ',
+        'label' => '13. USTADZ',
         'items' => [
             ['id' => 'navRppGenerator', 'label' => 'Formulir Generator Modul Ajar', 'icon' => 'brain-circuit', 'link' => 'rpp_generator.html'],
-            ['id' => 'navRppAlbum', 'label' => 'Album Perangkat Ajar', 'icon' => 'folder-open', 'link' => 'teaching_artifacts_album.html'],
+            ['id' => 'navRppAlbum', 'label' => 'Album Perangkat Ajar', 'icon' => 'folder-open', 'link' => 'rpp_album.html'],
             ['id' => 'navPerencanaanAkademik', 'label' => 'Buku Kerja Ustadz', 'icon' => 'book-check', 'link' => 'academic_planning.html'],
             ['id' => 'navKetersediaanMengajar', 'label' => 'Formulir Kesediaan Mengajar', 'icon' => 'clock', 'link' => 'teacher_availability.html'],
             ['id' => 'navInputNilai', 'label' => 'Formulir Input Nilai Rapot', 'icon' => 'graduation-cap', 'link' => 'input_grades.html']
         ]
     ],
     'Musyrif' => [
-        'label' => '13. MUSYRIF',
+        'label' => '14. MUSYRIF',
         'items' => [
+            ['id' => 'navMusyrifWidget', 'label' => 'Ringkasan Musyrif', 'icon' => 'activity', 'link' => '#'],
             ['id' => 'navMentoring', 'label' => 'Kelompok Mentoring', 'icon' => 'users-round', 'link' => 'mentoring_groups.html'],
             ['id' => 'navInputTahfizh', 'label' => 'Formulir Input Tahfizh', 'icon' => 'book-marked', 'link' => 'tahfizh_report_form.html'],
             ['id' => 'navValidasiIbadah', 'label' => 'Validasi Ibadah', 'icon' => 'check-square', 'link' => 'daily_worship_validation.html'],
@@ -118,7 +120,7 @@ $master_structure = [
         ]
     ],
     'Santri' => [
-        'label' => '14. SANTRI',
+        'label' => '15. SANTRI',
         'items' => [
             ['id' => 'navBiodataSantri', 'label' => 'Biodata Santri', 'icon' => 'book-user', 'link' => 'student_data.html'],
             ['id' => 'navIbadahHarian', 'label' => 'Formulir Laporan Ibadah Harian', 'icon' => 'notebook-pen', 'link' => 'daily_worship_form.html'],
@@ -126,7 +128,7 @@ $master_structure = [
         ]
     ],
     'Walisantri' => [
-        'label' => '15. WALISANTRI',
+        'label' => '16. WALISANTRI',
         'items' => [
             ['id' => 'navRekapIbadahAnak', 'label' => 'Rekap Ibadah Anak', 'icon' => 'clipboard-check', 'link' => 'select_student.html'],
             ['id' => 'navViewTahfizh', 'label' => 'Laporan Tahfizh', 'icon' => 'book-open-check', 'link' => 'tahfizh_student_view.html'],
