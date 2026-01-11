@@ -19,7 +19,7 @@ try {
     // Kita hitung berapa role yang 'pending' untuk menentukan status verifikasi
     $sql = "SELECT u.user_id, u.username, u.full_name, u.email, u.is_active, u.password_hash,
                    GROUP_CONCAT(
-                       CASE 
+                       DISTINCT CASE 
                            WHEN ur.status = 'pending' THEN CONCAT(ur.role_name, ' (Pending)')
                            ELSE ur.role_name 
                        END SEPARATOR ', '
