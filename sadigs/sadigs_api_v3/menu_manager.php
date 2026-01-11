@@ -104,7 +104,7 @@ $master_structure = [
         'KetuaYayasan' => [
             'label' => '3. KETUA YAYASAN',
             'items' => [
-                ['id' => 'navMenuManagement', 'label' => 'Manajemen Akses', 'icon' => 'lock'],
+                ['id' => 'navMenuManagement', 'label' => 'Formulir Manajemen Akses', 'icon' => 'lock'],
                 ['id' => 'navUserCredentials', 'label' => 'Data Akun Pengguna', 'icon' => 'key']
             ]
         ],
@@ -112,8 +112,8 @@ $master_structure = [
             'label' => '4. SEKRETARIS YAYASAN',
             'items' => [
                 ['id' => 'navUserCredentials', 'label' => 'Manajemen Pengguna', 'icon' => 'users'],
-                ['id' => 'navQuota', 'label' => 'Atur Kuota Peran', 'icon' => 'users'],
-                ['id' => 'navCalendarSettings', 'label' => 'Atur Kalender', 'icon' => 'calendar-cog']
+                ['id' => 'navQuota', 'label' => 'Formulir Atur Kuota Peran', 'icon' => 'users'],
+                ['id' => 'navCalendarSettings', 'label' => 'Formulir Atur Kalender', 'icon' => 'calendar-cog']
             ]
         ],
         'BendaharaYayasan' => ['label' => '5. BENDAHARA YAYASAN', 'items' => []],
@@ -122,7 +122,7 @@ $master_structure = [
             'items' => [
                 ['id' => 'navBukuIndukSantri', 'label' => 'Buku Induk Santri', 'icon' => 'book'],
                 ['id' => 'navManajemenKelas', 'label' => 'Manajemen Kelas', 'icon' => 'users'],
-                ['id' => 'navAturKurikulum', 'label' => 'Atur Kurikulum', 'icon' => 'book-open-check']
+                ['id' => 'navAturKurikulum', 'label' => 'Formulir Atur Kurikulum', 'icon' => 'book-open-check']
             ]
         ],
         'KepalaSekolah' => [
@@ -133,7 +133,7 @@ $master_structure = [
                 ['id' => 'navValidasiIzin', 'label' => 'Validasi Izin', 'icon' => 'check-square'],
                 ['id' => 'navDaftarIzin', 'label' => 'Daftar Izin', 'icon' => 'list-checks'],
                 ['id' => 'navValidasiPeraturan', 'label' => 'Validasi Peraturan', 'icon' => 'gavel'],
-                ['id' => 'navBuatPeraturan', 'label' => 'Terbitkan Peraturan', 'icon' => 'megaphone']
+                ['id' => 'navBuatPeraturan', 'label' => 'Formulir Terbitkan Peraturan', 'icon' => 'megaphone']
             ]
         ],
         'KepalaAsrama' => [
@@ -149,7 +149,7 @@ $master_structure = [
                 ['id' => 'navTabelPembayaran', 'label' => 'Data Pembayaran', 'icon' => 'banknote'],
                 ['id' => 'navRekapPembayaran', 'label' => 'Rekap Keuangan', 'icon' => 'pie-chart'],
                 ['id' => 'navPocketMoneyValidation', 'label' => 'Validasi Uang Saku', 'icon' => 'check-circle-2'],
-                ['id' => 'navFormulirTransaksi', 'label' => 'Form Transaksi Harian', 'icon' => 'pen-tool'],
+                ['id' => 'navFormulirTransaksi', 'label' => 'Formulir Transaksi Harian', 'icon' => 'pen-tool'],
                 ['id' => 'navTabelTransaksi', 'label' => 'Buku Transaksi Harian', 'icon' => 'book']
             ]
         ],
@@ -160,18 +160,18 @@ $master_structure = [
                 ['id' => 'navBiodataPegawai', 'label' => 'Biodata Pegawai', 'icon' => 'file-badge'],
                 ['id' => 'navIzinPegawai', 'label' => 'Formulir Izin', 'icon' => 'file-edit'],
                 ['id' => 'navBukuIndukPegawai', 'label' => 'Buku Induk Pegawai', 'icon' => 'book-open'],
-                ['id' => 'navRapat', 'label' => 'Undang Rapat', 'icon' => 'mail'],
+                ['id' => 'navRapat', 'label' => 'Formulir Undang Rapat', 'icon' => 'mail'],
                 ['id' => 'navJadwalRapat', 'label' => 'Jadwal Rapat', 'icon' => 'calendar-clock']
             ]
         ],
         'Ustadz' => [
             'label' => '13. USTADZ',
             'items' => [
-                ['id' => 'navRppGenerator', 'label' => 'Generator Modul Ajar', 'icon' => 'brain-circuit'],
+                ['id' => 'navRppGenerator', 'label' => 'Formulir Generator Modul Ajar', 'icon' => 'brain-circuit'],
                 ['id' => 'navRppAlbum', 'label' => 'Album Perangkat Ajar', 'icon' => 'folder-open'],
                 ['id' => 'navPerencanaanAkademik', 'label' => 'Buku Kerja Ustadz', 'icon' => 'book-check'],
-                ['id' => 'navKetersediaanMengajar', 'label' => 'Kesediaan Mengajar', 'icon' => 'clock'],
-                ['id' => 'navInputNilai', 'label' => 'Input Nilai Rapot', 'icon' => 'graduation-cap']
+                ['id' => 'navKetersediaanMengajar', 'label' => 'Formulir Kesediaan Mengajar', 'icon' => 'clock'],
+                ['id' => 'navInputNilai', 'label' => 'Formulir Input Nilai Rapot', 'icon' => 'graduation-cap']
             ]
         ],
         'Musyrif' => [
@@ -179,7 +179,7 @@ $master_structure = [
             'items' => [
                 ['id' => 'navMusyrifWidget', 'label' => 'Ringkasan Musyrif', 'icon' => 'activity'], // Widget Dashboard
                 ['id' => 'navMentoring', 'label' => 'Kelompok Mentoring', 'icon' => 'users-round'],
-                ['id' => 'navInputTahfizh', 'label' => 'Input Tahfizh', 'icon' => 'book-marked'],
+                ['id' => 'navInputTahfizh', 'label' => 'Formulir Input Tahfizh', 'icon' => 'book-marked'],
                 ['id' => 'navValidasiIbadah', 'label' => 'Validasi Ibadah', 'icon' => 'check-square'],
                 ['id' => 'navGuardianLeaveValidation', 'label' => 'Validasi Izin Walisantri', 'icon' => 'mail-check'],
                 ['id' => 'navMusyrifPocketMoney', 'label' => 'Riwayat Deposit Santri', 'icon' => 'archive'],
@@ -190,7 +190,7 @@ $master_structure = [
             'label' => '15. SANTRI',
             'items' => [
                 ['id' => 'navBiodataSantri', 'label' => 'Biodata Santri', 'icon' => 'book-user'],
-                ['id' => 'navIbadahHarian', 'label' => 'Laporan Ibadah Harian', 'icon' => 'notebook-pen'],
+                ['id' => 'navIbadahHarian', 'label' => 'Formulir Laporan Ibadah Harian', 'icon' => 'notebook-pen'],
                 ['id' => 'navSantriPocketMoney', 'label' => 'Uang Saku Saya', 'icon' => 'landmark']
             ]
         ],
@@ -199,8 +199,8 @@ $master_structure = [
             'items' => [
                 ['id' => 'navRekapIbadahAnak', 'label' => 'Rekap Ibadah Anak', 'icon' => 'clipboard-check'],
                 ['id' => 'navViewTahfizh', 'label' => 'Laporan Tahfizh', 'icon' => 'book-open-check'],
-                ['id' => 'navIzinWalisantri', 'label' => 'Izin Walisantri', 'icon' => 'mail-question'],
-                ['id' => 'navPocketMoneyDeposit', 'label' => 'Deposit Uang Saku', 'icon' => 'wallet'],
+                ['id' => 'navIzinWalisantri', 'label' => 'Formulir Izin Walisantri', 'icon' => 'mail-question'],
+                ['id' => 'navPocketMoneyDeposit', 'label' => 'Formulir Deposit Uang Saku', 'icon' => 'wallet'],
                 ['id' => 'navMonitoringAnak', 'label' => 'Monitoring Perkembangan', 'icon' => 'activity'],
                 ['id' => 'navFormulirPembayaran', 'label' => 'Formulir Pembayaran', 'icon' => 'credit-card']
             ]
