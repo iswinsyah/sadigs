@@ -16,6 +16,31 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 $roles = $_SESSION['roles'] ?? [];
 
+// --- KONFIGURASI MENU CERDAS (CONTEXTUAL) ---
+// Menu-menu ini akan otomatis pindah ke kategori peran user yang login
+$contextual_menus = ['navRapat', 'navJadwalRapat', 'navIzinPegawai', 'navKetersediaanMengajar'];
+
+// Mapping Role ke Category ID
+$role_to_cat_map = [
+    'Ketua Yayasan' => 'KetuaYayasan',
+    'Sekretaris Yayasan' => 'SekretarisYayasan',
+    'Bendahara Yayasan' => 'BendaharaYayasan',
+    'Kepala Sekolah' => 'KepalaSekolah',
+    'Admin Sekolah' => 'AdminSekolah',
+    'Sekretaris Sekolah' => 'SekretarisSekolah',
+    'Bendahara Sekolah' => 'BendaharaSekolah',
+    'Kepala Asrama Putra' => 'KepalaAsrama',
+    'Kepala Asrama Putri' => 'KepalaAsrama',
+    'Musyrif' => 'Musyrif',
+    'Musyrifah' => 'Musyrif',
+    'Ustadz' => 'Ustadz',
+    'Ustadzah' => 'Ustadz',
+    'Walisantri' => 'Walisantri',
+    'Santri' => 'Santri',
+    'Santri Rijal' => 'Santri',
+    "Santri Nisa'" => 'Santri'
+];
+
 // --- DATA MASTER (JURUS PAMUNGKAS: HARDCODED FALLBACK) ---
 // Data ini digunakan jika database kosong, error, atau belum disetting.
 $master_structure = [
@@ -228,10 +253,37 @@ try {
         $categories[$cat['category_id']] = ['label' => $cat['label'], 'menus' => []];
     }
     
+    // Tentukan Kategori Target User (Berdasarkan role prioritas tertinggi)
+    $user_target_cat = null;
+    // Urutan prioritas pengecekan role
+    $role_priority = ['Ketua Yayasan', 'Kepala Sekolah', 'Kepala Asrama Putra', 'Kepala Asrama Putri', 'Sekretaris Yayasan', 'Bendahara Yayasan', 'Admin Sekolah', 'Musyrif', 'Ustadz'];
+    
+    // Cari role user yang paling tinggi prioritasnya
+    foreach ($role_priority as $p_role) {
+        if (in_array($p_role, $roles) && isset($role_to_cat_map[$p_role])) {
+            $user_target_cat = $role_to_cat_map[$p_role];
+            break;
+        }
+    }
+    // Jika tidak ada di prioritas, ambil role pertama
+    if (!$user_target_cat && !empty($roles) && isset($role_to_cat_map[$roles[0]])) {
+        $user_target_cat = $role_to_cat_map[$roles[0]];
+    }
+
     $stmtMenus = $pdo->query("SELECT menu_id, category_id, icon, menu_name, link FROM menus ORDER BY sort_order ASC");
     while ($menu = $stmtMenus->fetch(PDO::FETCH_ASSOC)) {
-        if (isset($categories[$menu['category_id']])) {
-            $categories[$menu['category_id']]['menus'][] = $menu['menu_id'];
+        $cat_id = $menu['category_id'];
+
+        // LOGIKA MENU CERDAS: Pindahkan menu ke kategori user jika menu tersebut fleksibel
+        if ($user_target_cat && in_array($menu['menu_id'], $contextual_menus)) {
+            // Cek apakah kategori target valid
+            if (isset($categories[$user_target_cat])) {
+                $cat_id = $user_target_cat;
+            }
+        }
+
+        if (isset($categories[$cat_id])) {
+            $categories[$cat_id]['menus'][] = $menu['menu_id'];
         }
         $menu_names[$menu['menu_id']] = $menu['menu_name'];
         $menu_icons[$menu['menu_id']] = $menu['icon'];
