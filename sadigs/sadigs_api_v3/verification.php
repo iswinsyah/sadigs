@@ -96,15 +96,12 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pdo->prepare("DELETE FROM user_roles WHERE user_id = ?")->execute([$target_user_id]);
             
             // Insert role baru dengan status approved (karena diedit oleh admin)
-            $stmt = $pdo->prepare("INSERT INTO user_roles (user_id, role_name, status) VALUES (?, ?, 'approved')"); // Langsung approved? Atau pending?
-            // Biasanya kalau admin yang edit, langsung approved saja agar sekalian aktif.
-            // Tapi jika tombolnya "Simpan Perubahan" lalu ada tombol "Aktifkan" terpisah, bisa pending.
-            // Mari kita buat 'pending' agar alurnya konsisten: Edit -> Save -> Klik Aktifkan.
+            $stmt = $pdo->prepare("INSERT INTO user_roles (user_id, role_name, status) VALUES (?, ?, ?)");
             
             foreach ($new_roles as $role) {
-                $stmt->execute([$target_user_id, $role, 'pending']);
+                $stmt->execute([$target_user_id, $role, 'approved']);
             }
-            $msg = "Peran diperbarui. Silakan klik 'Aktifkan Akun' untuk memvalidasi.";
+            $msg = "Peran berhasil diperbarui dan diaktifkan.";
         }
         elseif ($action === 'reject') {
             // Hapus role yang statusnya pending
