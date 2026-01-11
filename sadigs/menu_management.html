@@ -325,7 +325,11 @@
                 body: JSON.stringify({ updates: pendingUpdates })
             });
             const result = await res.json();
-            if(result.success) { alert("Perubahan tersimpan!"); pendingUpdates = []; loadData(); }
+            if(result.success) { 
+                pendingUpdates = []; 
+                // Panggil susun ulang otomatis secara silent (tanpa confirm)
+                await autoReorganize(true); 
+            }
             else alert("Gagal menyimpan.");
         }
 
@@ -459,14 +463,17 @@
             loadData();
         }
 
-        async function autoReorganize() {
-            if(!confirm("Sistem akan menyusun ulang letak menu (Div) secara otomatis berdasarkan centang pada Tab Izin Akses.\n\nSusunan manual Anda mungkin akan berubah. Lanjutkan?")) return;
+        async function autoReorganize(silent = false) {
+            if(!silent) {
+                if(!confirm("Sistem akan menyusun ulang letak menu (Div) secara otomatis berdasarkan centang pada Tab Izin Akses.\n\nSusunan manual Anda mungkin akan berubah. Lanjutkan?")) return;
+            }
             
             try {
                 const res = await fetch('sadigs_api_v3/reorganize_menus.php');
                 const result = await res.json();
-                alert(result.message);
-                if(result.success) loadData();
+                if(!silent) alert(result.message);
+                else console.log("Auto-reorganize: " + result.message);
+                if(result.success) { loadData(); initSidebar(); }
             } catch(e) { alert("Gagal menyusun ulang."); }
         }
 

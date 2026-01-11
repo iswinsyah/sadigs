@@ -18,7 +18,8 @@ try {
     $groups = [
         'ManajemenYayasan' => ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan'],
         'ManajemenSekolah' => ['Kepala Sekolah', 'Kepala Asrama Putra', 'Kepala Asrama Putri', 'Admin Sekolah'],
-        'AdministrasiPegawai' => ['Kepala Sekolah', 'Admin Sekolah', 'Kepala Asrama Putra', 'Kepala Asrama Putri', 'Musyrif', 'Musyrifah', 'Ustadz', 'Ustadzah']
+        'AdministrasiPegawai' => ['Kepala Sekolah', 'Admin Sekolah', 'Kepala Asrama Putra', 'Kepala Asrama Putri', 'Musyrif', 'Musyrifah', 'Ustadz', 'Ustadzah'],
+        'KepalaAsrama' => ['Kepala Asrama Putra', 'Kepala Asrama Putri']
     ];
 
     // 2. Pastikan Kategori Ada di Database
@@ -26,7 +27,8 @@ try {
         'Umum' => '1. UMUM',
         'ManajemenYayasan' => '2. MANAJEMEN YAYASAN',
         'ManajemenSekolah' => '3. MANAJEMEN SEKOLAH',
-        'AdministrasiPegawai' => '4. ADMINISTRASI PEGAWAI'
+        'AdministrasiPegawai' => '4. ADMINISTRASI PEGAWAI',
+        'KepalaAsrama' => '8. KEPALA ASRAMA'
     ];
 
     // Tambahkan kategori untuk setiap peran individual (untuk fallback)
