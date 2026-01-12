@@ -15,12 +15,6 @@ $user_roles = $_SESSION['roles'] ?? [];
 $pdo = getDBConnection();
 
 if ($action === 'list_active') {
-    // Definisi 10 Peran Staf untuk kriteria Amanah Umum
-    $staff_roles = [
-        'Kepala Sekolah', 'Sekretaris Sekolah', 'Bendahara Sekolah', 'Admin Sekolah',
-        'Kepala Asrama Putra', 'Kepala Asrama Putri', 'Musyrif', 'Musyrifah', 'Ustadz', 'Ustadzah'
-    ];
-
     try {
         // Ambil semua peraturan yang sudah divalidasi (approved)
         $stmt = $pdo->query("
@@ -37,14 +31,17 @@ if ($action === 'list_active') {
 
         foreach ($all_regulations as $reg) {
             $targets = array_map('trim', explode(',', $reg['target_role']));
+            $is_umum = in_array('Umum', $targets);
             
-            // 1. Cek apakah user punya hak melihat ini (salah satu perannya ada di target)
+            // 1. Cek Hak Akses
             $has_access = false;
             
-            // FIX: Ketua & Sekretaris Yayasan bisa melihat semua amanah (Monitoring)
-            if (in_array('Ketua Yayasan', $user_roles) || in_array('Sekretaris Yayasan', $user_roles)) {
-                $has_access = true;
+            if ($is_umum) {
+                $has_access = true; // Semua user bisa lihat Umum
+            } elseif (in_array('Ketua Yayasan', $user_roles) || in_array('Sekretaris Yayasan', $user_roles)) {
+                $has_access = true; // Admin lihat semua (Monitoring)
             } else {
+                // Cek apakah salah satu role user ada di target
                 foreach ($user_roles as $ur) {
                     if (in_array($ur, $targets)) {
                         $has_access = true;
@@ -54,12 +51,8 @@ if ($action === 'list_active') {
             }
 
             if ($has_access) {
-                // 2. Cek Logika Amanah Umum: Apakah target mencakup SEMUA 10 peran staf?
-                $intersection = array_intersect($staff_roles, $targets);
-                // UPDATE: Dilonggarkan jadi minimal 8 peran agar jika ada 1-2 yang terlewat tetap masuk Umum
-                $is_general_staff = (count($intersection) >= 8);
-
-                if ($is_general_staff) {
+                // 2. Klasifikasi Tab (Umum vs Khusus)
+                if ($is_umum) {
                     $general[] = $reg;
                 } else {
                     $specific[] = $reg;
