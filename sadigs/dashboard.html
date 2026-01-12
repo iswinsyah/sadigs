@@ -140,6 +140,10 @@
                             <i data-lucide="user" class="w-4 h-4"></i>
                             <span id="roleNamePlaceholder">Amanah Saya (0)</span>
                         </button>
+                        <button onclick="switchAmanahTab('staff')" id="tabStaff" class="hidden flex-1 py-3 px-4 text-sm font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition flex items-center justify-center gap-2">
+                            <i data-lucide="briefcase" class="w-4 h-4"></i>
+                            <span id="staffCountPlaceholder">Amanah Staf (0)</span>
+                        </button>
                         <button onclick="switchAmanahTab('general')" id="tabGeneral" class="flex-1 py-3 px-4 text-sm font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition flex items-center justify-center gap-2">
                             <i data-lucide="users" class="w-4 h-4"></i>
                             <span id="generalCountPlaceholder">Amanah Umum (0)</span>
@@ -148,6 +152,9 @@
                     
                     <!-- Content Areas -->
                     <div id="amanahSpecificContent" class="p-4 space-y-3 bg-white min-h-[100px] max-h-[400px] overflow-y-auto custom-scrollbar">
+                        <p class="text-center text-gray-400 text-sm py-2">Memuat...</p>
+                    </div>
+                    <div id="amanahStaffContent" class="hidden p-4 space-y-3 bg-white min-h-[100px] max-h-[400px] overflow-y-auto custom-scrollbar">
                         <p class="text-center text-gray-400 text-sm py-2">Memuat...</p>
                     </div>
                     <div id="amanahGeneralContent" class="hidden p-4 space-y-3 bg-white min-h-[100px] max-h-[400px] overflow-y-auto custom-scrollbar">
@@ -377,6 +384,15 @@
                                     specificContainer.innerHTML = '<p class="text-center text-gray-500 text-sm py-4 italic">Tidak ada amanah khusus untuk peran Anda.</p>';
                                 }
 
+                                // Render Amanah Staf
+                                const staffContainer = document.getElementById('amanahStaffContent');
+                                if (regData.staff && regData.staff.length > 0) {
+                                    regData.staff.forEach(item => allRegulationsMap[item.id] = item);
+                                    staffContainer.innerHTML = regData.staff.map(item => createAmanahCard(item, 'indigo', isAdmin)).join('');
+                                } else {
+                                    staffContainer.innerHTML = '<p class="text-center text-gray-500 text-sm py-4 italic">Tidak ada amanah staf.</p>';
+                                }
+
                                 // Render Amanah Umum
                                 const generalContainer = document.getElementById('amanahGeneralContent');
                                 if (regData.general && regData.general.length > 0) {
@@ -588,20 +604,28 @@
         // --- LOGIKA TAB AMANAH ---
         function switchAmanahTab(tab) {
             const tabSpecific = document.getElementById('tabSpecific');
+            const tabStaff = document.getElementById('tabStaff');
             const tabGeneral = document.getElementById('tabGeneral');
             const contentSpecific = document.getElementById('amanahSpecificContent');
+            const contentStaff = document.getElementById('amanahStaffContent');
             const contentGeneral = document.getElementById('amanahGeneralContent');
 
+            // Reset semua ke style default (inactive)
+            [tabSpecific, tabStaff, tabGeneral].forEach(el => {
+                if(el) el.className = "flex-1 py-3 px-4 text-sm font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition flex items-center justify-center gap-2";
+            });
+            [contentSpecific, contentStaff, contentGeneral].forEach(el => el.classList.add('hidden'));
+
+            // Aktifkan tab yang dipilih
             if (tab === 'specific') {
                 tabSpecific.className = "flex-1 py-3 px-4 text-sm font-bold text-blue-600 border-b-2 border-blue-600 bg-white transition flex items-center justify-center gap-2";
-                tabGeneral.className = "flex-1 py-3 px-4 text-sm font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition flex items-center justify-center gap-2";
                 contentSpecific.classList.remove('hidden');
-                contentGeneral.classList.add('hidden');
+            } else if (tab === 'staff') {
+                tabStaff.className = "flex-1 py-3 px-4 text-sm font-bold text-indigo-600 border-b-2 border-indigo-600 bg-white transition flex items-center justify-center gap-2";
+                contentStaff.classList.remove('hidden');
             } else {
                 tabGeneral.className = "flex-1 py-3 px-4 text-sm font-bold text-teal-600 border-b-2 border-teal-600 bg-white transition flex items-center justify-center gap-2";
-                tabSpecific.className = "flex-1 py-3 px-4 text-sm font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition flex items-center justify-center gap-2";
                 contentGeneral.classList.remove('hidden');
-                contentSpecific.classList.add('hidden');
             }
         }
 

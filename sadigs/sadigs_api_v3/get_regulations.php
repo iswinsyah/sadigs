@@ -27,11 +27,17 @@ if ($action === 'list_active') {
         $all_regulations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         $general = [];
+        $staff = [];
         $specific = [];
+        
+        // Daftar peran yang TIDAK dianggap sebagai Staf (untuk logika akses otomatis)
+        // Jika user punya peran SELAIN ini, maka dia dianggap Staf.
+        $non_staff_roles = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan', 'Walisantri', 'Santri', 'Santri Rijal', "Santri Nisa'"];
 
         foreach ($all_regulations as $reg) {
             $targets = array_map('trim', explode(',', $reg['target_role']));
             $is_umum = in_array('Umum', $targets);
+            $is_staf = in_array('Staf', $targets);
             
             // 1. Cek Hak Akses
             $has_access = false;
@@ -40,6 +46,17 @@ if ($action === 'list_active') {
                 $has_access = true; // Semua user bisa lihat Umum
             } elseif (in_array('Ketua Yayasan', $user_roles) || in_array('Sekretaris Yayasan', $user_roles)) {
                 $has_access = true; // Admin lihat semua (Monitoring)
+            } elseif ($is_staf) {
+                // Cek apakah user memiliki setidaknya satu peran yang BUKAN (Yayasan/Wali/Santri)
+                // Contoh: Kepala Sekolah, Guru, Musyrif akan lolos cek ini.
+                $is_user_staff = false;
+                foreach ($user_roles as $ur) {
+                    if (!in_array($ur, $non_staff_roles)) {
+                        $is_user_staff = true;
+                        break;
+                    }
+                }
+                if ($is_user_staff) $has_access = true;
             } else {
                 // Cek apakah salah satu role user ada di target
                 foreach ($user_roles as $ur) {
@@ -54,13 +71,15 @@ if ($action === 'list_active') {
                 // 2. Klasifikasi Tab (Umum vs Khusus)
                 if ($is_umum) {
                     $general[] = $reg;
+                } elseif ($is_staf) {
+                    $staff[] = $reg;
                 } else {
                     $specific[] = $reg;
                 }
             }
         }
 
-        echo json_encode(['success' => true, 'general' => $general, 'specific' => $specific]);
+        echo json_encode(['success' => true, 'general' => $general, 'staff' => $staff, 'specific' => $specific]);
 
     } catch (Exception $e) {
         echo json_encode(['success' => false, 'message' => $e->getMessage()]);
