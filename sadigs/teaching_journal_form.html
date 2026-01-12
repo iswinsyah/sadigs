@@ -115,6 +115,7 @@
             if(!d.success) window.location.href='index.html';
             document.getElementById('sidebarUsername').textContent = d.username;
             document.getElementById('userInitial').textContent = d.username.charAt(0).toUpperCase();
+            document.getElementById('teacherNameDisplay').value = d.username; // Isi Nama Ustadz Otomatis
             document.getElementById('sidebarRole').textContent = d.roles.join(', ');
             // Render menu simple
             document.getElementById('sidebarNav').innerHTML = `<div class="p-4"><a href="dashboard.html" class="block text-teal-600 font-bold mb-2">Dashboard</a><a href="teaching_history.html" class="block text-gray-600 hover:text-teal-600">Lihat Riwayat</a></div>`;
@@ -148,12 +149,32 @@
                     document.getElementById('activeSubject').textContent = s.subject;
                     document.getElementById('activeGrade').textContent = "Kelas " + s.grade;
                     document.getElementById('activeStartTime').textContent = s.start_time.substring(0, 5);
+                    
+                    // Load Data Absensi Otomatis saat mau selesai
+                    loadSystemAbsences();
                 } else {
                     // Tidak ada sesi -> Tampilkan Form Start
                     document.getElementById('endForm').classList.add('hidden');
                     document.getElementById('startForm').classList.remove('hidden');
                 }
             } catch(e) { console.error(e); }
+        }
+
+        async function loadSystemAbsences() {
+            try {
+                const res = await fetch('sadigs_api_v3/teaching_journal_api.php?action=get_absent_students');
+                const result = await res.json();
+                const infoBox = document.getElementById('systemAbsenceInfo');
+                const textSpan = document.getElementById('absentListText');
+
+                if (result.success && result.data.length > 0) {
+                    const names = result.data.map(s => `${s.student_name} (${s.leave_type})`).join(', ');
+                    textSpan.textContent = names;
+                    infoBox.classList.remove('hidden');
+                } else {
+                    infoBox.classList.add('hidden');
+                }
+            } catch(e) { console.error("Gagal memuat data absensi", e); }
         }
 
         async function handleSubmission(formId, action) {

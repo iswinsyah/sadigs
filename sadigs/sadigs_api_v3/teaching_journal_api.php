@@ -34,6 +34,9 @@ try {
     $pdo->exec("ALTER TABLE teaching_journal MODIFY end_time TIME NULL");
     $pdo->exec("ALTER TABLE teaching_journal MODIFY topic TEXT NULL");
     $pdo->exec("ALTER TABLE teaching_journal MODIFY notes TEXT NULL");
+    // Update Baru: Jam Ke & Santri Absen
+    $pdo->exec("ALTER TABLE teaching_journal ADD COLUMN period_index INT NULL");
+    $pdo->exec("ALTER TABLE teaching_journal ADD COLUMN absent_students TEXT NULL");
 } catch (Exception $e) { /* Ignore if columns exist */ }
 
 try {
@@ -43,6 +46,15 @@ try {
         $stmt->execute([$user_id]);
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
         echo json_encode(['success' => true, 'data' => $data ?: null]);
+    }
+    elseif ($action === 'get_absent_students') {
+        // Ambil data santri yang sedang izin/sakit HARI INI (Status Approved)
+        // Digunakan untuk referensi otomatis di form jurnal
+        $stmt = $pdo->query("SELECT student_name, leave_type FROM guardian_leave_requests 
+                             WHERE status = 'approved' 
+                             AND CURDATE() BETWEEN start_date AND end_date");
+        $absentees = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        echo json_encode(['success' => true, 'data' => $absentees]);
     }
     elseif ($action === 'start_class') {
         // MULAI MENGAJAR
@@ -56,11 +68,12 @@ try {
              exit;
         }
 
-        $stmt = $pdo->prepare("INSERT INTO teaching_journal (user_id, teaching_date, start_time, grade, subject, location_lat, location_long) VALUES (?, CURDATE(), CURTIME(), ?, ?, ?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO teaching_journal (user_id, teaching_date, start_time, grade, subject, period_index, location_lat, location_long) VALUES (?, CURDATE(), CURTIME(), ?, ?, ?, ?, ?)");
         $stmt->execute([
             $user_id, 
             $data['grade'], 
             $data['subject'], 
+            $data['period_index'] ?? null,
             $data['latitude'] ?? null,
             $data['longitude'] ?? null
         ]);
@@ -72,10 +85,11 @@ try {
         $data = json_decode(file_get_contents('php://input'), true);
         $id = $data['id'];
         
-        $stmt = $pdo->prepare("UPDATE teaching_journal SET end_time = CURTIME(), topic = ?, notes = ?, location_lat = COALESCE(location_lat, ?), location_long = COALESCE(location_long, ?) WHERE id = ? AND user_id = ?");
+        $stmt = $pdo->prepare("UPDATE teaching_journal SET end_time = CURTIME(), topic = ?, notes = ?, absent_students = ?, location_lat = COALESCE(location_lat, ?), location_long = COALESCE(location_long, ?) WHERE id = ? AND user_id = ?");
         $stmt->execute([
             $data['topic'], 
             $data['notes'], 
+            $data['absent_students'] ?? '',
             $data['latitude'] ?? null,
             $data['longitude'] ?? null,
             $id, 
