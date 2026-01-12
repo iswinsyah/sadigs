@@ -134,13 +134,24 @@
             <!-- WIDGET: Papan Informasi & Peraturan -->
             <div id="regulationsWidget" class="hidden mb-8">
                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                    <div class="bg-gradient-to-r from-blue-600 to-blue-500 px-6 py-3 flex items-center gap-2 text-white">
-                        <i data-lucide="bell" class="w-5 h-5"></i>
-                        <h3 id="regulationsTitle" class="font-bold text-sm uppercase tracking-wide">Papan Informasi & Peraturan</h3>
+                    <!-- Tabs Header -->
+                    <div class="flex border-b border-gray-200 bg-gray-50">
+                        <button onclick="switchAmanahTab('specific')" id="tabSpecific" class="flex-1 py-3 px-4 text-sm font-bold text-blue-600 border-b-2 border-blue-600 bg-white transition flex items-center justify-center gap-2">
+                            <i data-lucide="user" class="w-4 h-4"></i>
+                            <span id="roleNamePlaceholder">Amanah Saya</span>
+                        </button>
+                        <button onclick="switchAmanahTab('general')" id="tabGeneral" class="flex-1 py-3 px-4 text-sm font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition flex items-center justify-center gap-2">
+                            <i data-lucide="users" class="w-4 h-4"></i>
+                            <span>Amanah Umum</span>
+                        </button>
                     </div>
-                    <div id="regulationsList" class="p-4 space-y-3 bg-blue-50/30">
-                        <!-- Item peraturan akan dimuat di sini -->
-                        <p class="text-center text-gray-400 text-sm py-2">Memuat informasi...</p>
+                    
+                    <!-- Content Areas -->
+                    <div id="amanahSpecificContent" class="p-4 space-y-3 bg-white min-h-[100px] max-h-[400px] overflow-y-auto custom-scrollbar">
+                        <p class="text-center text-gray-400 text-sm py-2">Memuat...</p>
+                    </div>
+                    <div id="amanahGeneralContent" class="hidden p-4 space-y-3 bg-white min-h-[100px] max-h-[400px] overflow-y-auto custom-scrollbar">
+                        <p class="text-center text-gray-400 text-sm py-2">Memuat...</p>
                     </div>
                 </div>
             </div>
@@ -280,15 +291,6 @@
                     myRawRoles = rawRoles;
                     const activeRoles = data.roles || [];
 
-                    // --- UPDATE JUDUL WIDGET PERATURAN (AMANAH) ---
-                    let regTitle = 'Papan Informasi & Peraturan';
-                    if (activeRoles.includes('Walisantri')) {
-                        regTitle = 'Amanah dan Prosedur Walisantri';
-                    } else if (activeRoles.length > 0) {
-                        regTitle = 'Amanah ' + activeRoles[0];
-                    }
-                    const regTitleEl = document.getElementById('regulationsTitle');
-                    if (regTitleEl) regTitleEl.textContent = regTitle;
 
                     // Update sidebar and main role display
                     let rolesText = 'User';
@@ -354,21 +356,30 @@
                     fetch('sadigs_api_v3/get_regulations.php?action=list_active')
                         .then(res => res.json())
                         .then(regData => {
-                            if (regData.success && regData.data.length > 0) {
+                            if (regData.success) {
                                 document.getElementById('regulationsWidget').classList.remove('hidden');
-                                const regContainer = document.getElementById('regulationsList');
-                                regContainer.innerHTML = '';
                                 
-                                regData.data.forEach(item => {
-                                    const div = document.createElement('div');
-                                    div.className = 'bg-white p-4 rounded-lg border-l-4 border-blue-500 shadow-sm hover:shadow-md transition';
-                                    div.innerHTML = `<div class="flex justify-between items-start"><h4 class="font-bold text-gray-800">${item.title}</h4><span class="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">${item.formatted_date}</span></div><p class="text-sm text-gray-600 mt-1 whitespace-pre-wrap">${item.content}</p>`;
-                                    regContainer.appendChild(div);
-                                });
+                                // Update Nama Tab [Peran]
+                                const userRole = activeRoles.length > 0 ? activeRoles[0] : 'Saya';
+                                document.getElementById('roleNamePlaceholder').textContent = `Amanah ${userRole}`;
+
+                                // Render Amanah Spesifik
+                                const specificContainer = document.getElementById('amanahSpecificContent');
+                                if (regData.specific && regData.specific.length > 0) {
+                                    specificContainer.innerHTML = regData.specific.map(item => createAmanahCard(item, 'blue')).join('');
+                                } else {
+                                    specificContainer.innerHTML = '<p class="text-center text-gray-500 text-sm py-4 italic">Tidak ada amanah khusus untuk peran Anda.</p>';
+                                }
+
+                                // Render Amanah Umum
+                                const generalContainer = document.getElementById('amanahGeneralContent');
+                                if (regData.general && regData.general.length > 0) {
+                                    generalContainer.innerHTML = regData.general.map(item => createAmanahCard(item, 'teal')).join('');
+                                } else {
+                                    generalContainer.innerHTML = '<p class="text-center text-gray-500 text-sm py-4 italic">Tidak ada amanah umum.</p>';
+                                }
+                                
                                 lucide.createIcons();
-                            } else {
-                                document.getElementById('regulationsWidget').classList.remove('hidden');
-                                document.getElementById('regulationsList').innerHTML = '<p class="text-center text-gray-500 text-sm py-4 italic">Belum ada amanah atau informasi baru.</p>';
                             }
                         });
 
@@ -553,6 +564,37 @@
                     window.location.reload();
                 }
             } catch(e) { alert('Gagal kembali ke admin.'); }
+        }
+
+        // --- LOGIKA TAB AMANAH ---
+        function switchAmanahTab(tab) {
+            const tabSpecific = document.getElementById('tabSpecific');
+            const tabGeneral = document.getElementById('tabGeneral');
+            const contentSpecific = document.getElementById('amanahSpecificContent');
+            const contentGeneral = document.getElementById('amanahGeneralContent');
+
+            if (tab === 'specific') {
+                tabSpecific.className = "flex-1 py-3 px-4 text-sm font-bold text-blue-600 border-b-2 border-blue-600 bg-white transition flex items-center justify-center gap-2";
+                tabGeneral.className = "flex-1 py-3 px-4 text-sm font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition flex items-center justify-center gap-2";
+                contentSpecific.classList.remove('hidden');
+                contentGeneral.classList.add('hidden');
+            } else {
+                tabGeneral.className = "flex-1 py-3 px-4 text-sm font-bold text-teal-600 border-b-2 border-teal-600 bg-white transition flex items-center justify-center gap-2";
+                tabSpecific.className = "flex-1 py-3 px-4 text-sm font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition flex items-center justify-center gap-2";
+                contentGeneral.classList.remove('hidden');
+                contentSpecific.classList.add('hidden');
+            }
+        }
+
+        function createAmanahCard(item, color) {
+            return `<div class="bg-${color}-50 p-4 rounded-lg border-l-4 border-${color}-500 shadow-sm hover:shadow-md transition">
+                <div class="flex justify-between items-start">
+                    <h4 class="font-bold text-gray-800">${item.title}</h4>
+                    <span class="text-xs text-gray-500 bg-white px-2 py-1 rounded border border-gray-200">${item.formatted_date}</span>
+                </div>
+                <p class="text-sm text-gray-600 mt-1 whitespace-pre-wrap">${item.content}</p>
+                <div class="mt-2 text-xs text-gray-400 flex items-center gap-1"><i data-lucide="user" class="w-3 h-3"></i> ${item.creator_name || 'Admin'}</div>
+            </div>`;
         }
     </script>
 </body>
