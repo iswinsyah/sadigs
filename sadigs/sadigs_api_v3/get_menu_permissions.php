@@ -56,6 +56,7 @@ $master_structure = [
     'ManajemenYayasan' => [
         'label' => '2. MANAJEMEN YAYASAN',
         'items' => [
+            ['id' => 'navRekapJurnal', 'label' => 'Rekap Jurnal Mengajar', 'icon' => 'book-open-check', 'link' => 'teaching_recap.html'],
             ['id' => 'navYayasanWidget', 'label' => 'Ringkasan Manajemen', 'icon' => 'activity', 'link' => '#']
         ]
     ],
@@ -128,6 +129,8 @@ $master_structure = [
     'Ustadz' => [
         'label' => '13. USTADZ',
         'items' => [
+            ['id' => 'navJurnalMengajar', 'label' => 'Isi Jurnal Mengajar', 'icon' => 'pen-tool', 'link' => 'teaching_journal_form.html'],
+            ['id' => 'navRiwayatMengajar', 'label' => 'Riwayat Mengajar', 'icon' => 'history', 'link' => 'teaching_history.html'],
             ['id' => 'navRppGenerator', 'label' => 'Formulir Generator Modul Ajar', 'icon' => 'brain-circuit', 'link' => 'rpp_generator.html'],
             ['id' => 'navRppAlbum', 'label' => 'Album Perangkat Ajar', 'icon' => 'folder-open', 'link' => 'rpp_album.html'],
             ['id' => 'navPerencanaanAkademik', 'label' => 'Buku Kerja Ustadz', 'icon' => 'book-check', 'link' => 'academic_planning.html'],
@@ -169,13 +172,13 @@ $master_structure = [
 ];
 
 $master_permissions = [
-    'Ketua Yayasan' => ['navDashboard', 'navProfil', 'navKalender', 'navVerifikasi', 'navQuota', 'navCalendarSettings', 'navMenuManagement', 'navUserCredentials', 'navAbsensi', 'navAbsensiPribadi', 'navRekapAbsensi', 'navGrafikAbsensi', 'navBiodataPegawai', 'navBukuIndukPegawai', 'navIzinPegawai', 'navValidasiIzin', 'navDaftarIzin', 'navRapat', 'navJadwalRapat', 'navRppGenerator', 'navRppAlbum', 'navBiodataSantri', 'navBukuIndukSantri', 'navIbadahHarian', 'navValidasiIbadah', 'navGuardianLeaveValidation', 'navOnLeaveList', 'navRekapIbadahAnak', 'navInputTahfizh', 'navViewTahfizh', 'navMentoring', 'navIzinWalisantri', 'navMusyrifPocketMoney', 'navSantriPocketMoney', 'navMusyrifWithdrawalValidation', 'navFormulirPembayaran', 'navValidasiPembayaran', 'navTabelPembayaran', 'navRekapPembayaran', 'navPocketMoneyDeposit', 'navPocketMoneyValidation', 'navFormulirTransaksi', 'navTabelTransaksi', 'navValidasiPeraturan', 'navBuatPeraturan', 'navYayasanWidget', 'navMusyrifWidget', 'navAturKurikulum', 'navJadwalPelajaran', 'navPenilaianKinerja', 'navMonitoringAkademik'],
-    'Sekretaris Yayasan' => ['navDashboard', 'navProfil', 'navKalender', 'navVerifikasi', 'navQuota', 'navCalendarSettings', 'navBiodataPegawai', 'navBukuIndukPegawai', 'navRapat', 'navJadwalRapat', 'navBuatPeraturan', 'navYayasanWidget', 'navRekapAbsensi', 'navGrafikAbsensi'],
-    'Bendahara Yayasan' => ['navDashboard', 'navProfil', 'navKalender', 'navValidasiPembayaran', 'navTabelPembayaran', 'navRekapPembayaran', 'navPocketMoneyValidation', 'navTabelTransaksi', 'navYayasanWidget', 'navRekapAbsensi', 'navGrafikAbsensi'],
+    'Ketua Yayasan' => ['navDashboard', 'navProfil', 'navKalender', 'navVerifikasi', 'navQuota', 'navCalendarSettings', 'navMenuManagement', 'navUserCredentials', 'navAbsensi', 'navAbsensiPribadi', 'navRekapAbsensi', 'navGrafikAbsensi', 'navBiodataPegawai', 'navBukuIndukPegawai', 'navIzinPegawai', 'navValidasiIzin', 'navDaftarIzin', 'navRapat', 'navJadwalRapat', 'navRppGenerator', 'navRppAlbum', 'navBiodataSantri', 'navBukuIndukSantri', 'navIbadahHarian', 'navValidasiIbadah', 'navGuardianLeaveValidation', 'navOnLeaveList', 'navRekapIbadahAnak', 'navInputTahfizh', 'navViewTahfizh', 'navMentoring', 'navIzinWalisantri', 'navMusyrifPocketMoney', 'navSantriPocketMoney', 'navMusyrifWithdrawalValidation', 'navFormulirPembayaran', 'navValidasiPembayaran', 'navTabelPembayaran', 'navRekapPembayaran', 'navPocketMoneyDeposit', 'navPocketMoneyValidation', 'navFormulirTransaksi', 'navTabelTransaksi', 'navValidasiPeraturan', 'navBuatPeraturan', 'navYayasanWidget', 'navMusyrifWidget', 'navAturKurikulum', 'navJadwalPelajaran', 'navPenilaianKinerja', 'navMonitoringAkademik', 'navRekapJurnal'],
+    'Sekretaris Yayasan' => ['navDashboard', 'navProfil', 'navKalender', 'navVerifikasi', 'navQuota', 'navCalendarSettings', 'navBiodataPegawai', 'navBukuIndukPegawai', 'navRapat', 'navJadwalRapat', 'navBuatPeraturan', 'navYayasanWidget', 'navRekapAbsensi', 'navGrafikAbsensi', 'navRekapJurnal'],
+    'Bendahara Yayasan' => ['navDashboard', 'navProfil', 'navKalender', 'navValidasiPembayaran', 'navTabelPembayaran', 'navRekapPembayaran', 'navPocketMoneyValidation', 'navTabelTransaksi', 'navYayasanWidget', 'navRekapAbsensi', 'navGrafikAbsensi', 'navRekapJurnal'],
     'Kepala Sekolah' => ['navDashboard', 'navProfil', 'navKalender', 'navAbsensi', 'navAbsensiPribadi', 'navRekapAbsensi', 'navGrafikAbsensi', 'navBiodataPegawai', 'navBukuIndukPegawai', 'navValidasiIzin', 'navDaftarIzin', 'navRapat', 'navJadwalRapat', 'navRppGenerator', 'navRppAlbum', 'navBiodataSantri', 'navBukuIndukSantri', 'navManajemenKelas', 'navValidasiIbadah', 'navMentoring', 'navInputNilai', 'navYayasanWidget', 'navPerencanaanAkademik', 'navKetersediaanMengajar', 'navAturKurikulum', 'navJadwalPelajaran', 'navPenilaianKinerja', 'navMonitoringAkademik', 'navValidasiPeraturan', 'navBuatPeraturan'],
     'Bendahara Sekolah' => ['navDashboard', 'navProfil', 'navKalender', 'navValidasiPembayaran', 'navTabelPembayaran', 'navRekapPembayaran', 'navPocketMoneyValidation', 'navFormulirTransaksi', 'navTabelTransaksi'],
     'Musyrif' => ['navDashboard', 'navProfil', 'navKalender', 'navAbsensi', 'navAbsensiPribadi', 'navIzinPegawai', 'navJadwalRapat', 'navValidasiIbadah', 'navGuardianLeaveValidation', 'navOnLeaveList', 'navInputTahfizh', 'navInputNilai', 'navMentoring', 'navMusyrifPocketMoney', 'navMusyrifWithdrawalValidation', 'navMusyrifWidget', 'navPerencanaanAkademik', 'navKetersediaanMengajar'],
-    'Ustadz' => ['navDashboard', 'navProfil', 'navKalender', 'navAbsensi', 'navAbsensiPribadi', 'navIzinPegawai', 'navJadwalRapat', 'navRppGenerator', 'navRppAlbum', 'navMentoring', 'navInputNilai', 'navMusyrifWidget', 'navPerencanaanAkademik', 'navKetersediaanMengajar'],
+    'Ustadz' => ['navDashboard', 'navProfil', 'navKalender', 'navAbsensi', 'navAbsensiPribadi', 'navIzinPegawai', 'navJadwalRapat', 'navRppGenerator', 'navRppAlbum', 'navMentoring', 'navInputNilai', 'navMusyrifWidget', 'navPerencanaanAkademik', 'navKetersediaanMengajar', 'navJurnalMengajar', 'navRiwayatMengajar'],
     'Santri' => ['navDashboard', 'navProfil', 'navKalender', 'navBiodataSantri', 'navIbadahHarian', 'navViewTahfizh', 'navSantriPocketMoney'],
     'Walisantri' => ['navDashboard', 'navProfil', 'navKalender', 'navRekapIbadahAnak', 'navViewTahfizh', 'navIzinWalisantri', 'navPocketMoneyDeposit', 'navMonitoringAnak', 'navFormulirPembayaran']
 ];
