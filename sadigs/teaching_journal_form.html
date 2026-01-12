@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulir Jurnal Mengajar | SADIGS</title>
+    <title>Formulir Jurnal Mengajar | SADIGS 3.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
@@ -34,69 +34,89 @@
             <div class="max-w-2xl mx-auto">
                 <div class="flex items-center gap-3 mb-6">
                     <a href="dashboard.html" class="p-2 bg-white rounded-full shadow-sm hover:bg-gray-100 transition"><i data-lucide="arrow-left" class="w-5 h-5 text-gray-600"></i></a>
-                    <h1 class="text-2xl font-bold text-gray-800">Isi Jurnal Mengajar</h1>
+                    <h1 class="text-2xl font-bold text-gray-800">Formulir Jurnal Mengajar</h1>
                 </div>
 
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <form id="journalForm" class="space-y-5">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-bold text-gray-700 mb-1">Tanggal</label>
-                                <input type="date" name="teaching_date" id="tDate" class="w-full p-2 border border-gray-300 rounded-lg" required>
+                <!-- JAM DIGITAL -->
+                <div class="bg-teal-600 text-white p-6 rounded-xl shadow-lg mb-6 text-center relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-full bg-white opacity-10 transform -skew-x-12"></div>
+                    <div class="relative z-10">
+                        <p class="text-teal-100 text-sm font-medium mb-1" id="currentDate">...</p>
+                        <h2 class="text-5xl font-extrabold tracking-widest font-mono" id="clock">00:00:00</h2>
+                        <p class="text-teal-200 text-xs mt-2">Waktu Server</p>
+                    </div>
+                </div>
+
+                <!-- CONTAINER UTAMA -->
+                <div id="mainContainer" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div id="loadingState" class="text-center py-10 text-gray-500">Memuat status...</div>
+
+                    <!-- FORM MULAI (START) -->
+                    <form id="startForm" class="hidden space-y-5">
+                        <div class="text-center mb-6">
+                            <div class="bg-gray-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <i data-lucide="book-open" class="w-8 h-8 text-gray-500"></i>
                             </div>
-                            <div class="flex gap-2">
-                                <div class="flex-1">
-                                    <label class="block text-sm font-bold text-gray-700 mb-1">Jam Mulai</label>
-                                    <input type="time" name="start_time" class="w-full p-2 border border-gray-300 rounded-lg" required>
-                                </div>
-                                <div class="flex-1">
-                                    <label class="block text-sm font-bold text-gray-700 mb-1">Jam Selesai</label>
-                                    <input type="time" name="end_time" class="w-full p-2 border border-gray-300 rounded-lg" required>
-                                </div>
-                            </div>
+                            <h3 class="text-lg font-bold text-gray-800">Siap Mengajar?</h3>
+                            <p class="text-gray-500 text-sm">Silakan pilih kelas dan mata pelajaran untuk memulai sesi.</p>
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-bold text-gray-700 mb-1">Kelas</label>
-                                <select name="grade" class="w-full p-2 border border-gray-300 rounded-lg bg-white" required>
+                                <select name="grade" class="w-full p-3 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-teal-500" required>
                                     <option value="">- Pilih Kelas -</option>
-                                    <option value="7">Kelas 7</option>
-                                    <option value="8">Kelas 8</option>
-                                    <option value="9">Kelas 9</option>
-                                    <option value="10">Kelas 10</option>
-                                    <option value="11">Kelas 11</option>
-                                    <option value="12">Kelas 12</option>
+                                    <option value="7">Kelas 7</option><option value="8">Kelas 8</option><option value="9">Kelas 9</option>
+                                    <option value="10">Kelas 10</option><option value="11">Kelas 11</option><option value="12">Kelas 12</option>
                                 </select>
                             </div>
                             <div>
                                 <label class="block text-sm font-bold text-gray-700 mb-1">Mata Pelajaran</label>
-                                <input type="text" name="subject" class="w-full p-2 border border-gray-300 rounded-lg" placeholder="Contoh: Fiqih" required>
+                                <input type="text" name="subject" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500" placeholder="Contoh: Fiqih" required>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-4 rounded-xl shadow-lg transform transition active:scale-95 flex justify-center items-center gap-2 text-lg">
+                            <i data-lucide="play-circle" class="w-6 h-6"></i> MULAI MENGAJAR
+                        </button>
+                    </form>
+
+                    <!-- FORM SELESAI (END) -->
+                    <form id="endForm" class="hidden space-y-5">
+                        <input type="hidden" name="id" id="sessionId">
+                        
+                        <div class="bg-green-50 border border-green-200 rounded-xl p-5 mb-6 text-center relative overflow-hidden">
+                            <div class="absolute top-0 right-0 p-2 opacity-10"><i data-lucide="clock" class="w-24 h-24 text-green-800"></i></div>
+                            <p class="text-green-800 text-sm font-bold uppercase tracking-wide mb-1">Sedang Mengajar</p>
+                            <h3 class="text-2xl font-extrabold text-green-900" id="activeSubject">...</h3>
+                            <p class="text-green-700 font-medium" id="activeGrade">...</p>
+                            <div class="mt-4 inline-block bg-white px-4 py-1 rounded-full shadow-sm border border-green-100">
+                                <span class="text-xs text-gray-500">Mulai: <span id="activeStartTime" class="font-mono font-bold text-gray-800">--:--</span></span>
                             </div>
                         </div>
 
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-1">Materi / Topik Bahasan</label>
-                            <input type="text" name="topic" class="w-full p-2 border border-gray-300 rounded-lg" placeholder="Contoh: Bab Thaharah" required>
+                            <input type="text" name="topic" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500" placeholder="Apa yang diajarkan hari ini?" required>
                         </div>
 
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">Catatan / Keterangan (Opsional)</label>
-                            <textarea name="notes" rows="2" class="w-full p-2 border border-gray-300 rounded-lg" placeholder="Catatan tambahan..."></textarea>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Catatan / Keterangan</label>
+                            <textarea name="notes" rows="2" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500" placeholder="Catatan kelas, PR, atau kendala..."></textarea>
                         </div>
 
-                        <!-- Lokasi (Hidden) -->
-                        <input type="hidden" name="latitude" id="lat">
-                        <input type="hidden" name="longitude" id="long">
-
-                        <button type="submit" id="submitBtn" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 rounded-lg shadow-md transition flex justify-center items-center gap-2">
-                            <i data-lucide="save" class="w-5 h-5"></i> Simpan Jurnal
+                        <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-xl shadow-lg transform transition active:scale-95 flex justify-center items-center gap-2 text-lg">
+                            <i data-lucide="stop-circle" class="w-6 h-6"></i> SELESAI MENGAJAR
                         </button>
                     </form>
                 </div>
             </div>
         </main>
     </div>
+
+    <!-- Hidden Inputs for Location -->
+    <input type="hidden" id="lat">
+    <input type="hidden" id="long">
 
     <script>
         lucide.createIcons();
@@ -111,99 +131,41 @@
         updateTime();
 
         // Sidebar & Session (Simplified)
-        fetch('sadigs_api_v3/session_check.php').then(r=>r.json()).then(d=>{
-            if(!d.success) window.location.href='index.html';
-            document.getElementById('sidebarUsername').textContent = d.username;
-            document.getElementById('userInitial').textContent = d.username.charAt(0).toUpperCase();
-            document.getElementById('teacherNameDisplay').value = d.username; // Isi Nama Ustadz Otomatis
-            document.getElementById('sidebarRole').textContent = d.roles.join(', ');
-            // Render menu simple
-            document.getElementById('sidebarNav').innerHTML = `<div class="p-4"><a href="dashboard.html" class="block text-teal-600 font-bold mb-2">Dashboard</a><a href="teaching_history.html" class="block text-gray-600 hover:text-teal-600">Lihat Riwayat</a></div>`;
-            
-            // PANGGIL FUNGSI CEK STATUS (PENTING!)
-            checkActiveSession();
-        });
-
         // Geolocation
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(pos => {
                 document.getElementById('lat').value = pos.coords.latitude;
                 document.getElementById('long').value = pos.coords.longitude;
-            });
+            }, err => console.log("Lokasi tidak diizinkan/error"));
         }
 
-        async function checkActiveSession() {
-            try {
-                const res = await fetch('sadigs_api_v3/teaching_journal_api.php?action=get_active_session');
-                const result = await res.json();
-                
-                document.getElementById('loadingState').classList.add('hidden');
-                
-                if (result.success && result.data) {
-                    // Ada sesi aktif -> Tampilkan Form End
-                    const s = result.data;
-                    document.getElementById('startForm').classList.add('hidden');
-                    document.getElementById('endForm').classList.remove('hidden');
-                    
-                    document.getElementById('sessionId').value = s.id;
-                    document.getElementById('activeSubject').textContent = s.subject;
-                    document.getElementById('activeGrade').textContent = "Kelas " + s.grade;
-                    document.getElementById('activeStartTime').textContent = s.start_time.substring(0, 5);
-                    
-                    // Load Data Absensi Otomatis saat mau selesai
-                    loadSystemAbsences();
-                } else {
-                    // Tidak ada sesi -> Tampilkan Form Start
-                    document.getElementById('endForm').classList.add('hidden');
-                    document.getElementById('startForm').classList.remove('hidden');
-                }
-            } catch(e) { console.error(e); }
-        }
+        fetch('sadigs_api_v3/session_check.php').then(r=>r.json()).then(d=>{
+            if(!d.success) window.location.href='index.html';
+            document.getElementById('sidebarUsername').textContent = d.username;
+            document.getElementById('userInitial').textContent = d.username.charAt(0).toUpperCase();
+            document.getElementById('sidebarRole').textContent = d.roles.join(', ');
+            // Render menu simple
+            document.getElementById('sidebarNav').innerHTML = `<div class="p-4"><a href="dashboard.html" class="block text-teal-600 font-bold mb-2">Dashboard</a><a href="teaching_history.html" class="block text-gray-600 hover:text-teal-600">Lihat Riwayat</a></div>`;
+        });
 
-        async function loadSystemAbsences() {
-            try {
-                const res = await fetch('sadigs_api_v3/teaching_journal_api.php?action=get_absent_students');
-                const result = await res.json();
-                const infoBox = document.getElementById('systemAbsenceInfo');
-                const textSpan = document.getElementById('absentListText');
+        document.getElementById('journalForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true; btn.innerHTML = 'Menyimpan...';
 
-                if (result.success && result.data.length > 0) {
-                    const names = result.data.map(s => `${s.student_name} (${s.leave_type})`).join(', ');
-                    textSpan.textContent = names;
-                    infoBox.classList.remove('hidden');
-                } else {
-                    infoBox.classList.add('hidden');
-                }
-            } catch(e) { console.error("Gagal memuat data absensi", e); }
-        }
-
-        async function handleSubmission(formId, action) {
-            const form = document.getElementById(formId);
-            const btn = form.querySelector('button');
-            const originalHTML = btn.innerHTML;
-            btn.disabled = true; btn.innerHTML = 'Memproses...';
-
-            const formData = new FormData(form);
+            const formData = new FormData(e.target);
             const data = Object.fromEntries(formData.entries());
-            data.latitude = document.getElementById('lat').value;
-            data.longitude = document.getElementById('long').value;
 
             try {
-                const res = await fetch(`sadigs_api_v3/teaching_journal_api.php?action=${action}`, {
+                const res = await fetch('sadigs_api_v3/teaching_journal_api.php?action=submit', {
                     method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)
                 });
                 const result = await res.json();
                 alert(result.message);
-                if(result.success) {
-                    checkActiveSession(); // Refresh state
-                    if (action === 'end_class') form.reset();
-                }
-            } catch(e) { alert('Gagal memproses.'); }
-            finally { btn.disabled = false; btn.innerHTML = originalHTML; }
-        }
-
-        document.getElementById('startForm').addEventListener('submit', (e) => { e.preventDefault(); handleSubmission('startForm', 'start_class'); });
-        document.getElementById('endForm').addEventListener('submit', (e) => { e.preventDefault(); handleSubmission('endForm', 'end_class'); });
+                if(result.success) window.location.href = 'teaching_history.html';
+            } catch(e) { alert('Gagal menyimpan.'); }
+            finally { btn.disabled = false; btn.innerHTML = 'Simpan Jurnal'; }
+        });
     </script>
 </body>
 </html>

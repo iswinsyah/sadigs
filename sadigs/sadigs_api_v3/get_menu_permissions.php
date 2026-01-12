@@ -129,7 +129,7 @@ $master_structure = [
     'Ustadz' => [
         'label' => '13. USTADZ',
         'items' => [
-            ['id' => 'navJurnalMengajar', 'label' => 'Isi Jurnal Mengajar', 'icon' => 'pen-tool', 'link' => 'teaching_journal_form.html'],
+            ['id' => 'navJurnalMengajar', 'label' => 'Formulir Jurnal Mengajar', 'icon' => 'pen-tool', 'link' => 'teaching_journal_form.html'],
             ['id' => 'navRiwayatMengajar', 'label' => 'Riwayat Mengajar', 'icon' => 'history', 'link' => 'teaching_history.html'],
             ['id' => 'navRppGenerator', 'label' => 'Formulir Generator Modul Ajar', 'icon' => 'brain-circuit', 'link' => 'rpp_generator.html'],
             ['id' => 'navRppAlbum', 'label' => 'Album Perangkat Ajar', 'icon' => 'folder-open', 'link' => 'rpp_album.html'],
