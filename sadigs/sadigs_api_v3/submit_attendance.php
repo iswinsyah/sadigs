@@ -12,27 +12,28 @@ $user_id = $_SESSION['user_id'];
 $notes = $_POST['notes'] ?? '';
 $lat = $_POST['latitude'] ?? null;
 $long = $_POST['longitude'] ?? null;
+$category = $_POST['category'] ?? 'Absensi Harian';
 
 $pdo = getDBConnection();
 
 try {
-    // Cek apakah sudah absen hari ini
-    $stmt = $pdo->prepare("SELECT id, check_out_time FROM employee_attendance WHERE user_id = ? AND attendance_date = CURDATE()");
-    $stmt->execute([$user_id]);
+    // Cek apakah sudah absen hari ini UNTUK KATEGORI INI
+    $stmt = $pdo->prepare("SELECT id, check_out_time FROM employee_attendance WHERE user_id = ? AND attendance_date = CURDATE() AND category = ?");
+    $stmt->execute([$user_id, $category]);
     $existing = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$existing) {
         // BELUM ABSEN -> LAKUKAN CHECK IN
-        $sql = "INSERT INTO employee_attendance (user_id, attendance_date, check_in_time, status, notes, location_lat, location_long) 
-                VALUES (?, CURDATE(), CURTIME(), 'Hadir', ?, ?, ?)";
+        $sql = "INSERT INTO employee_attendance (user_id, attendance_date, check_in_time, status, notes, location_lat, location_long, category) 
+                VALUES (?, CURDATE(), CURTIME(), 'Hadir', ?, ?, ?, ?)";
         $stmtInsert = $pdo->prepare($sql);
-        $stmtInsert->execute([$user_id, $notes, $lat, $long]);
+        $stmtInsert->execute([$user_id, $notes, $lat, $long, $category]);
         
-        echo json_encode(['success' => true, 'message' => 'Berhasil Absen Masuk! Semangat bekerja.']);
+        echo json_encode(['success' => true, 'message' => "Berhasil Absen Masuk ($category)!"]);
     } else {
         // SUDAH ABSEN MASUK -> CEK APAKAH SUDAH PULANG?
         if ($existing['check_out_time']) {
-            echo json_encode(['success' => false, 'message' => 'Anda sudah melakukan absen pulang hari ini.']);
+            echo json_encode(['success' => false, 'message' => "Anda sudah melakukan absen pulang untuk $category hari ini."]);
         } else {
             // LAKUKAN CHECK OUT
             // Append notes jika ada catatan baru
@@ -44,7 +45,7 @@ try {
             $stmtUpdate = $pdo->prepare($sql);
             $stmtUpdate->execute([$newNotes, $existing['id']]);
             
-            echo json_encode(['success' => true, 'message' => 'Berhasil Absen Pulang! Hati-hati di jalan.']);
+            echo json_encode(['success' => true, 'message' => "Berhasil Absen Pulang ($category)!"]);
         }
     }
 } catch (Exception $e) {

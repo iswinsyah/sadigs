@@ -14,9 +14,9 @@ $pdo = getDBConnection();
 try {
     $stmt = $pdo->prepare("SELECT * FROM employee_attendance WHERE user_id = ? AND attendance_date = CURDATE()");
     $stmt->execute([$user_id]);
-    $data = $stmt->fetch(PDO::FETCH_ASSOC);
+    $data = $stmt->fetchAll(PDO::FETCH_ASSOC); // Ambil semua (bisa harian + rapat)
 
-    echo json_encode(['success' => true, 'data' => $data ?: null]);
+    echo json_encode(['success' => true, 'data' => $data]);
 } catch (Exception $e) {
     echo json_encode(['success' => false, 'message' => $e->getMessage()]);
 }

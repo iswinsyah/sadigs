@@ -28,6 +28,21 @@
                 <p class="text-gray-500 text-sm mt-2">Waktu Server</p>
             </div>
 
+            <!-- Info Pegawai -->
+            <div class="w-full text-center">
+                <p class="text-xs text-gray-400 font-bold uppercase tracking-wider">Nama Pegawai</p>
+                <h2 id="employeeName" class="text-xl font-bold text-gray-800">Memuat...</h2>
+            </div>
+
+            <!-- Pilihan Kategori Absensi -->
+            <div class="w-full">
+                <label class="block text-sm font-bold text-gray-700 mb-1">Jenis Absensi</label>
+                <select id="attendanceCategory" onchange="updateUI()" class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 outline-none bg-white font-bold text-gray-700">
+                    <option value="Absensi Harian">Absensi Harian Kerja</option>
+                    <option value="Absensi Rapat">Absensi Rapat</option>
+                </select>
+            </div>
+
             <!-- Status Hari Ini -->
             <div id="statusContainer" class="w-full bg-gray-50 rounded-xl p-4 border border-gray-200 text-center">
                 <p class="text-sm text-gray-500 mb-1">Status Kehadiran Anda</p>
@@ -75,6 +90,15 @@
         setInterval(updateTime, 1000);
         updateTime();
 
+        // Load User Info
+        fetch('sadigs_api_v3/session_check.php').then(r=>r.json()).then(d=>{
+            if(d.success) {
+                document.getElementById('employeeName').textContent = d.full_name || d.username;
+            }
+        });
+
+        let todayData = []; // Menyimpan data absensi hari ini (array)
+
         // Geolocation
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(pos => {
@@ -89,47 +113,60 @@
                 const res = await fetch('sadigs_api_v3/get_today_status.php');
                 const data = await res.json();
                 
-                const btn = document.getElementById('actionBtn');
-                const statusText = document.getElementById('statusText');
-                const checkInEl = document.getElementById('checkInTime');
-                const checkOutEl = document.getElementById('checkOutTime');
-
                 if (data.success) {
-                    const att = data.data;
-                    
-                    if (!att) {
-                        // Belum Absen Sama Sekali
-                        statusText.textContent = "Belum Absen Hari Ini";
-                        statusText.className = "text-lg font-bold text-gray-500";
-                        btn.className = "w-full py-4 rounded-xl font-bold text-white text-lg shadow-lg transform transition active:scale-95 flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-700";
-                        btn.innerHTML = `<i data-lucide="log-in" class="w-6 h-6"></i> ABSEN MASUK`;
-                        btn.disabled = false;
-                    } else {
-                        // Sudah Absen Masuk
-                        checkInEl.textContent = att.check_in_time.substring(0, 5);
-                        
-                        if (!att.check_out_time) {
-                            // Belum Pulang
-                            statusText.textContent = "Sudah Absen Masuk";
-                            statusText.className = "text-lg font-bold text-teal-600";
-                            btn.className = "w-full py-4 rounded-xl font-bold text-white text-lg shadow-lg transform transition active:scale-95 flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700";
-                            btn.innerHTML = `<i data-lucide="log-out" class="w-6 h-6"></i> ABSEN PULANG`;
-                            btn.disabled = false;
-                        } else {
-                            // Sudah Selesai
-                            checkOutEl.textContent = att.check_out_time.substring(0, 5);
-                            statusText.textContent = "Absensi Selesai";
-                            statusText.className = "text-lg font-bold text-green-600";
-                            btn.className = "w-full py-4 rounded-xl font-bold text-white text-lg shadow-lg flex items-center justify-center gap-2 bg-green-500 cursor-default";
-                            btn.innerHTML = `<i data-lucide="check-circle" class="w-6 h-6"></i> SUDAH LENGKAP`;
-                            btn.disabled = true;
-                            document.querySelector('textarea').disabled = true;
-                        }
-                    }
-                    lucide.createIcons();
+                    todayData = data.data || [];
+                    updateUI(); // Update tampilan berdasarkan kategori yang dipilih
                 }
             } catch (e) { console.error(e); }
         }
+
+        function updateUI() {
+            const category = document.getElementById('attendanceCategory').value;
+            const att = todayData.find(r => r.category === category); // Cari data sesuai kategori
+            
+            const btn = document.getElementById('actionBtn');
+            const statusText = document.getElementById('statusText');
+            const checkInEl = document.getElementById('checkInTime');
+            const checkOutEl = document.getElementById('checkOutTime');
+            const textArea = document.querySelector('textarea');
+
+            // Reset Tampilan
+            checkInEl.textContent = '--:--';
+            checkOutEl.textContent = '--:--';
+            textArea.disabled = false;
+
+            if (!att) {
+                // Belum Absen
+                statusText.textContent = "Belum Absen (" + category + ")";
+                statusText.className = "text-lg font-bold text-gray-500";
+                btn.className = "w-full py-4 rounded-xl font-bold text-white text-lg shadow-lg transform transition active:scale-95 flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-700";
+                btn.innerHTML = `<i data-lucide="log-in" class="w-6 h-6"></i> ABSEN MASUK`;
+                btn.disabled = false;
+            } else {
+                // Sudah Absen Masuk
+                checkInEl.textContent = att.check_in_time.substring(0, 5);
+                
+                if (!att.check_out_time) {
+                    // Belum Pulang
+                    statusText.textContent = "Sudah Masuk (" + category + ")";
+                    statusText.className = "text-lg font-bold text-teal-600";
+                    btn.className = "w-full py-4 rounded-xl font-bold text-white text-lg shadow-lg transform transition active:scale-95 flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700";
+                    btn.innerHTML = `<i data-lucide="log-out" class="w-6 h-6"></i> ABSEN PULANG`;
+                    btn.disabled = false;
+                } else {
+                    // Sudah Selesai
+                    checkOutEl.textContent = att.check_out_time.substring(0, 5);
+                    statusText.textContent = "Selesai (" + category + ")";
+                    statusText.className = "text-lg font-bold text-green-600";
+                    btn.className = "w-full py-4 rounded-xl font-bold text-white text-lg shadow-lg flex items-center justify-center gap-2 bg-green-500 cursor-default";
+                    btn.innerHTML = `<i data-lucide="check-circle" class="w-6 h-6"></i> SUDAH LENGKAP`;
+                    btn.disabled = true;
+                    textArea.disabled = true;
+                }
+            }
+            lucide.createIcons();
+        }
+
         loadStatus();
 
         // Submit Form
@@ -141,6 +178,7 @@
             btn.innerHTML = 'Memproses...';
 
             const formData = new FormData(e.target);
+            formData.append('category', document.getElementById('attendanceCategory').value);
 
             try {
                 const res = await fetch('sadigs_api_v3/submit_attendance.php', {

@@ -25,6 +25,9 @@ $pdo->exec("CREATE TABLE IF NOT EXISTS employee_attendance (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )");
 
+// Update Schema: Tambah kolom category jika belum ada
+try { $pdo->exec("ALTER TABLE employee_attendance ADD COLUMN category VARCHAR(50) DEFAULT 'Absensi Harian'"); } catch (Exception $e) { }
+
 try {
     // Default: Bulan ini
     $date_start = $_GET['start_date'] ?? date('Y-m-01');

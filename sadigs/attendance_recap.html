@@ -74,6 +74,7 @@
                                 <tr>
                                     <th class="px-6 py-3 text-left font-bold text-gray-500 uppercase">Tanggal</th>
                                     <th class="px-6 py-3 text-left font-bold text-gray-500 uppercase">Nama Pegawai</th>
+                                    <th class="px-6 py-3 text-left font-bold text-gray-500 uppercase">Kategori</th>
                                     <th class="px-6 py-3 text-center font-bold text-gray-500 uppercase">Jam Masuk</th>
                                     <th class="px-6 py-3 text-center font-bold text-gray-500 uppercase">Jam Pulang</th>
                                     <th class="px-6 py-3 text-center font-bold text-gray-500 uppercase">Status</th>
@@ -82,7 +83,7 @@
                                 </tr>
                             </thead>
                             <tbody id="tableBody" class="bg-white divide-y divide-gray-200">
-                                <tr><td colspan="7" class="px-6 py-10 text-center text-gray-500">Memuat data...</td></tr>
+                                <tr><td colspan="8" class="px-6 py-10 text-center text-gray-500">Memuat data...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -124,7 +125,7 @@
             const end = document.getElementById('endDate').value;
             const tbody = document.getElementById('tableBody');
             
-            tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-10 text-center text-gray-500">Memuat...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="8" class="px-6 py-10 text-center text-gray-500">Memuat...</td></tr>';
 
             try {
                 const res = await fetch(`sadigs_api_v3/get_attendance_history.php?start_date=${start}&end_date=${end}`);
@@ -140,6 +141,7 @@
                         return `<tr class="hover:bg-gray-50">
                             <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">${row.attendance_date}</td>
                             <td class="px-6 py-4 font-bold text-gray-800">${row.full_name}</td>
+                            <td class="px-6 py-4 text-sm text-blue-600 font-medium">${row.category || 'Absensi Harian'}</td>
                             <td class="px-6 py-4 text-center text-green-600 font-mono">${row.check_in_time || '-'}</td>
                             <td class="px-6 py-4 text-center text-red-600 font-mono">${row.check_out_time || '-'}</td>
                             <td class="px-6 py-4 text-center"><span class="px-2 py-1 rounded-full text-xs font-bold ${row.status === 'Hadir' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${row.status}</span></td>
@@ -149,9 +151,9 @@
                     }).join('');
                     lucide.createIcons(); // Render ikon baru
                 } else {
-                    tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-10 text-center text-gray-500">Tidak ada data absensi pada periode ini.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="8" class="px-6 py-10 text-center text-gray-500">Tidak ada data absensi pada periode ini.</td></tr>';
                 }
-            } catch (e) { tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-10 text-center text-red-500">Gagal memuat data.</td></tr>'; }
+            } catch (e) { tbody.innerHTML = '<tr><td colspan="8" class="px-6 py-10 text-center text-red-500">Gagal memuat data.</td></tr>'; }
         }
         loadData();
     </script>
