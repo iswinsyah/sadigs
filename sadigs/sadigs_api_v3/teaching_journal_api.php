@@ -27,17 +27,15 @@ $pdo->exec("CREATE TABLE IF NOT EXISTS teaching_journal (
 )");
 
 // Update Schema: Tambah kolom lokasi jika belum ada
-try {
-    $pdo->exec("ALTER TABLE teaching_journal ADD COLUMN location_lat VARCHAR(50) NULL");
-    $pdo->exec("ALTER TABLE teaching_journal ADD COLUMN location_long VARCHAR(50) NULL");
-    // Update agar kolom ini boleh NULL (untuk sistem Start/End)
-    $pdo->exec("ALTER TABLE teaching_journal MODIFY end_time TIME NULL");
-    $pdo->exec("ALTER TABLE teaching_journal MODIFY topic TEXT NULL");
-    $pdo->exec("ALTER TABLE teaching_journal MODIFY notes TEXT NULL");
-    // Update Baru: Jam Ke & Santri Absen
-    $pdo->exec("ALTER TABLE teaching_journal ADD COLUMN period_index INT NULL");
-    $pdo->exec("ALTER TABLE teaching_journal ADD COLUMN absent_students TEXT NULL");
-} catch (Exception $e) { /* Ignore if columns exist */ }
+try { $pdo->exec("ALTER TABLE teaching_journal ADD COLUMN location_lat VARCHAR(50) NULL"); } catch (Exception $e) { }
+try { $pdo->exec("ALTER TABLE teaching_journal ADD COLUMN location_long VARCHAR(50) NULL"); } catch (Exception $e) { }
+// Update agar kolom ini boleh NULL (untuk sistem Start/End)
+try { $pdo->exec("ALTER TABLE teaching_journal MODIFY end_time TIME NULL"); } catch (Exception $e) { }
+try { $pdo->exec("ALTER TABLE teaching_journal MODIFY topic TEXT NULL"); } catch (Exception $e) { }
+try { $pdo->exec("ALTER TABLE teaching_journal MODIFY notes TEXT NULL"); } catch (Exception $e) { }
+// Update Baru: Jam Ke & Santri Absen (Pisahkan try-catch agar tidak skip jika error di atas)
+try { $pdo->exec("ALTER TABLE teaching_journal ADD COLUMN period_index INT NULL"); } catch (Exception $e) { }
+try { $pdo->exec("ALTER TABLE teaching_journal ADD COLUMN absent_students TEXT NULL"); } catch (Exception $e) { }
 
 try {
     if ($action === 'get_active_session') {
