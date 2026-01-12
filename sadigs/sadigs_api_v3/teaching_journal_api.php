@@ -26,12 +26,18 @@ $pdo->exec("CREATE TABLE IF NOT EXISTS teaching_journal (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )");
 
+// Update Schema: Tambah kolom lokasi jika belum ada
+try {
+    $pdo->exec("ALTER TABLE teaching_journal ADD COLUMN location_lat VARCHAR(50) NULL");
+    $pdo->exec("ALTER TABLE teaching_journal ADD COLUMN location_long VARCHAR(50) NULL");
+} catch (Exception $e) { /* Ignore if columns exist */ }
+
 try {
     if ($action === 'submit') {
         // Input Jurnal Baru
         $data = json_decode(file_get_contents('php://input'), true);
         
-        $stmt = $pdo->prepare("INSERT INTO teaching_journal (user_id, teaching_date, start_time, end_time, grade, subject, topic, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO teaching_journal (user_id, teaching_date, start_time, end_time, grade, subject, topic, notes, location_lat, location_long) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt->execute([
             $user_id, 
             $data['teaching_date'], 
@@ -40,7 +46,9 @@ try {
             $data['grade'], 
             $data['subject'], 
             $data['topic'] ?? '', 
-            $data['notes'] ?? ''
+            $data['notes'] ?? '',
+            $data['latitude'] ?? null,
+            $data['longitude'] ?? null
         ]);
         
         echo json_encode(['success' => true, 'message' => 'Jurnal mengajar berhasil disimpan.']);

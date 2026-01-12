@@ -85,6 +85,10 @@
                             <textarea name="notes" rows="2" class="w-full p-2 border border-gray-300 rounded-lg" placeholder="Catatan tambahan..."></textarea>
                         </div>
 
+                        <!-- Lokasi (Hidden) -->
+                        <input type="hidden" name="latitude" id="lat">
+                        <input type="hidden" name="longitude" id="long">
+
                         <button type="submit" id="submitBtn" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 rounded-lg shadow-md transition flex justify-center items-center gap-2">
                             <i data-lucide="save" class="w-5 h-5"></i> Simpan Jurnal
                         </button>
@@ -99,6 +103,14 @@
         document.getElementById('tDate').valueAsDate = new Date();
 
         // Sidebar & Session (Simplified)
+        // Geolocation
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(pos => {
+                document.getElementById('lat').value = pos.coords.latitude;
+                document.getElementById('long').value = pos.coords.longitude;
+            }, err => console.log("Lokasi tidak diizinkan/error"));
+        }
+
         fetch('sadigs_api_v3/session_check.php').then(r=>r.json()).then(d=>{
             if(!d.success) window.location.href='index.html';
             document.getElementById('sidebarUsername').textContent = d.username;
