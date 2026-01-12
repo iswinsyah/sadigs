@@ -80,9 +80,50 @@ try {
                 ORDER BY j.teaching_date DESC, u.full_name ASC";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$start_date, $end_date]);
-        echo json_encode(['success' => true, 'data' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+        
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Analisis Ketepatan Waktu
+        foreach ($data as &$row) {
+            $row['punctuality'] = analyzePunctuality($row['start_time'], $row['end_time']);
+        }
+        
+        echo json_encode(['success' => true, 'data' => $data]);
     }
 } catch (Exception $e) {
     echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+}
+
+// Fungsi Helper: Analisis Ketepatan Waktu
+function analyzePunctuality($start, $end) {
+    // Daftar Jam Pelajaran Standar
+    $slots = [
+        ['s' => '04:30', 'e' => '05:15'], ['s' => '05:15', 'e' => '06:00'],
+        ['s' => '07:30', 'e' => '08:15'], ['s' => '08:15', 'e' => '09:00'],
+        ['s' => '09:15', 'e' => '10:00'], ['s' => '10:00', 'e' => '10:45'],
+        ['s' => '10:45', 'e' => '11:15'], ['s' => '15:15', 'e' => '16:00'],
+        ['s' => '16:00', 'e' => '16:45'], ['s' => '16:45', 'e' => '17:30']
+    ];
+
+    $start_ts = strtotime($start);
+    $end_ts = strtotime($end);
+    $best_start_diff = 9999; $best_slot_start = null;
+    $best_end_diff = 9999; $best_slot_end = null;
+
+    // Cari slot jadwal terdekat
+    foreach ($slots as $slot) {
+        $diff_s = abs($start_ts - strtotime($slot['s']));
+        if ($diff_s < $best_start_diff) { $best_start_diff = $diff_s; $best_slot_start = $slot['s']; }
+        
+        $diff_e = abs($end_ts - strtotime($slot['e']));
+        if ($diff_e < $best_end_diff) { $best_end_diff = $diff_e; $best_slot_end = $slot['e']; }
+    }
+
+    $status = [];
+    // Toleransi 5 menit
+    if (($start_ts - strtotime($best_slot_start)) > 300) $status[] = "Telat " . round(($start_ts - strtotime($best_slot_start))/60) . "m";
+    if ((strtotime($best_slot_end) - $end_ts) > 300) $status[] = "Plg Cepat " . round((strtotime($best_slot_end) - $end_ts)/60) . "m";
+
+    return empty($status) ? "Tepat Waktu" : implode(", ", $status);
 }
 ?>
