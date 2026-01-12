@@ -40,10 +40,16 @@ if ($action === 'list_active') {
             
             // 1. Cek apakah user punya hak melihat ini (salah satu perannya ada di target)
             $has_access = false;
-            foreach ($user_roles as $ur) {
-                if (in_array($ur, $targets)) {
-                    $has_access = true;
-                    break;
+            
+            // FIX: Ketua & Sekretaris Yayasan bisa melihat semua amanah (Monitoring)
+            if (in_array('Ketua Yayasan', $user_roles) || in_array('Sekretaris Yayasan', $user_roles)) {
+                $has_access = true;
+            } else {
+                foreach ($user_roles as $ur) {
+                    if (in_array($ur, $targets)) {
+                        $has_access = true;
+                        break;
+                    }
                 }
             }
 
