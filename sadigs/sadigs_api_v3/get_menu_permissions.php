@@ -252,6 +252,24 @@ try {
         }
     }
 
+    // 2.6. SYNC MISSING PERMISSIONS (AUTO-HEALING FOR NEW FEATURES)
+    // Memastikan menu baru mendapatkan hak akses default jika belum ada di database
+    $new_menus_check = ['navJurnalMengajar', 'navRiwayatMengajar', 'navRekapJurnal', 'navRekapAbsensi', 'navGrafikAbsensi'];
+    $stmtCheckPerm = $pdo->prepare("SELECT COUNT(*) FROM menu_permissions WHERE menu_id = ?");
+    $stmtInsertPerm = $pdo->prepare("INSERT IGNORE INTO menu_permissions (role_name, menu_id, is_allowed) VALUES (?, ?, 1)");
+
+    foreach ($new_menus_check as $nm) {
+        $stmtCheckPerm->execute([$nm]);
+        if ($stmtCheckPerm->fetchColumn() == 0) {
+            // Menu ini belum ada permission-nya. Tambahkan default dari $master_permissions.
+            foreach ($master_permissions as $role => $menus) {
+                if (in_array($nm, $menus)) {
+                    $stmtInsertPerm->execute([$role, $nm]);
+                }
+            }
+        }
+    }
+
     // 3. AMBIL DATA DARI DATABASE
     // A. Struktur Menu
     $stmtCats = $pdo->query("SELECT * FROM menu_categories ORDER BY sort_order ASC");
