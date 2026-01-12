@@ -30,28 +30,58 @@ $pdo->exec("CREATE TABLE IF NOT EXISTS teaching_journal (
 try {
     $pdo->exec("ALTER TABLE teaching_journal ADD COLUMN location_lat VARCHAR(50) NULL");
     $pdo->exec("ALTER TABLE teaching_journal ADD COLUMN location_long VARCHAR(50) NULL");
+    // Update agar kolom ini boleh NULL (untuk sistem Start/End)
+    $pdo->exec("ALTER TABLE teaching_journal MODIFY end_time TIME NULL");
+    $pdo->exec("ALTER TABLE teaching_journal MODIFY topic TEXT NULL");
+    $pdo->exec("ALTER TABLE teaching_journal MODIFY notes TEXT NULL");
 } catch (Exception $e) { /* Ignore if columns exist */ }
 
 try {
-    if ($action === 'submit') {
-        // Input Jurnal Baru
+    if ($action === 'get_active_session') {
+        // Cek apakah ada sesi yang belum selesai hari ini
+        $stmt = $pdo->prepare("SELECT * FROM teaching_journal WHERE user_id = ? AND teaching_date = CURDATE() AND end_time IS NULL ORDER BY id DESC LIMIT 1");
+        $stmt->execute([$user_id]);
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
+        echo json_encode(['success' => true, 'data' => $data ?: null]);
+    }
+    elseif ($action === 'start_class') {
+        // MULAI MENGAJAR
         $data = json_decode(file_get_contents('php://input'), true);
         
-        $stmt = $pdo->prepare("INSERT INTO teaching_journal (user_id, teaching_date, start_time, end_time, grade, subject, topic, notes, location_lat, location_long) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        // Cek double session
+        $stmtCheck = $pdo->prepare("SELECT id FROM teaching_journal WHERE user_id = ? AND teaching_date = CURDATE() AND end_time IS NULL");
+        $stmtCheck->execute([$user_id]);
+        if ($stmtCheck->fetch()) {
+             echo json_encode(['success' => false, 'message' => 'Anda masih memiliki sesi mengajar yang belum selesai.']);
+             exit;
+        }
+
+        $stmt = $pdo->prepare("INSERT INTO teaching_journal (user_id, teaching_date, start_time, grade, subject, location_lat, location_long) VALUES (?, CURDATE(), CURTIME(), ?, ?, ?, ?)");
         $stmt->execute([
             $user_id, 
-            $data['teaching_date'], 
-            $data['start_time'], 
-            $data['end_time'], 
             $data['grade'], 
             $data['subject'], 
-            $data['topic'] ?? '', 
-            $data['notes'] ?? '',
             $data['latitude'] ?? null,
             $data['longitude'] ?? null
         ]);
         
-        echo json_encode(['success' => true, 'message' => 'Jurnal mengajar berhasil disimpan.']);
+        echo json_encode(['success' => true, 'message' => 'Selamat mengajar! Waktu mulai tercatat.']);
+
+    } elseif ($action === 'end_class') {
+        // SELESAI MENGAJAR
+        $data = json_decode(file_get_contents('php://input'), true);
+        $id = $data['id'];
+        
+        $stmt = $pdo->prepare("UPDATE teaching_journal SET end_time = CURTIME(), topic = ?, notes = ?, location_lat = COALESCE(location_lat, ?), location_long = COALESCE(location_long, ?) WHERE id = ? AND user_id = ?");
+        $stmt->execute([
+            $data['topic'], 
+            $data['notes'], 
+            $data['latitude'] ?? null,
+            $data['longitude'] ?? null,
+            $id, 
+            $user_id
+        ]);
+        echo json_encode(['success' => true, 'message' => 'Sesi mengajar selesai. Terima kasih!']);
 
     } elseif ($action === 'get_my_history') {
         // Riwayat Pribadi Ustadz
