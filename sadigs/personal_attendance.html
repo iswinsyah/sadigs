@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Riwayat Absensi Saya | SADIGS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>body{font-family:'Inter',sans-serif;}</style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+
+    <div class="flex h-screen overflow-hidden">
+        <!-- SIDEBAR (Placeholder, akan diisi JS) -->
+        <aside id="sidebar" class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col hidden lg:flex">
+            <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-teal-600 text-white"><h1 class="text-2xl font-extrabold">SADIGS</h1></div>
+            <nav id="sidebarNav" class="flex-1 overflow-y-auto py-4 px-3 space-y-2"></nav>
+        </aside>
+
+        <!-- KONTEN UTAMA -->
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative">
+            <div class="max-w-4xl mx-auto">
+                <div class="flex items-center gap-3 mb-6">
+                    <a href="dashboard.html" class="p-2 bg-white rounded-full shadow-sm hover:bg-gray-100 transition"><i data-lucide="arrow-left" class="w-5 h-5 text-gray-600"></i></a>
+                    <h1 class="text-2xl font-bold text-gray-800">Riwayat Absensi Saya</h1>
+                </div>
+
+                <!-- Filter Bulan -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-6 flex gap-4 items-center">
+                    <input type="month" id="monthFilter" class="p-2 border border-gray-300 rounded-lg text-sm">
+                    <button onclick="loadHistory()" class="bg-teal-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-teal-700">Tampilkan</button>
+                </div>
+
+                <!-- Tabel -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <table class="min-w-full divide-y divide-gray-200 text-sm">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left font-bold text-gray-500 uppercase">Tanggal</th>
+                                <th class="px-6 py-3 text-center font-bold text-gray-500 uppercase">Masuk</th>
+                                <th class="px-6 py-3 text-center font-bold text-gray-500 uppercase">Pulang</th>
+                                <th class="px-6 py-3 text-center font-bold text-gray-500 uppercase">Status</th>
+                                <th class="px-6 py-3 text-left font-bold text-gray-500 uppercase">Catatan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyBody" class="bg-white divide-y divide-gray-200">
+                            <tr><td colspan="5" class="px-6 py-8 text-center text-gray-500">Memuat data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        
+        // Set default month
+        const now = new Date();
+        const monthStr = now.toISOString().slice(0, 7); // YYYY-MM
+        document.getElementById('monthFilter').value = monthStr;
+
+        async function loadHistory() {
+            const month = document.getElementById('monthFilter').value;
+            const tbody = document.getElementById('historyBody');
+            tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center text-gray-500">Memuat...</td></tr>';
+
+            try {
+                const res = await fetch(`sadigs_api_v3/get_my_attendance.php?month=${month}`);
+                const result = await res.json();
+
+                if (result.success && result.data.length > 0) {
+                    tbody.innerHTML = result.data.map(row => `
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 font-medium text-gray-900">${row.formatted_date}</td>
+                            <td class="px-6 py-4 text-center text-green-600 font-mono">${row.check_in_time ? row.check_in_time.substring(0,5) : '-'}</td>
+                            <td class="px-6 py-4 text-center text-red-600 font-mono">${row.check_out_time ? row.check_out_time.substring(0,5) : '-'}</td>
+                            <td class="px-6 py-4 text-center"><span class="px-2 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800">${row.status}</span></td>
+                            <td class="px-6 py-4 text-gray-500 truncate max-w-xs">${row.notes || '-'}</td>
+                        </tr>
+                    `).join('');
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center text-gray-500">Tidak ada riwayat absensi pada bulan ini.</td></tr>';
+                }
+            } catch (e) { tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center text-red-500">Gagal memuat data.</td></tr>'; }
+        }
+
+        // Sidebar Logic (Simplified)
+        async function initSidebar() {
+            try {
+                const permRes = await fetch('sadigs_api_v3/get_menu_permissions.php');
+                const permData = await permRes.json();
+                if (permData.success) {
+                    const nav = document.getElementById('sidebarNav');
+                    nav.innerHTML = '';
+                    // Render menu logic here (copy from dashboard if needed full sidebar)
+                    // For brevity, just adding back button
+                    nav.innerHTML = `<a href="dashboard.html" class="block p-4 text-teal-600 font-bold hover:bg-gray-50">Kembali ke Dashboard</a>`;
+                }
+            } catch(e){}
+        }
+
+        loadHistory();
+        initSidebar();
+    </script>
+</body>
+</html>

@@ -3,357 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Absensi Pegawai | SADIGS 3.0</title>
+    <title>Formulir Absensi | SADIGS</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>body{font-family:'Inter',sans-serif;}</style>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans antialiased">
 
-    <!-- HEADER MOBILE -->
-    <div class="lg:hidden flex items-center gap-4 bg-kedua text-white p-4 shadow-md sticky top-0 z-50">
-        <button id="mobileMenuBtn" class="focus:outline-none p-1 rounded hover:bg-kedua/80 transition"><i data-lucide="menu" class="w-7 h-7"></i></button>
-        <div class="font-bold text-xl flex items-center gap-2"><img src="https://raw.githubusercontent.com/villaqurankotabatu-commits/gambarvqbm/f44bf009884af11aba2c967a2401026225f7b02b/vila%20quran.png" alt="Logo" class="h-8"></div>
-    </div>
+    <div class="max-w-md mx-auto min-h-screen bg-white shadow-2xl overflow-hidden flex flex-col">
+        <!-- Header -->
+        <div class="bg-teal-600 p-6 text-white text-center relative">
+            <a href="dashboard.html" class="absolute left-4 top-6 p-1 hover:bg-teal-700 rounded-full transition"><i data-lucide="arrow-left" class="w-6 h-6"></i></a>
+            <h1 class="text-xl font-bold tracking-wide">Absensi Pegawai</h1>
+            <p class="text-teal-100 text-sm mt-1" id="currentDate">Memuat tanggal...</p>
+        </div>
 
-    <div class="flex h-screen overflow-hidden">
-        
-        <!-- SIDEBAR -->
-        <aside id="sidebar" class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col transition-transform transform -translate-x-full lg:translate-x-0 fixed lg:static h-full z-40 shadow-2xl lg:shadow-none">
-            <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-kedua text-white">
-                <img src="https://raw.githubusercontent.com/villaqurankotabatu-commits/gambarvqbm/f44bf009884af11aba2c967a2401026225f7b02b/vila%20quran.png" alt="Logo Villa Quran" class="h-9">
-            </div>
-            <div class="p-6 border-b border-gray-100 bg-utama/10">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-utama/20 flex items-center justify-center text-kedua font-bold text-lg shadow-sm"><span id="userInitial">U</span></div>
-                    <div class="overflow-hidden">
-                        <p id="sidebarUsername" class="font-bold text-gray-800 text-sm truncate">Memuat...</p>
-                        <p id="sidebarRole" class="text-xs text-gray-500 truncate font-medium">Role...</p>
-                    </div>
-                </div>
-            </div>
-            <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-2 no-scrollbar">
-                
-                <!-- Div 1: UMUM -->
-                <div class="bg-gray-50 rounded-lg p-2">
-                    <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">UMUM</h3>
-                    <a id="navDashboard" href="dashboard.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm">
-                        <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard
-                    </a>
-                    <a id="navKalender" href="calendar_view.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm">
-                        <i data-lucide="table" class="w-5 h-5"></i> Tabel Kalender
-                    </a>
-                    <a id="navProfil" href="profile.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm">
-                        <i data-lucide="user" class="w-5 h-5"></i> Profil Saya
-                    </a>
-                </div>
-
-                <!-- Container untuk menu Yayasan -->
-                <div id="menuYayasan" class="hidden space-y-2">
-                    <!-- Div 2: KEPEGAWAIAN -->
-                    <div class="bg-gray-50 rounded-lg p-2">
-                        <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KEPEGAWAIAN</h3>
-                        <a id="navAbsensi" href="attendance.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-utama bg-white rounded-md transition font-semibold text-sm shadow-sm"><i data-lucide="map-pin" class="w-5 h-5"></i> Absensi Pegawai</a>
-                        <a id="navBiodataPegawai" href="employee_data.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="file-badge" class="w-5 h-5"></i> Biodata Pegawai</a>
-                        <a id="navIzinPegawai" href="leave_request.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="file-edit" class="w-5 h-5"></i> Izin Pegawai</a>
-                        <a id="navBukuIndukPegawai" href="employee_master_book.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="book-open" class="w-5 h-5"></i> Buku Induk Pegawai</a>
-                        <a id="navRapat" href="meeting_invitation.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="mail" class="w-5 h-5"></i> Formulir Undang Rapat</a>
-                        <a id="navJadwalRapat" href="meeting_schedule.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="calendar-clock" class="w-5 h-5"></i> Jadwal Rapat</a>
-                    </div>
-
-                    <!-- Div 3: KHUSUS -->
-                    <div id="groupKhusus" class="hidden bg-gray-50 rounded-lg p-2">
-                        <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KHUSUS</h3>
-                        <a id="navVerifikasi" href="verification_management.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="users" class="w-5 h-5"></i> Verifikasi Pegawai</a>
-                        <a id="navQuota" href="quota_management.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="user-cog" class="w-5 h-5"></i> Atur Kuota</a>
-                        <a id="navCalendarSettings" href="calendar_settings.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="calendar-cog" class="w-5 h-5"></i> Atur Kalender</a>
-                        <a id="navMenuManagement" href="menu_management.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="lock" class="w-5 h-5"></i> Manajemen Akses</a>
-                    </div>
-                </div>
-
-                <!-- Div 4: KESANTRIAN -->
-                <div id="groupSantri" class="hidden bg-gray-50 rounded-lg p-2 mt-2">
-                    <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KESANTRIAN</h3>
-                    <a id="navBiodataSantri" href="student_data.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="book-user" class="w-5 h-5"></i> Biodata Santri</a>
-                    <a id="navBukuIndukSantri" href="student_master_book.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="book" class="w-5 h-5"></i> Buku Induk Santri</a>
-                    <a id="navIbadahHarian" href="daily_worship_form.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="notebook-pen" class="w-5 h-5"></i> Ibadah Harian</a>
-                    <a id="navMentoring" href="mentoring_groups.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="users-round" class="w-5 h-5"></i> Kelompok Mentoring</a>
-                    <a id="navValidasiIbadah" href="daily_worship_validation.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm"><i data-lucide="check-square" class="w-5 h-5"></i> Validasi Ibadah</a>
-                    <a id="navRekapIbadahAnak" href="select_student.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="clipboard-check" class="w-5 h-5"></i> Rekap Ibadah Anak</a>
-                    <a id="navIzinWalisantri" href="guardian_leave_request.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="mail-question" class="w-5 h-5"></i> Izin Walisantri</a>
-                </div>
-
-                <!-- Div 5: KEUANGAN -->
-                <div id="groupKeuangan" class="hidden bg-gray-50 rounded-lg p-2 mt-2">
-                    <h3 class="px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">KEUANGAN</h3>
-                    <a id="navFormulirPembayaran" href="payment_form.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="credit-card" class="w-5 h-5"></i> Formulir Pembayaran</a>
-                    <a id="navValidasiPembayaran" href="payment_validation.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="check-circle-2" class="w-5 h-5"></i> Validasi Pembayaran</a>
-                    <a id="navTabelPembayaran" href="payment_list.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="banknote" class="w-5 h-5"></i> Data Pembayaran</a>
-                    <a id="navRekapPembayaran" href="payment_recap.html" class="hidden flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm"><i data-lucide="pie-chart" class="w-5 h-5"></i> Rekap Keuangan</a>
-                </div>
-                
-                <!-- Tombol Logout -->
-                <div class="pt-2">
-                    <button id="logoutBtn" class="w-full flex items-center gap-3 px-4 py-2 text-tombol-kedua hover:bg-tombol-kedua/10 rounded-lg transition font-medium"><i data-lucide="log-out" class="w-5 h-5"></i> Keluar</button>
-                </div>
-            </nav>
-        </aside>
-        <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden lg:hidden backdrop-blur-sm"></div>
-
-        <!-- KONTEN UTAMA -->
-        <main class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative flex flex-col items-center justify-center min-h-screen lg:min-h-0">
+        <!-- Content -->
+        <div class="flex-1 p-6 flex flex-col items-center justify-center space-y-8">
             
-            <div class="w-full max-w-md">
-                <!-- Jam Realtime -->
-                <div class="text-center mb-8">
-                    <h2 class="text-3xl font-black text-gray-800 tracking-tight" id="realtimeClock">00:00:00</h2>
-                    <p class="text-gray-500 text-sm mt-1" id="currentDate">Senin, 1 Januari 2024</p>
-                </div>
+            <!-- Jam Digital -->
+            <div class="text-center">
+                <div id="clock" class="text-5xl font-extrabold text-gray-800 tracking-wider font-mono">00:00:00</div>
+                <p class="text-gray-500 text-sm mt-2">Waktu Server</p>
+            </div>
 
-                <!-- Kartu Absensi -->
-                <div class="bg-white p-8 rounded-2xl shadow-xl border-t-4 border-teal-600">
-                    <h3 class="text-xl font-bold text-gray-800 mb-6 text-center">Formulir Absensi</h3>
-                    
-                    <form id="attendanceForm" class="space-y-5">
-                        <!-- 1. Nama (Readonly) -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Nama Pegawai</label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <i data-lucide="user" class="w-5 h-5 text-gray-400"></i>
-                                </div>
-                                <input type="text" id="formName" class="w-full pl-10 pr-4 py-2 border border-gray-200 bg-gray-100 rounded-lg text-gray-600 font-medium cursor-not-allowed" readonly value="Memuat...">
-                            </div>
-                        </div>
-
-                        <!-- 2. Password -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Konfirmasi Password</label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <i data-lucide="lock" class="w-5 h-5 text-gray-400"></i>
-                                </div>
-                                <input type="password" id="formPassword" class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none transition" placeholder="Masukkan password Anda" required>
-                            </div>
-                        </div>
-
-                        <!-- 3. Jenis Absensi -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Jenis Absensi</label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <i data-lucide="list" class="w-5 h-5 text-gray-400"></i>
-                                </div>
-                                <select id="formCategory" class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none transition bg-white appearance-none cursor-pointer">
-                                    <option value="Absensi Harian">Absensi Harian</option>
-                                    <option value="Absensi Rapat Pekanan">Absensi Rapat Pekanan</option>
-                                    <option value="Absensi Rapat Bulanan">Absensi Rapat Bulanan</option>
-                                    <option value="Absensi Rapat Khusus">Absensi Rapat Khusus</option>
-                                </select>
-                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none"><i data-lucide="chevron-down" class="w-4 h-4 text-gray-400"></i></div>
-                            </div>
-                        </div>
-
-                        <!-- Lokasi (Otomatis) -->
-                        <div class="bg-blue-50 p-3 rounded-lg flex items-start gap-3 text-sm text-blue-800">
-                            <i data-lucide="map-pin" class="w-5 h-5 flex-shrink-0 mt-0.5"></i>
-                            <div>
-                                <p class="font-bold text-xs uppercase tracking-wide mb-1">Lokasi Terdeteksi:</p>
-                                <p id="locationText" class="italic">Mencari lokasi...</p>
-                            </div>
-                        </div>
-
-                        <!-- 3. Pilihan Absen -->
-                        <div class="grid grid-cols-2 gap-4 pt-2">
-                            <button type="button" onclick="submitAttendance('Masuk')" class="flex flex-col items-center justify-center p-4 border-2 border-teal-100 bg-teal-50 hover:bg-teal-100 hover:border-teal-300 rounded-xl transition group">
-                                <div class="bg-teal-200 p-3 rounded-full mb-2 group-hover:scale-110 transition">
-                                    <i data-lucide="log-in" class="w-6 h-6 text-teal-800"></i>
-                                </div>
-                                <span class="font-bold text-teal-800">Absen Masuk</span>
-                            </button>
-
-                            <button type="button" onclick="submitAttendance('Pulang')" class="flex flex-col items-center justify-center p-4 border-2 border-orange-100 bg-orange-50 hover:bg-orange-100 hover:border-orange-300 rounded-xl transition group">
-                                <div class="bg-orange-200 p-3 rounded-full mb-2 group-hover:scale-110 transition">
-                                    <i data-lucide="log-out" class="w-6 h-6 text-orange-800"></i>
-                                </div>
-                                <span class="font-bold text-orange-800">Absen Pulang</span>
-                            </button>
-                        </div>
-                    </form>
+            <!-- Status Hari Ini -->
+            <div id="statusContainer" class="w-full bg-gray-50 rounded-xl p-4 border border-gray-200 text-center">
+                <p class="text-sm text-gray-500 mb-1">Status Kehadiran Anda</p>
+                <h3 id="statusText" class="text-lg font-bold text-gray-800">Belum Absen</h3>
+                <div class="flex justify-center gap-4 mt-3 text-sm">
+                    <div class="bg-white px-3 py-1 rounded border border-gray-200 shadow-sm">
+                        <span class="block text-xs text-gray-400">Masuk</span>
+                        <span id="checkInTime" class="font-bold text-teal-600">--:--</span>
+                    </div>
+                    <div class="bg-white px-3 py-1 rounded border border-gray-200 shadow-sm">
+                        <span class="block text-xs text-gray-400">Pulang</span>
+                        <span id="checkOutTime" class="font-bold text-red-600">--:--</span>
+                    </div>
                 </div>
             </div>
-        </main>
+
+            <!-- Form -->
+            <form id="attendanceForm" class="w-full space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Catatan / Aktivitas (Opsional)</label>
+                    <textarea name="notes" rows="2" class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 outline-none text-sm" placeholder="Contoh: Mengajar kelas 10, Rapat guru..."></textarea>
+                </div>
+                
+                <!-- Lokasi (Hidden) -->
+                <input type="hidden" name="latitude" id="lat">
+                <input type="hidden" name="longitude" id="long">
+
+                <button type="submit" id="actionBtn" disabled class="w-full py-4 rounded-xl font-bold text-white text-lg shadow-lg transform transition active:scale-95 flex items-center justify-center gap-2 bg-gray-400 cursor-not-allowed">
+                    <i data-lucide="loader" class="w-6 h-6 animate-spin"></i> Memuat...
+                </button>
+            </form>
+
+        </div>
     </div>
 
     <script>
         lucide.createIcons();
 
-        // Mobile Menu Logic
-        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-        const sidebar = document.getElementById('sidebar');
-        const sidebarOverlay = document.getElementById('sidebarOverlay');
-        function toggleSidebar() {
-            sidebar.classList.toggle('-translate-x-full');
-            sidebarOverlay.classList.toggle('hidden');
-        }
-        mobileMenuBtn.addEventListener('click', toggleSidebar);
-        sidebarOverlay.addEventListener('click', toggleSidebar);
-
-        // --- JAM REALTIME ---
-        function updateClock() {
+        // Jam & Tanggal
+        function updateTime() {
             const now = new Date();
-            document.getElementById('realtimeClock').textContent = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }).replace(/\./g, ':');
-            document.getElementById('currentDate').textContent = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('clock').textContent = now.toLocaleTimeString('id-ID', {hour12: false});
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('id-ID', {weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'});
         }
-        setInterval(updateClock, 1000);
-        updateClock();
+        setInterval(updateTime, 1000);
+        updateTime();
 
-        // --- GEOLOCATION ---
-        let currentLat = null;
-        let currentLng = null;
-        let currentAddress = "Lokasi tidak ditemukan";
+        // Geolocation
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(pos => {
+                document.getElementById('lat').value = pos.coords.latitude;
+                document.getElementById('long').value = pos.coords.longitude;
+            }, err => console.log("Lokasi tidak diizinkan/error"));
+        }
 
-        function initLocation() {
-            if ("geolocation" in navigator) {
-                navigator.geolocation.getCurrentPosition(async (position) => {
-                    currentLat = position.coords.latitude;
-                    currentLng = position.coords.longitude;
+        // Load Status Hari Ini
+        async function loadStatus() {
+            try {
+                const res = await fetch('sadigs_api_v3/get_today_status.php');
+                const data = await res.json();
+                
+                const btn = document.getElementById('actionBtn');
+                const statusText = document.getElementById('statusText');
+                const checkInEl = document.getElementById('checkInTime');
+                const checkOutEl = document.getElementById('checkOutTime');
+
+                if (data.success) {
+                    const att = data.data;
                     
-                    // Reverse Geocoding (Optional: Menggunakan OpenStreetMap Nominatim)
-                    try {
-                        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${currentLat}&lon=${currentLng}`);
-                        const data = await res.json();
-                        currentAddress = data.display_name || `${currentLat}, ${currentLng}`;
-                        document.getElementById('locationText').textContent = currentAddress;
-                    } catch (e) {
-                        currentAddress = `${currentLat}, ${currentLng}`;
-                        document.getElementById('locationText').textContent = `Lat: ${currentLat}, Lng: ${currentLng}`;
-                    }
-                }, (error) => {
-                    document.getElementById('locationText').textContent = "Gagal mendeteksi lokasi. Pastikan GPS aktif.";
-                    document.getElementById('locationText').classList.add('text-red-600');
-                });
-            } else {
-                document.getElementById('locationText').textContent = "Browser tidak mendukung Geolocation.";
-            }
-        }
-
-        // --- INIT PAGE ---
-        async function initPage() {
-            // Reset sidebar state on page load to prevent UI lock
-            const sidebar = document.getElementById('sidebar');
-            const sidebarOverlay = document.getElementById('sidebarOverlay');
-            if (sidebar) sidebar.classList.add('-translate-x-full');
-            if (sidebarOverlay) sidebarOverlay.classList.add('hidden');
-
-            try {
-                const sessionRes = await fetch('sadigs_api_v3/session_check.php');
-                const sessionData = await sessionRes.json();
-
-                if (!sessionData.success) {
-                    window.location.href = 'index.html';
-                    return;
-                }
-
-                // Update Sidebar Info
-                document.getElementById('sidebarUsername').textContent = sessionData.username;
-                document.getElementById('userInitial').textContent = sessionData.username.charAt(0).toUpperCase();
-                document.getElementById('formName').value = sessionData.username;
-
-                const rawRoles = sessionData.raw_roles || [];
-                let rolesText = 'User';
-                if (rawRoles.length > 0) {
-                    rolesText = rawRoles.map(r => r.status === 'approved' ? r.role_name : `${r.role_name} (Pending)`).join(', ');
-                }
-                document.getElementById('sidebarRole').textContent = rolesText;
-
-                // Cek Peran Pegawai untuk akses halaman
-                const pegawaiRoles = ['Kepala Sekolah', 'Kepala Asrama', 'Admin Sekolah', 'Sekretaris Sekolah', 'Bendahara Sekolah', 'Musyrif', 'Ustadz', 'Musyrifah', 'Ustadzah'];
-                if (!sessionData.roles.some(r => pegawaiRoles.includes(r))) {
-                    alert('Halaman ini khusus Pegawai.');
-                    window.location.href = 'dashboard.html';
-                    return;
-                }
-
-                // --- LOGIKA MENU DINAMIS (DATABASE) ---
-                fetch('sadigs_api_v3/get_menu_permissions.php')
-                    .then(res => res.json())
-                    .then(permData => {
-                        if (permData.success) {
-                            const allowedMenus = permData.permissions || [];
-                            allowedMenus.forEach(id => {
-                                const el = document.getElementById(id);
-                                if (el) el.classList.remove('hidden');
-                            });
-                            if (document.querySelector('#menuYayasan a:not(.hidden)')) document.getElementById('menuYayasan').classList.remove('hidden');
-                            if (document.querySelector('#groupKhusus a:not(.hidden)')) document.getElementById('groupKhusus').classList.remove('hidden');
-                            if (document.querySelector('#groupSantri a:not(.hidden)')) document.getElementById('groupSantri').classList.remove('hidden');
-                            if (document.querySelector('#groupKeuangan a:not(.hidden)')) document.getElementById('groupKeuangan').classList.remove('hidden');
+                    if (!att) {
+                        // Belum Absen Sama Sekali
+                        statusText.textContent = "Belum Absen Hari Ini";
+                        statusText.className = "text-lg font-bold text-gray-500";
+                        btn.className = "w-full py-4 rounded-xl font-bold text-white text-lg shadow-lg transform transition active:scale-95 flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-700";
+                        btn.innerHTML = `<i data-lucide="log-in" class="w-6 h-6"></i> ABSEN MASUK`;
+                        btn.disabled = false;
+                    } else {
+                        // Sudah Absen Masuk
+                        checkInEl.textContent = att.check_in_time.substring(0, 5);
+                        
+                        if (!att.check_out_time) {
+                            // Belum Pulang
+                            statusText.textContent = "Sudah Absen Masuk";
+                            statusText.className = "text-lg font-bold text-teal-600";
+                            btn.className = "w-full py-4 rounded-xl font-bold text-white text-lg shadow-lg transform transition active:scale-95 flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700";
+                            btn.innerHTML = `<i data-lucide="log-out" class="w-6 h-6"></i> ABSEN PULANG`;
+                            btn.disabled = false;
+                        } else {
+                            // Sudah Selesai
+                            checkOutEl.textContent = att.check_out_time.substring(0, 5);
+                            statusText.textContent = "Absensi Selesai";
+                            statusText.className = "text-lg font-bold text-green-600";
+                            btn.className = "w-full py-4 rounded-xl font-bold text-white text-lg shadow-lg flex items-center justify-center gap-2 bg-green-500 cursor-default";
+                            btn.innerHTML = `<i data-lucide="check-circle" class="w-6 h-6"></i> SUDAH LENGKAP`;
+                            btn.disabled = true;
+                            document.querySelector('textarea').disabled = true;
                         }
-                    })
-                    .catch(e => console.error("Gagal memuat izin menu:", e));
-
-                // Mulai deteksi lokasi
-                initLocation();
-
-            } catch (error) {
-                console.error(error);
-            }
+                    }
+                    lucide.createIcons();
+                }
+            } catch (e) { console.error(e); }
         }
+        loadStatus();
 
-        // --- SUBMIT ABSENSI ---
-        window.submitAttendance = async function(type) {
-            const password = document.getElementById('formPassword').value;
-            const category = document.getElementById('formCategory').value;
-            
-            if (!password) {
-                alert('Harap masukkan password untuk konfirmasi.');
-                return;
-            }
-            if (!currentLat || !currentLng) {
-                alert('Lokasi belum terdeteksi. Tunggu sebentar atau izinkan akses lokasi.');
-                return;
-            }
+        // Submit Form
+        document.getElementById('attendanceForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('actionBtn');
+            const originalContent = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = 'Memproses...';
 
-            if (!confirm(`Apakah Anda yakin ingin absen ${type} sekarang?`)) return;
+            const formData = new FormData(e.target);
 
             try {
-                const res = await fetch('sadigs_api_v3/attendance.php', {
+                const res = await fetch('sadigs_api_v3/submit_attendance.php', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        password: password,
-                        type: type,
-                        category: category,
-                        latitude: currentLat,
-                        longitude: currentLng,
-                        address: currentAddress
-                    })
+                    body: formData
                 });
                 const result = await res.json();
-
-                if (result.success) {
-                    alert(result.message);
-                    document.getElementById('formPassword').value = ''; // Reset password
-                } else {
-                    alert('Gagal: ' + result.message);
-                }
-            } catch (error) {
-                alert('Terjadi kesalahan koneksi.');
-            }
-        }
-
-        // Logout
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            if(confirm('Keluar aplikasi?')) window.location.href = 'sadigs_api_v3/logout.php';
+                alert(result.message);
+                if (result.success) loadStatus();
+            } catch (e) { alert('Gagal memproses absensi.'); }
+            finally { btn.disabled = false; btn.innerHTML = originalContent; }
         });
-
-        initPage();
     </script>
 </body>
 </html>
