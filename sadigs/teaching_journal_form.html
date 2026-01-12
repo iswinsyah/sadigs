@@ -100,7 +100,15 @@
 
     <script>
         lucide.createIcons();
-        document.getElementById('tDate').valueAsDate = new Date();
+
+        // Jam Digital
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('clock').textContent = now.toLocaleTimeString('id-ID', {hour12: false});
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('id-ID', {weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'});
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
 
         // Sidebar & Session (Simplified)
         fetch('sadigs_api_v3/session_check.php').then(r=>r.json()).then(d=>{
