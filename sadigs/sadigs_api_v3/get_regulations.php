@@ -56,7 +56,8 @@ if ($action === 'list_active') {
             if ($has_access) {
                 // 2. Cek Logika Amanah Umum: Apakah target mencakup SEMUA 10 peran staf?
                 $intersection = array_intersect($staff_roles, $targets);
-                $is_general_staff = (count($intersection) == count($staff_roles));
+                // UPDATE: Dilonggarkan jadi minimal 8 peran agar jika ada 1-2 yang terlewat tetap masuk Umum
+                $is_general_staff = (count($intersection) >= 8);
 
                 if ($is_general_staff) {
                     $general[] = $reg;
