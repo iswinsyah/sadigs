@@ -16,6 +16,9 @@ $category = $_POST['category'] ?? 'Absensi Harian';
 
 $pdo = getDBConnection();
 
+// Update Schema: Tambah kolom category jika belum ada (PENTING: Agar tidak error saat WHERE category=...)
+try { $pdo->exec("ALTER TABLE employee_attendance ADD COLUMN category VARCHAR(50) DEFAULT 'Absensi Harian'"); } catch (Exception $e) { }
+
 try {
     // Cek apakah sudah absen hari ini UNTUK KATEGORI INI
     $stmt = $pdo->prepare("SELECT id, check_out_time FROM employee_attendance WHERE user_id = ? AND attendance_date = CURDATE() AND category = ?");

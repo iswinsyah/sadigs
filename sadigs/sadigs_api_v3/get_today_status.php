@@ -11,6 +11,9 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 $pdo = getDBConnection();
 
+// Update Schema: Tambah kolom category jika belum ada
+try { $pdo->exec("ALTER TABLE employee_attendance ADD COLUMN category VARCHAR(50) DEFAULT 'Absensi Harian'"); } catch (Exception $e) { }
+
 try {
     $stmt = $pdo->prepare("SELECT * FROM employee_attendance WHERE user_id = ? AND attendance_date = CURDATE()");
     $stmt->execute([$user_id]);
