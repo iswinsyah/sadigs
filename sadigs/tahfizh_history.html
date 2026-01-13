@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Riwayat Tahfidz | SADIGS 3.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>body{font-family:'Inter',sans-serif;}</style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+
+    <div class="flex h-screen overflow-hidden">
+        <!-- SIDEBAR -->
+        <aside id="sidebar" class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col hidden lg:flex">
+            <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-teal-600 text-white">
+                <h1 class="text-2xl font-extrabold tracking-wider">SADIGS</h1>
+            </div>
+            <div class="p-6 border-b border-gray-100 bg-teal-50">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-teal-200 flex items-center justify-center text-teal-800 font-bold text-lg shadow-sm"><span id="userInitial">U</span></div>
+                    <div class="overflow-hidden">
+                        <p id="sidebarUsername" class="font-bold text-gray-800 text-sm truncate">Memuat...</p>
+                        <p id="sidebarRole" class="text-xs text-gray-500 truncate font-medium">Role...</p>
+                    </div>
+                </div>
+            </div>
+            <nav id="sidebarNav" class="flex-1 overflow-y-auto py-4 px-3 space-y-2">
+                <div class="text-center text-gray-400 text-sm mt-4">Memuat menu...</div>
+            </nav>
+        </aside>
+
+        <!-- KONTEN UTAMA -->
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative">
+            <div class="max-w-5xl mx-auto">
+                <!-- Header -->
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-3">
+                        <a href="dashboard.html" class="p-2 bg-white rounded-full shadow-sm hover:bg-gray-100 transition"><i data-lucide="arrow-left" class="w-5 h-5 text-gray-600"></i></a>
+                        <div>
+                            <h1 class="text-2xl font-bold text-gray-800">Riwayat Hafalan</h1>
+                            <p class="text-sm text-gray-500">Pantau perkembangan tahfidz secara real-time.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabel Riwayat -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-teal-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-teal-800 uppercase tracking-wider">Tanggal</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-teal-800 uppercase tracking-wider">Santri</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-teal-800 uppercase tracking-wider">Hafalan</th>
+                                    <th class="px-6 py-3 text-center text-xs font-bold text-teal-800 uppercase tracking-wider">Nilai</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-teal-800 uppercase tracking-wider">Catatan</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-teal-800 uppercase tracking-wider">Musyrif</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyBody" class="bg-white divide-y divide-gray-200">
+                                <tr><td colspan="6" class="px-6 py-10 text-center text-gray-500">Memuat data...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        async function initPage() {
+            try {
+                // 1. Cek Sesi
+                const sessionRes = await fetch('sadigs_api_v3/session_check.php');
+                const sessionData = await sessionRes.json();
+                if (!sessionData.success) { window.location.href = 'index.html'; return; }
+
+                document.getElementById('sidebarUsername').textContent = sessionData.username;
+                document.getElementById('userInitial').textContent = sessionData.username.charAt(0).toUpperCase();
+                document.getElementById('sidebarRole').textContent = sessionData.roles.join(', ');
+
+                // Render Sidebar Simple
+                const nav = document.getElementById('sidebarNav');
+                nav.innerHTML = `
+                    <div class="p-2 space-y-1">
+                        <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-teal-50 hover:text-teal-600 rounded-md font-medium"><i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard</a>
+                        <a href="tahfizh_history.html" class="flex items-center gap-3 px-3 py-2 bg-teal-50 text-teal-700 rounded-md font-bold"><i data-lucide="book-open" class="w-5 h-5"></i> Riwayat Tahfidz</a>
+                    </div>
+                `;
+                lucide.createIcons();
+
+                // 2. Load Data
+                loadHistory();
+
+            } catch (e) { console.error(e); }
+        }
+
+        async function loadHistory() {
+            const tbody = document.getElementById('historyBody');
+            try {
+                const res = await fetch('sadigs_api_v3/tahfizh_report_api.php?action=get_history');
+                const result = await res.json();
+
+                if (result.success && result.data.length > 0) {
+                    tbody.innerHTML = result.data.map(row => `
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 font-medium">${row.report_date}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-800">${row.student_name}</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">
+                                <div class="font-bold text-teal-700">${row.last_surah_name}</div>
+                                <div class="text-xs text-gray-500">Ayat ${row.last_ayah_number} (Juz ${row.last_juz_number})</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                <span class="px-2 py-1 rounded text-xs font-bold ${getGradeColor(row.fluency_grade)}">${row.fluency_grade || '-'}</span>
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-600 italic max-w-xs truncate">${row.musyrif_notes || '-'}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${row.teacher_name || 'Musyrif'}</td>
+                        </tr>
+                    `).join('');
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-10 text-center text-gray-500">
+                        <div class="flex flex-col items-center justify-center gap-2">
+                            <i data-lucide="inbox" class="w-10 h-10 text-gray-300"></i>
+                            <p>${result.message || 'Belum ada data riwayat hafalan.'}</p>
+                        </div>
+                    </td></tr>`;
+                    lucide.createIcons();
+                }
+            } catch (e) {
+                tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-10 text-center text-red-500">Gagal memuat data.</td></tr>';
+            }
+        }
+
+        function getGradeColor(grade) {
+            if(grade === 'A') return 'bg-green-100 text-green-800';
+            if(grade === 'B') return 'bg-blue-100 text-blue-800';
+            if(grade === 'C') return 'bg-yellow-100 text-yellow-800';
+            return 'bg-red-100 text-red-800';
+        }
+
+        initPage();
+    </script>
+</body>
+</html>

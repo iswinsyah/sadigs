@@ -4,8 +4,8 @@ require_once 'db_connect.php';
 
 if (session_status() === PHP_SESSION_NONE) session_start();
 // Perbaikan Izin: Izinkan Musyrif, Ustadz, Ustadzah, Kepala Asrama
-$allowed_roles = ['Musyrif', 'Musyrifah', 'Ustadz', 'Ustadzah', 'Kepala Asrama Putra', 'Kepala Asrama Putri'];
-if (!isset($_SESSION['user_id']) || empty(array_intersect($allowed_roles, $_SESSION['roles'] ?? []))) {
+$allowed_roles = ['Musyrif', 'Musyrifah', 'Ustadz', 'Ustadzah', 'Kepala Asrama Putra', 'Kepala Asrama Putri', 'Walisantri', 'Santri Rijal', "Santri Nisa'"];
+if (!isset($_SESSION['user_id'])) {
     sendJSONResponse(['success' => false, 'message' => 'Akses ditolak. Anda tidak memiliki izin input tahfidz.'], 403);
 }
 
@@ -13,18 +13,60 @@ $pdo = getDBConnection();
 $musyrif_id = $_SESSION['user_id'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    $student_id = $_GET['student_id'] ?? null;
-    $report_date = $_GET['date'] ?? null;
+    $action = $_GET['action'] ?? 'get_single';
 
-    if (!$student_id || !$report_date) {
-        sendJSONResponse(['success' => false, 'message' => 'ID Santri dan tanggal diperlukan.'], 400);
-    }
+    if ($action === 'get_history') {
+        // LOGIKA RIWAYAT (Untuk Walisantri, Santri, & Musyrif)
+        $user_id = $_SESSION['user_id'];
+        $roles = $_SESSION['roles'] ?? [];
+        $username = $_SESSION['username'];
 
-    try {
+        try {
+            if (in_array('Walisantri', $roles)) {
+                // Walisantri: Cari anak berdasarkan parent_username
+                $stmtChild = $pdo->prepare("SELECT user_id FROM users WHERE user_id IN (SELECT user_id FROM student_details WHERE parent_username = ?)");
+                $stmtChild->execute([$username]);
+                $children = $stmtChild->fetchAll(PDO::FETCH_COLUMN);
+                
+                if (empty($children)) {
+                    sendJSONResponse(['success' => true, 'data' => [], 'message' => 'Belum ada santri yang terhubung. Hubungi admin untuk menautkan akun.']);
+                }
+                
+                $placeholders = implode(',', array_fill(0, count($children), '?'));
+                $sql = "SELECT r.*, u.full_name as student_name, t.full_name as teacher_name 
+                        FROM tahfizh_reports r 
+                        JOIN users u ON r.student_id = u.user_id 
+                        LEFT JOIN users t ON r.musyrif_id = t.user_id
+                        WHERE r.student_id IN ($placeholders) 
+                        ORDER BY r.report_date DESC LIMIT 50";
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute($children);
+                sendJSONResponse(['success' => true, 'data' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+
+            } else {
+                // Santri / Musyrif (Lihat berdasarkan parameter atau diri sendiri)
+                $target_id = $_GET['student_id'] ?? $user_id;
+                
+                $sql = "SELECT r.*, u.full_name as student_name, t.full_name as teacher_name 
+                        FROM tahfizh_reports r 
+                        JOIN users u ON r.student_id = u.user_id 
+                        LEFT JOIN users t ON r.musyrif_id = t.user_id
+                        WHERE r.student_id = ? 
+                        ORDER BY r.report_date DESC LIMIT 50";
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute([$target_id]);
+                sendJSONResponse(['success' => true, 'data' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+            }
+        } catch (Exception $e) {
+            sendJSONResponse(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    } else {
+        // LOGIKA SINGLE REPORT (Existing)
+        $student_id = $_GET['student_id'] ?? null;
+        $report_date = $_GET['date'] ?? null;
         $stmt = $pdo->prepare("SELECT * FROM tahfizh_reports WHERE student_id = ? AND report_date = ?");
         $stmt->execute([$student_id, $report_date]);
-        $data = $stmt->fetch(PDO::FETCH_ASSOC);
-        sendJSONResponse(['success' => true, 'data' => $data ?: null]);
+        sendJSONResponse(['success' => true, 'data' => $stmt->fetch(PDO::FETCH_ASSOC) ?: null]);
     } catch (Exception $e) {
         sendJSONResponse(['success' => false, 'message' => $e->getMessage()], 500);
     }
