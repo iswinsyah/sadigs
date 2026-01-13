@@ -9,6 +9,23 @@ try {
     die("Gagal koneksi database: " . $e->getMessage());
 }
 
+// --- AUTO-CREATE TABLES (Jaring Pengaman) ---
+$pdo->exec("CREATE TABLE IF NOT EXISTS menus (
+    menu_id VARCHAR(50) PRIMARY KEY,
+    menu_name VARCHAR(100) NOT NULL,
+    category_id VARCHAR(50),
+    icon VARCHAR(50),
+    link VARCHAR(255)
+)");
+
+$pdo->exec("CREATE TABLE IF NOT EXISTS menu_permissions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    role_name VARCHAR(50) NOT NULL,
+    menu_id VARCHAR(100) NOT NULL,
+    is_allowed TINYINT(1) DEFAULT 0,
+    UNIQUE KEY unique_perm (role_name, menu_id)
+)");
+
 // Daftar Menu Baru yang ingin didaftarkan
 $menuDetails = [
     'navFormulirPembayaran' => 'Formulir Pembayaran',
@@ -52,8 +69,8 @@ foreach ($allRoles as $role) {
             // 2. Jika belum ada, Insert
             // Default: Hanya Ketua Yayasan yang otomatis aktif (1), lainnya non-aktif (0)
             $canView = ($role === 'Ketua Yayasan') ? 1 : 0;
-            
-            $insert = $pdo->prepare("INSERT INTO menu_permissions (role_name, menu_id, can_view) VALUES (?, ?, ?)");
+
+            $insert = $pdo->prepare("INSERT INTO menu_permissions (role_name, menu_id, is_allowed) VALUES (?, ?, ?)");
             $insert->execute([$role, $menuId, $canView]);
             
             echo "<li style='color: green;'>Berhasil menambahkan: <b>$menuId</b> untuk role <b>$role</b> (Akses: $canView)</li>";
