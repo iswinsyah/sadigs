@@ -35,7 +35,8 @@ try {
             JOIN user_roles ur ON s.user_id = ur.user_id
             LEFT JOIN mentoring_assignments ma ON s.user_id = ma.student_id
             LEFT JOIN users m ON ma.musyrif_id = m.user_id
-            WHERE ur.role_name IN ('Santri', 'Santri Rijal', 'Santri Nisa\'') AND ur.status = 'approved'
+            WHERE ur.role_name IN ('Santri Rijal', 'Santri Nisa\'') AND ur.status = 'approved'
+            GROUP BY s.user_id
             ORDER BY s.full_name ASC";
 
     $stmt = $pdo->prepare($sql);
