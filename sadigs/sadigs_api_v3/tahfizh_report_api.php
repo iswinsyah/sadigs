@@ -3,8 +3,10 @@ header('Content-Type: application/json');
 require_once 'db_connect.php';
 
 if (session_status() === PHP_SESSION_NONE) session_start();
-if (!isset($_SESSION['user_id']) || !in_array('Musyrif', $_SESSION['roles'] ?? [])) {
-    sendJSONResponse(['success' => false, 'message' => 'Akses ditolak. Hanya untuk Musyrif.'], 403);
+// Perbaikan Izin: Izinkan Musyrif, Ustadz, Ustadzah, Kepala Asrama
+$allowed_roles = ['Musyrif', 'Musyrifah', 'Ustadz', 'Ustadzah', 'Kepala Asrama Putra', 'Kepala Asrama Putri'];
+if (!isset($_SESSION['user_id']) || empty(array_intersect($allowed_roles, $_SESSION['roles'] ?? []))) {
+    sendJSONResponse(['success' => false, 'message' => 'Akses ditolak. Anda tidak memiliki izin input tahfidz.'], 403);
 }
 
 $pdo = getDBConnection();
@@ -31,11 +33,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $input = json_decode(file_get_contents('php://input'), true);
 
-    // --- Security Check: Pastikan Musyrif hanya mengisi untuk santri binaannya ---
-    $stmtCheck = $pdo->prepare("SELECT COUNT(*) FROM mentoring_assignments WHERE student_id = ? AND musyrif_id = ?");
-    $stmtCheck->execute([$input['student_id'], $musyrif_id]);
-    if ($stmtCheck->fetchColumn() == 0) {
-        sendJSONResponse(['success' => false, 'message' => 'Akses ditolak. Anda bukan pembimbing santri ini.'], 403);
+    // Validasi Dasar
+    if (empty($input['student_id']) || empty($input['last_surah_name'])) {
+        sendJSONResponse(['success' => false, 'message' => 'Nama Santri dan Nama Surat wajib diisi.'], 400);
+        exit;
     }
 
     try {

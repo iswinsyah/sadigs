@@ -3,216 +3,184 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form Laporan Tahfizh | SADIGS 3.0</title>
+    <title>Input Laporan Tahfidz | SADIGS 3.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
-    <style>body { font-family: 'Inter', sans-serif; } input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { opacity: 1; }</style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>body{font-family:'Inter',sans-serif;}</style>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans antialiased">
-    <div class="flex h-screen overflow-hidden">
-        <aside class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col hidden lg:flex">
-            <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-kedua text-white">
-                <img src="https://raw.githubusercontent.com/villaqurankotabatu-commits/gambarvqbm/f44bf009884af11aba2c967a2401026225f7b02b/vila%20quran.png" alt="Logo" class="h-9">
-            </div>
-            <div class="p-6">
-                <a href="dashboard.html" class="flex items-center gap-2 text-gray-600 hover:text-utama transition">
-                    <i data-lucide="arrow-left" class="w-5 h-5"></i> Kembali ke Dashboard
-                </a>
-            </div>
-        </aside>
-        <main class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative">
-            <header class="mb-8">
-                <h2 class="text-2xl lg:text-3xl font-bold text-gray-800">Form Laporan Tahfizh</h2>
-                <p class="text-gray-500 text-sm mt-1">Isi laporan capaian hafalan untuk santri binaan Anda.</p>
-            </header>
-            <div class="max-w-3xl bg-white p-8 rounded-xl shadow-sm border border-gray-100">
-                <form id="reportForm" class="space-y-8">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label for="student_id_selector" class="block text-sm font-medium text-gray-700 mb-1">Pilih Santri</label>
-                            <select id="student_id_selector" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-utama outline-none bg-white">
-                                <option value="">Memuat santri...</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="report_date" class="block text-sm font-medium text-gray-700 mb-1">Tanggal Laporan</label>
-                            <input type="date" id="report_date" name="report_date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-utama outline-none">
-                        </div>
-                    </div>
 
-                    <!-- Capaian Kuantitatif -->
-                    <div class="border-t pt-6">
-                        <h3 class="text-lg font-bold text-kedua mb-4">Capaian Setoran Baru</h3>
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+    <div class="flex h-screen overflow-hidden">
+        <!-- SIDEBAR -->
+        <aside id="sidebar" class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col hidden lg:flex">
+            <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-teal-600 text-white">
+                <h1 class="text-2xl font-extrabold tracking-wider">SADIGS</h1>
+            </div>
+            <div class="p-6 border-b border-gray-100 bg-teal-50">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-teal-200 flex items-center justify-center text-teal-800 font-bold text-lg shadow-sm"><span id="userInitial">U</span></div>
+                    <div class="overflow-hidden">
+                        <p id="sidebarUsername" class="font-bold text-gray-800 text-sm truncate">Memuat...</p>
+                        <p id="sidebarRole" class="text-xs text-gray-500 truncate font-medium">Role...</p>
+                    </div>
+                </div>
+            </div>
+            <nav id="sidebarNav" class="flex-1 overflow-y-auto py-4 px-3 space-y-2">
+                <!-- Menu akan di-render oleh JS -->
+                <div class="text-center text-gray-400 text-sm mt-4">Memuat menu...</div>
+            </nav>
+        </aside>
+
+        <!-- KONTEN UTAMA -->
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative">
+            <div class="max-w-3xl mx-auto">
+                <!-- Header -->
+                <div class="flex items-center gap-3 mb-6">
+                    <a href="dashboard.html" class="p-2 bg-white rounded-full shadow-sm hover:bg-gray-100 transition"><i data-lucide="arrow-left" class="w-5 h-5 text-gray-600"></i></a>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">Laporan Tahfidz</h1>
+                        <p class="text-sm text-gray-500">Input setoran hafalan santri</p>
+                    </div>
+                </div>
+
+                <!-- Form Card -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <form id="reportForm" class="space-y-6">
+                        
+                        <!-- Pilih Santri & Tanggal -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Nama Surat</label>
-                                <select name="last_surah_name" id="last_surah_name" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white">
-                                    <option value="">- Pilih Surat -</option>
+                                <label class="block text-sm font-bold text-gray-700 mb-1">Nama Santri <span class="text-red-500">*</span></label>
+                                <select name="student_id" id="studentSelect" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 bg-white" required>
+                                    <option value="">-- Pilih Santri --</option>
+                                    <option disabled>Memuat data...</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Ayat</label>
-                                <input type="number" name="last_ayah_number" class="w-full px-3 py-2 border border-gray-300 rounded-lg" placeholder="20">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Juz</label>
-                                <input type="number" name="last_juz_number" class="w-full px-3 py-2 border border-gray-300 rounded-lg" placeholder="30">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Halaman</label>
-                                <input type="number" name="last_page_number" class="w-full px-3 py-2 border border-gray-300 rounded-lg" placeholder="583">
+                                <label class="block text-sm font-bold text-gray-700 mb-1">Tanggal Laporan <span class="text-red-500">*</span></label>
+                                <input type="date" name="report_date" id="reportDate" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500" required>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Penilaian Kualitatif -->
-                    <div class="border-t pt-6">
-                        <h3 class="text-lg font-bold text-kedua mb-4">Penilaian Kualitatif</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Kelancaran (Fluency)</label>
-                                <select name="fluency_grade" class="grade-dropdown w-full px-3 py-2 border border-gray-300 rounded-lg bg-white"></select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Tajwid & Makhraj</label>
-                                <select name="tajwid_grade" class="grade-dropdown w-full px-3 py-2 border border-gray-300 rounded-lg bg-white"></select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Adab & Perilaku</label>
-                                <select name="adab_grade" class="grade-dropdown w-full px-3 py-2 border border-gray-300 rounded-lg bg-white"></select>
+                        <!-- Detail Hafalan -->
+                        <div class="border-t border-gray-100 pt-4">
+                            <h3 class="text-teal-700 font-bold mb-3">Capaian Hafalan</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-700 mb-1">Nama Surat <span class="text-red-500">*</span></label>
+                                    <input type="text" name="last_surah_name" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500" placeholder="Contoh: Al-Baqarah" required>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-700 mb-1">Ayat Terakhir <span class="text-red-500">*</span></label>
+                                    <input type="number" name="last_ayah_number" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500" placeholder="Contoh: 10" required>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-700 mb-1">Juz</label>
+                                    <input type="number" name="last_juz_number" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500" placeholder="Contoh: 1">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-700 mb-1">Halaman</label>
+                                    <input type="number" name="last_page_number" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500" placeholder="Contoh: 20">
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Catatan Naratif -->
-                    <div class="border-t pt-6">
-                        <h3 class="text-lg font-bold text-kedua mb-4">Catatan Tambahan</h3>
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Laporan Muraja'ah (Pengulangan)</label>
-                                <textarea name="murajaah_notes" rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Contoh: Juz 30 lancar, Juz 29 perlu penguatan."></textarea>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Catatan Umum & Rekomendasi</label>
-                                <textarea name="musyrif_notes" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Contoh: Ananda Fulan sangat bersemangat minggu ini. Perlu lebih fokus pada hukum bacaan Mad."></textarea>
+                        <!-- Penilaian -->
+                        <div class="border-t border-gray-100 pt-4">
+                            <h3 class="text-teal-700 font-bold mb-3">Penilaian Kualitas</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-700 mb-1">Kelancaran</label>
+                                    <select name="fluency_grade" class="w-full p-3 border border-gray-300 rounded-lg bg-white"><option value="A">A (Sangat Baik)</option><option value="B">B (Baik)</option><option value="C">C (Cukup)</option><option value="D">D (Kurang)</option></select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-700 mb-1">Tajwid</label>
+                                    <select name="tajwid_grade" class="w-full p-3 border border-gray-300 rounded-lg bg-white"><option value="A">A (Sangat Baik)</option><option value="B">B (Baik)</option><option value="C">C (Cukup)</option><option value="D">D (Kurang)</option></select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-700 mb-1">Adab</label>
+                                    <select name="adab_grade" class="w-full p-3 border border-gray-300 rounded-lg bg-white"><option value="A">A (Sangat Baik)</option><option value="B">B (Baik)</option><option value="C">C (Cukup)</option><option value="D">D (Kurang)</option></select>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="flex justify-end pt-4">
-                        <button type="submit" id="saveBtn" class="bg-utama hover:bg-kedua text-white font-bold py-3 px-8 rounded-lg transition shadow-md flex items-center gap-2">
-                            <i data-lucide="save" class="w-5 h-5"></i> Simpan Laporan
+                        <!-- Catatan -->
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Catatan Musyrif (Opsional)</label>
+                            <textarea name="musyrif_notes" rows="2" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500" placeholder="Catatan perkembangan santri..."></textarea>
+                        </div>
+
+                        <!-- Tombol Submit -->
+                        <button type="submit" id="submitBtn" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-4 rounded-xl shadow-lg transform transition active:scale-95 flex justify-center items-center gap-2 text-lg">
+                            <i data-lucide="save" class="w-6 h-6"></i> SIMPAN LAPORAN
                         </button>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </main>
     </div>
 
     <script>
         lucide.createIcons();
+        document.getElementById('reportDate').valueAsDate = new Date();
 
-        const surahList = [
-            "1. Al-Fatihah", "2. Al-Baqarah", "3. Ali 'Imran", "4. An-Nisa", "5. Al-Ma'idah", "6. Al-An'am", "7. Al-A'raf", "8. Al-Anfal", "9. At-Tawbah", "10. Yunus",
-            "11. Hud", "12. Yusuf", "13. Ar-Ra'd", "14. Ibrahim", "15. Al-Hijr", "16. An-Nahl", "17. Al-Isra'", "18. Al-Kahf", "19. Maryam", "20. Taha",
-            "21. Al-Anbiya'", "22. Al-Hajj", "23. Al-Mu'minun", "24. An-Nur", "25. Al-Furqan", "26. Asy-Syu'ara'", "27. An-Naml", "28. Al-Qasas", "29. Al-'Ankabut", "30. Ar-Rum",
-            "31. Luqman", "32. As-Sajdah", "33. Al-Ahzab", "34. Saba'", "35. Fatir", "36. Ya-Sin", "37. As-Saffat", "38. Sad", "39. Az-Zumar", "40. Ghafir",
-            "41. Fussilat", "42. Asy-Syura", "43. Az-Zukhruf", "44. Ad-Dukhan", "45. Al-Jasiyah", "46. Al-Ahqaf", "47. Muhammad", "48. Al-Fath", "49. Al-Hujurat", "50. Qaf",
-            "51. Az-Zariyat", "52. At-Tur", "53. An-Najm", "54. Al-Qamar", "55. Ar-Rahman", "56. Al-Waqi'ah", "57. Al-Hadid", "58. Al-Mujadilah", "59. Al-Hasyr", "60. Al-Mumtahanah",
-            "61. As-Saff", "62. Al-Jumu'ah", "63. Al-Munafiqun", "64. At-Tagabun", "65. At-Talaq", "66. At-Tahrim", "67. Al-Mulk", "68. Al-Qalam", "69. Al-Haqqah", "70. Al-Ma'arij",
-            "71. Nuh", "72. Al-Jinn", "73. Al-Muzzammil", "74. Al-Muddassir", "75. Al-Qiyamah", "76. Al-Insan", "77. Al-Mursalat", "78. An-Naba'", "79. An-Nazi'at", "80. 'Abasa",
-            "81. At-Takwir", "82. Al-Infitar", "83. Al-Mutaffifin", "84. Al-Insyiqaq", "85. Al-Buruj", "86. At-Tariq", "87. Al-A'la", "88. Al-Gasyiyah", "89. Al-Fajr", "90. Al-Balad",
-            "91. Asy-Syams", "92. Al-Lail", "93. Ad-Duha", "94. Asy-Syarh", "95. At-Tin", "96. Al-'Alaq", "97. Al-Qadr", "98. Al-Bayyinah", "99. Az-Zalzalah", "100. Al-'Adiyat",
-            "101. Al-Qari'ah", "102. At-Takasur", "103. Al-'Asr", "104. Al-Humazah", "105. Al-Fil", "106. Quraisy", "107. Al-Ma'un", "108. Al-Kausar", "109. Al-Kafirun", "110. An-Nasr",
-            "111. Al-Masad", "112. Al-Ikhlas", "113. Al-Falaq", "114. An-Nas"
-        ];
-
-        const gradeOptions = `
-            <option value="">- Pilih Nilai -</option>
-            <option value="A">A (Mumtaz)</option>
-            <option value="B">B (Jayyid)</option>
-            <option value="C">C (Aslaha)</option>
-            <option value="D">D ('Aadiy)</option>
-        `;
-        document.querySelectorAll('.grade-dropdown').forEach(select => select.innerHTML = gradeOptions);
-
-        const surahSelect = document.getElementById('last_surah_name');
-        surahList.forEach(surah => {
-            surahSelect.innerHTML += `<option value="${surah}">${surah}</option>`;
-        });
-
-        const studentSelector = document.getElementById('student_id_selector');
-        const dateInput = document.getElementById('report_date');
-        const form = document.getElementById('reportForm');
-
+        // 1. Load Sidebar & Session
         async function initPage() {
             try {
-                const studentsRes = await fetch('sadigs_api_v3/get_musyrif_students.php');
-                const studentsResult = await studentsRes.json();
-                if (studentsResult.success && studentsResult.data.length > 0) {
-                    studentSelector.innerHTML = '<option value="">- Pilih Santri -</option>';
-                    studentsResult.data.forEach(student => {
-                        studentSelector.innerHTML += `<option value="${student.user_id}">${student.full_name || student.username}</option>`;
-                    });
-                } else {
-                    studentSelector.innerHTML = '<option value="">Tidak ada santri binaan</option>';
-                    studentSelector.disabled = true;
-                }
-            } catch(e) {
-                studentSelector.innerHTML = '<option value="">Gagal memuat santri</option>';
-                studentSelector.disabled = true;
-            }
+                const sessionRes = await fetch('sadigs_api_v3/session_check.php');
+                const sessionData = await sessionRes.json();
+                if (!sessionData.success) { window.location.href = 'index.html'; return; }
 
-            dateInput.value = new Date().toISOString().split('T')[0];
-            
-            studentSelector.addEventListener('change', () => loadReportData());
-            dateInput.addEventListener('change', () => loadReportData());
+                document.getElementById('sidebarUsername').textContent = sessionData.username;
+                document.getElementById('userInitial').textContent = sessionData.username.charAt(0).toUpperCase();
+                document.getElementById('sidebarRole').textContent = sessionData.roles.join(', ');
+
+                // Render Sidebar Sederhana
+                const nav = document.getElementById('sidebarNav');
+                nav.innerHTML = `
+                    <div class="p-2 space-y-1">
+                        <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-teal-50 hover:text-teal-600 rounded-md font-medium"><i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard</a>
+                        <a href="tahfizh_report_form.html" class="flex items-center gap-3 px-3 py-2 bg-teal-50 text-teal-700 rounded-md font-bold"><i data-lucide="book-open" class="w-5 h-5"></i> Input Tahfidz</a>
+                        <a href="attendance.html" class="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-teal-50 hover:text-teal-600 rounded-md font-medium"><i data-lucide="map-pin" class="w-5 h-5"></i> Absensi</a>
+                    </div>
+                `;
+                lucide.createIcons();
+
+                // Load Data Santri
+                loadStudents();
+
+            } catch (e) { console.error(e); }
         }
 
-        async function loadReportData() {
-            const studentId = studentSelector.value;
-            const date = dateInput.value;
-            
-            form.reset(); // Selalu reset form saat ganti
-            dateInput.value = date; // Kembalikan tanggal
-            studentSelector.value = studentId; // Kembalikan pilihan santri
-
-            if (!studentId || !date) return;
-
+        // 2. Load Dropdown Santri
+        async function loadStudents() {
             try {
-                const res = await fetch(`sadigs_api_v3/tahfizh_report_api.php?student_id=${studentId}&date=${date}`);
+                const res = await fetch('sadigs_api_v3/class_management_api.php?action=get_students');
                 const result = await res.json();
+                const select = document.getElementById('studentSelect');
                 
                 if (result.success && result.data) {
-                    const data = result.data;
-                    for (const key in data) {
-                        const el = form.elements[key];
-                        if (el) {
-                           el.value = data[key];
-                        }
-                    }
+                    select.innerHTML = '<option value="">-- Pilih Santri --</option>';
+                    result.data.forEach(s => {
+                        const option = document.createElement('option');
+                        option.value = s.user_id;
+                        option.textContent = `${s.full_name} (${s.grade})`;
+                        select.appendChild(option);
+                    });
                 }
-            } catch (e) {
-                console.error("Gagal memuat data laporan:", e);
-            }
+            } catch (e) { console.error("Gagal memuat santri", e); }
         }
 
-        form.addEventListener('submit', async (e) => {
+        // 3. Handle Submit
+        document.getElementById('reportForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const studentId = studentSelector.value;
-            if (!studentId) {
-                alert('Silakan pilih santri terlebih dahulu.');
-                return;
-            }
-
-            const btn = document.getElementById('saveBtn');
-            const originalText = btn.innerHTML;
+            const btn = document.getElementById('submitBtn');
+            const originalHTML = btn.innerHTML;
             btn.disabled = true; btn.innerHTML = 'Menyimpan...';
 
             const formData = new FormData(e.target);
             const data = Object.fromEntries(formData.entries());
-            data.student_id = studentId; // Tambahkan student_id ke data
 
             try {
                 const res = await fetch('sadigs_api_v3/tahfizh_report_api.php', {
@@ -221,15 +189,19 @@
                     body: JSON.stringify(data)
                 });
                 const result = await res.json();
+                
                 alert(result.message);
-                if(!result.success) {
-                    // Jika gagal, jangan reload, biarkan user perbaiki
+                
+                if (result.success) {
+                    e.target.reset(); // Reset Form setelah sukses
+                    document.getElementById('reportDate').valueAsDate = new Date(); // Kembalikan tanggal hari ini
+                    document.getElementById('studentSelect').focus(); // Fokus kembali ke santri
                 }
-            } catch (error) {
+            } catch (e) {
                 alert('Terjadi kesalahan koneksi.');
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = originalText;
+                btn.innerHTML = originalHTML;
             }
         });
 
