@@ -43,8 +43,13 @@
                             <p class="text-sm text-gray-500">Pantau perkembangan tahfidz secara real-time.</p>
                         </div>
                     </div>
-                    <div id="managementActions" class="hidden">
-                        <a href="tahfizh_recap.html" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2 shadow-sm"><i data-lucide="bar-chart-2" class="w-4 h-4"></i> Lihat Grafik Rekap</a>
+                    <div class="flex gap-2">
+                        <button onclick="exportExcel()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2 shadow-sm transition transform active:scale-95">
+                            <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Export Excel
+                        </button>
+                        <div id="managementActions" class="hidden">
+                            <a href="tahfizh_recap.html" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2 shadow-sm"><i data-lucide="bar-chart-2" class="w-4 h-4"></i> Grafik</a>
+                        </div>
                     </div>
                 </div>
 
@@ -149,6 +154,44 @@
             if(grade === 'B') return 'bg-blue-100 text-blue-800';
             if(grade === 'C') return 'bg-yellow-100 text-yellow-800';
             return 'bg-red-100 text-red-800';
+        }
+
+        async function exportExcel() {
+            try {
+                const btn = document.querySelector('button[onclick="exportExcel()"]');
+                const originalContent = btn.innerHTML;
+                btn.disabled = true; btn.innerHTML = '<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Memproses...';
+                lucide.createIcons();
+
+                const res = await fetch('sadigs_api_v3/tahfizh_report_api.php?action=get_history&mode=export');
+                const result = await res.json();
+
+                if (result.success && result.data.length > 0) {
+                    // Buat CSV
+                    const headers = ['Tanggal', 'Nama Santri', 'Surat', 'Ayat', 'Juz', 'Halaman', 'Kelancaran', 'Tajwid', 'Adab', 'Catatan', 'Musyrif'];
+                    const csvContent = [
+                        headers.join(','),
+                        ...result.data.map(row => [
+                            `"${row.report_date}"`, `"${row.student_name}"`, `"${row.last_surah_name}"`, `"${row.last_ayah_number}"`, 
+                            `"${row.last_juz_number}"`, `"${row.last_page_number}"`, `"${row.fluency_grade}"`, `"${row.tajwid_grade}"`, 
+                            `"${row.adab_grade}"`, `"${(row.musyrif_notes || '').replace(/"/g, '""')}"`, `"${row.teacher_name}"`
+                        ].join(','))
+                    ].join('\n');
+
+                    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                    const link = document.createElement("a");
+                    link.href = URL.createObjectURL(blob);
+                    link.download = "Laporan_Tahfidz_" + new Date().toISOString().slice(0,10) + ".csv";
+                    link.click();
+                } else {
+                    alert('Tidak ada data untuk diexport.');
+                }
+                btn.disabled = false; btn.innerHTML = originalContent;
+                lucide.createIcons();
+            } catch(e) { 
+                console.error(e); alert('Gagal export data.'); 
+                document.querySelector('button[onclick="exportExcel()"]').disabled = false;
+            }
         }
 
         initPage();

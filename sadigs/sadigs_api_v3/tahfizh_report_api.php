@@ -67,7 +67,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $sql .= " WHERE " . implode(' AND ', $where);
             }
 
-            $sql .= " ORDER BY r.report_date DESC LIMIT 100";
+            // Cek apakah mode export (ambil semua data tanpa limit)
+            if (isset($_GET['mode']) && $_GET['mode'] === 'export') {
+                $sql .= " ORDER BY r.report_date DESC"; 
+            } else {
+                // Mode tampilan biasa (batasi 100 agar ringan)
+                $sql .= " ORDER BY r.report_date DESC LIMIT 100";
+            }
             
             $stmt = $pdo->prepare($sql);
             $stmt->execute($params);
