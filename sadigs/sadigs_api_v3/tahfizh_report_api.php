@@ -21,42 +21,72 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $roles = $_SESSION['roles'] ?? [];
         $username = $_SESSION['username'];
 
+        // Deteksi Peran
+        $is_santri = !empty(array_intersect(['Santri', 'Santri Rijal', "Santri Nisa'"], $roles));
+        $is_walisantri = in_array('Walisantri', $roles);
+        $is_musyrif = !empty(array_intersect(['Musyrif', 'Musyrifah'], $roles));
+        $is_management = !empty(array_intersect(['Ketua Yayasan', 'Kepala Sekolah', 'Kepala Asrama Putra', 'Kepala Asrama Putri'], $roles));
+
         try {
-            if (in_array('Walisantri', $roles)) {
-                // Walisantri: Cari anak berdasarkan parent_username
-                $stmtChild = $pdo->prepare("SELECT user_id FROM users WHERE user_id IN (SELECT user_id FROM student_details WHERE parent_username = ?)");
+            $sql = "SELECT r.*, u.full_name as student_name, t.full_name as teacher_name 
+                    FROM tahfizh_reports r 
+                    JOIN users u ON r.student_id = u.user_id 
+                    LEFT JOIN users t ON r.musyrif_id = t.user_id ";
+            
+            $where = [];
+            $params = [];
+
+            if ($is_management) {
+                // Manajemen: Lihat semua (tanpa filter WHERE)
+            } elseif ($is_walisantri) {
+                // Walisantri: Cari ID anak
+                $stmtChild = $pdo->prepare("SELECT user_id FROM student_details WHERE parent_username = ?");
                 $stmtChild->execute([$username]);
                 $children = $stmtChild->fetchAll(PDO::FETCH_COLUMN);
                 
                 if (empty($children)) {
-                    sendJSONResponse(['success' => true, 'data' => [], 'message' => 'Belum ada santri yang terhubung. Hubungi admin untuk menautkan akun.']);
+                    sendJSONResponse(['success' => true, 'data' => [], 'message' => 'Belum ada data anak.']);
+                    exit;
                 }
-                
                 $placeholders = implode(',', array_fill(0, count($children), '?'));
-                $sql = "SELECT r.*, u.full_name as student_name, t.full_name as teacher_name 
-                        FROM tahfizh_reports r 
-                        JOIN users u ON r.student_id = u.user_id 
-                        LEFT JOIN users t ON r.musyrif_id = t.user_id
-                        WHERE r.student_id IN ($placeholders) 
-                        ORDER BY r.report_date DESC LIMIT 50";
-                $stmt = $pdo->prepare($sql);
-                $stmt->execute($children);
-                sendJSONResponse(['success' => true, 'data' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
-
-            } else {
-                // Santri / Musyrif (Lihat berdasarkan parameter atau diri sendiri)
-                $target_id = $_GET['student_id'] ?? $user_id;
-                
-                $sql = "SELECT r.*, u.full_name as student_name, t.full_name as teacher_name 
-                        FROM tahfizh_reports r 
-                        JOIN users u ON r.student_id = u.user_id 
-                        LEFT JOIN users t ON r.musyrif_id = t.user_id
-                        WHERE r.student_id = ? 
-                        ORDER BY r.report_date DESC LIMIT 50";
-                $stmt = $pdo->prepare($sql);
-                $stmt->execute([$target_id]);
-                sendJSONResponse(['success' => true, 'data' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+                $where[] = "r.student_id IN ($placeholders)";
+                $params = $children;
+            } elseif ($is_musyrif) {
+                // Musyrif: Lihat santri binaannya (via mentoring_assignments)
+                // ATAU laporan yang dia input sendiri (r.musyrif_id = ?)
+                // Kita gunakan logika: Santri binaan
+                $where[] = "r.student_id IN (SELECT student_id FROM mentoring_assignments WHERE musyrif_id = ?)";
+                $params[] = $user_id;
+            } elseif ($is_santri) {
+                // Santri: Hanya lihat punya sendiri (KUNCI KEAMANAN)
+                $where[] = "r.student_id = ?";
+                $params[] = $user_id;
             }
+
+            if (!empty($where)) {
+                $sql .= " WHERE " . implode(' AND ', $where);
+            }
+
+            $sql .= " ORDER BY r.report_date DESC LIMIT 100";
+            
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($params);
+            sendJSONResponse(['success' => true, 'data' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+
+        } catch (Exception $e) {
+            sendJSONResponse(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    } elseif ($action === 'get_recap_stats') {
+        // API untuk Grafik Rekapitulasi (Hanya Manajemen)
+        try {
+            // Statistik Sebaran Juz (Berdasarkan laporan terakhir setiap santri)
+            $sql = "SELECT last_juz_number as juz, COUNT(*) as count 
+                    FROM tahfizh_reports 
+                    WHERE id IN (SELECT MAX(id) FROM tahfizh_reports GROUP BY student_id)
+                    GROUP BY last_juz_number 
+                    ORDER BY last_juz_number ASC";
+            $stmt = $pdo->query($sql);
+            sendJSONResponse(['success' => true, 'data' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
         } catch (Exception $e) {
             sendJSONResponse(['success' => false, 'message' => $e->getMessage()], 500);
         }

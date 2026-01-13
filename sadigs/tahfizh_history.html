@@ -43,6 +43,9 @@
                             <p class="text-sm text-gray-500">Pantau perkembangan tahfidz secara real-time.</p>
                         </div>
                     </div>
+                    <div id="managementActions" class="hidden">
+                        <a href="tahfizh_recap.html" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2 shadow-sm"><i data-lucide="bar-chart-2" class="w-4 h-4"></i> Lihat Grafik Rekap</a>
+                    </div>
                 </div>
 
                 <!-- Tabel Riwayat -->
@@ -82,6 +85,12 @@
                 document.getElementById('sidebarUsername').textContent = sessionData.username;
                 document.getElementById('userInitial').textContent = sessionData.username.charAt(0).toUpperCase();
                 document.getElementById('sidebarRole').textContent = sessionData.roles.join(', ');
+
+                // Cek jika Manajemen, tampilkan tombol grafik
+                const managementRoles = ['Ketua Yayasan', 'Kepala Sekolah', 'Kepala Asrama Putra', 'Kepala Asrama Putri'];
+                if (sessionData.roles.some(r => managementRoles.includes(r))) {
+                    document.getElementById('managementActions').classList.remove('hidden');
+                }
 
                 // Render Sidebar Simple
                 const nav = document.getElementById('sidebarNav');

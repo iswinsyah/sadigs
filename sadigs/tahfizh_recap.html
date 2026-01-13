@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rekapitulasi Tahfidz | SADIGS 3.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>body{font-family:'Inter',sans-serif;}</style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+
+    <div class="flex h-screen overflow-hidden">
+        <aside id="sidebar" class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col hidden lg:flex">
+            <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-teal-600 text-white">
+                <h1 class="text-2xl font-extrabold tracking-wider">SADIGS</h1>
+            </div>
+            <div class="p-6">
+                <a href="dashboard.html" class="flex items-center gap-2 text-gray-600 hover:text-teal-600 transition">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i> Kembali ke Dashboard
+                </a>
+            </div>
+        </aside>
+
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative">
+            <div class="max-w-6xl mx-auto">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">Rekapitulasi Capaian Tahfidz</h1>
+                        <p class="text-sm text-gray-500">Grafik sebaran hafalan santri berdasarkan laporan terakhir.</p>
+                    </div>
+                    <button onclick="window.print()" class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-bold hover:bg-gray-50 flex items-center gap-2">
+                        <i data-lucide="printer" class="w-4 h-4"></i> Cetak Laporan
+                    </button>
+                </div>
+
+                <!-- Grafik -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mb-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">Sebaran Capaian Juz Santri</h3>
+                    <div class="h-96">
+                        <canvas id="juzChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Info -->
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-start gap-3">
+                    <i data-lucide="info" class="w-5 h-5 text-blue-600 mt-0.5"></i>
+                    <div>
+                        <h4 class="font-bold text-blue-800 text-sm">Informasi Data</h4>
+                        <p class="text-sm text-blue-700">Data di atas diambil berdasarkan laporan setoran terakhir setiap santri. Santri yang belum pernah menyetor hafalan tidak masuk dalam grafik ini.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        async function initPage() {
+            // Cek Sesi
+            const sessionRes = await fetch('sadigs_api_v3/session_check.php');
+            const sessionData = await sessionRes.json();
+            if (!sessionData.success) { window.location.href = 'index.html'; return; }
+
+            // Cek Izin (Hanya Manajemen)
+            const allowed = ['Ketua Yayasan', 'Kepala Sekolah', 'Kepala Asrama Putra', 'Kepala Asrama Putri'];
+            const hasAccess = sessionData.roles.some(r => allowed.includes(r));
+            if (!hasAccess) {
+                alert('Akses ditolak. Halaman ini khusus untuk Manajemen.');
+                window.location.href = 'dashboard.html';
+                return;
+            }
+
+            loadChart();
+        }
+
+        async function loadChart() {
+            try {
+                const res = await fetch('sadigs_api_v3/tahfizh_report_api.php?action=get_recap_stats');
+                const result = await res.json();
+
+                if (result.success && result.data) {
+                    const labels = result.data.map(d => 'Juz ' + d.juz);
+                    const counts = result.data.map(d => d.count);
+
+                    const ctx = document.getElementById('juzChart').getContext('2d');
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Jumlah Santri',
+                                data: counts,
+                                backgroundColor: 'rgba(20, 184, 166, 0.7)',
+                                borderColor: 'rgba(20, 184, 166, 1)',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+                    });
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        initPage();
+    </script>
+</body>
+</html>
