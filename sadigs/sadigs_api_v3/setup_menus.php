@@ -9,6 +9,17 @@ try {
     die("Gagal koneksi database: " . $e->getMessage());
 }
 
+// --- AUTO-MIGRATE SCHEMA (Jaring Pengaman Hosting) ---
+try {
+    $check = $pdo->query("SHOW COLUMNS FROM menu_permissions LIKE 'can_view'");
+    if ($check->rowCount() > 0) {
+        $pdo->exec("ALTER TABLE menu_permissions CHANGE COLUMN can_view is_allowed TINYINT(1) DEFAULT 0");
+        echo "<p style='color:blue'>ℹ️ Auto-fix: Kolom 'can_view' diperbarui menjadi 'is_allowed'.</p>";
+    }
+} catch (Exception $e) {
+    // Abaikan jika tabel belum ada
+}
+
 // --- AUTO-CREATE TABLES (Jaring Pengaman) ---
 $pdo->exec("CREATE TABLE IF NOT EXISTS menus (
     menu_id VARCHAR(50) PRIMARY KEY,
