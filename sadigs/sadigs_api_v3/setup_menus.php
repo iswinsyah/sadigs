@@ -99,6 +99,23 @@ foreach (array_keys($menuDetails) as $menuId) {
 }
 echo "<li><b style='color:blue'>Info:</b> Hak akses Ketua Yayasan untuk menu baru telah dipastikan AKTIF.</li>";
 
+// --- FORCE UPDATE PERMISSIONS FOR TAHFIDZ (SANTRI & WALISANTRI) ---
+// Agar otomatis aktif tanpa perlu setting manual di Manajemen Akses
+$tahfidzPerms = [
+    'navViewTahfizh' => ['Walisantri', 'Santri', 'Santri Rijal', "Santri Nisa'", 'Musyrif', 'Musyrifah'],
+    'navInputTahfizh' => ['Musyrif', 'Musyrifah', 'Ustadz', 'Ustadzah'],
+    'navRekapTahfizh' => ['Ketua Yayasan', 'Kepala Sekolah', 'Kepala Asrama Putra', 'Kepala Asrama Putri']
+];
+
+foreach ($tahfidzPerms as $mId => $rList) {
+    foreach ($rList as $rName) {
+        // Gunakan INSERT ... ON DUPLICATE KEY UPDATE untuk memastikan permission aktif (1)
+        $pdo->prepare("INSERT INTO menu_permissions (role_name, menu_id, is_allowed) VALUES (?, ?, 1) ON DUPLICATE KEY UPDATE is_allowed = 1")
+            ->execute([$rName, $mId]);
+    }
+}
+echo "<li><b style='color:blue'>Info:</b> Hak akses Tahfidz untuk Santri, Walisantri, dan Musyrif telah diaktifkan otomatis.</li>";
+
 echo "</ul>";
 
 if ($count > 0) {
