@@ -39,14 +39,14 @@ $pdo->exec("CREATE TABLE IF NOT EXISTS menu_permissions (
 
 // Daftar Menu Baru yang ingin didaftarkan
 $menuDetails = [
-    'navFormulirPembayaran' => 'Formulir Pembayaran',
-    'navValidasiPembayaran' => 'Validasi Pembayaran',
-    'navTabelPembayaran' => 'Data Pembayaran',
-    'navRekapPembayaran' => 'Rekap Keuangan',
+    'navFormulirPembayaran' => ['name' => 'Formulir Pembayaran', 'link' => 'payment_form.html', 'icon' => 'credit-card'],
+    'navValidasiPembayaran' => ['name' => 'Validasi Pembayaran', 'link' => 'payment_validation.html', 'icon' => 'check-circle-2'],
+    'navTabelPembayaran' => ['name' => 'Data Pembayaran', 'link' => 'payment_list.html', 'icon' => 'banknote'],
+    'navRekapPembayaran' => ['name' => 'Rekap Keuangan', 'link' => 'payment_recap.html', 'icon' => 'pie-chart'],
     // Menu Tahfidz Baru
-    'navInputTahfizh' => 'Input Tahfidz',
-    'navViewTahfizh' => 'Riwayat Tahfidz',
-    'navRekapTahfizh' => 'Rekap Grafik Tahfidz'
+    'navInputTahfizh' => ['name' => 'Input Tahfidz', 'link' => 'tahfizh_report_form.html', 'icon' => 'book-open'],
+    'navViewTahfizh' => ['name' => 'Riwayat Tahfidz', 'link' => 'tahfizh_history.html', 'icon' => 'history'],
+    'navRekapTahfizh' => ['name' => 'Rekap Grafik Tahfidz', 'link' => 'tahfizh_recap.html', 'icon' => 'bar-chart-2']
 ];
 
 // Ambil semua role yang ada di sistem
@@ -62,9 +62,10 @@ echo "<p>Memproses pendaftaran menu ke database...</p>";
 echo "<ul>";
 
 // 1. Pastikan Menu Terdaftar di Tabel 'menus'
-foreach ($menuDetails as $id => $name) {
-    $stmt = $pdo->prepare("INSERT IGNORE INTO menus (menu_id, menu_name) VALUES (?, ?)");
-    $stmt->execute([$id, $name]);
+foreach ($menuDetails as $id => $detail) {
+    // Gunakan ON DUPLICATE KEY UPDATE untuk memperbaiki link/icon jika sebelumnya kosong
+    $stmt = $pdo->prepare("INSERT INTO menus (menu_id, menu_name, link, icon) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE menu_name = VALUES(menu_name), link = VALUES(link), icon = VALUES(icon)");
+    $stmt->execute([$id, $detail['name'], $detail['link'], $detail['icon']]);
 }
 
 $count = 0;
@@ -89,6 +90,14 @@ foreach ($allRoles as $role) {
         }
     }
 }
+
+// --- FORCE UPDATE ADMIN PERMISSIONS ---
+// Pastikan Ketua Yayasan selalu punya akses ke menu baru ini (jika sebelumnya 0)
+$adminRole = 'Ketua Yayasan';
+foreach (array_keys($menuDetails) as $menuId) {
+    $pdo->prepare("UPDATE menu_permissions SET is_allowed = 1 WHERE role_name = ? AND menu_id = ?")->execute([$adminRole, $menuId]);
+}
+echo "<li><b style='color:blue'>Info:</b> Hak akses Ketua Yayasan untuk menu baru telah dipastikan AKTIF.</li>";
 
 echo "</ul>";
 
