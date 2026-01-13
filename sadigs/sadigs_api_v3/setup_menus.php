@@ -10,11 +10,15 @@ try {
 }
 
 // Daftar Menu Baru yang ingin didaftarkan
-$newMenus = [
-    'navFormulirPembayaran',
-    'navValidasiPembayaran',
-    'navTabelPembayaran',
-    'navRekapPembayaran'
+$menuDetails = [
+    'navFormulirPembayaran' => 'Formulir Pembayaran',
+    'navValidasiPembayaran' => 'Validasi Pembayaran',
+    'navTabelPembayaran' => 'Data Pembayaran',
+    'navRekapPembayaran' => 'Rekap Keuangan',
+    // Menu Tahfidz Baru
+    'navInputTahfizh' => 'Input Tahfidz',
+    'navViewTahfizh' => 'Riwayat Tahfidz',
+    'navRekapTahfizh' => 'Rekap Grafik Tahfidz'
 ];
 
 // Ambil semua role yang ada di sistem
@@ -29,10 +33,16 @@ echo "<h3>Setup Menu Baru SADIGS</h3>";
 echo "<p>Memproses pendaftaran menu ke database...</p>";
 echo "<ul>";
 
+// 1. Pastikan Menu Terdaftar di Tabel 'menus'
+foreach ($menuDetails as $id => $name) {
+    $stmt = $pdo->prepare("INSERT IGNORE INTO menus (menu_id, menu_name) VALUES (?, ?)");
+    $stmt->execute([$id, $name]);
+}
+
 $count = 0;
 
 foreach ($allRoles as $role) {
-    foreach ($newMenus as $menuId) {
+    foreach (array_keys($menuDetails) as $menuId) {
         // 1. Cek apakah kombinasi Role + Menu sudah ada
         $check = $pdo->prepare("SELECT COUNT(*) FROM menu_permissions WHERE role_name = ? AND menu_id = ?");
         $check->execute([$role, $menuId]);
