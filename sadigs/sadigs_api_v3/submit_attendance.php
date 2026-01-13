@@ -13,11 +13,14 @@ $notes = $_POST['notes'] ?? '';
 $lat = $_POST['latitude'] ?? null;
 $long = $_POST['longitude'] ?? null;
 $category = $_POST['category'] ?? 'Absensi Harian';
+$address = $_POST['address'] ?? ''; // Tangkap alamat
 
 $pdo = getDBConnection();
 
 // Update Schema: Tambah kolom category jika belum ada (PENTING: Agar tidak error saat WHERE category=...)
 try { $pdo->exec("ALTER TABLE employee_attendance ADD COLUMN category VARCHAR(50) DEFAULT 'Absensi Harian'"); } catch (Exception $e) { }
+// Update Schema: Tambah kolom alamat
+try { $pdo->exec("ALTER TABLE employee_attendance ADD COLUMN location_address TEXT NULL"); } catch (Exception $e) { }
 
 try {
     // Cek apakah sudah absen hari ini UNTUK KATEGORI INI
@@ -27,10 +30,10 @@ try {
 
     if (!$existing) {
         // BELUM ABSEN -> LAKUKAN CHECK IN
-        $sql = "INSERT INTO employee_attendance (user_id, attendance_date, check_in_time, status, notes, location_lat, location_long, category) 
-                VALUES (?, CURDATE(), CURTIME(), 'Hadir', ?, ?, ?, ?)";
+        $sql = "INSERT INTO employee_attendance (user_id, attendance_date, check_in_time, status, notes, location_lat, location_long, category, location_address) 
+                VALUES (?, CURDATE(), CURTIME(), 'Hadir', ?, ?, ?, ?, ?)";
         $stmtInsert = $pdo->prepare($sql);
-        $stmtInsert->execute([$user_id, $notes, $lat, $long, $category]);
+        $stmtInsert->execute([$user_id, $notes, $lat, $long, $category, $address]);
         
         echo json_encode(['success' => true, 'message' => "Berhasil Absen Masuk ($category)!"]);
     } else {
