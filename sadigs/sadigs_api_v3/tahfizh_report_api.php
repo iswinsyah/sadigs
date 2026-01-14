@@ -13,6 +13,7 @@ $pdo = getDBConnection();
 $musyrif_id = $_SESSION['user_id'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    try { // FIX: Wrap the entire GET logic in a try-catch block
     $action = $_GET['action'] ?? 'get_single';
 
     if ($action === 'get_history') {
@@ -103,18 +104,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $stmt = $pdo->prepare("SELECT * FROM tahfizh_reports WHERE student_id = ? AND report_date = ?");
         $stmt->execute([$student_id, $report_date]);
         sendJSONResponse(['success' => true, 'data' => $stmt->fetch(PDO::FETCH_ASSOC) ?: null]);
-    } catch (Exception $e) {
-        sendJSONResponse(['success' => false, 'message' => $e->getMessage()], 500);
-    }
-}
-
-elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $input = json_decode(file_get_contents('php://input'), true);
-
-    // Validasi Dasar
-    if (empty($input['student_id']) || empty($input['last_surah_name'])) {
-        sendJSONResponse(['success' => false, 'message' => 'Nama Santri dan Nama Surat wajib diisi.'], 400);
-        exit;
     }
 
     try {
@@ -142,9 +131,10 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'mid' => $musyrif_id,
             'rdate' => $input['report_date'],
             'surah' => $input['last_surah_name'] ?: null,
-            'ayah' => $input['last_ayah_number'] ?: null,
-            'juz' => $input['last_juz_number'] ?: null,
-            'page' => $input['last_page_number'] ?: null,
+            // FIX: Handle empty string for numeric fields
+            'ayah' => (isset($input['last_ayah_number']) && $input['last_ayah_number'] !== '') ? $input['last_ayah_number'] : null,
+            'juz' => (isset($input['last_juz_number']) && $input['last_juz_number'] !== '') ? $input['last_juz_number'] : null,
+            'page' => (isset($input['last_page_number']) && $input['last_page_number'] !== '') ? $input['last_page_number'] : null,
             'fluency' => $input['fluency_grade'] ?: null,
             'tajwid' => $input['tajwid_grade'] ?: null,
             'adab' => $input['adab_grade'] ?: null,

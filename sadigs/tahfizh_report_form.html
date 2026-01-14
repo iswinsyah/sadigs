@@ -69,7 +69,9 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-bold text-gray-700 mb-1">Nama Surat <span class="text-red-500">*</span></label>
-                                    <input type="text" name="last_surah_name" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500" placeholder="Contoh: Al-Baqarah" required>
+                                    <select name="last_surah_name" id="surahSelect" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 bg-white" required>
+                                        <option value="">-- Pilih Surat --</option>
+                                    </select>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-bold text-gray-700 mb-1">Ayat Terakhir <span class="text-red-500">*</span></label>
@@ -150,6 +152,9 @@
                 // Load Data Santri
                 loadStudents();
 
+                // Load Pilihan Surat
+                populateSurahs();
+
             } catch (e) { console.error(e); }
         }
 
@@ -161,15 +166,39 @@
                 const select = document.getElementById('studentSelect');
                 
                 if (result.success && result.data) {
+                    // FIX: Filter santri duplikat dari API
+                    const uniqueStudents = [];
+                    const map = new Map();
+                    for (const item of result.data) {
+                        if(!map.has(item.user_id)){
+                            map.set(item.user_id, true);
+                            uniqueStudents.push(item);
+                        }
+                    }
+
                     select.innerHTML = '<option value="">-- Pilih Santri --</option>';
-                    result.data.forEach(s => {
+                    uniqueStudents.forEach(s => {
                         const option = document.createElement('option');
                         option.value = s.user_id;
-                        option.textContent = `${s.full_name} (${s.grade})`;
+                        option.textContent = `${s.full_name} (${s.grade || 'Santri'})`;
                         select.appendChild(option);
                     });
                 }
             } catch (e) { console.error("Gagal memuat santri", e); }
+        }
+
+        // REQUEST: Tambah dropdown surat
+        function populateSurahs() {
+            const surahList = [
+                "Al-Fatihah", "Al-Baqarah", "Ali 'Imran", "An-Nisa'", "Al-Ma'idah", "Al-An'am", "Al-A'raf", "Al-Anfal", "At-Tawbah", "Yunus", "Hud", "Yusuf", "Ar-Ra'd", "Ibrahim", "Al-Hijr", "An-Nahl", "Al-Isra'", "Al-Kahf", "Maryam", "Taha", "Al-Anbiya'", "Al-Hajj", "Al-Mu'minun", "An-Nur", "Al-Furqan", "Asy-Syu'ara'", "An-Naml", "Al-Qasas", "Al-'Ankabut", "Ar-Rum", "Luqman", "As-Sajdah", "Al-Ahzab", "Saba'", "Fatir", "Ya-Sin", "As-Saffat", "Sad", "Az-Zumar", "Ghafir", "Fussilat", "Asy-Syura", "Az-Zukhruf", "Ad-Dukhan", "Al-Jasiyah", "Al-Ahqaf", "Muhammad", "Al-Fath", "Al-Hujurat", "Qaf", "Az-Zariyat", "At-Tur", "An-Najm", "Al-Qamar", "Ar-Rahman", "Al-Waqi'ah", "Al-Hadid", "Al-Mujadilah", "Al-Hasyr", "Al-Mumtahanah", "As-Saff", "Al-Jumu'ah", "Al-Munafiqun", "At-Tagabun", "At-Talaq", "At-Tahrim", "Al-Mulk", "Al-Qalam", "Al-Haqqah", "Al-Ma'arij", "Nuh", "Al-Jinn", "Al-Muzzammil", "Al-Muddassir", "Al-Qiyamah", "Al-Insan", "Al-Mursalat", "An-Naba'", "An-Nazi'at", "'Abasa", "At-Takwir", "Al-Infitar", "Al-Mutaffifin", "Al-Insyiqaq", "Al-Buruj", "At-Tariq", "Al-A'la", "Al-Gasyiyah", "Al-Fajr", "Al-Balad", "Asy-Syams", "Al-Lail", "Ad-Duha", "Asy-Syarh", "At-Tin", "Al-'Alaq", "Al-Qadr", "Al-Bayyinah", "Az-Zalzalah", "Al-'Adiyat", "Al-Qari'ah", "At-Takasur", "Al-'Asr", "Al-Humazah", "Al-Fil", "Quraisy", "Al-Ma'un", "Al-Kausar", "Al-Kafirun", "An-Nasr", "Al-Masad", "Al-Ikhlas", "Al-Falaq", "An-Nas"
+            ];
+            const select = document.getElementById('surahSelect');
+            surahList.forEach((surah, index) => {
+                const option = document.createElement('option');
+                option.value = `${index + 1}. ${surah}`;
+                option.textContent = `${index + 1}. ${surah}`;
+                select.appendChild(option);
+            });
         }
 
         // 3. Handle Submit
