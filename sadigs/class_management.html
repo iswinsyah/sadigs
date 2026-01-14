@@ -43,14 +43,12 @@
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-bold text-teal-800 uppercase tracking-wider">Nama Santri</th>
                                     <th class="px-6 py-3 text-left text-xs font-bold text-teal-800 uppercase tracking-wider">Gender</th>
-                                    <th class="px-6 py-3 text-left text-xs font-bold text-teal-800 uppercase tracking-wider">Nama Ayah</th>
-                                    <th class="px-6 py-3 text-left text-xs font-bold text-teal-800 uppercase tracking-wider">Nama Ibu</th>
                                     <th class="px-6 py-3 text-left text-xs font-bold text-teal-800 uppercase tracking-wider">Status / Kelas</th>
                                     <th class="px-6 py-3 text-center text-xs font-bold text-teal-800 uppercase tracking-wider">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="studentTableBody" class="bg-white divide-y divide-gray-200">
-                                <tr><td colspan="7" class="px-6 py-10 text-center text-gray-500">Memuat data...</td></tr>
+                                <tr><td colspan="5" class="px-6 py-10 text-center text-gray-500">Memuat data...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -88,8 +86,6 @@
                         tr.innerHTML = `
                             <td class="px-6 py-4 whitespace-nowrap font-bold text-gray-800">${s.full_name}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${s.gender}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${s.father_name || '-'}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${s.mother_name || '-'}</td>
                             <td class="px-6 py-4 whitespace-nowrap">${selectHtml}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-center">
                                 <a href="student_data.html?id=${s.user_id}" class="text-blue-600 hover:text-blue-800 text-xs font-bold border border-blue-200 px-3 py-1 rounded hover:bg-blue-50 transition">Detail</a>
@@ -99,11 +95,11 @@
                     });
                     lucide.createIcons();
                 } else {
-                    tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-10 text-center text-gray-500">Tidak ada data santri.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-10 text-center text-gray-500">Tidak ada data santri.</td></tr>';
                 }
             } catch (e) {
                 console.error(e);
-                document.getElementById('studentTableBody').innerHTML = '<tr><td colspan="7" class="px-6 py-10 text-center text-red-500">Gagal memuat data.</td></tr>';
+                document.getElementById('studentTableBody').innerHTML = '<tr><td colspan="5" class="px-6 py-10 text-center text-red-500">Gagal memuat data.</td></tr>';
             }
         }
 

@@ -36,7 +36,6 @@ try {
     if ($action === 'get_students') {
         // Ambil data santri + detail orang tua
         $sql = "SELECT u.user_id, u.full_name, u.gender, 
-                       sd.father_name, sd.mother_name, 
                        sd.grade, sd.status
                 FROM users u
                 JOIN user_roles ur ON u.user_id = ur.user_id
