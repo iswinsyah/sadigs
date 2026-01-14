@@ -77,6 +77,28 @@ try {
         }
     }
 
+    // 5. CARI USER (Untuk Form Kirim)
+    elseif ($action === 'search_users') {
+        $query = $_GET['q'] ?? '';
+        if (strlen($query) < 3) {
+            sendJSONResponse(['success' => true, 'data' => []]); // Minimal 3 karakter
+        }
+        
+        $stmt = $pdo->prepare("SELECT username, full_name, user_id FROM users WHERE username LIKE ? OR full_name LIKE ? LIMIT 10");
+        $stmt->execute(["%$query%", "%$query%"]);
+        $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Tambahkan info role (opsional, untuk memastikan orang yang tepat)
+        foreach ($users as &$u) {
+            $stmtRole = $pdo->prepare("SELECT role_name FROM user_roles WHERE user_id = ?");
+            $stmtRole->execute([$u['user_id']]);
+            $roles = $stmtRole->fetchAll(PDO::FETCH_COLUMN);
+            $u['roles'] = implode(', ', $roles);
+        }
+        
+        sendJSONResponse(['success' => true, 'data' => $users]);
+    }
+
     else {
         sendJSONResponse(['success' => false, 'message' => 'Action invalid'], 400);
     }
