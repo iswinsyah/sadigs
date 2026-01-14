@@ -74,7 +74,25 @@
         // Cek Sesi
         fetch('sadigs_api_v3/session_check.php').then(r=>r.json()).then(d=>{
             if(!d.success) window.location.href = 'index.html';
+            checkUrlParams();
         });
+
+        // Cek jika ada parameter di URL untuk pre-fill
+        function checkUrlParams() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const username = urlParams.get('username');
+            const fullname = urlParams.get('fullname');
+
+            if (username && fullname) {
+                selectUser({
+                    username: username,
+                    full_name: decodeURIComponent(fullname)
+                });
+                // Sembunyikan input pencarian jika user sudah dipilih dari URL
+                const searchContainer = document.getElementById('userSearch').parentElement.parentElement;
+                searchContainer.classList.add('hidden');
+            }
+        }
 
         // Logika Pencarian User
         const searchInput = document.getElementById('userSearch');
@@ -129,6 +147,8 @@
         function resetSelection() {
             document.getElementById('targetUsername').value = '';
             document.getElementById('selectedUserContainer').classList.add('hidden');
+            const searchContainer = document.getElementById('userSearch').parentElement.parentElement;
+            searchContainer.classList.remove('hidden');
         }
 
         // Hide dropdown when clicking outside
