@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manajemen Kelas | SADIGS</title>
+    <title>Manajemen Kelas & Data Santri | SADIGS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
@@ -13,19 +13,9 @@
 
     <div class="flex h-screen overflow-hidden">
         <!-- SIDEBAR -->
-        <aside class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col hidden lg:flex">
-            <div class="h-16 flex items-center justify-center gap-3 border-b border-gray-200 bg-[#4FB7B3] text-white">
-                <img src="assets/img/logo.png" alt="Logo" class="h-8 bg-white rounded-full p-0.5">
-                <h1 class="text-3xl tracking-wide" style="font-family: 'Marlin Condensed', sans-serif;">SADIGS</h1>
-            </div>
-            <div class="p-6 border-b border-gray-100 bg-teal-50">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-teal-200 flex items-center justify-center text-teal-800 font-bold text-lg shadow-sm"><span id="userInitial">U</span></div>
-                    <div class="overflow-hidden">
-                        <p id="sidebarUsername" class="font-bold text-gray-800 text-sm truncate">Memuat...</p>
-                        <p id="sidebarRole" class="text-xs text-gray-500 truncate font-medium">Role...</p>
-                    </div>
-                </div>
+        <aside id="sidebar" class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col hidden lg:flex">
+            <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-teal-600 text-white">
+                <h1 class="text-2xl font-extrabold tracking-wider">SADIGS</h1>
             </div>
             <div class="p-6">
                 <a href="dashboard.html" class="flex items-center gap-2 text-gray-600 hover:text-teal-600 transition">
@@ -34,80 +24,35 @@
             </div>
         </aside>
 
-        <!-- KONTEN UTAMA -->
         <main class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative">
             <div class="max-w-6xl mx-auto">
-                <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+                <div class="flex justify-between items-center mb-6">
                     <div>
-                        <h1 class="text-2xl font-bold text-gray-800">Manajemen Kelas & Status</h1>
-                        <p class="text-sm text-gray-500">Atur kenaikan kelas santri secara massal atau per individu.</p>
+                        <h1 class="text-2xl font-bold text-gray-800">Manajemen Kelas & Data Santri</h1>
+                        <p class="text-sm text-gray-500">Atur kelas dan pantau data orang tua santri.</p>
                     </div>
-                    
-                    <!-- PANEL AKSI MASSAL -->
-                    <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-200 flex flex-col md:flex-row items-center gap-3">
-                        <span class="text-xs font-bold text-gray-500 uppercase">Aksi Massal:</span>
-                        <select id="bulkStatusSelect" class="text-sm border-gray-300 border rounded px-3 py-2 focus:ring-teal-500 focus:border-teal-500">
-                            <option value="">-- Pilih Status Tujuan --</option>
-                            <option value="Kelas 7">Kelas 7</option>
-                            <option value="Kelas 8">Kelas 8</option>
-                            <option value="Kelas 9">Kelas 9</option>
-                            <option value="Kelas 10">Kelas 10</option>
-                            <option value="Kelas 11">Kelas 11</option>
-                            <option value="Kelas 12">Kelas 12</option>
-                            <option disabled>──────────</option>
-                            <option value="Lulus">Lulus</option>
-                            <option value="Pindah">Pindah</option>
-                            <option value="Keluar">Keluar</option>
-                        </select>
-                        <button onclick="executeBulkUpdate()" class="bg-teal-600 text-white px-4 py-2 rounded text-sm font-bold hover:bg-teal-700 transition flex items-center gap-2">
-                            <i data-lucide="users" class="w-4 h-4"></i> Terapkan
-                        </button>
+                    <div class="flex gap-2">
+                        <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Cari santri..." class="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 outline-none">
                     </div>
                 </div>
 
-                <!-- FILTER & TABEL -->
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                    <div class="p-4 border-b border-gray-100 flex flex-col md:flex-row gap-4 justify-between items-center bg-gray-50/50">
-                        <div class="flex items-center gap-2 w-full md:w-auto">
-                            <i data-lucide="filter" class="w-4 h-4 text-gray-400"></i>
-                            <select id="filterGrade" onchange="applyFilter()" class="text-sm border-gray-300 border rounded-lg px-3 py-2 w-full md:w-48">
-                                <option value="all">Semua Status</option>
-                                <option value="Belum Diatur">Belum Diatur</option>
-                                <option value="Kelas 7">Kelas 7</option>
-                                <option value="Kelas 8">Kelas 8</option>
-                                <option value="Kelas 9">Kelas 9</option>
-                                <option value="Kelas 10">Kelas 10</option>
-                                <option value="Kelas 11">Kelas 11</option>
-                                <option value="Kelas 12">Kelas 12</option>
-                                <option value="Lulus">Lulus</option>
-                                <option value="Pindah">Pindah</option>
-                                <option value="Keluar">Keluar</option>
-                            </select>
-                        </div>
-                        <input type="text" id="searchInput" onkeyup="applyFilter()" placeholder="Cari nama santri..." class="w-full md:w-64 px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 outline-none">
-                    </div>
-
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
+                            <thead class="bg-teal-50">
                                 <tr>
-                                    <th class="px-6 py-3 text-left w-10">
-                                        <input type="checkbox" id="selectAll" onchange="toggleSelectAll()" class="rounded text-teal-600 focus:ring-teal-500 w-4 h-4">
-                                    </th>
-                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Nama Santri</th>
-                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Gender</th>
-                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Status Saat Ini</th>
-                                    <th class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Aksi</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-teal-800 uppercase tracking-wider">Nama Santri</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-teal-800 uppercase tracking-wider">Gender</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-teal-800 uppercase tracking-wider">Nama Ayah</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-teal-800 uppercase tracking-wider">Nama Ibu</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-teal-800 uppercase tracking-wider">Status / Kelas</th>
+                                    <th class="px-6 py-3 text-center text-xs font-bold text-teal-800 uppercase tracking-wider">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="studentTableBody" class="bg-white divide-y divide-gray-200">
-                                <tr><td colspan="5" class="p-8 text-center text-gray-400">Memuat data...</td></tr>
+                                <tr><td colspan="7" class="px-6 py-10 text-center text-gray-500">Memuat data...</td></tr>
                             </tbody>
                         </table>
-                    </div>
-                    <div class="p-4 border-t border-gray-100 text-xs text-gray-500 flex justify-between">
-                        <span id="totalCount">Total: 0 Santri</span>
-                        <span id="selectedCount">0 Dipilih</span>
                     </div>
                 </div>
             </div>
@@ -116,175 +61,77 @@
 
     <script>
         lucide.createIcons();
-        let allStudents = [];
-
-        async function initPage() {
-            // 1. Cek Sesi & Load User Info
-            const sessionRes = await fetch('sadigs_api_v3/session_check.php');
-            const sessionData = await sessionRes.json();
-            if (!sessionData.success) { window.location.href = 'index.html'; return; }
-
-            document.getElementById('sidebarUsername').textContent = sessionData.username;
-            document.getElementById('userInitial').textContent = sessionData.username.charAt(0).toUpperCase();
-            const rawRoles = sessionData.raw_roles || [];
-            document.getElementById('sidebarRole').textContent = rawRoles.length > 0 ? rawRoles.map(r => r.role_name).join(', ') : 'User';
-
-            // 2. Cek Izin Akses (Manajemen Akses)
-            try {
-                const permRes = await fetch('sadigs_api_v3/get_menu_permissions.php');
-                const permData = await permRes.json();
-                if (permData.success) {
-                    const allowedMenus = permData.permissions || [];
-                    if (!allowedMenus.includes('navManajemenKelas')) {
-                        alert('Akses Ditolak. Anda tidak memiliki izin untuk mengakses halaman ini.');
-                        window.location.href = 'dashboard.html';
-                        return;
-                    }
-                }
-            } catch (e) { console.error("Gagal cek izin:", e); }
-
-            loadStudents();
-        }
 
         async function loadStudents() {
             try {
                 const res = await fetch('sadigs_api_v3/class_management_api.php?action=get_students');
                 const result = await res.json();
-                if(result.success) {
-                    allStudents = result.data;
-                    renderTable(allStudents);
+                
+                const tbody = document.getElementById('studentTableBody');
+                tbody.innerHTML = '';
+
+                if (result.success && result.data.length > 0) {
+                    result.data.forEach(s => {
+                        const tr = document.createElement('tr');
+                        tr.className = "hover:bg-gray-50 transition";
+                        
+                        // Dropdown Status
+                        const options = ['Kelas 7', 'Kelas 8', 'Kelas 9', 'Kelas 10', 'Kelas 11', 'Kelas 12', 'Lulus', 'Pindah', 'Keluar'];
+                        let selectHtml = `<select onchange="updateStatus(${s.user_id}, this.value)" class="text-sm border-gray-300 rounded focus:ring-teal-500 border px-2 py-1 bg-white">`;
+                        selectHtml += `<option value="">- Pilih -</option>`;
+                        options.forEach(opt => {
+                            const selected = s.grade === opt ? 'selected' : '';
+                            selectHtml += `<option value="${opt}" ${selected}>${opt}</option>`;
+                        });
+                        selectHtml += `</select>`;
+
+                        tr.innerHTML = `
+                            <td class="px-6 py-4 whitespace-nowrap font-bold text-gray-800">${s.full_name}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${s.gender}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${s.father_name || '-'}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${s.mother_name || '-'}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">${selectHtml}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                <a href="student_data.html?id=${s.user_id}" class="text-blue-600 hover:text-blue-800 text-xs font-bold border border-blue-200 px-3 py-1 rounded hover:bg-blue-50 transition">Detail</a>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                    lucide.createIcons();
                 } else {
-                    alert('Gagal memuat data: ' + result.message);
+                    tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-10 text-center text-gray-500">Tidak ada data santri.</td></tr>';
                 }
-            } catch(e) {
+            } catch (e) {
                 console.error(e);
-                document.getElementById('studentTableBody').innerHTML = '<tr><td colspan="5" class="p-4 text-center text-red-500">Gagal terhubung ke server.</td></tr>';
+                document.getElementById('studentTableBody').innerHTML = '<tr><td colspan="7" class="px-6 py-10 text-center text-red-500">Gagal memuat data.</td></tr>';
             }
         }
 
-        function renderTable(data) {
-            const tbody = document.getElementById('studentTableBody');
-            tbody.innerHTML = '';
-            
-            if(data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-gray-400">Tidak ada data santri.</td></tr>';
-                return;
-            }
-
-            data.forEach(s => {
-                // Warna badge status
-                let badgeColor = 'bg-gray-100 text-gray-800';
-                if(s.grade.includes('Kelas')) badgeColor = 'bg-blue-100 text-blue-800';
-                else if(s.grade === 'Lulus') badgeColor = 'bg-green-100 text-green-800';
-                else if(s.grade === 'Pindah' || s.grade === 'Keluar') badgeColor = 'bg-red-100 text-red-800';
-
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-gray-50 transition";
-                tr.innerHTML = `
-                    <td class="px-6 py-4">
-                        <input type="checkbox" name="studentCheck" value="${s.user_id}" onchange="updateSelectedCount()" class="rounded text-teal-600 focus:ring-teal-500 w-4 h-4">
-                    </td>
-                    <td class="px-6 py-4">
-                        <div class="font-bold text-gray-800">${s.full_name}</div>
-                        <div class="text-xs text-gray-500 font-mono">${s.username}</div>
-                    </td>
-                    <td class="px-6 py-4 text-sm text-gray-600">${s.gender || '-'}</td>
-                    <td class="px-6 py-4">
-                        <span class="${badgeColor} px-2 py-1 rounded-full text-xs font-bold">${s.grade}</span>
-                    </td>
-                    <td class="px-6 py-4 text-center">
-                        <button onclick="editSingle(${s.user_id}, '${s.full_name}', '${s.grade}')" class="text-blue-600 hover:text-blue-800 text-xs font-bold border border-blue-200 bg-blue-50 px-3 py-1 rounded hover:bg-blue-100 transition">
-                            Edit
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-            
-            document.getElementById('totalCount').textContent = `Total: ${data.length} Santri`;
-            updateSelectedCount();
-        }
-
-        function applyFilter() {
-            const filterGrade = document.getElementById('filterGrade').value;
-            const search = document.getElementById('searchInput').value.toLowerCase();
-
-            const filtered = allStudents.filter(s => {
-                const matchGrade = filterGrade === 'all' || s.grade === filterGrade;
-                const matchName = s.full_name.toLowerCase().includes(search) || s.username.toLowerCase().includes(search);
-                return matchGrade && matchName;
-            });
-
-            renderTable(filtered);
-        }
-
-        function toggleSelectAll() {
-            const master = document.getElementById('selectAll');
-            const checkboxes = document.querySelectorAll('input[name="studentCheck"]');
-            checkboxes.forEach(cb => cb.checked = master.checked);
-            updateSelectedCount();
-        }
-
-        function updateSelectedCount() {
-            const count = document.querySelectorAll('input[name="studentCheck"]:checked').length;
-            document.getElementById('selectedCount').textContent = `${count} Dipilih`;
-        }
-
-        async function executeBulkUpdate() {
-            const checkboxes = document.querySelectorAll('input[name="studentCheck"]:checked');
-            const ids = Array.from(checkboxes).map(cb => cb.value);
-            const newGrade = document.getElementById('bulkStatusSelect').value;
-
-            if(ids.length === 0) {
-                alert('Pilih minimal satu santri dari tabel.');
-                return;
-            }
-            if(!newGrade) {
-                alert('Pilih status tujuan terlebih dahulu.');
-                return;
-            }
-
-            if(!confirm(`Anda akan mengubah status ${ids.length} santri menjadi "${newGrade}".\n\nLanjutkan?`)) return;
-
+        async function updateStatus(userId, newGrade) {
             try {
-                const res = await fetch('sadigs_api_v3/class_management_api.php?action=update_bulk', {
+                const res = await fetch('sadigs_api_v3/class_management_api.php?action=update_status', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ user_ids: ids, new_grade: newGrade })
+                    body: JSON.stringify({ user_id: userId, grade: newGrade })
                 });
                 const result = await res.json();
-                alert(result.message);
-                if(result.success) {
-                    loadStudents();
-                    document.getElementById('selectAll').checked = false;
-                }
-            } catch(e) {
-                alert('Terjadi kesalahan koneksi.');
-            }
+                if(!result.success) alert('Gagal update: ' + result.message);
+                // Optional: Toast notification
+            } catch(e) { alert('Koneksi error'); }
         }
 
-        function editSingle(id, name, currentGrade) {
-            // Simple prompt for individual edit (bisa diganti modal jika mau lebih fancy)
-            // Kita gunakan dropdown logic yang sama dengan bulk tapi hanya untuk 1 ID
-            const newGrade = prompt(`Ubah status untuk santri:\n${name}\n\nStatus saat ini: ${currentGrade}\n\nKetik status baru (contoh: Kelas 8, Lulus, Pindah):`, currentGrade);
-            
-            if(newGrade && newGrade !== currentGrade) {
-                // Validasi input manual sederhana
-                const validStatuses = ['Kelas 7','Kelas 8','Kelas 9','Kelas 10','Kelas 11','Kelas 12','Lulus','Pindah','Keluar'];
-                // Optional: paksa user input sesuai list, atau biarkan bebas. Di sini kita biarkan bebas tapi disarankan sesuai list.
-                
-                fetch('sadigs_api_v3/class_management_api.php?action=update_bulk', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ user_ids: [id], new_grade: newGrade })
-                }).then(res => res.json()).then(result => {
-                    alert(result.message);
-                    loadStudents();
-                });
-            }
+        function filterTable() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toLowerCase();
+            const rows = document.querySelectorAll('#studentTableBody tr');
+
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                row.style.display = text.includes(filter) ? "" : "none";
+            });
         }
 
-        initPage();
+        loadStudents();
     </script>
 </body>
 </html>
