@@ -3,318 +3,233 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pengaturan Profil | SADIGS 3.0</title>
+    <title>Profil Saya | SADIGS 3.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'utama': '#4FB7B3',
-                        'kedua': '#26667F',
-                        'tombol-utama': '#3674B5',
-                        'tombol-kedua': '#F93827',
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>body{font-family:'Inter',sans-serif;}</style>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans antialiased">
 
     <div class="flex h-screen overflow-hidden">
         <!-- SIDEBAR -->
         <aside id="sidebar" class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col hidden lg:flex">
-            <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-kedua text-white">
-                <img src="assets/img/logo.png" alt="Logo Sekolah" class="h-9">
+            <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-teal-600 text-white">
+                <h1 class="text-2xl font-extrabold tracking-wider">SADIGS</h1>
             </div>
             <div class="p-6">
-                <a href="dashboard.html" class="flex items-center gap-2 text-gray-600 hover:text-utama transition">
+                <a href="dashboard.html" class="flex items-center gap-2 text-gray-600 hover:text-teal-600 transition">
                     <i data-lucide="arrow-left" class="w-5 h-5"></i> Kembali ke Dashboard
                 </a>
             </div>
-            <nav id="sidebarNav" class="flex-1 overflow-y-auto py-4 px-3 space-y-2">
-                <!-- Menu akan dimuat oleh JS -->
-            </nav>
         </aside>
 
         <!-- KONTEN UTAMA -->
         <main class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative">
-            <header class="mb-8">
-                <h2 class="text-2xl lg:text-3xl font-bold text-gray-800">Pengaturan Profil</h2>
-                <p class="text-gray-500 text-sm mt-1">Kelola informasi akun dan keamanan Anda.</p>
-            </header>
+            <div class="max-w-3xl mx-auto">
+                <header class="mb-8">
+                    <h2 class="text-2xl lg:text-3xl font-bold text-gray-800">Profil Saya</h2>
+                    <p class="text-gray-500 text-sm mt-1">Kelola informasi akun dan peran Anda di sistem.</p>
+                </header>
 
-            <form id="profileForm" class="space-y-10">
-                <!-- Informasi Dasar -->
-                <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-100">
-                    <h3 class="text-lg font-bold text-gray-800 border-b pb-4 mb-6">Informasi Dasar</h3>
-                    <fieldset id="basicInfoFields" disabled class="space-y-6 opacity-50">
+                <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-200">
+                    <form id="profileForm" class="space-y-6">
+                        
+                        <!-- Info Dasar -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label for="username" class="block text-sm font-bold text-gray-700 mb-1">Username</label>
-                                <input type="text" id="username" class="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg" readonly>
-                                <p class="text-xs text-gray-400 mt-1">Username tidak dapat diubah.</p>
+                                <label class="block text-sm font-bold text-gray-700 mb-1">Username</label>
+                                <input type="text" id="username" class="w-full p-3 border border-gray-200 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed" readonly>
                             </div>
                             <div>
-                                <label for="email" class="block text-sm font-bold text-gray-700 mb-1">Email</label>
-                                <input type="email" id="email" class="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg" readonly>
-                                <p class="text-xs text-gray-400 mt-1">Hubungi admin untuk ubah email.</p>
+                                <label class="block text-sm font-bold text-gray-700 mb-1">Nama Lengkap <span class="text-red-500">*</span></label>
+                                <input type="text" name="full_name" id="full_name" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500" required placeholder="Sesuai KTP/Ijazah">
+                                <p class="text-xs text-orange-600 mt-1">Penting: Gunakan nama lengkap asli agar sistem bisa mengenali keluarga Anda.</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-1">Jenis Kelamin</label>
+                                <select name="gender" id="gender" class="w-full p-3 border border-gray-300 rounded-lg bg-white">
+                                    <option value="Laki-laki">Laki-laki</option>
+                                    <option value="Perempuan">Perempuan</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-1">Ganti Password (Opsional)</label>
+                                <input type="password" name="password" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500" placeholder="Kosongkan jika tidak diganti">
                             </div>
                         </div>
+
                         <div>
-                            <label for="full_name" class="block text-sm font-bold text-gray-700 mb-1">Nama Lengkap</label>
-                            <input type="text" id="full_name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-utama outline-none">
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Bio / Catatan Singkat</label>
+                            <textarea name="bio" id="bio" rows="2" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500"></textarea>
                         </div>
+
+                        <hr class="border-gray-100">
+
+                        <!-- Manajemen Peran -->
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-2">Jenis Kelamin</label>
-                            <div class="flex gap-6">
-                                <label class="flex items-center gap-2 cursor-pointer">
-                                    <input type="radio" name="gender" value="Laki-laki" class="w-4 h-4 text-utama focus:ring-utama">
-                                    <span>Laki-laki</span>
-                                </label>
-                                <label class="flex items-center gap-2 cursor-pointer">
-                                    <input type="radio" name="gender" value="Perempuan" class="w-4 h-4 text-utama focus:ring-utama">
-                                    <span>Perempuan</span>
-                                </label>
+                            <h3 class="text-lg font-bold text-teal-800 mb-3">Peran & Akses</h3>
+                            <p class="text-sm text-gray-500 mb-4">Centang peran yang sesuai dengan Anda. Peran baru memerlukan persetujuan admin.</p>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="rolesContainer">
+                                <!-- Checkbox Role akan di-render JS -->
                             </div>
                         </div>
-                        <div>
-                            <label for="bio" class="block text-sm font-bold text-gray-700 mb-1">Bio Singkat</label>
-                            <textarea id="bio" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-utama outline-none" placeholder="Ceritakan sedikit tentang Anda..."></textarea>
-                        </div>
-                    </fieldset>
-                </div>
 
-                <!-- Keamanan -->
-                <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-100">
-                    <h3 class="text-lg font-bold text-gray-800 border-b pb-4 mb-6">Keamanan</h3>
-                    <fieldset id="securityFields" disabled class="opacity-50">
-                        <div>
-                            <label for="password" class="block text-sm font-bold text-gray-700 mb-1">Password Baru (Opsional)</label>
-                            <input type="password" id="password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-utama outline-none" placeholder="••••••••">
-                            <p class="text-xs text-gray-400 mt-1">Minimal 8 karakter jika diisi.</p>
-                        </div>
-                    </fieldset>
-                </div>
+                        <!-- AUTO LINKING FAMILY (Dinamis) -->
+                        <div id="familyLinkingSection" class="hidden bg-blue-50 p-5 rounded-xl border border-blue-100">
+                            <h3 class="text-lg font-bold text-blue-800 mb-2 flex items-center gap-2"><i data-lucide="users" class="w-5 h-5"></i> Hubungkan Keluarga</h3>
+                            <p class="text-sm text-blue-700 mb-4">Sistem akan otomatis mencocokkan data berdasarkan Nama Lengkap.</p>
 
-                <!-- Manajemen Peran -->
-                <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-100">
-                    <h3 class="text-lg font-bold text-gray-800 border-b pb-4 mb-6">Manajemen Peran</h3>
-                    <fieldset id="roleFields" disabled class="space-y-6 opacity-50">
-                        <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-2">Peran Anda Saat Ini:</label>
-                            <div id="currentRoles" class="text-gray-500">Memuat...</div>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-2">Ajukan / Tambah Peran Baru:</label>
-                            <div id="roleSelectionList" class="space-y-3 max-h-60 overflow-y-auto pr-2 custom-scrollbar border rounded-lg p-4">
-                                <div class="text-center text-gray-400">Memuat opsi peran...</div>
+                            <!-- Input untuk Walisantri -->
+                            <div id="walisantriInputs" class="hidden space-y-3">
+                                <label class="block text-sm font-bold text-gray-700">Masukkan Nama Lengkap Anak (Santri) yang dititipkan:</label>
+                                <input type="text" name="child_name_1" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Nama Lengkap Anak Pertama">
+                                <input type="text" name="child_name_2" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Nama Lengkap Anak Kedua (Jika ada)">
                             </div>
-                            <p class="text-xs text-gray-400 mt-2">Peran yang baru dipilih akan memerlukan validasi dari Yayasan.</p>
-                        </div>
-                    </fieldset>
-                </div>
 
-                <!-- Tombol Aksi -->
-                <div class="flex justify-end gap-4 pt-4">
-                    <a href="dashboard.html" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 font-semibold hover:bg-gray-100 transition">Batal</a>
-                    <button type="submit" id="saveBtn" class="px-8 py-2 bg-tombol-utama text-white font-bold rounded-lg hover:bg-tombol-utama/90 transition shadow-md disabled:opacity-50" disabled>
-                        Simpan Perubahan
-                    </button>
+                            <!-- Input untuk Santri -->
+                            <div id="santriInputs" class="hidden space-y-3">
+                                <label class="block text-sm font-bold text-gray-700">Masukkan Nama Lengkap Orang Tua (Walisantri):</label>
+                                <input type="text" name="parent_name_1" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Nama Lengkap Ayah">
+                                <input type="text" name="parent_name_2" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Nama Lengkap Ibu">
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end pt-4">
+                            <button type="submit" id="saveBtn" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-8 rounded-lg transition shadow-md flex items-center gap-2">
+                                <i data-lucide="save" class="w-5 h-5"></i> Simpan Perubahan
+                            </button>
+                        </div>
+                    </form>
                 </div>
-            </form>
+            </div>
         </main>
     </div>
 
     <script>
         lucide.createIcons();
 
-        // Global state
-        let myRawRoles = [];
+        // Daftar Role yang tersedia untuk dipilih user
+        const availableRoles = [
+            'Walisantri', 'Santri Rijal', "Santri Nisa'", 
+            'Ustadz', 'Ustadzah', 'Musyrif', 'Musyrifah'
+        ];
 
-        // --- UTILITY FUNCTIONS ---
-        function enableForms() {
-            document.getElementById('basicInfoFields').disabled = false;
-            document.getElementById('securityFields').disabled = false;
-            document.getElementById('roleFields').disabled = false;
-            document.getElementById('saveBtn').disabled = false;
-            document.getElementById('basicInfoFields').classList.remove('opacity-50');
-            document.getElementById('securityFields').classList.remove('opacity-50');
-            document.getElementById('roleFields').classList.remove('opacity-50');
-        }
-
-        // --- DATA FETCHING AND RENDERING ---
-        async function loadProfileData() {
-            try {
-                const res = await fetch('sadigs_api_v3/get_my_profile.php');
-                const result = await res.json();
-                if (result.success) {
-                    const data = result.data;
-                    document.getElementById('username').value = data.username || '';
-                    document.getElementById('email').value = data.email || '';
-                    document.getElementById('full_name').value = data.full_name || '';
-                    document.getElementById('bio').value = data.bio || ''; // Handle null bio
-                    if (data.gender) {
-                        const genderRadio = document.querySelector(`input[name="gender"][value="${data.gender}"]`);
-                        if (genderRadio) genderRadio.checked = true;
-                    }
-                } else {
-                    throw new Error(result.message);
-                }
-            } catch (error) {
-                alert('Gagal memuat data profil: ' + error.message);
-            }
-        }
-
-        async function loadRoleData(sessionData) {
-            // 1. Render Current Roles from session data
-            myRawRoles = sessionData.raw_roles || [];
-            const currentRolesContainer = document.getElementById('currentRoles');
-            if (myRawRoles.length > 0) {
-                currentRolesContainer.innerHTML = myRawRoles.map(role => {
-                    const statusClass = role.status === 'approved' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800';
-                    const statusText = role.status === 'approved' ? 'Disetujui' : 'Pending';
-                    return `<span class="inline-block text-sm font-medium px-3 py-1 rounded-full ${statusClass} mr-2 mb-2">${role.role_name} (${statusText})</span>`;
-                }).join('');
-            } else {
-                currentRolesContainer.innerHTML = '<span class="text-gray-500">Belum ada peran yang ditetapkan.</span>';
-            }
-
-            // 2. Fetch available roles for editing
-            const roleListContainer = document.getElementById('roleSelectionList');
-            try {
-                const res = await fetch('sadigs_api_v3/quota.php?t=' + new Date().getTime());
-                const quotaResult = await res.json();
-                if (quotaResult.success) {
-                    roleListContainer.innerHTML = '';
-                    const quotas = quotaResult.quotas;
-
-                    // Add default roles first
-                    ['Santri Rijal', 'Santri Nisa\'', 'Walisantri'].forEach(role => {
-                         addRoleOption(roleListContainer, role, null);
-                    });
-
-                    // Daftar peran khusus yang disembunyikan (kecuali sudah punya)
-                    const hiddenRoles = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan'];
-
-                    // Add roles with quota
-                    for (const [role, info] of Object.entries(quotas)) {
-                        // Skip jika sudah ada di defaultRoles (mencegah duplikasi)
-                        if (['Santri Rijal', "Santri Nisa'", 'Walisantri'].includes(role)) continue;
-
-                        const isFull = info.max_limit > 0 && info.current_count >= info.max_limit;
-                        // Fix: Handle format role object/string dan trim nama role
-                        const userHasRole = myRawRoles.some(r => (typeof r === 'string' ? r : r.role_name) === role);
-                        
-                        // Tampilkan jika: User sudah punya ATAU (Tidak disembunyikan DAN Belum penuh)
-                        // Gunakan trim() untuk memastikan tidak ada spasi yang menyebabkan mismatch
-                        if (userHasRole || (!hiddenRoles.includes(role.trim()) && !isFull)) {
-                             addRoleOption(roleListContainer, role, info);
-                        }
-                    }
-                } else {
-                    throw new Error(quotaResult.message);
-                }
-            } catch (error) {
-                roleListContainer.innerHTML = `<div class="text-center text-red-500">Gagal memuat opsi peran: ${error.message}</div>`;
-            }
-        }
-
-        function addRoleOption(container, role, info) {
-            const isChecked = myRawRoles.some(r => r.role_name === role);
-            const isDisabled = isChecked && myRawRoles.find(r => r.role_name === role)?.status === 'approved';
-            const quotaText = info ? `<span class="text-xs text-utama font-medium bg-utama/10 px-2 py-1 rounded-full ml-auto">Sisa: ${info.max_limit - info.current_count}</span>` : '';
-            
-            const div = document.createElement('div');
-            div.innerHTML = `
-                <label class="flex items-center p-3 border border-gray-200 rounded-lg ${isDisabled ? 'cursor-not-allowed bg-gray-100' : 'cursor-pointer hover:bg-gray-50'} transition">
-                    <input type="checkbox" name="selected_roles" value="${role}" class="w-5 h-5 text-utama border-gray-300 focus:ring-utama rounded" ${isChecked ? 'checked' : ''} ${isDisabled ? 'disabled' : ''}>
-                    <span class="ml-3 font-medium text-gray-700">${role}</span>
-                    ${quotaText}
-                </label>
-            `;
-            container.appendChild(div);
-        }
-
-        // --- INITIALIZATION ---
         async function initPage() {
-            // 1. Check session and permissions
-            const sessionRes = await fetch('sadigs_api_v3/session_check.php');
-            const sessionData = await sessionRes.json();
-            if (!sessionData.success) { window.location.href = 'index.html'; return; }
+            try {
+                // Ambil Data Profil
+                const res = await fetch('sadigs_api_v3/update_profile.php'); // GET Request
+                const result = await res.json();
+                
+                if (result.success && result.data) {
+                    const d = result.data;
+                    document.getElementById('username').value = d.username;
+                    document.getElementById('full_name').value = d.full_name || '';
+                    document.getElementById('gender').value = d.gender || 'Laki-laki';
+                    document.getElementById('bio').value = d.bio || '';
 
-            const permRes = await fetch('sadigs_api_v3/get_menu_permissions.php');
-            const permData = await permRes.json();
-            const allowedMenus = permData.success ? permData.permissions : [];
-
-            if (!allowedMenus.includes('navProfil')) {
-                alert('Anda tidak memiliki izin untuk mengakses halaman ini.');
-                window.location.href = 'dashboard.html';
-                return;
-            }
-
-            // 2. Render Sidebar
-            const nav = document.getElementById('sidebarNav');
-            nav.innerHTML = `<div class="bg-gray-50 rounded-lg p-2"><h3 class="px-2 mb-2 text-xs font-bold text-gray-400">UMUM</h3><a id="navProfil" href="profile.html" class="flex items-center gap-3 px-3 py-2.5 text-utama bg-white rounded-md transition font-semibold text-sm shadow-sm"><i data-lucide="user" class="w-5 h-5"></i> Profil Saya</a></div>`;
-            lucide.createIcons();
-
-            // 3. Load all data in parallel
-            await Promise.all([
-                loadProfileData(),
-                loadRoleData(sessionData)
-            ]);
-
-            // 4. Enable form after all data is loaded
-            enableForms();
+                    renderRoles(d.roles || []);
+                }
+            } catch (e) { console.error(e); }
         }
 
-        // --- FORM SUBMISSION ---
+        function renderRoles(userRoles) {
+            const container = document.getElementById('rolesContainer');
+            container.innerHTML = '';
+
+            // Map status role user saat ini
+            const myRoles = {}; 
+            userRoles.forEach(r => myRoles[r.role_name] = r.status);
+
+            availableRoles.forEach(role => {
+                const isChecked = myRoles.hasOwnProperty(role);
+                const status = myRoles[role]; // 'approved' or 'pending'
+                
+                let statusBadge = '';
+                if (isChecked) {
+                    if (status === 'approved') statusBadge = '<span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded ml-2">Aktif</span>';
+                    else statusBadge = '<span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded ml-2">Menunggu</span>';
+                }
+
+                const div = document.createElement('div');
+                div.className = `flex items-center p-3 border rounded-lg ${isChecked ? 'bg-teal-50 border-teal-200' : 'bg-gray-50 border-gray-200'}`;
+                div.innerHTML = `
+                    <input type="checkbox" name="roles[]" value="${role}" class="role-check w-5 h-5 text-teal-600 rounded focus:ring-teal-500" ${isChecked ? 'checked' : ''}>
+                    <span class="ml-3 font-medium text-gray-700">${role}</span>
+                    ${statusBadge}
+                `;
+                container.appendChild(div);
+            });
+
+            // Pasang Event Listener untuk Checkbox
+            document.querySelectorAll('.role-check').forEach(cb => {
+                cb.addEventListener('change', checkFamilyInputs);
+            });
+            checkFamilyInputs(); // Cek awal
+        }
+
+        function checkFamilyInputs() {
+            const checkboxes = document.querySelectorAll('.role-check:checked');
+            const selectedRoles = Array.from(checkboxes).map(cb => cb.value);
+
+            const isWalisantri = selectedRoles.includes('Walisantri');
+            const isSantri = selectedRoles.some(r => r.includes('Santri'));
+
+            const section = document.getElementById('familyLinkingSection');
+            const waliInputs = document.getElementById('walisantriInputs');
+            const santriInputs = document.getElementById('santriInputs');
+
+            if (isWalisantri || isSantri) {
+                section.classList.remove('hidden');
+                if (isWalisantri) {
+                    waliInputs.classList.remove('hidden');
+                    santriInputs.classList.add('hidden');
+                } else {
+                    santriInputs.classList.remove('hidden');
+                    waliInputs.classList.add('hidden');
+                }
+            } else {
+                section.classList.add('hidden');
+            }
+        }
+
         document.getElementById('profileForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('saveBtn');
-            btn.disabled = true;
-            btn.innerHTML = 'Menyimpan...';
+            const originalHTML = btn.innerHTML;
+            btn.disabled = true; btn.innerHTML = 'Menyimpan...';
 
-            const selectedCheckboxes = document.querySelectorAll('input[name="selected_roles"]:checked');
-            const selectedRoles = Array.from(selectedCheckboxes).map(cb => cb.value);
-
-            const dataToSave = {
-                full_name: document.getElementById('full_name').value,
-                gender: document.querySelector('input[name="gender"]:checked')?.value,
-                bio: document.getElementById('bio').value,
-                password: document.getElementById('password').value,
-                roles: selectedRoles
+            // Susun Data JSON
+            const formData = new FormData(e.target);
+            const data = {
+                full_name: formData.get('full_name'),
+                gender: formData.get('gender'),
+                bio: formData.get('bio'),
+                password: formData.get('password'),
+                roles: formData.getAll('roles[]'),
+                family_linking: {
+                    child_names: [formData.get('child_name_1'), formData.get('child_name_2')],
+                    parent_names: [formData.get('parent_name_1'), formData.get('parent_name_2')]
+                }
             };
 
             try {
                 const res = await fetch('sadigs_api_v3/update_profile.php', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(dataToSave)
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
                 });
                 const result = await res.json();
                 alert(result.message);
-                if (result.success) {
-                    window.location.reload();
-                }
-            } catch (error) {
-                alert('Terjadi kesalahan koneksi saat menyimpan.');
+                if (result.success) window.location.reload();
+            } catch (e) {
+                alert('Gagal menyimpan profil.');
             } finally {
-                btn.disabled = false;
-                btn.innerHTML = 'Simpan Perubahan';
+                btn.disabled = false; btn.innerHTML = originalHTML;
             }
         });
 
-        // Start the process
         initPage();
     </script>
 </body>
