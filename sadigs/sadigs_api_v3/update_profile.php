@@ -35,6 +35,13 @@ if (is_null($input)) {
 
 $pdo = getDBConnection();
 
+// --- AUTO-SCHEMA: Pastikan tabel student_details ada ---
+try {
+    $pdo->exec("CREATE TABLE IF NOT EXISTS student_details (user_id INT PRIMARY KEY)");
+    // Coba tambahkan kolom parent_username jika belum ada
+    $pdo->exec("ALTER TABLE student_details ADD COLUMN parent_username VARCHAR(100) NULL");
+} catch (Exception $e) { /* Abaikan error jika kolom sudah ada */ }
+
 try {
     $pdo->beginTransaction();
 
