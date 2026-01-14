@@ -77,13 +77,25 @@ if (isset($_SESSION['user_id'], $_SESSION['username'])) {
     // SINKRONISASI: Perbarui variabel sesi dengan data peran terbaru dari database.
     $_SESSION['roles'] = $approved_roles;
 
+    // Cek Notifikasi Belum Dibaca (Safe Mode)
+    $unread_count = 0;
+    try {
+        // Cek dulu apakah tabel notifications ada untuk menghindari error jika setup belum dijalankan
+        $stmtNotif = $pdo->prepare("SELECT COUNT(*) FROM notifications WHERE user_id = ? AND is_read = 0");
+        $stmtNotif->execute([$_SESSION['user_id']]);
+        $unread_count = $stmtNotif->fetchColumn();
+    } catch (Exception $e) {
+        // Abaikan error jika tabel belum ada
+    }
+
     // Sesi valid, kirimkan data ke dashboard.html
     sendJSONResponse(array(
         'success' => true,
         'user_id' => $_SESSION['user_id'],
         'username' => $_SESSION['username'],
         'roles' => $approved_roles, // Hanya kirim peran yang sudah disetujui
-        'raw_roles' => $raw_roles // Kirim data mentah untuk UI profil
+        'raw_roles' => $raw_roles, // Kirim data mentah untuk UI profil
+        'unread_notif' => $unread_count // Jumlah notifikasi belum dibaca
     ));
     
 } else {

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kirim Notifikasi | SADIGS 3.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>body{font-family:'Inter',sans-serif;}</style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+
+    <div class="flex h-screen overflow-hidden">
+        <aside id="sidebar" class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col hidden lg:flex">
+            <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-teal-600 text-white">
+                <h1 class="text-2xl font-extrabold tracking-wider">SADIGS</h1>
+            </div>
+            <div class="p-6">
+                <a href="dashboard.html" class="flex items-center gap-2 text-gray-600 hover:text-teal-600 transition">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i> Kembali ke Dashboard
+                </a>
+            </div>
+        </aside>
+
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative">
+            <div class="max-w-2xl mx-auto">
+                <h1 class="text-2xl font-bold text-gray-800 mb-6">Kirim Notifikasi Personal</h1>
+                
+                <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-200">
+                    <form id="notifForm" class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Username Tujuan <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                                <i data-lucide="user" class="absolute left-3 top-3 w-5 h-5 text-gray-400"></i>
+                                <input type="text" name="target_username" class="w-full pl-10 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500" placeholder="Masukkan username user..." required>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">Pastikan username benar (case-sensitive).</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Judul Pesan <span class="text-red-500">*</span></label>
+                            <input type="text" name="title" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500" placeholder="Contoh: Peringatan Pembayaran" required>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Isi Pesan <span class="text-red-500">*</span></label>
+                            <textarea name="message" rows="4" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500" placeholder="Tulis pesan Anda di sini..." required></textarea>
+                        </div>
+
+                        <button type="submit" id="sendBtn" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 rounded-lg shadow-md flex justify-center items-center gap-2">
+                            <i data-lucide="send" class="w-5 h-5"></i> Kirim Notifikasi
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // Cek Sesi
+        fetch('sadigs_api_v3/session_check.php').then(r=>r.json()).then(d=>{
+            if(!d.success) window.location.href = 'index.html';
+        });
+
+        document.getElementById('notifForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('sendBtn');
+            const originalHTML = btn.innerHTML;
+            btn.disabled = true; btn.innerHTML = 'Mengirim...';
+
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                const res = await fetch('sadigs_api_v3/notifications_api.php?action=send', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+                
+                alert(result.message);
+                if (result.success) {
+                    e.target.reset();
+                }
+            } catch (e) {
+                alert('Gagal mengirim notifikasi.');
+            } finally {
+                btn.disabled = false; btn.innerHTML = originalHTML;
+            }
+        });
+    </script>
+</body>
+</html>

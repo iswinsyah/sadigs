@@ -46,7 +46,10 @@ $menuDetails = [
     // Menu Tahfidz Baru
     'navInputTahfizh' => ['name' => 'Input Tahfidz', 'link' => 'tahfizh_report_form.html', 'icon' => 'book-open'],
     'navViewTahfizh' => ['name' => 'Riwayat Tahfidz', 'link' => 'tahfizh_history.html', 'icon' => 'history'],
-    'navRekapTahfizh' => ['name' => 'Rekap Grafik Tahfidz', 'link' => 'tahfizh_recap.html', 'icon' => 'bar-chart-2']
+    'navRekapTahfizh' => ['name' => 'Rekap Grafik Tahfidz', 'link' => 'tahfizh_recap.html', 'icon' => 'bar-chart-2'],
+    // Menu Notifikasi Baru
+    'navKirimNotifikasi' => ['name' => 'Kirim Notifikasi', 'link' => 'admin_notifications.html', 'icon' => 'send'],
+    'navLihatNotifikasi' => ['name' => 'Notifikasi Saya', 'link' => 'my_notifications.html', 'icon' => 'bell']
 ];
 
 // Ambil semua role yang ada di sistem
@@ -115,6 +118,18 @@ foreach ($tahfidzPerms as $mId => $rList) {
     }
 }
 echo "<li><b style='color:blue'>Info:</b> Hak akses Tahfidz untuk Santri, Walisantri, dan Musyrif telah diaktifkan otomatis.</li>";
+
+// --- FORCE UPDATE PERMISSIONS FOR NOTIFICATIONS ---
+$notifPerms = [
+    'navKirimNotifikasi' => ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan', 'Kepala Sekolah', 'Admin Sekolah'],
+    'navLihatNotifikasi' => $allRoles // Semua role bisa lihat notifikasi
+];
+foreach ($notifPerms as $mId => $rList) {
+    foreach ($rList as $rName) {
+        $pdo->prepare("INSERT INTO menu_permissions (role_name, menu_id, is_allowed) VALUES (?, ?, 1) ON DUPLICATE KEY UPDATE is_allowed = 1")->execute([$rName, $mId]);
+    }
+}
+echo "<li><b style='color:blue'>Info:</b> Hak akses Notifikasi telah diaktifkan otomatis.</li>";
 
 echo "</ul>";
 
