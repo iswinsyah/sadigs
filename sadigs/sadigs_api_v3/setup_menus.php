@@ -49,7 +49,13 @@ $menuDetails = [
     'navRekapTahfizh' => ['name' => 'Rekap Grafik Tahfidz', 'link' => 'tahfizh_recap.html', 'icon' => 'bar-chart-2'],
     // Menu Notifikasi Baru
     'navKirimNotifikasi' => ['name' => 'Kirim Notifikasi', 'link' => 'admin_notifications.html', 'icon' => 'send'],
-    'navLihatNotifikasi' => ['name' => 'Notifikasi Saya', 'link' => 'my_notifications.html', 'icon' => 'bell']
+    'navLihatNotifikasi' => ['name' => 'Notifikasi Saya', 'link' => 'my_notifications.html', 'icon' => 'bell'],
+    // Menu Akademik & Santri (Tambahan)
+    'navBiodataSantri' => ['name' => 'Biodata Santri', 'link' => 'student_data.html', 'icon' => 'book-user'],
+    'navBukuIndukSantri' => ['name' => 'Buku Induk Santri', 'link' => 'student_master_book.html', 'icon' => 'book'],
+    'navManajemenKelas' => ['name' => 'Manajemen Kelas', 'link' => 'class_management.html', 'icon' => 'users'],
+    'navInputNilai' => ['name' => 'Input Nilai Rapot', 'link' => 'input_grades.html', 'icon' => 'graduation-cap'],
+    'navMonitoringAkademik' => ['name' => 'Monitoring Akademik', 'link' => 'academic_monitoring.html', 'icon' => 'monitor-check']
 ];
 
 // Ambil semua role yang ada di sistem
@@ -130,6 +136,18 @@ foreach ($notifPerms as $mId => $rList) {
     }
 }
 echo "<li><b style='color:blue'>Info:</b> Hak akses Notifikasi telah diaktifkan otomatis.</li>";
+
+// --- FORCE UPDATE PERMISSIONS FOR ACADEMIC ---
+$academicPerms = [
+    'navManajemenKelas' => ['Ketua Yayasan', 'Kepala Sekolah', 'Admin Sekolah'],
+    'navMonitoringAkademik' => ['Ketua Yayasan', 'Kepala Sekolah', 'Admin Sekolah'],
+    'navBukuIndukSantri' => ['Ketua Yayasan', 'Kepala Sekolah', 'Admin Sekolah', 'Bendahara Sekolah']
+];
+foreach ($academicPerms as $mId => $rList) {
+    foreach ($rList as $rName) {
+        $pdo->prepare("INSERT INTO menu_permissions (role_name, menu_id, is_allowed) VALUES (?, ?, 1) ON DUPLICATE KEY UPDATE is_allowed = 1")->execute([$rName, $mId]);
+    }
+}
 
 echo "</ul>";
 
