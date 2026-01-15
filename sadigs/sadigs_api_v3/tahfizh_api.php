@@ -24,6 +24,32 @@ $pdo->exec("CREATE TABLE IF NOT EXISTS tahfizh_reports (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )");
 
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    $action = $_GET['action'] ?? '';
+
+    if ($action === 'get_my_students') {
+        try {
+            $teacher_id = $_SESSION['user_id'];
+            
+            // Ambil santri yang dimentori oleh guru/musyrif yang login
+            $stmt = $pdo->prepare("
+                SELECT u.user_id, u.full_name
+                FROM users u
+                JOIN mentoring_assignments ma ON u.user_id = ma.student_id
+                WHERE ma.musyrif_id = ?
+                ORDER BY u.full_name ASC
+            ");
+            $stmt->execute([$teacher_id]);
+            $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            echo json_encode(['success' => true, 'data' => $students]);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => 'Gagal mengambil data santri: ' . $e->getMessage()]);
+        }
+        exit;
+    }
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $input = json_decode(file_get_contents('php://input'), true);
     

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Input Laporan Tahfidz | SADIGS 3.0</title>
+    <title>Input Laporan Tahfidz | SADIGS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
@@ -12,110 +12,67 @@
 <body class="bg-gray-50 text-gray-800 font-sans antialiased">
 
     <div class="flex h-screen overflow-hidden">
-        <!-- SIDEBAR -->
         <aside id="sidebar" class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col hidden lg:flex">
             <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-teal-600 text-white">
                 <h1 class="text-2xl font-extrabold tracking-wider">SADIGS</h1>
             </div>
-            <div class="p-6 border-b border-gray-100 bg-teal-50">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-teal-200 flex items-center justify-center text-teal-800 font-bold text-lg shadow-sm"><span id="userInitial">U</span></div>
-                    <div class="overflow-hidden">
-                        <p id="sidebarUsername" class="font-bold text-gray-800 text-sm truncate">Memuat...</p>
-                        <p id="sidebarRole" class="text-xs text-gray-500 truncate font-medium">Role...</p>
-                    </div>
-                </div>
+            <div class="p-6">
+                <a href="dashboard.html" class="flex items-center gap-2 text-gray-600 hover:text-teal-600 transition">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i> Kembali ke Dashboard
+                </a>
             </div>
-            <nav id="sidebarNav" class="flex-1 overflow-y-auto py-4 px-3 space-y-2">
-                <!-- Menu akan di-render oleh JS -->
-                <div class="text-center text-gray-400 text-sm mt-4">Memuat menu...</div>
-            </nav>
         </aside>
 
-        <!-- KONTEN UTAMA -->
         <main class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative">
-            <div class="max-w-3xl mx-auto">
-                <!-- Header -->
-                <div class="flex items-center gap-3 mb-6">
-                    <a href="dashboard.html" class="p-2 bg-white rounded-full shadow-sm hover:bg-gray-100 transition"><i data-lucide="arrow-left" class="w-5 h-5 text-gray-600"></i></a>
-                    <div>
-                        <h1 class="text-2xl font-bold text-gray-800">Laporan Tahfidz</h1>
-                        <p class="text-sm text-gray-500">Input setoran hafalan santri</p>
-                    </div>
-                </div>
-
-                <!-- Form Card -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <form id="reportForm" class="space-y-6">
+            <div class="max-w-2xl mx-auto">
+                <h1 class="text-2xl font-bold text-gray-800 mb-6">Input Laporan Tahfidz</h1>
+                
+                <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-200">
+                    <form id="tahfizhForm" class="space-y-6">
                         
-                        <!-- Pilih Santri & Tanggal -->
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Pilih Santri <span class="text-red-500">*</span></label>
+                            <select name="student_id" id="studentSelect" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500" required>
+                                <option value="">Memuat santri binaan...</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Jenis Laporan <span class="text-red-500">*</span></label>
+                            <div class="flex gap-4">
+                                <label class="flex items-center"><input type="radio" name="type" value="Ziyadah" class="mr-2" checked> Ziyadah (Hafalan Baru)</label>
+                                <label class="flex items-center"><input type="radio" name="type" value="Murajaah" class="mr-2"> Muraja'ah (Pengulangan)</label>
+                            </div>
+                        </div>
+
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-bold text-gray-700 mb-1">Nama Santri <span class="text-red-500">*</span></label>
-                                <select name="student_id" id="studentSelect" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 bg-white" required>
-                                    <option value="">-- Pilih Santri --</option>
-                                    <option disabled>Memuat data...</option>
-                                </select>
+                                <label class="block text-sm font-bold text-gray-700 mb-1">Surat <span class="text-red-500">*</span></label>
+                                <input type="text" name="surah" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500" placeholder="Contoh: An-Naba" required>
                             </div>
                             <div>
-                                <label class="block text-sm font-bold text-gray-700 mb-1">Tanggal Laporan <span class="text-red-500">*</span></label>
-                                <input type="date" name="report_date" id="reportDate" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500" required>
+                                <label class="block text-sm font-bold text-gray-700 mb-1">Ayat <span class="text-red-500">*</span></label>
+                                <input type="text" name="ayat" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500" placeholder="Contoh: 1-10" required>
                             </div>
                         </div>
 
-                        <!-- Detail Hafalan -->
-                        <div class="border-t border-gray-100 pt-4">
-                            <h3 class="text-teal-700 font-bold mb-3">Capaian Hafalan</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm font-bold text-gray-700 mb-1">Nama Surat <span class="text-red-500">*</span></label>
-                                    <select name="last_surah_name" id="surahSelect" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 bg-white" required>
-                                        <option value="">-- Pilih Surat --</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-bold text-gray-700 mb-1">Ayat Terakhir <span class="text-red-500">*</span></label>
-                                    <input type="number" name="last_ayah_number" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500" placeholder="Contoh: 10" required>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-bold text-gray-700 mb-1">Juz</label>
-                                    <input type="number" name="last_juz_number" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500" placeholder="Contoh: 1">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-bold text-gray-700 mb-1">Halaman</label>
-                                    <input type="number" name="last_page_number" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500" placeholder="Contoh: 20">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Penilaian -->
-                        <div class="border-t border-gray-100 pt-4">
-                            <h3 class="text-teal-700 font-bold mb-3">Penilaian Kualitas</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div>
-                                    <label class="block text-sm font-bold text-gray-700 mb-1">Kelancaran</label>
-                                    <select name="fluency_grade" class="w-full p-3 border border-gray-300 rounded-lg bg-white"><option value="A">A (Sangat Baik)</option><option value="B">B (Baik)</option><option value="C">C (Cukup)</option><option value="D">D (Kurang)</option></select>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-bold text-gray-700 mb-1">Tajwid</label>
-                                    <select name="tajwid_grade" class="w-full p-3 border border-gray-300 rounded-lg bg-white"><option value="A">A (Sangat Baik)</option><option value="B">B (Baik)</option><option value="C">C (Cukup)</option><option value="D">D (Kurang)</option></select>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-bold text-gray-700 mb-1">Adab</label>
-                                    <select name="adab_grade" class="w-full p-3 border border-gray-300 rounded-lg bg-white"><option value="A">A (Sangat Baik)</option><option value="B">B (Baik)</option><option value="C">C (Cukup)</option><option value="D">D (Kurang)</option></select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Catatan -->
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">Catatan Musyrif (Opsional)</label>
-                            <textarea name="musyrif_notes" rows="2" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500" placeholder="Catatan perkembangan santri..."></textarea>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Kualitas Hafalan <span class="text-red-500">*</span></label>
+                            <select name="quality" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500" required>
+                                <option value="Mumtaz">Mumtaz (Sangat Lancar)</option>
+                                <option value="Jayyid Jiddan">Jayyid Jiddan (Lancar)</option>
+                                <option value="Jayyid">Jayyid (Cukup Lancar)</option>
+                                <option value="Maqbul">Maqbul (Kurang Lancar)</option>
+                            </select>
                         </div>
 
-                        <!-- Tombol Submit -->
-                        <button type="submit" id="submitBtn" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-4 rounded-xl shadow-lg transform transition active:scale-95 flex justify-center items-center gap-2 text-lg">
-                            <i data-lucide="save" class="w-6 h-6"></i> SIMPAN LAPORAN
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Catatan (Opsional)</label>
+                            <textarea name="notes" rows="3" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500" placeholder="Contoh: Perlu perbaikan di makhraj huruf..."></textarea>
+                        </div>
+
+                        <button type="submit" id="sendBtn" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 rounded-lg shadow-md flex justify-center items-center gap-2">
+                            <i data-lucide="save" class="w-5 h-5"></i> Simpan Laporan
                         </button>
                     </form>
                 </div>
@@ -125,86 +82,41 @@
 
     <script>
         lucide.createIcons();
-        document.getElementById('reportDate').valueAsDate = new Date();
 
-        // 1. Load Sidebar & Session
-        async function initPage() {
-            try {
-                const sessionRes = await fetch('sadigs_api_v3/session_check.php');
-                const sessionData = await sessionRes.json();
-                if (!sessionData.success) { window.location.href = 'index.html'; return; }
+        // Cek Sesi & Muat Santri
+        fetch('sadigs_api_v3/session_check.php').then(r=>r.json()).then(d=>{
+            if(!d.success) window.location.href = 'index.html';
+            loadStudents();
+        });
 
-                document.getElementById('sidebarUsername').textContent = sessionData.username;
-                document.getElementById('userInitial').textContent = sessionData.username.charAt(0).toUpperCase();
-                document.getElementById('sidebarRole').textContent = sessionData.roles.join(', ');
-
-                // Render Sidebar Sederhana
-                const nav = document.getElementById('sidebarNav');
-                nav.innerHTML = `
-                    <div class="p-2 space-y-1">
-                        <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-teal-50 hover:text-teal-600 rounded-md font-medium"><i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard</a>
-                        <a href="tahfizh_report_form.html" class="flex items-center gap-3 px-3 py-2 bg-teal-50 text-teal-700 rounded-md font-bold"><i data-lucide="book-open" class="w-5 h-5"></i> Input Tahfidz</a>
-                        <a href="attendance.html" class="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-teal-50 hover:text-teal-600 rounded-md font-medium"><i data-lucide="map-pin" class="w-5 h-5"></i> Absensi</a>
-                    </div>
-                `;
-                lucide.createIcons();
-
-                // Load Data Santri
-                loadStudents();
-
-                // Load Pilihan Surat
-                populateSurahs();
-
-            } catch (e) { console.error(e); }
-        }
-
-        // 2. Load Dropdown Santri
         async function loadStudents() {
+            const select = document.getElementById('studentSelect');
             try {
-                const res = await fetch('sadigs_api_v3/class_management_api.php?action=get_students');
+                const res = await fetch('sadigs_api_v3/tahfizh_api.php?action=get_my_students');
                 const result = await res.json();
-                const select = document.getElementById('studentSelect');
                 
-                if (result.success && result.data) {
-                    // FIX: Filter santri duplikat dari API
-                    const uniqueStudents = [];
-                    const map = new Map();
-                    for (const item of result.data) {
-                        if(!map.has(item.user_id)){
-                            map.set(item.user_id, true);
-                            uniqueStudents.push(item);
-                        }
-                    }
-
+                if (result.success && result.data.length > 0) {
                     select.innerHTML = '<option value="">-- Pilih Santri --</option>';
-                    uniqueStudents.forEach(s => {
+                    result.data.forEach(student => {
                         const option = document.createElement('option');
-                        option.value = s.user_id;
-                        option.textContent = `${s.full_name} (${s.grade || 'Santri'})`;
+                        option.value = student.user_id;
+                        option.textContent = student.full_name;
                         select.appendChild(option);
                     });
+                } else {
+                    select.innerHTML = '<option value="">Tidak ada santri binaan yang terdaftar</option>';
+                    select.disabled = true;
                 }
-            } catch (e) { console.error("Gagal memuat santri", e); }
+            } catch (e) {
+                console.error(e);
+                select.innerHTML = '<option value="">Gagal memuat data santri</option>';
+                select.disabled = true;
+            }
         }
 
-        // REQUEST: Tambah dropdown surat
-        function populateSurahs() {
-            const surahList = [
-                "Al-Fatihah", "Al-Baqarah", "Ali 'Imran", "An-Nisa'", "Al-Ma'idah", "Al-An'am", "Al-A'raf", "Al-Anfal", "At-Tawbah", "Yunus", "Hud", "Yusuf", "Ar-Ra'd", "Ibrahim", "Al-Hijr", "An-Nahl", "Al-Isra'", "Al-Kahf", "Maryam", "Taha", "Al-Anbiya'", "Al-Hajj", "Al-Mu'minun", "An-Nur", "Al-Furqan", "Asy-Syu'ara'", "An-Naml", "Al-Qasas", "Al-'Ankabut", "Ar-Rum", "Luqman", "As-Sajdah", "Al-Ahzab", "Saba'", "Fatir", "Ya-Sin", "As-Saffat", "Sad", "Az-Zumar", "Ghafir", "Fussilat", "Asy-Syura", "Az-Zukhruf", "Ad-Dukhan", "Al-Jasiyah", "Al-Ahqaf", "Muhammad", "Al-Fath", "Al-Hujurat", "Qaf", "Az-Zariyat", "At-Tur", "An-Najm", "Al-Qamar", "Ar-Rahman", "Al-Waqi'ah", "Al-Hadid", "Al-Mujadilah", "Al-Hasyr", "Al-Mumtahanah", "As-Saff", "Al-Jumu'ah", "Al-Munafiqun", "At-Tagabun", "At-Talaq", "At-Tahrim", "Al-Mulk", "Al-Qalam", "Al-Haqqah", "Al-Ma'arij", "Nuh", "Al-Jinn", "Al-Muzzammil", "Al-Muddassir", "Al-Qiyamah", "Al-Insan", "Al-Mursalat", "An-Naba'", "An-Nazi'at", "'Abasa", "At-Takwir", "Al-Infitar", "Al-Mutaffifin", "Al-Insyiqaq", "Al-Buruj", "At-Tariq", "Al-A'la", "Al-Gasyiyah", "Al-Fajr", "Al-Balad", "Asy-Syams", "Al-Lail", "Ad-Duha", "Asy-Syarh", "At-Tin", "Al-'Alaq", "Al-Qadr", "Al-Bayyinah", "Az-Zalzalah", "Al-'Adiyat", "Al-Qari'ah", "At-Takasur", "Al-'Asr", "Al-Humazah", "Al-Fil", "Quraisy", "Al-Ma'un", "Al-Kausar", "Al-Kafirun", "An-Nasr", "Al-Masad", "Al-Ikhlas", "Al-Falaq", "An-Nas"
-            ];
-            const select = document.getElementById('surahSelect');
-            surahList.forEach((surah, index) => {
-                const option = document.createElement('option');
-                option.value = `${index + 1}. ${surah}`;
-                option.textContent = `${index + 1}. ${surah}`;
-                select.appendChild(option);
-            });
-        }
-
-        // 3. Handle Submit
-        document.getElementById('reportForm').addEventListener('submit', async (e) => {
+        document.getElementById('tahfizhForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const btn = document.getElementById('submitBtn');
+            const btn = document.getElementById('sendBtn');
             const originalHTML = btn.innerHTML;
             btn.disabled = true; btn.innerHTML = 'Menyimpan...';
 
@@ -212,7 +124,7 @@
             const data = Object.fromEntries(formData.entries());
 
             try {
-                const res = await fetch('sadigs_api_v3/tahfizh_report_api.php', {
+                const res = await fetch('sadigs_api_v3/tahfizh_api.php', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(data)
@@ -220,21 +132,15 @@
                 const result = await res.json();
                 
                 alert(result.message);
-                
                 if (result.success) {
-                    e.target.reset(); // Reset Form setelah sukses
-                    document.getElementById('reportDate').valueAsDate = new Date(); // Kembalikan tanggal hari ini
-                    document.getElementById('studentSelect').focus(); // Fokus kembali ke santri
+                    e.target.reset();
                 }
             } catch (e) {
-                alert('Terjadi kesalahan koneksi.');
+                alert('Gagal menyimpan laporan.');
             } finally {
-                btn.disabled = false;
-                btn.innerHTML = originalHTML;
+                btn.disabled = false; btn.innerHTML = originalHTML;
             }
         });
-
-        initPage();
     </script>
 </body>
 </html>
