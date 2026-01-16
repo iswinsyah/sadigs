@@ -10,32 +10,32 @@ if (!isset($_SESSION['user_id'])) {
 $pdo = getDBConnection();
 $user_id = $_SESSION['user_id'];
 
-// Auto-create table jika belum ada (Standarisasi Schema)
-$pdo->exec("CREATE TABLE IF NOT EXISTS daily_worship (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    report_date DATE NOT NULL,
-    subuh VARCHAR(20),
-    zuhur VARCHAR(20),
-    ashar VARCHAR(20),
-    maghrib VARCHAR(20),
-    isya VARCHAR(20),
-    tahajud TINYINT(1) DEFAULT 0,
-    dhuha TINYINT(1) DEFAULT 0,
-    quran_reading VARCHAR(100),
-    notes TEXT,
-    status VARCHAR(20) DEFAULT 'pending', -- pending, approved, rejected
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE KEY unique_report (user_id, report_date)
-)");
-
 try {
-    // Ambil 30 hari terakhir
-    $stmt = $pdo->prepare("SELECT * FROM daily_worship WHERE user_id = ? ORDER BY report_date DESC LIMIT 30");
+    // Gunakan tabel 'ibadah_harian' yang sudah berisi data
+    $stmt = $pdo->prepare("SELECT * FROM ibadah_harian WHERE user_id = ? ORDER BY report_date DESC LIMIT 30");
     $stmt->execute([$user_id]);
-    $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $raw_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    sendJSONResponse(['success' => true, 'data' => $data]);
+    // Mapping data agar sesuai dengan tampilan frontend
+    $formatted_data = [];
+    foreach ($raw_data as $row) {
+        $formatted_data[] = [
+            'id' => $row['id'],
+            'report_date' => $row['report_date'],
+            'subuh' => $row['shalat_subuh'] ?? '-',
+            'zuhur' => $row['shalat_dzuhur'] ?? '-',
+            'ashar' => $row['shalat_ashar'] ?? '-',
+            'maghrib' => $row['shalat_maghrib'] ?? '-',
+            'isya' => $row['shalat_isya'] ?? '-',
+            'tahajud' => $row['tahajud'] ?? 0,
+            'dhuha' => $row['dhuha'] ?? 0,
+            'quran_reading' => $row['quran_reading'] ?? $row['tilawah'] ?? '-', // Handle variasi nama kolom
+            'notes' => $row['notes'] ?? '',
+            'status' => $row['validation_status'] ?? 'pending'
+        ];
+    }
+    
+    sendJSONResponse(['success' => true, 'data' => $formatted_data]);
 } catch (Exception $e) {
     sendJSONResponse(['success' => false, 'message' => $e->getMessage()], 500);
 }

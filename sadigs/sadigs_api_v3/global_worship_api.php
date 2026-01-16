@@ -23,11 +23,9 @@ try {
                 dw.id, dw.report_date, dw.created_at,
                 u.full_name, u.username,
                 sd.grade,
-                dw.subuh, dw.zuhur, dw.ashar, dw.maghrib, dw.isya,
-                dw.tahajud, dw.dhuha, dw.quran_reading, dw.notes,
+                dw.sdhajud, dw.dhuha, dw.quran_reading, dw.notes,
                 dw.status as validation_status
-            FROM daily_worship dw
-            JOIN users u ON dw.user_id = u.user_id
+            FROM ibadah_harian dwer_id = u.user_id
             LEFT JOIN student_details sd ON u.user_id = sd.user_id
             WHERE dw.report_date = ?
             ORDER BY sd.grade ASC, u.full_name ASC";
