@@ -52,6 +52,7 @@ $menuDetails = [
     'navLihatNotifikasi' => ['name' => 'Notifikasi Saya', 'link' => 'my_notifications.html', 'icon' => 'bell'],
     // Menu Akademik & Santri (Tambahan)
     'navRiwayatIbadah' => ['name' => 'Riwayat Ibadah', 'link' => 'student_worship_view.html', 'icon' => 'history'],
+    'navMonitoringIbadah' => ['name' => 'Monitoring Ibadah', 'link' => 'global_worship_monitoring.html', 'icon' => 'bar-chart-2'],
     'navBiodataSantri' => ['name' => 'Biodata Santri', 'link' => 'student_data.html', 'icon' => 'book-user'],
     'navBukuIndukSantri' => ['name' => 'Buku Induk Santri', 'link' => 'student_master_book.html', 'icon' => 'book'],
     'navManajemenKelas' => ['name' => 'Manajemen Kelas', 'link' => 'class_management.html', 'icon' => 'users'],
@@ -154,6 +155,12 @@ foreach ($academicPerms as $mId => $rList) {
 $worshipPerms = ['Santri', 'Santri Rijal', "Santri Nisa'"];
 foreach ($worshipPerms as $rName) {
     $pdo->prepare("INSERT INTO menu_permissions (role_name, menu_id, is_allowed) VALUES (?, 'navRiwayatIbadah', 1) ON DUPLICATE KEY UPDATE is_allowed = 1")->execute([$rName]);
+}
+
+// --- FORCE UPDATE PERMISSIONS FOR GLOBAL MONITORING ---
+$monitoringPerms = ['Ketua Yayasan', 'Kepala Sekolah', 'Kepala Asrama Putra', 'Kepala Asrama Putri', 'Admin Sekolah'];
+foreach ($monitoringPerms as $rName) {
+    $pdo->prepare("INSERT INTO menu_permissions (role_name, menu_id, is_allowed) VALUES (?, 'navMonitoringIbadah', 1) ON DUPLICATE KEY UPDATE is_allowed = 1")->execute([$rName]);
 }
 
 echo "</ul>";
