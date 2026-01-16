@@ -41,12 +41,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 // Manajemen: Lihat semua (tanpa filter WHERE)
             } elseif ($is_walisantri) {
                 // Walisantri: Cari ID anak
-                $stmtChild = $pdo->prepare("SELECT user_id FROM student_details WHERE parent_username = ?");
-                $stmtChild->execute([$username]);
+                // Ambil Nama Lengkap Walisantri
+                $stmtUser = $pdo->prepare("SELECT full_name FROM users WHERE user_id = ?");
+                $stmtUser->execute([$user_id]);
+                $walisantri_fullname = $stmtUser->fetchColumn();
+
+                $sqlChild = "SELECT user_id FROM student_details WHERE parent_username = :username";
+                $paramsChild = ['username' => $username];
+
+                if ($walisantri_fullname) {
+                    $sqlChild .= " OR father_name = :fullname OR mother_name = :fullname OR parent_name = :fullname";
+                    $paramsChild['fullname'] = $walisantri_fullname;
+                }
+
+                $stmtChild = $pdo->prepare($sqlChild);
+                $stmtChild->execute($paramsChild);
                 $children = $stmtChild->fetchAll(PDO::FETCH_COLUMN);
                 
                 if (empty($children)) {
-                    sendJSONResponse(['success' => true, 'data' => [], 'message' => 'Belum ada data anak.']);
+                    sendJSONResponse(['success' => true, 'data' => [], 'message' => 'Belum ada data anak. Pastikan Nama Ayah/Ibu di Buku Induk sesuai dengan Nama Akun Anda.']);
                     exit;
                 }
                 $placeholders = implode(',', array_fill(0, count($children), '?'));
