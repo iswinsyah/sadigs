@@ -9,10 +9,13 @@ if (!isset($_SESSION['user_id'])) {
     sendJSONResponse(['success' => false, 'message' => 'Unauthorized'], 401);
 }
 
-// 2. Cek Role (Hanya Ketua Yayasan yang boleh melakukan ini)
+// 2. Cek Role & Izin
 $roles = $_SESSION['roles'] ?? [];
-if (!in_array('Ketua Yayasan', $roles)) {
-    sendJSONResponse(['success' => false, 'message' => 'Akses Ditolak. Hanya Ketua Yayasan yang berhak.'], 403);
+$is_admin = in_array('Ketua Yayasan', $roles);
+$is_walisantri = in_array('Walisantri', $roles);
+
+if (!$is_admin && !$is_walisantri) {
+    sendJSONResponse(['success' => false, 'message' => 'Akses Ditolak. Anda tidak memiliki izin.'], 403);
 }
 
 $input = json_decode(file_get_contents('php://input'), true);
@@ -25,6 +28,32 @@ if (!$target_user_id) {
 try {
     $pdo = getDBConnection();
     
+    // JIKA WALISANTRI: Validasi Hubungan Orang Tua - Anak
+    if (!$is_admin && $is_walisantri) {
+        $walisantri_id = $_SESSION['user_id'];
+        
+        // Ambil data walisantri
+        $stmtWali = $pdo->prepare("SELECT username, full_name FROM users WHERE user_id = ?");
+        $stmtWali->execute([$walisantri_id]);
+        $wali = $stmtWali->fetch(PDO::FETCH_ASSOC);
+
+        // Cek apakah target adalah anak dari walisantri ini (Logic sama dengan get_my_children)
+        $sqlCheck = "SELECT COUNT(*) FROM student_details sd 
+                     WHERE sd.user_id = :child_id 
+                     AND (
+                        sd.parent_username = :username 
+                        OR sd.father_name = :fullname 
+                        OR sd.mother_name = :fullname 
+                        OR sd.parent_name = :fullname
+                     )";
+        $stmtCheck = $pdo->prepare($sqlCheck);
+        $stmtCheck->execute(['child_id' => $target_user_id, 'username' => $wali['username'], 'fullname' => $wali['full_name']]);
+        
+        if ($stmtCheck->fetchColumn() == 0) {
+            sendJSONResponse(['success' => false, 'message' => 'Akses Ditolak. Akun ini tidak terdaftar sebagai anak Anda.'], 403);
+        }
+    }
+
     // Ambil data target user
     $stmt = $pdo->prepare("SELECT user_id, username, full_name FROM users WHERE user_id = ?");
     $stmt->execute([$target_user_id]);

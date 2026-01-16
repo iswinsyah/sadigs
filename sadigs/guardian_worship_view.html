@@ -37,6 +37,9 @@
                         <select id="childSelect" onchange="loadReport(this.value)" class="border-none outline-none text-sm font-bold text-teal-700 bg-transparent cursor-pointer">
                             <option value="">Memuat data anak...</option>
                         </select>
+                        <button id="impersonateBtn" onclick="impersonateChild()" class="hidden bg-blue-600 text-white px-3 py-1 rounded text-xs font-bold hover:bg-blue-700 flex items-center gap-1 ml-2 transition shadow-sm" title="Masuk sebagai anak ini">
+                            <i data-lucide="log-in" class="w-3 h-3"></i> Login Anak
+                        </button>
                     </div>
                 </div>
 
@@ -96,6 +99,10 @@
 
         async function loadReport(studentId) {
             if(!studentId) return;
+            
+            // Tampilkan tombol impersonate
+            document.getElementById('impersonateBtn').classList.remove('hidden');
+
             const tbody = document.getElementById('reportTableBody');
             tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-10 text-center text-gray-500">Memuat data...</td></tr>';
 
@@ -136,6 +143,24 @@
                     tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-10 text-center text-gray-500">Belum ada laporan ibadah untuk anak ini.</td></tr>';
                 }
             } catch (e) { tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-10 text-center text-red-500">Gagal memuat data.</td></tr>'; }
+        }
+
+        async function impersonateChild() {
+            const studentId = document.getElementById('childSelect').value;
+            if (!studentId) return;
+            
+            if(!confirm('Anda akan login sebagai anak ini untuk melihat tampilan dari sisi mereka.\n\nLanjutkan?')) return;
+
+            try {
+                const res = await fetch('sadigs_api_v3/impersonate_user.php', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ user_id: studentId })
+                });
+                const result = await res.json();
+                if(result.success) { window.location.href = 'dashboard.html'; }
+                else { alert(result.message); }
+            } catch(e) { alert('Gagal login.'); }
         }
 
         function getBadge(label, status) {
