@@ -24,8 +24,8 @@ if (isset($_GET['reset_permissions']) && $_GET['reset_permissions'] == '1') {
             'Ustadz' => ['navDashboard', 'navProfil', 'navKalender', 'navAbsensi', 'navIzinPegawai', 'navJadwalRapat', 'navRppGenerator', 'navRppAlbum', 'navPerencanaanAkademik', 'navInputNilai', 'navKetersediaanMengajar', 'navJadwalPelajaran'],
             'Ustadzah' => ['navDashboard', 'navProfil', 'navKalender', 'navAbsensi', 'navIzinPegawai', 'navJadwalRapat', 'navRppGenerator', 'navRppAlbum', 'navPerencanaanAkademik', 'navInputNilai', 'navKetersediaanMengajar', 'navJadwalPelajaran'],
             'Walisantri' => ['navDashboard', 'navProfil', 'navKalender', 'navRekapIbadahAnak', 'navViewTahfizh', 'navIzinWalisantri', 'navPocketMoneyDeposit', 'navMonitoringAnak'],
-            'Santri Rijal' => ['navDashboard', 'navProfil', 'navKalender', 'navBiodataSantri', 'navIbadahHarian', 'navViewTahfizh', 'navSantriPocketMoney'],
-            'Santri Nisa\'' => ['navDashboard', 'navProfil', 'navKalender', 'navBiodataSantri', 'navIbadahHarian', 'navViewTahfizh', 'navSantriPocketMoney'],
+            'Santri Rijal' => ['navDashboard', 'navProfil', 'navKalender', 'navBiodataSantri', 'navIbadahHarian', 'navRiwayatIbadah', 'navViewTahfizh', 'navSantriPocketMoney'],
+            'Santri Nisa\'' => ['navDashboard', 'navProfil', 'navKalender', 'navBiodataSantri', 'navIbadahHarian', 'navRiwayatIbadah', 'navViewTahfizh', 'navSantriPocketMoney'],
         ];
         $stmt = $pdo->prepare("INSERT INTO menu_permissions (role_name, menu_id, is_allowed) VALUES (?, ?, 1)");
         foreach ($defaults as $role => $menus) { foreach ($menus as $menu) { $stmt->execute([$role, $menu]); } }
