@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pantau Ibadah Anak | SADIGS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>body{font-family:'Inter',sans-serif;}</style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+
+    <div class="flex h-screen overflow-hidden">
+        <aside id="sidebar" class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col hidden lg:flex">
+            <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-teal-600 text-white">
+                <h1 class="text-2xl font-extrabold tracking-wider">SADIGS</h1>
+            </div>
+            <div class="p-6">
+                <a href="dashboard.html" class="flex items-center gap-2 text-gray-600 hover:text-teal-600 transition">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i> Kembali ke Dashboard
+                </a>
+            </div>
+        </aside>
+
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative">
+            <div class="max-w-6xl mx-auto">
+                <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">Pantau Ibadah Anak</h1>
+                        <p class="text-sm text-gray-500">Lihat kedisiplinan ibadah putra/putri Anda.</p>
+                    </div>
+                    
+                    <!-- Dropdown Pilih Anak -->
+                    <div class="bg-white p-2 rounded-lg shadow-sm border border-gray-200 flex items-center gap-2">
+                        <label class="text-sm font-bold text-gray-600"><i data-lucide="user" class="w-4 h-4 inline mr-1"></i>Pilih Anak:</label>
+                        <select id="childSelect" onchange="loadReport(this.value)" class="border-none outline-none text-sm font-bold text-teal-700 bg-transparent cursor-pointer">
+                            <option value="">Memuat data anak...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 text-sm">
+                            <thead class="bg-teal-50">
+                                <tr>
+                                    <th class="px-4 py-3 text-left font-bold text-teal-800 uppercase">Tanggal</th>
+                                    <th class="px-4 py-3 text-center font-bold text-teal-800 uppercase">Sholat Wajib</th>
+                                    <th class="px-4 py-3 text-center font-bold text-teal-800 uppercase">Sunnah</th>
+                                    <th class="px-4 py-3 text-left font-bold text-teal-800 uppercase">Tilawah</th>
+                                    <th class="px-4 py-3 text-center font-bold text-teal-800 uppercase">Validasi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reportTableBody" class="bg-white divide-y divide-gray-200">
+                                <tr><td colspan="5" class="px-6 py-10 text-center text-gray-500">Silakan pilih anak terlebih dahulu.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // Cek Sesi & Load Anak
+        fetch('sadigs_api_v3/session_check.php').then(r=>r.json()).then(d=>{
+            if(!d.success) window.location.href = 'index.html';
+            loadChildren();
+        });
+
+        async function loadChildren() {
+            const select = document.getElementById('childSelect');
+            try {
+                const res = await fetch('sadigs_api_v3/get_my_children.php');
+                const result = await res.json();
+                
+                if (result.success && result.children.length > 0) {
+                    select.innerHTML = '';
+                    result.children.forEach((child, index) => {
+                        const opt = document.createElement('option');
+                        opt.value = child.user_id;
+                        opt.textContent = child.full_name;
+                        select.appendChild(opt);
+                    });
+                    // Otomatis load anak pertama
+                    loadReport(result.children[0].user_id);
+                } else {
+                    select.innerHTML = '<option value="">Tidak ada data anak terhubung</option>';
+                    document.getElementById('reportTableBody').innerHTML = '<tr><td colspan="5" class="px-6 py-10 text-center text-red-500">Akun Anda belum terhubung dengan data santri manapun.<br>Hubungi admin untuk menghubungkan akun.</td></tr>';
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        async function loadReport(studentId) {
+            if(!studentId) return;
+            const tbody = document.getElementById('reportTableBody');
+            tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-10 text-center text-gray-500">Memuat data...</td></tr>';
+
+            try {
+                const res = await fetch(`sadigs_api_v3/get_child_worship_report.php?id=${studentId}`);
+                const result = await res.json();
+                
+                if (result.success && result.data.length > 0) {
+                    tbody.innerHTML = '';
+                    result.data.forEach(row => {
+                        const tr = document.createElement('tr');
+                        tr.className = "hover:bg-gray-50 transition";
+                        
+                        const date = new Date(row.report_date).toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'short' });
+                        
+                        const sholat = `
+                            <div class="flex justify-center gap-1">
+                                ${getBadge('S', row.shalat_subuh)} ${getBadge('Z', row.shalat_dzuhur)} ${getBadge('A', row.shalat_ashar)} ${getBadge('M', row.shalat_maghrib)} ${getBadge('I', row.shalat_isya)}
+                            </div>`;
+
+                        const sunnah = `
+                            <span class="${row.dhuha == 1 ? 'text-green-600' : 'text-gray-300'} font-bold text-xs mr-1">D</span>
+                            <span class="${row.tahajud == 1 ? 'text-blue-600' : 'text-gray-300'} font-bold text-xs">T</span>`;
+
+                        const validator = row.validator_name ? `<span class="text-xs text-green-600 flex items-center justify-center gap-1"><i data-lucide="check-circle" class="w-3 h-3"></i> ${row.validator_name}</span>` : '<span class="text-xs text-gray-400 italic">Belum divalidasi</span>';
+
+                        tr.innerHTML = `
+                            <td class="px-4 py-3 font-bold text-gray-700">${date}</td>
+                            <td class="px-4 py-3 text-center">${sholat}</td>
+                            <td class="px-4 py-3 text-center">${sunnah}</td>
+                            <td class="px-4 py-3 text-gray-600">${row.tilawah || '-'}</td>
+                            <td class="px-4 py-3 text-center">${validator}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                    lucide.createIcons();
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-10 text-center text-gray-500">Belum ada laporan ibadah untuk anak ini.</td></tr>';
+                }
+            } catch (e) { tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-10 text-center text-red-500">Gagal memuat data.</td></tr>'; }
+        }
+
+        function getBadge(label, status) {
+            const color = status === 'Jamaah' ? 'bg-green-500' : (status === 'Munfarid' ? 'bg-yellow-500' : 'bg-red-500');
+            return `<span class="w-5 h-5 flex items-center justify-center rounded text-white text-[10px] font-bold ${color}" title="${label}: ${status}">${label}</span>`;
+        }
+    </script>
+</body>
+</html>

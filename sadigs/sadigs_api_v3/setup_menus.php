@@ -56,6 +56,7 @@ $menuDetails = [
     'navBiodataSantri' => ['name' => 'Biodata Santri', 'link' => 'student_data.html', 'icon' => 'book-user'],
     'navBukuIndukSantri' => ['name' => 'Buku Induk Santri', 'link' => 'student_master_book.html', 'icon' => 'book'],
     'navManajemenKelas' => ['name' => 'Manajemen Kelas', 'link' => 'class_management.html', 'icon' => 'users'],
+    'navRekapIbadahAnak' => ['name' => 'Rekap Ibadah Anak', 'link' => 'guardian_worship_view.html', 'icon' => 'clipboard-check'],
     'navInputNilai' => ['name' => 'Input Nilai Rapot', 'link' => 'input_grades.html', 'icon' => 'graduation-cap'],
     'navMonitoringAkademik' => ['name' => 'Monitoring Akademik', 'link' => 'academic_monitoring.html', 'icon' => 'monitor-check']
 ];
@@ -162,6 +163,10 @@ $monitoringPerms = ['Ketua Yayasan', 'Kepala Sekolah', 'Kepala Asrama Putra', 'K
 foreach ($monitoringPerms as $rName) {
     $pdo->prepare("INSERT INTO menu_permissions (role_name, menu_id, is_allowed) VALUES (?, 'navMonitoringIbadah', 1) ON DUPLICATE KEY UPDATE is_allowed = 1")->execute([$rName]);
 }
+
+// --- FORCE UPDATE PERMISSIONS FOR GUARDIAN ---
+$pdo->prepare("INSERT INTO menu_permissions (role_name, menu_id, is_allowed) VALUES ('Walisantri', 'navRekapIbadahAnak', 1) ON DUPLICATE KEY UPDATE is_allowed = 1")->execute();
+
 
 echo "</ul>";
 

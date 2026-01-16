@@ -14,7 +14,7 @@ try {
     // Cari santri yang field parent_username-nya cocok dengan username walisantri yang login
     $stmt = $pdo->prepare("
         SELECT u.user_id, sd.full_name, u.username 
-        FROM student_data sd
+        FROM student_details sd
         JOIN users u ON sd.user_id = u.user_id
         WHERE sd.parent_username = ?
     ");
