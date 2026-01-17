@@ -7,6 +7,18 @@ try {
 
     echo "<h1>Setup Standar KPI Pegawai (Revisi)</h1>";
 
+    // Pastikan tabel ada sebelum digunakan (FIX: untuk error table not found)
+    $pdo->exec("CREATE TABLE IF NOT EXISTS performance_kpi (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        role_name VARCHAR(50) NOT NULL,
+        kpi_name VARCHAR(100) NOT NULL,
+        kpi_type ENUM('automatic', 'manual') NOT NULL,
+        weight DECIMAL(5,2) NOT NULL,
+        description TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )");
+    echo "<p>✅ Tabel 'performance_kpi' siap digunakan.</p>";
+
     // Bersihkan data lama agar tidak duplikat
     $pdo->exec("TRUNCATE TABLE performance_kpi");
     echo "<p>✅ Tabel KPI lama dibersihkan.</p>";
