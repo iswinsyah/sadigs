@@ -174,6 +174,48 @@ function calculateAutoKPI($pdo, $user_id, $period_id, $kpi_name) {
         return ($rapatCount > 0) ? 100 : 0;
     }
 
+    // --- LOGIKA BARU UNTUK MUSYRIF & KEPALA ASRAMA ---
+
+    if ($kpi_name === 'Intensitas Simakan Hafalan') {
+        // Hitung berapa hari Musyrif menginput data di bulan ini
+        // Target: Input setiap hari kerja (Senin-Sabtu)
+        $stmtInput = $pdo->prepare("
+            SELECT COUNT(DISTINCT report_date) 
+            FROM tahfizh_reports 
+            WHERE musyrif_id = ? AND report_date BETWEEN ? AND ?
+        ");
+        $stmtInput->execute([$user_id, $period['start_date'], $period['end_date']]);
+        $inputDays = $stmtInput->fetchColumn();
+
+        // Hitung hari kerja dalam periode (Estimasi 24 hari/bulan)
+        $targetDays = 24; 
+        
+        return min(100, round(($inputDays / $targetDays) * 100, 2));
+    }
+
+    if ($kpi_name === 'Rata-rata Hafalan Santri') {
+        // Khusus Kepala Asrama: Mengambil rata-rata kualitas hafalan seluruh santri di periode ini
+        // Konversi Nilai: Mumtaz=100, Jayyid Jiddan=85, Jayyid=70, Maqbul=50
+        $sqlAvg = "
+            SELECT AVG(
+                CASE 
+                    WHEN quality = 'Mumtaz' THEN 100
+                    WHEN quality = 'Jayyid Jiddan' THEN 85
+                    WHEN quality = 'Jayyid' THEN 70
+                    ELSE 50 
+                END
+            ) as avg_score
+            FROM tahfizh_reports 
+            WHERE report_date BETWEEN ? AND ?
+        ";
+        // Note: Idealnya difilter berdasarkan Gender (Putra/Putri) sesuai role Kepala Asrama,
+        // tapi untuk saat ini kita ambil global dulu atau perlu join ke user gender.
+        // Kita ambil global dulu untuk simplifikasi awal.
+        $stmtAvg = $pdo->prepare($sqlAvg);
+        $stmtAvg->execute([$period['start_date'], $period['end_date']]);
+        return round($stmtAvg->fetchColumn() ?: 0, 2);
+    }
+
     return 0;
 }
 
