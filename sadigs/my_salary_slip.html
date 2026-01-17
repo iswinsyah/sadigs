@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estimasi Gaji Saya | SADIGS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>body{font-family:'Inter',sans-serif;}</style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+
+    <div class="flex h-screen overflow-hidden">
+        <aside id="sidebar" class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col hidden lg:flex">
+            <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-teal-600 text-white">
+                <h1 class="text-2xl font-extrabold tracking-wider">SADIGS</h1>
+            </div>
+            <div class="p-6">
+                <a href="dashboard.html" class="flex items-center gap-2 text-gray-600 hover:text-teal-600 transition">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i> Kembali ke Dashboard
+                </a>
+            </div>
+        </aside>
+
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative">
+            <div class="max-w-4xl mx-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">Estimasi Gaji Bulan Ini</h1>
+                        <p class="text-sm text-gray-500" id="periodLabel">Memuat periode...</p>
+                    </div>
+                    <div class="bg-teal-100 text-teal-800 px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2">
+                        <i data-lucide="user" class="w-4 h-4"></i> <span id="roleLabel">...</span>
+                    </div>
+                </div>
+
+                <!-- GRAND TOTAL CARD -->
+                <div class="bg-gradient-to-r from-teal-600 to-teal-500 rounded-2xl p-6 text-white shadow-lg mb-8 transform hover:scale-[1.01] transition-transform duration-300">
+                    <p class="text-teal-100 text-sm font-medium mb-1">Estimasi Take Home Pay (Sementara)</p>
+                    <h2 class="text-4xl font-extrabold tracking-tight" id="grandTotal">Rp 0</h2>
+                    <p class="text-xs text-teal-100 mt-2 opacity-80">*Angka ini akan terus bertambah seiring aktivitas Anda.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <!-- 1. GAJI POKOK -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="p-2 bg-blue-100 rounded-lg text-blue-600"><i data-lucide="briefcase" class="w-5 h-5"></i></div>
+                            <h3 class="font-bold text-gray-700">Gaji Pokok & Tunjangan</h3>
+                        </div>
+                        <p class="text-2xl font-bold text-gray-800" id="fixedSalary">Rp 0</p>
+                        <p class="text-xs text-gray-500 mt-1">Pendapatan tetap bulanan.</p>
+                    </div>
+
+                    <!-- 2. UANG KEHADIRAN -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="p-2 bg-green-100 rounded-lg text-green-600"><i data-lucide="clock" class="w-5 h-5"></i></div>
+                            <h3 class="font-bold text-gray-700">Uang Kehadiran</h3>
+                        </div>
+                        <p class="text-2xl font-bold text-gray-800" id="attendanceSalary">Rp 0</p>
+                        
+                        <!-- Detail Zona -->
+                        <div class="flex gap-2 mt-3">
+                            <span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded font-bold" title="Tepat Waktu" id="countGreen">0x 🟢</span>
+                            <span class="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded font-bold" title="Telat Ringan" id="countYellow">0x 🟡</span>
+                            <span class="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded font-bold" title="Telat Sedang" id="countOrange">0x 🟠</span>
+                            <span class="px-2 py-1 bg-red-100 text-red-700 text-xs rounded font-bold" title="Telat Berat" id="countRed">0x 🔴</span>
+                        </div>
+                    </div>
+
+                    <!-- 3. INSENTIF TAMBAHAN -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="p-2 bg-purple-100 rounded-lg text-purple-600"><i data-lucide="star" class="w-5 h-5"></i></div>
+                            <h3 class="font-bold text-gray-700">Insentif Tambahan</h3>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">Rapat</span>
+                                <span class="font-bold text-gray-800" id="meetingSalary">Rp 0</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">Piket Ahad</span>
+                                <span class="font-bold text-gray-800" id="piketSalary">Rp 0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. BONUS KINERJA (KPI) -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="p-2 bg-yellow-100 rounded-lg text-yellow-600"><i data-lucide="award" class="w-5 h-5"></i></div>
+                            <h3 class="font-bold text-gray-700">Bonus Kinerja (KPI)</h3>
+                        </div>
+                        <div class="flex justify-between items-end">
+                            <div>
+                                <p class="text-2xl font-bold text-gray-800" id="kpiBonus">Rp 0</p>
+                                <p class="text-xs text-gray-500 mt-1">Skor Saat Ini: <span class="font-bold text-teal-600" id="kpiScore">0</span>/100</p>
+                            </div>
+                            <div class="h-2 w-24 bg-gray-200 rounded-full overflow-hidden">
+                                <div class="h-full bg-yellow-400" id="kpiBar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        const formatRp = (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num);
+
+        fetch('sadigs_api_v3/my_salary_estimation.php')
+            .then(r => r.json())
+            .then(res => {
+                if (res.success) {
+                    const d = res.data;
+                    
+                    document.getElementById('periodLabel').textContent = 'Periode: ' + d.period;
+                    document.getElementById('roleLabel').textContent = d.role;
+                    document.getElementById('grandTotal').textContent = formatRp(d.grand_total);
+
+                    document.getElementById('fixedSalary').textContent = formatRp(d.base_salary);
+                    
+                    document.getElementById('attendanceSalary').textContent = formatRp(d.attendance.total);
+                    document.getElementById('countGreen').textContent = d.attendance.counts.green + 'x 🟢';
+                    document.getElementById('countYellow').textContent = d.attendance.counts.yellow + 'x 🟡';
+                    document.getElementById('countOrange').textContent = d.attendance.counts.orange + 'x 🟠';
+                    document.getElementById('countRed').textContent = d.attendance.counts.red + 'x 🔴';
+
+                    document.getElementById('meetingSalary').textContent = formatRp(d.meeting);
+                    document.getElementById('piketSalary').textContent = formatRp(d.piket);
+
+                    document.getElementById('kpiBonus').textContent = formatRp(d.kpi.bonus);
+                    document.getElementById('kpiScore').textContent = d.kpi.score;
+                    document.getElementById('kpiBar').style.width = d.kpi.score + '%';
+                } else {
+                    alert(res.message);
+                    window.location.href = 'dashboard.html';
+                }
+            })
+            .catch(err => console.error(err));
+    </script>
+</body>
+</html>

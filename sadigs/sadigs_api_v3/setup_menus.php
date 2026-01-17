@@ -60,7 +60,9 @@ $menuDetails = [
     'navInputNilai' => ['name' => 'Input Nilai Rapot', 'link' => 'input_grades.html', 'icon' => 'graduation-cap'],
     'navMonitoringAkademik' => ['name' => 'Monitoring Akademik', 'link' => 'academic_monitoring.html', 'icon' => 'monitor-check'],
     // Menu Penggajian
-    'navAturGaji' => ['name' => 'Pengaturan Gaji', 'link' => 'payroll_settings.html', 'icon' => 'settings']
+    'navAturGaji' => ['name' => 'Pengaturan Gaji', 'link' => 'payroll_settings.html', 'icon' => 'settings'],
+    // Menu Slip Gaji Real-time (Untuk Pegawai)
+    'navSlipGaji' => ['name' => 'Estimasi Gaji Saya', 'link' => 'my_salary_slip.html', 'icon' => 'wallet']
 ];
 
 // Ambil semua role yang ada di sistem
@@ -173,6 +175,13 @@ $pdo->prepare("INSERT INTO menu_permissions (role_name, menu_id, is_allowed) VAL
 $payrollPerms = ['Ketua Yayasan', 'Bendahara Yayasan'];
 foreach ($payrollPerms as $rName) {
     $pdo->prepare("INSERT INTO menu_permissions (role_name, menu_id, is_allowed) VALUES (?, 'navAturGaji', 1) ON DUPLICATE KEY UPDATE is_allowed = 1")->execute([$rName]);
+}
+
+// --- FORCE UPDATE PERMISSIONS FOR SALARY SLIP ---
+// Semua role pegawai (kecuali santri/wali) bisa lihat slip gaji mereka
+$employeeRoles = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan', 'Kepala Sekolah', 'Admin Sekolah', 'Sekretaris Sekolah', 'Bendahara Sekolah', 'Kepala Asrama Putra', 'Kepala Asrama Putri', 'Musyrif', 'Musyrifah', 'Ustadz', 'Ustadzah'];
+foreach ($employeeRoles as $rName) {
+    $pdo->prepare("INSERT INTO menu_permissions (role_name, menu_id, is_allowed) VALUES (?, 'navSlipGaji', 1) ON DUPLICATE KEY UPDATE is_allowed = 1")->execute([$rName]);
 }
 
 
