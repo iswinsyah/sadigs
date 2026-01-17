@@ -46,7 +46,7 @@ try {
     }
 
     // 3. Ambil Konfigurasi Tarif (Zona Waktu, Rapat, Piket)
-    $config = $pdo->query("SELECT * FROM payroll_config")->fetchAll(PDO::FETCH_KEY_PAIR);
+    $config = $pdo->query("SELECT config_key, config_value FROM payroll_config")->fetchAll(PDO::FETCH_KEY_PAIR);
 
     // 4. Hitung Pendapatan Harian (Absensi, Rapat, Piket)
     $currentMonthStart = date('Y-m-01');

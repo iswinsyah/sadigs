@@ -19,7 +19,7 @@ $pdo = getDBConnection();
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     try {
         // 1. Ambil Config Global
-        $config = $pdo->query("SELECT * FROM payroll_config")->fetchAll(PDO::FETCH_KEY_PAIR);
+        $config = $pdo->query("SELECT config_key, config_value FROM payroll_config")->fetchAll(PDO::FETCH_KEY_PAIR);
 
         // 2. Ambil Standar Gaji per Role (Gaji Pokok & Tunjangan Jabatan)
         $roles = ['Kepala Sekolah', 'Sekretaris Sekolah', 'Bendahara Sekolah', 'Musyrif', 'Ustadz', 'Kepala Asrama Putra', 'Kepala Asrama Putri'];
