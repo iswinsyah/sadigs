@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengaturan Standar Gaji | SADIGS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>body{font-family:'Inter',sans-serif;}</style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+
+    <div class="flex h-screen overflow-hidden">
+        <aside id="sidebar" class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col hidden lg:flex">
+            <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-teal-600 text-white">
+                <h1 class="text-2xl font-extrabold tracking-wider">SADIGS</h1>
+            </div>
+            <div class="p-6">
+                <a href="dashboard.html" class="flex items-center gap-2 text-gray-600 hover:text-teal-600 transition">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i> Kembali ke Dashboard
+                </a>
+            </div>
+        </aside>
+
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative">
+            <div class="max-w-5xl mx-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">Pengaturan Standar Gaji</h1>
+                        <p class="text-sm text-gray-500">Rumuskan nominal gaji pokok, tunjangan, dan tarif insentif di sini.</p>
+                    </div>
+                    <button onclick="saveSettings()" class="bg-teal-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-teal-700 shadow-lg flex items-center gap-2">
+                        <i data-lucide="save" class="w-5 h-5"></i> Simpan Perubahan
+                    </button>
+                </div>
+
+                <!-- TABS -->
+                <div class="mb-6 border-b border-gray-200">
+                    <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+                        <button onclick="switchTab('global')" id="tab-global" class="tab-btn border-teal-500 text-teal-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                            1. Global & Zona Waktu
+                        </button>
+                        <button onclick="switchTab('struktural')" id="tab-struktural" class="tab-btn border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                            2. Struktural (Tipe A)
+                        </button>
+                        <button onclick="switchTab('musyrif')" id="tab-musyrif" class="tab-btn border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                            3. Musyrif (Tipe B)
+                        </button>
+                        <button onclick="switchTab('guru')" id="tab-guru" class="tab-btn border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                            4. Guru Mapel (Tipe C)
+                        </button>
+                    </nav>
+                </div>
+
+                <form id="payrollForm">
+                    <!-- TAB 1: GLOBAL -->
+                    <div id="content-global" class="tab-content space-y-6">
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2"><i data-lucide="clock" class="w-5 h-5 text-teal-600"></i> Nominal Uang Kehadiran (Skema Bertingkat)</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Zona Hijau (Tepat Waktu)</label>
+                                    <div class="relative"><span class="absolute left-3 top-2 text-gray-500">Rp</span><input type="number" name="config[reward_zona_hijau]" class="w-full pl-10 p-2 border rounded focus:ring-teal-500" placeholder="0"></div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Zona Kuning (Telat Ringan)</label>
+                                    <div class="relative"><span class="absolute left-3 top-2 text-gray-500">Rp</span><input type="number" name="config[reward_zona_kuning]" class="w-full pl-10 p-2 border rounded focus:ring-teal-500" placeholder="0"></div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Zona Oranye (Telat Sedang)</label>
+                                    <div class="relative"><span class="absolute left-3 top-2 text-gray-500">Rp</span><input type="number" name="config[reward_zona_oranye]" class="w-full pl-10 p-2 border rounded focus:ring-teal-500" placeholder="0"></div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Zona Merah (Telat Berat)</label>
+                                    <div class="relative"><span class="absolute left-3 top-2 text-gray-500">Rp</span><input type="number" name="config[reward_zona_merah]" class="w-full pl-10 p-2 border rounded focus:ring-teal-500" placeholder="0"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2"><i data-lucide="star" class="w-5 h-5 text-yellow-500"></i> Insentif Tambahan</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Insentif Rapat (Per Kehadiran)</label>
+                                    <div class="relative"><span class="absolute left-3 top-2 text-gray-500">Rp</span><input type="number" name="config[insentif_rapat]" class="w-full pl-10 p-2 border rounded focus:ring-teal-500" placeholder="0"></div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Insentif Piket Ahad (Per Shift)</label>
+                                    <div class="relative"><span class="absolute left-3 top-2 text-gray-500">Rp</span><input type="number" name="config[insentif_piket]" class="w-full pl-10 p-2 border rounded focus:ring-teal-500" placeholder="0"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 2: STRUKTURAL -->
+                    <div id="content-struktural" class="tab-content hidden space-y-6">
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                            <h3 class="text-lg font-bold text-gray-800 mb-4">Gaji Pokok & Tunjangan Jabatan</h3>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-4 py-2 text-left text-xs font-bold text-gray-500 uppercase">Jabatan</th>
+                                            <th class="px-4 py-2 text-left text-xs font-bold text-gray-500 uppercase">Gaji Pokok (Fixed)</th>
+                                            <th class="px-4 py-2 text-left text-xs font-bold text-gray-500 uppercase">Tunjangan Jabatan</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200">
+                                        <!-- Loop Roles -->
+                                        <script>
+                                            const rolesA = ['Kepala Sekolah', 'Sekretaris Sekolah', 'Bendahara Sekolah', 'Kepala Asrama Putra', 'Kepala Asrama Putri'];
+                                            rolesA.forEach(role => {
+                                                document.write(`
+                                                <tr>
+                                                    <td class="px-4 py-3 font-medium text-gray-900">${role}</td>
+                                                    <td class="px-4 py-3"><input type="number" name="standards[${role}][gapok]" class="w-full p-1 border rounded text-sm" placeholder="0"></td>
+                                                    <td class="px-4 py-3"><input type="number" name="standards[${role}][tunjangan]" class="w-full p-1 border rounded text-sm" placeholder="0"></td>
+                                                </tr>`);
+                                            });
+                                        </script>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 3: MUSYRIF -->
+                    <div id="content-musyrif" class="tab-content hidden space-y-6">
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                            <h3 class="text-lg font-bold text-gray-800 mb-4">Standar Gaji Musyrif</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Gaji Pokok Musyrif</label>
+                                    <input type="number" name="standards[Musyrif][gapok]" class="w-full p-2 border rounded focus:ring-teal-500" placeholder="0">
+                                </div>
+                                <!-- Tunjangan jabatan musyrif biasanya 0 atau included -->
+                            </div>
+
+                            <h4 class="font-bold text-gray-700 mb-2 border-b pb-1">Tarif Mengajar Bertingkat (Khusus Musyrif)</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-blue-50 p-4 rounded-lg">
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-600 mb-1">Batas Jam Awal (Tier 1)</label>
+                                    <input type="number" name="rates[Musyrif][limit]" class="w-full p-2 border rounded text-sm" placeholder="Contoh: 6">
+                                    <p class="text-xs text-gray-500 mt-1">Jam ke-0 sampai ke-X</p>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-600 mb-1">Tarif Tier 1 (Murah)</label>
+                                    <input type="number" name="rates[Musyrif][rate1]" class="w-full p-2 border rounded text-sm" placeholder="Rp">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-600 mb-1">Tarif Tier 2 (Normal)</label>
+                                    <input type="number" name="rates[Musyrif][rate2]" class="w-full p-2 border rounded text-sm" placeholder="Rp">
+                                    <p class="text-xs text-gray-500 mt-1">Untuk jam selebihnya</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 4: GURU -->
+                    <div id="content-guru" class="tab-content hidden space-y-6">
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                            <h3 class="text-lg font-bold text-gray-800 mb-4">Tarif Mengajar Guru (Ustadz/Ustadzah)</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Tarif Per Jam Pelajaran</label>
+                                    <input type="number" name="rates[Ustadz][rate1]" class="w-full p-2 border rounded focus:ring-teal-500" placeholder="Rp">
+                                    <!-- Untuk Guru Murni, Tier 1 Limit = 999 (Semua jam tarifnya sama) -->
+                                    <input type="hidden" name="rates[Ustadz][limit]" value="999">
+                                    <input type="hidden" name="rates[Ustadz][rate2]" value="0">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // Load Data saat halaman dibuka
+        fetch('sadigs_api_v3/payroll_settings_api.php').then(r=>r.json()).then(d=>{
+            if(d.success) {
+                // Isi Config Global
+                for (const [key, val] of Object.entries(d.config)) {
+                    const el = document.querySelector(`[name="config[${key}]"]`);
+                    if(el) el.value = val;
+                }
+                // Isi Standar Gaji
+                for (const [role, vals] of Object.entries(d.standards)) {
+                    const elGapok = document.querySelector(`[name="standards[${role}][gapok]"]`);
+                    const elTunj = document.querySelector(`[name="standards[${role}][tunjangan]"]`);
+                    if(elGapok) elGapok.value = parseInt(vals.gapok);
+                    if(elTunj) elTunj.value = parseInt(vals.tunjangan);
+                }
+                // Isi Tarif Mengajar
+                for (const [role, r] of Object.entries(d.rates)) {
+                    const elLimit = document.querySelector(`[name="rates[${role}][limit]"]`);
+                    const elRate1 = document.querySelector(`[name="rates[${role}][rate1]"]`);
+                    const elRate2 = document.querySelector(`[name="rates[${role}][rate2]"]`);
+                    if(elLimit) elLimit.value = r.tier_1_limit;
+                    if(elRate1) elRate1.value = parseInt(r.tier_1_rate);
+                    if(elRate2) elRate2.value = parseInt(r.tier_2_rate);
+                }
+            }
+        });
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('border-teal-500', 'text-teal-600');
+                el.classList.add('border-transparent', 'text-gray-500');
+            });
+            
+            document.getElementById('content-' + tabName).classList.remove('hidden');
+            const btn = document.getElementById('tab-' + tabName);
+            btn.classList.remove('border-transparent', 'text-gray-500');
+            btn.classList.add('border-teal-500', 'text-teal-600');
+        }
+
+        async function saveSettings() {
+            const form = document.getElementById('payrollForm');
+            const formData = new FormData(form);
+            const data = { config: {}, standards: {}, rates: {} };
+            
+            for (let [key, value] of formData.entries()) {
+                if (key.startsWith('config[')) {
+                    const k = key.match(/\[(.*?)\]/)[1];
+                    data.config[k] = value;
+                } else if (key.startsWith('standards[')) {
+                    const matches = key.match(/standards\[(.*?)\]\[(.*?)\]/);
+                    if (!data.standards[matches[1]]) data.standards[matches[1]] = {};
+                    data.standards[matches[1]][matches[2]] = value;
+                } else if (key.startsWith('rates[')) {
+                    const matches = key.match(/rates\[(.*?)\]\[(.*?)\]/);
+                    if (!data.rates[matches[1]]) data.rates[matches[1]] = {};
+                    data.rates[matches[1]][matches[2]] = value;
+                }
+            }
+
+            try {
+                const res = await fetch('sadigs_api_v3/payroll_settings_api.php', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+                alert(result.message);
+            } catch(e) { alert('Gagal menyimpan.'); }
+        }
+    </script>
+</body>
+</html>

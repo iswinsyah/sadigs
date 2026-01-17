@@ -58,7 +58,9 @@ $menuDetails = [
     'navManajemenKelas' => ['name' => 'Manajemen Kelas', 'link' => 'class_management.html', 'icon' => 'users'],
     'navRekapIbadahAnak' => ['name' => 'Rekap Ibadah Anak', 'link' => 'guardian_worship_view.html', 'icon' => 'clipboard-check'],
     'navInputNilai' => ['name' => 'Input Nilai Rapot', 'link' => 'input_grades.html', 'icon' => 'graduation-cap'],
-    'navMonitoringAkademik' => ['name' => 'Monitoring Akademik', 'link' => 'academic_monitoring.html', 'icon' => 'monitor-check']
+    'navMonitoringAkademik' => ['name' => 'Monitoring Akademik', 'link' => 'academic_monitoring.html', 'icon' => 'monitor-check'],
+    // Menu Penggajian
+    'navAturGaji' => ['name' => 'Pengaturan Gaji', 'link' => 'payroll_settings.html', 'icon' => 'settings']
 ];
 
 // Ambil semua role yang ada di sistem
@@ -166,6 +168,12 @@ foreach ($monitoringPerms as $rName) {
 
 // --- FORCE UPDATE PERMISSIONS FOR GUARDIAN ---
 $pdo->prepare("INSERT INTO menu_permissions (role_name, menu_id, is_allowed) VALUES ('Walisantri', 'navRekapIbadahAnak', 1) ON DUPLICATE KEY UPDATE is_allowed = 1")->execute();
+
+// --- FORCE UPDATE PERMISSIONS FOR PAYROLL SETTINGS ---
+$payrollPerms = ['Ketua Yayasan', 'Bendahara Yayasan'];
+foreach ($payrollPerms as $rName) {
+    $pdo->prepare("INSERT INTO menu_permissions (role_name, menu_id, is_allowed) VALUES (?, 'navAturGaji', 1) ON DUPLICATE KEY UPDATE is_allowed = 1")->execute([$rName]);
+}
 
 
 echo "</ul>";
