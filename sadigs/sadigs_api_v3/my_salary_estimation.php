@@ -11,6 +11,52 @@ $user_id = $_SESSION['user_id'];
 $pdo = getDBConnection();
 
 try {
+    // --- AUTO-FIX: Pastikan tabel kinerja ada (Self-Healing) ---
+    // 1. Tabel Periode
+    $pdo->exec("CREATE TABLE IF NOT EXISTS performance_periods (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        period_name VARCHAR(50) NOT NULL,
+        start_date DATE NOT NULL,
+        end_date DATE NOT NULL,
+        is_active BOOLEAN DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )");
+
+    // 2. Cek/Buat Periode Aktif Bulan Ini
+    $stmtCheckPeriod = $pdo->query("SELECT COUNT(*) FROM performance_periods WHERE is_active = 1");
+    if ($stmtCheckPeriod->fetchColumn() == 0) {
+        $currentMonth = date('F Y');
+        $startDate = date('Y-m-01');
+        $endDate = date('Y-m-t');
+        $stmtInsertPeriod = $pdo->prepare("INSERT INTO performance_periods (period_name, start_date, end_date) VALUES (?, ?, ?)");
+        $stmtInsertPeriod->execute([$currentMonth, $startDate, $endDate]);
+    }
+
+    // 3. Tabel KPI (Jaga-jaga jika belum ada)
+    $pdo->exec("CREATE TABLE IF NOT EXISTS performance_kpi (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        role_name VARCHAR(50) NOT NULL,
+        kpi_name VARCHAR(100) NOT NULL,
+        kpi_type ENUM('automatic', 'manual') NOT NULL,
+        weight DECIMAL(5,2) NOT NULL,
+        description TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )");
+
+    // 4. Tabel Skor (Tanpa FK strict agar tidak error saat create)
+    $pdo->exec("CREATE TABLE IF NOT EXISTS performance_scores (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        period_id INT NOT NULL,
+        kpi_id INT NOT NULL,
+        score DECIMAL(5,2) DEFAULT 0,
+        assessor_id INT NULL,
+        notes TEXT,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        UNIQUE KEY unique_score (user_id, period_id, kpi_id)
+    )");
+    // -----------------------------------------------------------
+
     // 1. Tentukan Peran Utama (Prioritas peran pegawai)
     $stmtRole = $pdo->prepare("SELECT role_name FROM user_roles WHERE user_id = ? AND status = 'approved'");
     $stmtRole->execute([$user_id]);
