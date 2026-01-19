@@ -87,10 +87,16 @@
         async function loadChildren() {
             const container = document.getElementById('studentListContainer');
             try {
-                const res = await fetch('sadigs_api_v3/get_my_children.php');
+                // Tambahkan timestamp agar tidak kena cache browser
+                const res = await fetch('sadigs_api_v3/get_my_children.php?t=' + new Date().getTime());
                 const result = await res.json();
                 // Perbaikan: Menggunakan result.data sesuai update API terbaru
                 const children = result.data || result.children; 
+
+                if (!result.success) {
+                    container.innerHTML = `<div class="text-center p-8 text-red-500 bg-red-50 rounded-lg border border-red-200"><strong>Server Error:</strong> ${result.message}</div>`;
+                    return;
+                }
                 
                 if (result.success && children && children.length > 0) {
                     container.innerHTML = '';

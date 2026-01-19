@@ -21,6 +21,13 @@ try {
         $pdo->exec("ALTER TABLE student_details ADD COLUMN grade VARCHAR(20) NULL");
     }
 
+    // --- SELF-HEALING: Pastikan kolom 'student_photo_path' ada ---
+    try {
+        $pdo->query("SELECT student_photo_path FROM student_details LIMIT 1");
+    } catch (Exception $e) {
+        $pdo->exec("ALTER TABLE student_details ADD COLUMN student_photo_path VARCHAR(255) NULL");
+    }
+
     // Ambil nama lengkap user login untuk fallback pencarian
     $stmtUser = $pdo->prepare("SELECT full_name FROM users WHERE user_id = ?");
     $stmtUser->execute([$user_id]);
@@ -28,7 +35,7 @@ try {
 
     // Cari anak berdasarkan Username Wali ATAU Nama Lengkap Wali
     $sql = "
-        SELECT u.user_id, u.username, u.full_name, u.gender, u.student_photo_path, sd.grade 
+        SELECT u.user_id, u.username, u.full_name, u.gender, sd.student_photo_path, sd.grade 
         FROM student_details sd
         JOIN users u ON sd.user_id = u.user_id
         WHERE sd.parent_username = ? 
