@@ -90,6 +90,39 @@ try {
         $_SESSION['email'] = $email;
     }
 
+    // 4. Child Names (Logika Penghubungan Walisantri)
+    // Fitur ini mengecek nama anak yang dikirim dan menghubungkannya ke akun ini
+    $child_names = $data['child_names'] ?? null;
+    $linking_messages = [];
+    
+    if (!is_null($child_names) && is_array($child_names)) {
+        // Ambil username walisantri saat ini
+        $stmtUser = $pdo->prepare("SELECT username FROM users WHERE user_id = ?");
+        $stmtUser->execute([$user_id]);
+        $parent_username = $stmtUser->fetchColumn();
+
+        if ($parent_username) {
+            foreach ($child_names as $childName) {
+                $childName = trim($childName);
+                if (empty($childName)) continue;
+
+                // Cari santri berdasarkan nama lengkap
+                $stmtFind = $pdo->prepare("SELECT user_id FROM users WHERE full_name = ?");
+                $stmtFind->execute([$childName]);
+                $student = $stmtFind->fetch(PDO::FETCH_ASSOC);
+
+                if ($student) {
+                    // Link-kan: Update data santri agar parent_username-nya mengarah ke akun ini
+                    $stmtLink = $pdo->prepare("INSERT INTO student_details (user_id, parent_username) VALUES (?, ?) ON DUPLICATE KEY UPDATE parent_username = VALUES(parent_username)");
+                    $stmtLink->execute([$student['user_id'], $parent_username]);
+                    $linking_messages[] = "Berhasil menghubungkan santri: $childName";
+                } else {
+                    $linking_messages[] = "PERINGATAN: Santri '$childName' tidak ditemukan (Cek ejaan)";
+                }
+            }
+        }
+    }
+
     // --- Eksekusi Query Update ---
     // Pastikan setidaknya satu field yang valid untuk diubah telah dikirim
     if (empty($updates)) {
@@ -113,9 +146,14 @@ try {
     $stmt_fetch->execute(['user_id' => $user_id]);
     $updated_user = $stmt_fetch->fetch();
 
+    $finalMsg = 'Akun berhasil diperbarui.';
+    if (!empty($linking_messages)) {
+        $finalMsg .= ' ' . implode('. ', $linking_messages);
+    }
+
     sendJSONResponse([
         'success' => true, 
-        'message' => 'Akun berhasil diperbarui.',
+        'message' => $finalMsg,
         'user' => $updated_user
     ]);
 

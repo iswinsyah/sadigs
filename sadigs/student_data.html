@@ -368,8 +368,8 @@
             } else {
                 // Role lain (misal admin) yang mungkin diberi akses
                 if (!idFromUrl) {
-                    alert('Harap tentukan ID santri yang akan dilihat.');
-                    window.location.href = 'dashboard.html';
+                    // Redirect admin ke halaman pemilihan santri jika tidak ada ID
+                    window.location.href = 'select_student.html';
                     return;
                 }
                 targetUserId = idFromUrl;
