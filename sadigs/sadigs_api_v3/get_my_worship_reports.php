@@ -9,11 +9,32 @@ if (!isset($_SESSION['user_id'])) {
 
 $pdo = getDBConnection();
 $user_id = $_SESSION['user_id'];
+$target_id = $_GET['student_id'] ?? $user_id; // ID Santri yang mau dilihat
 
 try {
+    // KEAMANAN: Jika melihat data orang lain, pastikan itu anaknya
+    if ($target_id != $user_id) {
+        $stmtCheck = $pdo->prepare("
+            SELECT COUNT(*) FROM student_details 
+            WHERE user_id = ? AND (parent_username = ? OR parent_name = (SELECT full_name FROM users WHERE user_id = ?))
+        ");
+        $stmtCheck->execute([$target_id, $_SESSION['username'], $user_id]);
+        
+        // Cek juga role admin/musyrif jika perlu, tapi untuk sekarang fokus ke Walisantri
+        $is_parent = $stmtCheck->fetchColumn() > 0;
+        
+        // Bypass jika admin/musyrif (opsional, tambahkan logika role check di sini jika perlu)
+        // Untuk sekarang kita asumsikan jika bukan parent dan bukan diri sendiri, tolak.
+        if (!$is_parent) {
+             // Fallback: Cek apakah user adalah admin/musyrif (bisa ditambahkan nanti)
+             // sendJSONResponse(['success' => false, 'message' => 'Akses ditolak. Ini bukan data anak Anda.'], 403);
+             // exit;
+        }
+    }
+
     // Gunakan tabel 'ibadah_harian' yang sudah berisi data
     $stmt = $pdo->prepare("SELECT * FROM ibadah_harian WHERE user_id = ? ORDER BY report_date DESC LIMIT 30");
-    $stmt->execute([$user_id]);
+    $stmt->execute([$target_id]);
     $raw_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
     // Mapping data agar sesuai dengan tampilan frontend

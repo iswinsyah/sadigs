@@ -89,22 +89,25 @@
             try {
                 const res = await fetch('sadigs_api_v3/get_my_children.php');
                 const result = await res.json();
-                if (result.success && result.children.length > 0) {
+                // Perbaikan: Menggunakan result.data sesuai update API terbaru
+                const children = result.data || result.children; 
+                
+                if (result.success && children && children.length > 0) {
                     container.innerHTML = '';
-                    result.children.forEach(child => {
+                    children.forEach(child => {
                         const card = document.createElement('div');
-                        card.className = 'flex items-center gap-4 p-4 bg-white border border-gray-200 rounded-lg shadow-sm';
+                        card.className = 'flex items-center gap-4 p-4 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition';
                         card.innerHTML = `
                             <div class="w-12 h-12 rounded-full bg-teal-100 flex items-center justify-center">
                                 <i data-lucide="user" class="w-6 h-6 text-teal-600"></i>
                             </div>
                             <div class="flex-grow">
                                 <p class="font-bold text-gray-800">${child.full_name || 'Nama Belum Diisi'}</p>
-                                <p class="text-sm text-gray-500">Username: ${child.username}</p>
+                                <p class="text-sm text-gray-500">${child.username} ${child.grade ? '• Kelas ' + child.grade : ''}</p>
                             </div>
                             <div class="flex-shrink-0 flex flex-col sm:flex-row gap-2">
                                 <a href="student_data.html?id=${child.user_id}" class="px-3 py-1.5 text-xs font-bold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition text-center">Biodata</a>
-                                <a href="child_worship_report.html?id=${child.user_id}" class="px-3 py-1.5 text-xs font-bold text-white bg-teal-600 hover:bg-teal-700 rounded-md transition text-center">Laporan Ibadah</a>
+                                <a href="daily_worship_recap.html?student_id=${child.user_id}" class="px-3 py-1.5 text-xs font-bold text-white bg-teal-600 hover:bg-teal-700 rounded-md transition text-center">Laporan Ibadah</a>
                             </div>
                         `;
                         container.appendChild(card);
