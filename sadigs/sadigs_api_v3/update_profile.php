@@ -45,6 +45,8 @@ try {
 try {
     $pdo->beginTransaction();
 
+    $linking_results = []; // Penampung pesan hasil linking
+
     // 1. Update Data Pribadi di tabel 'users'
     $updates = [];
     $params = ['user_id' => $user_id];
@@ -102,6 +104,9 @@ try {
                     // Link-kan Santri tersebut ke Walisantri ini (update parent_username)
                     $stmtLink = $pdo->prepare("INSERT INTO student_details (user_id, parent_username) VALUES (?, ?) ON DUPLICATE KEY UPDATE parent_username = VALUES(parent_username)");
                     $stmtLink->execute([$student['user_id'], $username]);
+                    $linking_results[] = "✅ Berhasil menghubungkan santri: $childName.";
+                } else {
+                    $linking_results[] = "❌ GAGAL: Santri '$childName' tidak ditemukan. Cek ejaan.";
                 }
             }
         }
@@ -127,13 +132,22 @@ try {
                     // Link-kan Diri Sendiri (Santri) ke Walisantri tersebut
                     $stmtLink = $pdo->prepare("INSERT INTO student_details (user_id, parent_username) VALUES (?, ?) ON DUPLICATE KEY UPDATE parent_username = VALUES(parent_username)");
                     $stmtLink->execute([$user_id, $parent['username']]);
+                    $linking_results[] = "✅ Berhasil terhubung ke Walisantri: $parentName.";
+                } else {
+                    $linking_results[] = "❌ GAGAL: Walisantri '$parentName' tidak ditemukan.";
                 }
             }
         }
     }
 
     $pdo->commit();
-    sendJSONResponse(['success' => true, 'message' => 'Profil berhasil diperbarui. Pengajuan peran baru (jika ada) telah dikirim untuk validasi. Halaman akan dimuat ulang.']);
+    
+    $msg = 'Profil berhasil diperbarui.';
+    if (!empty($linking_results)) {
+        $msg .= "\n" . implode("\n", $linking_results);
+    }
+    
+    sendJSONResponse(['success' => true, 'message' => $msg]);
 
 } catch (Exception $e) {
     if ($pdo->inTransaction()) $pdo->rollBack();
