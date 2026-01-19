@@ -125,14 +125,14 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 font-medium">${row.report_date}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-800">${row.student_name}</td>
                             <td class="px-6 py-4 text-sm text-gray-700">
-                                <div class="font-bold text-teal-700">${row.last_surah_name}</div>
-                                <div class="text-xs text-gray-500">Ayat ${row.last_ayah_number} (Juz ${row.last_juz_number})</div>
+                                <div class="font-bold text-teal-700">${row.surah}</div>
+                                <div class="text-xs text-gray-500">Ayat ${row.ayat} <span class="bg-gray-100 px-1 rounded ml-1">${row.type}</span></div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-center">
-                                <span class="px-2 py-1 rounded text-xs font-bold ${getGradeColor(row.fluency_grade)}">${row.fluency_grade || '-'}</span>
+                                <span class="px-2 py-1 rounded text-xs font-bold ${getGradeColor(row.quality)}">${row.quality || '-'}</span>
                             </td>
-                            <td class="px-6 py-4 text-sm text-gray-600 italic max-w-xs truncate">${row.musyrif_notes || '-'}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${row.teacher_name || 'Musyrif'}</td>
+                            <td class="px-6 py-4 text-sm text-gray-600 italic max-w-xs truncate">${row.notes || '-'}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${row.musyrif_name || '-'}</td>
                         </tr>
                     `).join('');
                 } else {
@@ -150,10 +150,10 @@
         }
 
         function getGradeColor(grade) {
-            if(grade === 'A') return 'bg-green-100 text-green-800';
-            if(grade === 'B') return 'bg-blue-100 text-blue-800';
-            if(grade === 'C') return 'bg-yellow-100 text-yellow-800';
-            return 'bg-red-100 text-red-800';
+            if(grade === 'Mumtaz') return 'bg-green-100 text-green-800';
+            if(grade === 'Jayyid Jiddan') return 'bg-blue-100 text-blue-800';
+            if(grade === 'Jayyid') return 'bg-yellow-100 text-yellow-800';
+            return 'bg-red-100 text-red-800'; // Maqbul
         }
 
         async function exportExcel() {
@@ -168,13 +168,12 @@
 
                 if (result.success && result.data.length > 0) {
                     // Buat CSV
-                    const headers = ['Tanggal', 'Nama Santri', 'Surat', 'Ayat', 'Juz', 'Halaman', 'Kelancaran', 'Tajwid', 'Adab', 'Catatan', 'Musyrif'];
+                    const headers = ['Tanggal', 'Nama Santri', 'Jenis', 'Surat', 'Ayat', 'Kualitas', 'Catatan', 'Musyrif'];
                     const csvContent = [
                         headers.join(','),
                         ...result.data.map(row => [
-                            `"${row.report_date}"`, `"${row.student_name}"`, `"${row.last_surah_name}"`, `"${row.last_ayah_number}"`, 
-                            `"${row.last_juz_number}"`, `"${row.last_page_number}"`, `"${row.fluency_grade}"`, `"${row.tajwid_grade}"`, 
-                            `"${row.adab_grade}"`, `"${(row.musyrif_notes || '').replace(/"/g, '""')}"`, `"${row.teacher_name}"`
+                            `"${row.report_date}"`, `"${row.student_name}"`, `"${row.type}"`, `"${row.surah}"`, 
+                            `"${row.ayat}"`, `"${row.quality}"`, `"${(row.notes || '').replace(/"/g, '""')}"`, `"${row.musyrif_name}"`
                         ].join(','))
                     ].join('\n');
 

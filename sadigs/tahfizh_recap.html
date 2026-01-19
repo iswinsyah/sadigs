@@ -38,7 +38,7 @@
 
                 <!-- Grafik -->
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mb-6">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">Sebaran Capaian Juz Santri</h3>
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">Sebaran Kualitas Hafalan Santri</h3>
                     <div class="h-96">
                         <canvas id="juzChart"></canvas>
                     </div>
@@ -49,7 +49,7 @@
                     <i data-lucide="info" class="w-5 h-5 text-blue-600 mt-0.5"></i>
                     <div>
                         <h4 class="font-bold text-blue-800 text-sm">Informasi Data</h4>
-                        <p class="text-sm text-blue-700">Data di atas diambil berdasarkan laporan setoran terakhir setiap santri. Santri yang belum pernah menyetor hafalan tidak masuk dalam grafik ini.</p>
+                        <p class="text-sm text-blue-700">Grafik menampilkan jumlah setoran hafalan berdasarkan kualitas (Mumtaz, Jayyid Jiddan, dll) dari seluruh laporan yang masuk.</p>
                     </div>
                 </div>
             </div>
@@ -83,7 +83,7 @@
                 const result = await res.json();
 
                 if (result.success && result.data) {
-                    const labels = result.data.map(d => 'Juz ' + d.juz);
+                    const labels = result.data.map(d => d.juz); // 'juz' di sini berisi label kualitas (Mumtaz dll)
                     const counts = result.data.map(d => d.count);
 
                     const ctx = document.getElementById('juzChart').getContext('2d');
