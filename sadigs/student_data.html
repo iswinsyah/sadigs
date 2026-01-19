@@ -55,6 +55,22 @@
                 <p class="text-gray-500 text-sm mt-1">Lengkapi data diri untuk keperluan akademik dan pembagian kelas.</p>
             </header>
 
+            <!-- QUICK INFO CARD (Added per request) -->
+            <div id="quickInfoCard" class="hidden bg-teal-50 border-l-4 border-teal-500 p-4 mb-6 rounded-r-lg shadow-sm">
+                <div class="flex items-start gap-3">
+                    <div class="p-2 bg-white rounded-full text-teal-600 shadow-sm">
+                        <i data-lucide="users" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-teal-800 text-sm uppercase tracking-wide mb-1">Orang Tua / Wali</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-1 text-sm text-gray-700">
+                            <p><span class="font-semibold text-gray-500 w-16 inline-block">Ayah:</span> <span id="view_father_name">-</span></p>
+                            <p><span class="font-semibold text-gray-500 w-16 inline-block">Ibu:</span> <span id="view_mother_name">-</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="max-w-3xl bg-white p-8 rounded-xl shadow-sm border border-gray-100">
                 <!-- PENTING: enctype diperlukan untuk upload file -->
                 <form id="studentForm" class="space-y-6" enctype="multipart/form-data">
@@ -193,7 +209,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <!-- 19. Nama Ayah -->
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">19. Nama Ayah</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">19. Nama Lengkap Ayah</label>
                                 <input type="text" name="father_name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none">
                             </div>
                             <!-- 20. No HP Ayah -->
@@ -220,7 +236,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <!-- 23. Nama Ibu -->
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">23. Nama Ibu</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">23. Nama Lengkap Ibu</label>
                                 <input type="text" name="mother_name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none">
                             </div>
                             <!-- 24. No HP Ibu -->
@@ -411,6 +427,11 @@
                     if(d.parent_phone) form.querySelector('[name="parent_phone"]').value = d.parent_phone;
                     if(d.guardian_job) form.querySelector('[name="guardian_job"]').value = d.guardian_job;
                     if(d.guardian_address) form.querySelector('[name="guardian_address"]').value = d.guardian_address;
+
+                    // Populate Quick Info Card
+                    document.getElementById('view_father_name').textContent = d.father_name || '-';
+                    document.getElementById('view_mother_name').textContent = d.mother_name || '-';
+                    document.getElementById('quickInfoCard').classList.remove('hidden');
 
                     // Update UI untuk file yang sudah ada
                     if(d.student_photo_path) {
