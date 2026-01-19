@@ -13,6 +13,14 @@ $user_id = $_SESSION['user_id'];
 $pdo = getDBConnection();
 
 try {
+    // --- SELF-HEALING: Pastikan kolom 'grade' ada (Fix Data Tidak Ditemukan) ---
+    try {
+        $pdo->query("SELECT grade FROM student_details LIMIT 1");
+    } catch (Exception $e) {
+        // Jika error (kolom tidak ada), buat kolomnya
+        $pdo->exec("ALTER TABLE student_details ADD COLUMN grade VARCHAR(20) NULL");
+    }
+
     // Ambil nama lengkap user login untuk fallback pencarian
     $stmtUser = $pdo->prepare("SELECT full_name FROM users WHERE user_id = ?");
     $stmtUser->execute([$user_id]);
