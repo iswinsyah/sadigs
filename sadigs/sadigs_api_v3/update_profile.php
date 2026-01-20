@@ -10,9 +10,24 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 $username = $_SESSION['username'];
 
+// --- AUTO-SCHEMA: Pastikan tabel ada SEBELUM query apapun (GET/POST) ---
+$pdo = getDBConnection();
+try {
+    $pdo->exec("CREATE TABLE IF NOT EXISTS student_details (user_id INT PRIMARY KEY)");
+    // Coba tambahkan kolom parent_username jika belum ada
+    try { $pdo->exec("ALTER TABLE student_details ADD COLUMN parent_username VARCHAR(100) NULL"); } catch(Exception $e){}
+    
+    // --- TABEL BARU: student_guardians (Untuk Multi-Parent) ---
+    $pdo->exec("CREATE TABLE IF NOT EXISTS student_guardians (
+        id INT AUTO_INCREMENT PRIMARY KEY, 
+        student_id INT NOT NULL, 
+        walisantri_id INT NOT NULL, 
+        UNIQUE KEY unique_relation (student_id, walisantri_id)
+    )");
+} catch (Exception $e) { /* Abaikan error jika kolom sudah ada */ }
+
 // --- GET HANDLER: Ambil Data Profil ---
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    $pdo = getDBConnection();
     // Ambil data user
     $stmt = $pdo->prepare("SELECT username, full_name, email, gender, bio FROM users WHERE user_id = ?");
     $stmt->execute([$user_id]);
@@ -51,23 +66,6 @@ if (is_null($input)) {
     sendJSONResponse(['success' => false, 'message' => 'Invalid JSON input.'], 400);
     exit;
 }
-
-$pdo = getDBConnection();
-
-// --- AUTO-SCHEMA: Pastikan tabel student_details ada ---
-try {
-    $pdo->exec("CREATE TABLE IF NOT EXISTS student_details (user_id INT PRIMARY KEY)");
-    // Coba tambahkan kolom parent_username jika belum ada
-    $pdo->exec("ALTER TABLE student_details ADD COLUMN parent_username VARCHAR(100) NULL");
-    
-    // --- TABEL BARU: student_guardians (Untuk Multi-Parent) ---
-    $pdo->exec("CREATE TABLE IF NOT EXISTS student_guardians (
-        id INT AUTO_INCREMENT PRIMARY KEY, 
-        student_id INT NOT NULL, 
-        walisantri_id INT NOT NULL, 
-        UNIQUE KEY unique_relation (student_id, walisantri_id)
-    )");
-} catch (Exception $e) { /* Abaikan error jika kolom sudah ada */ }
 
 try {
     $pdo->beginTransaction();
