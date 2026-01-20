@@ -31,7 +31,8 @@ try {
         'surah' => "VARCHAR(100) NULL",
         'ayat' => "VARCHAR(50) NULL",
         'quality' => "VARCHAR(50) NULL",
-        'type' => "VARCHAR(20) DEFAULT 'Ziyadah'"
+        'type' => "VARCHAR(20) DEFAULT 'Ziyadah'",
+        'notes' => "TEXT NULL"
     ];
     
     foreach ($columns as $col => $def) {
