@@ -40,6 +40,14 @@ try {
     $pdo->exec("CREATE TABLE IF NOT EXISTS student_details (user_id INT PRIMARY KEY)");
     // Coba tambahkan kolom parent_username jika belum ada
     $pdo->exec("ALTER TABLE student_details ADD COLUMN parent_username VARCHAR(100) NULL");
+    
+    // --- TABEL BARU: student_guardians (Untuk Multi-Parent) ---
+    $pdo->exec("CREATE TABLE IF NOT EXISTS student_guardians (
+        id INT AUTO_INCREMENT PRIMARY KEY, 
+        student_id INT NOT NULL, 
+        walisantri_id INT NOT NULL, 
+        UNIQUE KEY unique_relation (student_id, walisantri_id)
+    )");
 } catch (Exception $e) { /* Abaikan error jika kolom sudah ada */ }
 
 try {
@@ -101,9 +109,10 @@ try {
                 $student = $stmtFind->fetch(PDO::FETCH_ASSOC);
                 
                 if ($student) {
-                    // Link-kan Santri tersebut ke Walisantri ini (update parent_username)
-                    $stmtLink = $pdo->prepare("INSERT INTO student_details (user_id, parent_username) VALUES (?, ?) ON DUPLICATE KEY UPDATE parent_username = VALUES(parent_username)");
-                    $stmtLink->execute([$student['user_id'], $username]);
+                    // Link-kan menggunakan tabel student_guardians (Multi-Parent Support)
+                    // INSERT IGNORE agar jika sudah terhubung tidak error
+                    $stmtLink = $pdo->prepare("INSERT IGNORE INTO student_guardians (student_id, walisantri_id) VALUES (?, ?)");
+                    $stmtLink->execute([$student['user_id'], $user_id]);
                     $linking_results[] = "✅ Berhasil menghubungkan santri: {$student['full_name']} ({$student['username']}).";
                 } else {
                     $linking_results[] = "❌ GAGAL: Santri '$childIdentifier' tidak ditemukan. Cek Username/Nama.";

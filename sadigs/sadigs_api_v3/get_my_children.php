@@ -33,17 +33,19 @@ try {
     $stmtUser->execute([$user_id]);
     $fullName = $stmtUser->fetchColumn();
 
-    // Cari anak berdasarkan Username Wali ATAU Nama Lengkap Wali
+    // Cari anak berdasarkan tabel relasi baru (student_guardians) ATAU tabel lama (fallback)
     $sql = "
-        SELECT u.user_id, u.username, u.full_name, u.gender, sd.student_photo_path, sd.grade 
-        FROM student_details sd
-        JOIN users u ON sd.user_id = u.user_id
-        WHERE sd.parent_username = ? 
+        SELECT DISTINCT u.user_id, u.username, u.full_name, u.gender, sd.student_photo_path, sd.grade 
+        FROM users u
+        LEFT JOIN student_details sd ON u.user_id = sd.user_id
+        LEFT JOIN student_guardians sg ON u.user_id = sg.student_id
+        WHERE sg.walisantri_id = ?
+           OR sd.parent_username = ? 
            OR (sd.parent_name IS NOT NULL AND sd.parent_name != '' AND sd.parent_name = ?)
     ";
     
     $stmt = $pdo->prepare($sql);
-    $stmt->execute([$username, $fullName]);
+    $stmt->execute([$user_id, $username, $fullName]);
     $children = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     echo json_encode(['success' => true, 'data' => $children]);

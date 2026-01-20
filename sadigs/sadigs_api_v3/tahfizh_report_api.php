@@ -31,13 +31,15 @@ try {
             $stmtUser->execute([$user_id]);
             $fullName = $stmtUser->fetchColumn();
 
-            // Cari ID anak-anak yang terhubung
+            // Cari ID anak-anak yang terhubung (Support Multi-Parent)
             $stmtKids = $pdo->prepare("
-                SELECT user_id FROM student_details 
-                WHERE parent_username = ? 
-                OR (parent_name IS NOT NULL AND parent_name != '' AND parent_name = ?)
+                SELECT DISTINCT u.user_id 
+                FROM users u
+                LEFT JOIN student_details sd ON u.user_id = sd.user_id
+                LEFT JOIN student_guardians sg ON u.user_id = sg.student_id
+                WHERE sg.walisantri_id = ? OR sd.parent_username = ? OR sd.parent_name = ?
             ");
-            $stmtKids->execute([$username, $fullName]);
+            $stmtKids->execute([$user_id, $username, $fullName]);
             $kidIds = $stmtKids->fetchAll(PDO::FETCH_COLUMN);
 
             if (empty($kidIds)) {

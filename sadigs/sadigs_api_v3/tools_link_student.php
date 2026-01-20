@@ -19,6 +19,12 @@ try {
     try { $pdo->exec("ALTER TABLE student_details ADD COLUMN parent_username VARCHAR(100) NULL"); } catch(Exception $e){}
     try { $pdo->exec("ALTER TABLE student_details ADD COLUMN parent_name VARCHAR(100) NULL"); } catch(Exception $e){}
     try { $pdo->exec("ALTER TABLE student_details ADD COLUMN grade VARCHAR(20) NULL"); } catch(Exception $e){}
+    
+    $pdo->exec("CREATE TABLE IF NOT EXISTS student_guardians (
+        id INT AUTO_INCREMENT PRIMARY KEY, 
+        student_id INT NOT NULL, walisantri_id INT NOT NULL, 
+        UNIQUE KEY unique_relation (student_id, walisantri_id)
+    )");
 } catch (Exception $e) {
     die("Error Database Init: " . $e->getMessage());
 }
@@ -36,8 +42,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         if ($student) {
             // Lakukan Linking
-            $stmtLink = $pdo->prepare("INSERT INTO student_details (user_id, parent_username) VALUES (?, ?) ON DUPLICATE KEY UPDATE parent_username = VALUES(parent_username)");
-            if ($stmtLink->execute([$student['user_id'], $username])) {
+            $stmtLink = $pdo->prepare("INSERT IGNORE INTO student_guardians (student_id, walisantri_id) VALUES (?, ?)");
+            if ($stmtLink->execute([$student['user_id'], $user_id])) {
                 $message = "<div class='alert success'>✅ Berhasil menghubungkan santri: <strong>{$student['full_name']}</strong> ({$target_username}) ke akun Anda.</div>";
             } else {
                 $message = "<div class='alert error'>❌ Gagal menyimpan ke database.</div>";
@@ -56,13 +62,14 @@ $my_fullname = $stmtUser->fetchColumn();
 
 // Data Anak Terhubung
 $sqlChildren = "
-    SELECT u.full_name, u.username, sd.grade 
-    FROM student_details sd
-    JOIN users u ON sd.user_id = u.user_id
-    WHERE sd.parent_username = ? OR sd.parent_name = ?
+    SELECT DISTINCT u.full_name, u.username, sd.grade 
+    FROM users u
+    LEFT JOIN student_details sd ON u.user_id = sd.user_id
+    LEFT JOIN student_guardians sg ON u.user_id = sg.student_id
+    WHERE sg.walisantri_id = ? OR sd.parent_username = ?
 ";
 $stmtChildren = $pdo->prepare($sqlChildren);
-$stmtChildren->execute([$username, $my_fullname]);
+$stmtChildren->execute([$user_id, $username]);
 $children = $stmtChildren->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
