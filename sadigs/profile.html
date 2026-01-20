@@ -84,22 +84,28 @@
                             <!-- Input untuk Walisantri -->
                             <div id="walisantriInputs" class="hidden space-y-3">
                                 <label class="block text-sm font-bold text-gray-700">Pilih Nama Anak (Santri):</label>
-                                <p class="text-xs text-gray-500 mb-2">Silakan cari dan pilih nama putra/putri Anda dari daftar di bawah ini (Disusun Abjad).</p>
+                                <p class="text-xs text-gray-500 mb-2">Silakan cari dan pilih nama putra/putri Anda. Jika salah pilih, klik tombol <strong>Ubah</strong>.</p>
                                 
-                                <div class="relative">
-                                    <select name="child_name_1" id="child_select_1" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white appearance-none cursor-pointer">
-                                        <option value="">-- Pilih Anak Pertama --</option>
-                                        <option disabled>Memuat data...</option>
-                                    </select>
-                                    <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-gray-500"><i data-lucide="chevron-down" class="w-4 h-4"></i></div>
+                                <div class="flex items-center gap-2">
+                                    <div class="relative flex-1">
+                                        <select name="child_name_1" id="child_select_1" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white appearance-none cursor-pointer transition" onchange="handleChildSelect()">
+                                            <option value="">-- Pilih Anak Pertama --</option>
+                                            <option disabled>Memuat data...</option>
+                                        </select>
+                                        <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-gray-500"><i data-lucide="chevron-down" class="w-4 h-4"></i></div>
+                                    </div>
+                                    <button type="button" id="btn_reset_1" onclick="resetChildSelect('child_select_1')" class="hidden px-4 py-3 text-sm font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg border border-red-200 transition">Ubah</button>
                                 </div>
 
-                                <div class="relative">
-                                    <select name="child_name_2" id="child_select_2" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white appearance-none cursor-pointer">
-                                        <option value="">-- Pilih Anak Kedua (Jika ada) --</option>
-                                        <option disabled>Memuat data...</option>
-                                    </select>
-                                    <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-gray-500"><i data-lucide="chevron-down" class="w-4 h-4"></i></div>
+                                <div class="flex items-center gap-2">
+                                    <div class="relative flex-1">
+                                        <select name="child_name_2" id="child_select_2" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white appearance-none cursor-pointer transition" onchange="handleChildSelect()">
+                                            <option value="">-- Pilih Anak Kedua (Jika ada) --</option>
+                                            <option disabled>Memuat data...</option>
+                                        </select>
+                                        <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-gray-500"><i data-lucide="chevron-down" class="w-4 h-4"></i></div>
+                                    </div>
+                                    <button type="button" id="btn_reset_2" onclick="resetChildSelect('child_select_2')" class="hidden px-4 py-3 text-sm font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg border border-red-200 transition">Ubah</button>
                                 </div>
                             </div>
 
@@ -184,6 +190,30 @@
             checkFamilyInputs(); // Cek awal
         }
 
+        function handleChildSelect() {
+            const s1 = document.getElementById('child_select_1');
+            const s2 = document.getElementById('child_select_2');
+            const v1 = s1.value;
+            const v2 = s2.value;
+
+            // Tampilkan tombol Ubah jika ada nilai
+            document.getElementById('btn_reset_1').classList.toggle('hidden', !v1);
+            document.getElementById('btn_reset_2').classList.toggle('hidden', !v2);
+
+            // Disable pilihan yang sudah dipilih di dropdown lawan
+            Array.from(s2.options).forEach(opt => {
+                if (opt.value) opt.disabled = (opt.value === v1);
+            });
+            Array.from(s1.options).forEach(opt => {
+                if (opt.value) opt.disabled = (opt.value === v2);
+            });
+        }
+
+        function resetChildSelect(id) {
+            document.getElementById(id).value = "";
+            handleChildSelect();
+        }
+
         // --- LOGIKA BARU: Load Daftar Santri untuk Dropdown ---
         let santriListLoaded = false;
         async function loadSantriList() {
@@ -201,6 +231,7 @@
                     select1.innerHTML = '<option value="">-- Pilih Anak Pertama --</option>' + options;
                     select2.innerHTML = '<option value="">-- Pilih Anak Kedua (Jika ada) --</option>' + options;
                     santriListLoaded = true;
+                    handleChildSelect(); // Inisialisasi state
                 }
             } catch (e) { console.error("Gagal memuat daftar santri", e); }
         }
@@ -235,7 +266,9 @@
             e.preventDefault();
             const btn = document.getElementById('saveBtn');
             const originalHTML = btn.innerHTML;
-            btn.disabled = true; btn.innerHTML = 'Menyimpan...';
+            btn.disabled = true; 
+            btn.innerHTML = '<i data-lucide="loader" class="w-5 h-5 animate-spin"></i> Sedang Menyimpan...';
+            lucide.createIcons();
 
             // Susun Data JSON
             const formData = new FormData(e.target);
