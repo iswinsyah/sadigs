@@ -132,6 +132,7 @@
         lucide.createIcons();
 
         // Daftar Role yang tersedia untuk dipilih user
+        let myLinkedChildren = []; // Penampung data anak dari database
         const availableRoles = [
             'Walisantri', 'Santri Rijal', "Santri Nisa'", 
             'Ustadz', 'Ustadzah', 'Musyrif', 'Musyrifah'
@@ -149,6 +150,11 @@
                     document.getElementById('full_name').value = d.full_name || '';
                     document.getElementById('gender').value = d.gender || 'Laki-laki';
                     document.getElementById('bio').value = d.bio || '';
+
+                    // Simpan data anak yang sudah terhubung
+                    if (d.linked_children && Array.isArray(d.linked_children)) {
+                        myLinkedChildren = d.linked_children;
+                    }
 
                     renderRoles(d.roles || []);
                 }
@@ -231,6 +237,13 @@
                     select1.innerHTML = '<option value="">-- Pilih Anak Pertama --</option>' + options;
                     select2.innerHTML = '<option value="">-- Pilih Anak Kedua (Jika ada) --</option>' + options;
                     santriListLoaded = true;
+                    
+                    // --- AUTO-SELECT: Pilih anak yang sudah tersimpan ---
+                    if (myLinkedChildren.length > 0) {
+                        if (myLinkedChildren[0]) select1.value = myLinkedChildren[0];
+                        if (myLinkedChildren[1]) select2.value = myLinkedChildren[1];
+                    }
+                    
                     handleChildSelect(); // Inisialisasi state
                 }
             } catch (e) { console.error("Gagal memuat daftar santri", e); }

@@ -23,6 +23,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $stmtRoles->execute([$user_id]);
     $user['roles'] = $stmtRoles->fetchAll(PDO::FETCH_ASSOC);
     
+    // --- AMBIL LINKED CHILDREN (Jika Walisantri) ---
+    $user['linked_children'] = [];
+    $isWalisantri = false;
+    foreach($user['roles'] as $r) {
+        if($r['role_name'] === 'Walisantri') $isWalisantri = true;
+    }
+
+    if ($isWalisantri) {
+        $stmtKids = $pdo->prepare("
+            SELECT DISTINCT u.username 
+            FROM users u
+            LEFT JOIN student_details sd ON u.user_id = sd.user_id
+            LEFT JOIN student_guardians sg ON u.user_id = sg.student_id
+            WHERE sg.walisantri_id = ? OR sd.parent_username = ?
+        ");
+        $stmtKids->execute([$user_id, $username]);
+        $user['linked_children'] = $stmtKids->fetchAll(PDO::FETCH_COLUMN);
+    }
+    
     sendJSONResponse(['success' => true, 'data' => $user]);
 }
 
