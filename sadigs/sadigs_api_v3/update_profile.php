@@ -84,29 +84,29 @@ try {
         
         // A. Jika User adalah WALISANTRI -> Input Nama Anak
         if (!empty($family['child_names']) && is_array($family['child_names'])) {
-            foreach ($family['child_names'] as $childName) {
-                $childName = trim($childName);
-                if (empty($childName)) continue;
+            foreach ($family['child_names'] as $childIdentifier) {
+                $childIdentifier = trim($childIdentifier);
+                if (empty($childIdentifier)) continue;
                 
-                // Cari Santri berdasarkan Nama Lengkap
+                // Cari Santri berdasarkan Username ATAU Nama Lengkap
                 // Kita cari user yang punya role mengandung kata 'Santri'
                 $stmtFind = $pdo->prepare("
-                    SELECT u.user_id FROM users u 
+                    SELECT u.user_id, u.full_name, u.username FROM users u 
                     JOIN user_roles ur ON u.user_id = ur.user_id 
-                    WHERE TRIM(LOWER(u.full_name)) = TRIM(LOWER(?)) 
+                    WHERE (u.username = ? OR TRIM(LOWER(u.full_name)) = TRIM(LOWER(?)))
                     AND ur.role_name LIKE 'Santri%'
                     LIMIT 1
                 ");
-                $stmtFind->execute([$childName]);
+                $stmtFind->execute([$childIdentifier, $childIdentifier]);
                 $student = $stmtFind->fetch(PDO::FETCH_ASSOC);
                 
                 if ($student) {
                     // Link-kan Santri tersebut ke Walisantri ini (update parent_username)
                     $stmtLink = $pdo->prepare("INSERT INTO student_details (user_id, parent_username) VALUES (?, ?) ON DUPLICATE KEY UPDATE parent_username = VALUES(parent_username)");
                     $stmtLink->execute([$student['user_id'], $username]);
-                    $linking_results[] = "✅ Berhasil menghubungkan santri: $childName.";
+                    $linking_results[] = "✅ Berhasil menghubungkan santri: {$student['full_name']} ({$student['username']}).";
                 } else {
-                    $linking_results[] = "❌ GAGAL: Santri '$childName' tidak ditemukan. Cek ejaan.";
+                    $linking_results[] = "❌ GAGAL: Santri '$childIdentifier' tidak ditemukan. Cek Username/Nama.";
                 }
             }
         }
