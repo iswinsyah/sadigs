@@ -105,7 +105,7 @@
                 th.addEventListener('dragleave', handleDragLeave);
 
                 th.innerHTML = `<div class="writing-mode-vertical transform -rotate-45 origin-bottom-left translate-x-4 mb-2">${role}</div>`; // Style miring biar muat
-                th.textContent = role; // Fallback normal text
+                th.title = "Klik & Tahan untuk geser"; // Tooltip bantuan
                 headerRow.appendChild(th);
             });
 
