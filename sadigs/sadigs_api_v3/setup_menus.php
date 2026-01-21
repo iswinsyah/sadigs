@@ -57,8 +57,11 @@ $menuDetails = [
     'navBukuIndukSantri' => ['name' => 'Buku Induk Santri', 'link' => 'student_master_book.html', 'icon' => 'book'],
     'navManajemenKelas' => ['name' => 'Manajemen Kelas', 'link' => 'class_management.html', 'icon' => 'users'],
     'navRekapIbadahAnak' => ['name' => 'Rekap Ibadah Anak', 'link' => 'guardian_worship_view.html', 'icon' => 'clipboard-check'],
-    'navInputNilai' => ['name' => 'Input Nilai Rapot', 'link' => 'input_grades.html', 'icon' => 'graduation-cap'],
     'navMonitoringAkademik' => ['name' => 'Monitoring Akademik', 'link' => 'academic_monitoring.html', 'icon' => 'monitor-check'],
+    // Menu Akademik Baru (Leger & Mapel)
+    'navManajemenMapel' => ['name' => 'Manajemen Mapel', 'link' => 'subjects_management.html', 'icon' => 'library'],
+    'navInputNilaiAkademik' => ['name' => 'Input Nilai Mapel', 'link' => 'grade_input.html', 'icon' => 'edit-3'],
+    'navLegerNilai' => ['name' => 'Leger Nilai', 'link' => 'academic_ledger.html', 'icon' => 'book-open'],
     // Menu Penggajian
     'navAturGaji' => ['name' => 'Pengaturan Gaji', 'link' => 'payroll_settings.html', 'icon' => 'settings'],
     // Menu Slip Gaji Real-time (Untuk Pegawai)
@@ -76,6 +79,10 @@ $allRoles = array_unique(array_merge($roles, $defaultRoles));
 echo "<h3>Setup Menu Baru SADIGS</h3>";
 echo "<p>Memproses pendaftaran menu ke database...</p>";
 echo "<ul>";
+
+// --- HAPUS MENU LAMA (Agar tidak membingungkan) ---
+$pdo->exec("DELETE FROM menus WHERE menu_id = 'navInputNilai'");
+$pdo->exec("DELETE FROM menu_permissions WHERE menu_id = 'navInputNilai'");
 
 // 1. Pastikan Menu Terdaftar di Tabel 'menus'
 foreach ($menuDetails as $id => $detail) {
@@ -151,6 +158,18 @@ $academicPerms = [
     'navBukuIndukSantri' => ['Ketua Yayasan', 'Kepala Sekolah', 'Admin Sekolah', 'Bendahara Sekolah']
 ];
 foreach ($academicPerms as $mId => $rList) {
+    foreach ($rList as $rName) {
+        $pdo->prepare("INSERT INTO menu_permissions (role_name, menu_id, is_allowed) VALUES (?, ?, 1) ON DUPLICATE KEY UPDATE is_allowed = 1")->execute([$rName, $mId]);
+    }
+}
+
+// --- FORCE UPDATE PERMISSIONS FOR ACADEMIC LEDGER ---
+$academicLegerPerms = [
+    'navManajemenMapel' => ['Ketua Yayasan', 'Kepala Sekolah', 'Admin Sekolah'],
+    'navInputNilaiAkademik' => ['Ketua Yayasan', 'Kepala Sekolah', 'Admin Sekolah', 'Ustadz', 'Ustadzah'],
+    'navLegerNilai' => ['Ketua Yayasan', 'Kepala Sekolah', 'Admin Sekolah']
+];
+foreach ($academicLegerPerms as $mId => $rList) {
     foreach ($rList as $rName) {
         $pdo->prepare("INSERT INTO menu_permissions (role_name, menu_id, is_allowed) VALUES (?, ?, 1) ON DUPLICATE KEY UPDATE is_allowed = 1")->execute([$rName, $mId]);
     }

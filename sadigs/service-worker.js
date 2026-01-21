@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sadigs-app-v2';
+const CACHE_NAME = 'sadigs-app-v4';
 const urlsToCache = [
   './',
   'index.html',
