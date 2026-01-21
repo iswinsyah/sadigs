@@ -6,7 +6,10 @@ const urlsToCache = [
   'profile.html',
   'tahfizh_history.html',
   'tahfizh_recap.html',
-  'manifest.json'
+  'manifest.json',
+  'subjects_management.html',
+  'grade_input.html',
+  'academic_ledger.html'
 ];
 
 // 1. Install Service Worker & Cache Aset Statis

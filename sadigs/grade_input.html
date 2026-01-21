@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Input Nilai Akademik | SADIGS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>body{font-family:'Inter',sans-serif;}</style>
+</head>
+<body class="bg-gray-50 p-6">
+    <div class="max-w-6xl mx-auto">
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800">Input Nilai Akademik</h1>
+                <p class="text-sm text-gray-500">Masukkan nilai Tugas, UH, dan UAS.</p>
+            </div>
+            <div class="flex gap-2">
+                <a href="subjects_management.html" class="bg-white border border-gray-300 px-4 py-2 rounded font-bold text-sm hover:bg-gray-50">Atur Mapel</a>
+                <a href="dashboard.html" class="bg-gray-200 px-4 py-2 rounded font-bold text-sm hover:bg-gray-300">Kembali</a>
+            </div>
+        </div>
+
+        <!-- Pilih Mapel -->
+        <div class="bg-white p-4 rounded-xl shadow-sm mb-6 border border-gray-200 flex items-center gap-4">
+            <label class="font-bold text-gray-700">Pilih Mapel:</label>
+            <select id="subjectSelect" class="p-2 border rounded w-64" onchange="loadScores()">
+                <option value="">-- Pilih Mapel --</option>
+            </select>
+            <button onclick="saveAllScores()" class="ml-auto bg-green-600 text-white px-6 py-2 rounded font-bold hover:bg-green-700 flex items-center gap-2">
+                <i data-lucide="save" class="w-4 h-4"></i> Simpan Nilai
+            </button>
+        </div>
+
+        <!-- Tabel Input -->
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-200">
+            <table class="w-full text-left">
+                <thead class="bg-blue-50 border-b border-blue-100">
+                    <tr>
+                        <th class="p-4 font-bold text-blue-800 w-10">No</th>
+                        <th class="p-4 font-bold text-blue-800">Nama Santri</th>
+                        <th class="p-4 font-bold text-blue-800 w-24 text-center">Tugas 1</th>
+                        <th class="p-4 font-bold text-blue-800 w-24 text-center">Tugas 2</th>
+                        <th class="p-4 font-bold text-blue-800 w-24 text-center">UH 1</th>
+                        <th class="p-4 font-bold text-blue-800 w-24 text-center">UAS</th>
+                    </tr>
+                </thead>
+                <tbody id="scoreTable">
+                    <tr><td colspan="6" class="p-8 text-center text-gray-400">Silakan pilih mata pelajaran terlebih dahulu.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // 1. Load Dropdown Mapel
+        async function init() {
+            const res = await fetch('sadigs_api_v3/academic_api.php?action=get_subjects');
+            const result = await res.json();
+            const select = document.getElementById('subjectSelect');
+            if(result.success) {
+                result.data.forEach(s => {
+                    const opt = document.createElement('option');
+                    opt.value = s.id;
+                    opt.textContent = `${s.name} (Kelas ${s.grade_level})`;
+                    select.appendChild(opt);
+                });
+            }
+        }
+
+        // 2. Load Data Santri & Nilai
+        async function loadScores() {
+            const subjectId = document.getElementById('subjectSelect').value;
+            const tbody = document.getElementById('scoreTable');
+            
+            if(!subjectId) {
+                tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-gray-400">Silakan pilih mata pelajaran.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center">Memuat data...</td></tr>';
+
+            try {
+                const res = await fetch(`sadigs_api_v3/academic_api.php?action=get_scores&subject_id=${subjectId}`);
+                const result = await res.json();
+
+                if(result.success && result.data.length > 0) {
+                    tbody.innerHTML = result.data.map((row, index) => `
+                        <tr class="border-b hover:bg-gray-50" data-student-id="${row.student_id}">
+                            <td class="p-4 text-gray-500">${index + 1}</td>
+                            <td class="p-4 font-bold text-gray-800">${row.full_name}</td>
+                            <td class="p-2 text-center"><input type="number" class="w-20 p-2 border rounded text-center focus:ring-2 focus:ring-blue-500 inp-t1" value="${row.tugas_1}" min="0" max="100"></td>
+                            <td class="p-2 text-center"><input type="number" class="w-20 p-2 border rounded text-center focus:ring-2 focus:ring-blue-500 inp-t2" value="${row.tugas_2}" min="0" max="100"></td>
+                            <td class="p-2 text-center"><input type="number" class="w-20 p-2 border rounded text-center focus:ring-2 focus:ring-blue-500 inp-uh1" value="${row.uh_1}" min="0" max="100"></td>
+                            <td class="p-2 text-center"><input type="number" class="w-20 p-2 border rounded text-center focus:ring-2 focus:ring-blue-500 inp-uas" value="${row.uas}" min="0" max="100"></td>
+                        </tr>
+                    `).join('');
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-red-500">Tidak ada data santri untuk kelas mapel ini.</td></tr>';
+                }
+            } catch(e) { console.error(e); }
+        }
+
+        // 3. Simpan Semua Nilai
+        async function saveAllScores() {
+            const subjectId = document.getElementById('subjectSelect').value;
+            if(!subjectId) return alert('Pilih mapel dulu!');
+
+            const rows = document.querySelectorAll('#scoreTable tr[data-student-id]');
+            const scores = Array.from(rows).map(tr => ({
+                student_id: tr.dataset.studentId,
+                tugas_1: tr.querySelector('.inp-t1').value || 0,
+                tugas_2: tr.querySelector('.inp-t2').value || 0,
+                uh_1: tr.querySelector('.inp-uh1').value || 0,
+                uas: tr.querySelector('.inp-uas').value || 0
+            }));
+
+            try {
+                const res = await fetch('sadigs_api_v3/academic_api.php?action=save_scores', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ subject_id: subjectId, scores: scores })
+                });
+                const result = await res.json();
+                alert(result.message);
+            } catch(e) { alert('Gagal menyimpan.'); }
+        }
+
+        init();
+    </script>
+</body>
+</html>
