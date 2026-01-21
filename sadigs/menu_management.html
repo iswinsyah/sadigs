@@ -3,32 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manajemen Akses & Struktur Menu | SADIGS</title>
+    <title>Manajemen Akses | SADIGS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- SortableJS untuk Drag & Drop -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'utama': '#4FB7B3',
-                        'kedua': '#26667F',
-                        'tombol-utama': '#3674B5',
-                        'tombol-kedua': '#F93827',
-                    }
-                }
-            }
-        }
-    </script>
     <style>
         body{font-family:'Inter',sans-serif;}
-        .sortable-ghost { opacity: 0.4; background-color: #f3f4f6; border: 2px dashed #cbd5e1; }
-        .sortable-drag { cursor: grabbing; }
-        .menu-item { cursor: grab; }
-        .menu-item:active { cursor: grabbing; }
+        /* Sticky Header & First Column for large tables */
+        th.sticky-col, td.sticky-col { position: sticky; left: 0; z-index: 10; background-color: white; }
+        th.sticky-col { z-index: 20; }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans antialiased">
@@ -36,434 +19,189 @@
     <div class="flex h-screen overflow-hidden">
         <!-- SIDEBAR -->
         <aside class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col hidden lg:flex">
-            <div class="h-16 flex items-center justify-center gap-3 border-b border-gray-200 bg-utama text-white">
-                <img src="assets/img/logo.png" alt="Logo" class="h-8 bg-white rounded-full p-0.5">
-                <h1 class="text-3xl tracking-wide" style="font-family: 'Marlin Condensed', sans-serif;">SADIGS</h1>
+            <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-teal-600 text-white">
+                <h1 class="text-2xl font-extrabold tracking-wider">SADIGS</h1>
             </div>
-            <div class="p-6 border-b border-gray-100 bg-utama/10">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-utama/20 flex items-center justify-center text-kedua font-bold text-lg shadow-sm">
-                        <span id="userInitial">U</span>
-                    </div>
-                    <div class="overflow-hidden">
-                        <p id="sidebarUsername" class="font-bold text-gray-800 text-sm truncate">Memuat...</p>
-                        <p id="sidebarRole" class="text-xs text-gray-500 truncate font-medium">Role...</p>
-                    </div>
-                </div>
+            <div class="p-6">
+                <a href="dashboard.html" class="flex items-center gap-2 text-gray-600 hover:text-teal-600 transition">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i> Kembali ke Dashboard
+                </a>
             </div>
-            <nav id="sidebarNav" class="flex-1 overflow-y-auto py-4 px-3 space-y-2 no-scrollbar">
-                <div id="sidebarLoading" class="p-4 text-center text-gray-400 text-sm">Memuat menu...</div>
-            </nav>
         </aside>
 
-        <!-- KONTEN UTAMA -->
         <main class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative">
-            <div class="max-w-7xl mx-auto">
-                <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
+            <div class="max-w-full mx-auto">
+                <div class="flex justify-between items-center mb-6 sticky top-0 bg-gray-50 z-30 py-2">
                     <div>
-                        <h1 class="text-2xl font-bold text-gray-800">Manajemen Akses & Menu</h1>
-                        <p class="text-sm text-gray-500">Atur izin akses peran dan susunan menu (Drag & Drop).</p>
+                        <h1 class="text-2xl font-bold text-gray-800">Manajemen Akses Menu</h1>
+                        <p class="text-sm text-gray-500">Atur siapa yang boleh melihat menu apa.</p>
                     </div>
-                    <div class="flex gap-3">
-                        <button onclick="switchTab('permissions')" id="tabPerms" class="px-4 py-2 bg-teal-600 text-white rounded-lg font-bold shadow-sm transition">Izin Akses</button>
-                        <button onclick="switchTab('structure')" id="tabStruct" class="px-4 py-2 bg-white text-gray-600 border border-gray-300 hover:bg-gray-50 rounded-lg font-bold shadow-sm transition">Susunan Menu</button>
-                    </div>
+                    
+                    <!-- TOMBOL SIMPAN DENGAN INDIKATOR -->
+                    <button id="saveBtn" onclick="savePermissions()" class="bg-teal-600 hover:bg-teal-700 text-white px-6 py-3 rounded-lg font-bold shadow-lg flex items-center gap-2 transition-all transform active:scale-95">
+                        <i data-lucide="save" class="w-5 h-5"></i>
+                        <span>Simpan Perubahan Izin</span>
+                    </button>
                 </div>
 
-                <!-- TAB 1: IZIN AKSES (MATRIX) -->
-                <div id="viewPermissions" class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                    <div class="overflow-auto max-h-[75vh]">
-                        <table class="min-w-full divide-y divide-gray-200" id="permsTable">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider sticky left-0 top-0 bg-gray-50 z-20 shadow-sm border-r">Menu / Fitur</th>
-                                    <!-- Role headers will be injected here -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="overflow-x-auto max-h-[75vh]">
+                        <table class="min-w-full divide-y divide-gray-200 text-sm relative">
+                            <thead class="bg-gray-100">
+                                <tr id="headerRow">
+                                    <th class="px-4 py-3 text-left font-bold text-gray-700 uppercase sticky top-0 z-20 bg-gray-100 sticky-col border-r border-gray-200 shadow-sm">Menu / Role</th>
+                                    <!-- Role Headers will be injected here -->
                                 </tr>
                             </thead>
-                            <tbody class="bg-white divide-y divide-gray-200" id="permsBody">
-                                <tr><td class="p-8 text-center text-gray-400">Memuat data...</td></tr>
+                            <tbody id="matrixBody" class="divide-y divide-gray-200">
+                                <tr><td class="p-10 text-center text-gray-500">Memuat matriks akses...</td></tr>
                             </tbody>
                         </table>
                     </div>
-                    <div class="p-4 border-t border-gray-100 bg-gray-50 flex justify-end">
-                        <button onclick="saveChanges()" class="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2 rounded-lg font-bold shadow-md transition flex items-center gap-2">
-                            <i data-lucide="save" class="w-4 h-4"></i> Simpan Perubahan Izin
-                        </button>
-                    </div>
                 </div>
-
-                <!-- TAB 2: STRUKTUR MENU (DRAG & DROP) -->
-                <div id="viewStructure" class="hidden">
-                    <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6 rounded-r-lg">
-                        <div class="flex">
-                            <div class="flex-shrink-0"><i data-lucide="info" class="h-5 w-5 text-blue-400"></i></div>
-                            <div class="ml-3">
-                                <h3 class="text-sm font-bold text-blue-800">Informasi Susunan Menu:</h3>
-                                <p class="text-sm text-blue-700 mt-1">Posisi menu di sini 
-                        </div>
-                    </div>
-                    
-                    <div id="structureContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <!-- Categories will be injected here -->
-                    </div>
-
-                    <div class="fixed bottom-6 right-6">
-                        <button onclick="saveStructure()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full font-bold shadow-xl transition flex items-center gap-2 transform hover:scale-105">
-                            <i data-lucide="save" class="w-5 h-5"></i> Simpan Susunan
-                        </button>
-                        <button onclick="autoReorganize()" class="mt-2 bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-full font-bold shadow-xl transition flex items-center gap-2 transform hover:scale-105">
-                            <i data-lucide="wand-2" class="w-5 h-5"></i> Susun Ulang Otomatis
-                        </button>
-                    </div>
-                </div>
-
             </div>
         </main>
     </div>
 
     <script>
-        let globalData = null;
-        let pendingUpdates = [];
+        lucide.createIcons();
+        let currentPermissions = {}; // Store state
 
-        // --- SIDEBAR LOGIC ---
-        async function initSidebar() {
+        async function init() {
             try {
-                // 1. Cek Sesi
-                const sessionRes = await fetch('sadigs_api_v3/session_check.php');
-                const sessionData = await sessionRes.json();
-                if (!sessionData.success) { window.location.href = 'index.html'; return; }
+                const res = await fetch('sadigs_api_v3/manage_access_api.php');
+                const data = await res.json();
 
-                // 2. Update Info User di Sidebar
-                document.getElementById('sidebarUsername').textContent = sessionData.username;
-                document.getElementById('userInitial').textContent = sessionData.username.charAt(0).toUpperCase();
-                const rawRoles = sessionData.raw_roles || [];
-                let rolesText = 'User';
-                if (rawRoles.length > 0) {
-                    rolesText = rawRoles.map(r => r.status === 'approved' ? r.role_name : `${r.role_name} (Pending)`).join(', ');
+                if (data.success) {
+                    renderMatrix(data.roles, data.menus, data.permissions);
+                } else {
+                    alert('Gagal memuat data: ' + data.message);
                 }
-                document.getElementById('sidebarRole').textContent = rolesText;
-
-                // 3. Ambil dan Terapkan Hak Akses Menu
-                const permRes = await fetch('sadigs_api_v3/get_menu_permissions.php');
-                const permData = await permRes.json();
-                if (permData.success) {
-                    const sidebarNav = document.getElementById('sidebarNav');
-                    sidebarNav.innerHTML = '';
-
-                    const allowedMenus = permData.permissions || [];
-                    const categories = permData.categories || {};
-                    const menuNames = permData.menu_names || {};
-                    const menuIcons = permData.menu_icons || {};
-                    const menuLinks = permData.menu_links || {};
-
-                    for (const [catId, cat] of Object.entries(categories)) {
-                        const visibleMenus = cat.menus.filter(mId => allowedMenus.includes(mId));
-                        
-                        if (visibleMenus.length > 0) {
-                            const groupDiv = document.createElement('div');
-                            groupDiv.className = "bg-gray-50 rounded-lg p-2 mt-2";
-                            
-                            const title = document.createElement('h3');
-                            title.className = "px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider";
-                            title.textContent = cat.label;
-                            groupDiv.appendChild(title);
-                            
-                            visibleMenus.forEach(menuId => {
-                                if (menuId === 'navYayasanWidget' || menuId === 'navMusyrifWidget') return;
-
-                                const link = document.createElement('a');
-                                link.href = menuLinks[menuId] || '#';
-                                const isActive = window.location.pathname.includes(link.href) && link.href !== '#';
-                                
-                                link.className = isActive 
-                                    ? "flex items-center gap-3 px-3 py-2.5 text-utama bg-white rounded-md transition font-semibold text-sm shadow-sm"
-                                    : "flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-utama rounded-md transition font-medium text-sm";
-                                
-                                const iconName = menuIcons[menuId] || 'circle';
-                                link.innerHTML = `<i data-lucide="${iconName}" class="w-5 h-5"></i> ${menuNames[menuId] || menuId}`;
-                                groupDiv.appendChild(link);
-                            });
-                            sidebarNav.appendChild(groupDiv);
-                        }
-                    }
-                    
-                    // Tombol Logout
-                    const logoutDiv = document.createElement('div');
-                    logoutDiv.className = "pt-2";
-                    logoutDiv.innerHTML = `<button onclick="if(confirm('Keluar aplikasi?')) window.location.href='sadigs_api_v3/logout.php'" class="w-full flex items-center gap-3 px-4 py-2 text-tombol-kedua hover:bg-tombol-kedua/10 rounded-lg transition font-medium"><i data-lucide="log-out" class="w-5 h-5"></i> Keluar</button>`;
-                    sidebarNav.appendChild(logoutDiv);
-                    lucide.createIcons();
-                }
-            } catch (e) { console.error(e); }
+            } catch (e) { console.error(e); alert('Koneksi error.'); }
         }
 
-        function switchTab(tab) {
-            if(tab === 'permissions') {
-                document.getElementById('viewPermissions').classList.remove('hidden');
-                document.getElementById('viewStructure').classList.add('hidden');
-                document.getElementById('tabPerms').className = "px-4 py-2 bg-teal-600 text-white rounded-lg font-bold shadow-sm transition";
-                document.getElementById('tabStruct').className = "px-4 py-2 bg-white text-gray-600 border border-gray-300 hover:bg-gray-50 rounded-lg font-bold shadow-sm transition";
-            } else {
-                document.getElementById('viewPermissions').classList.add('hidden');
-                document.getElementById('viewStructure').classList.remove('hidden');
-                document.getElementById('tabPerms').className = "px-4 py-2 bg-white text-gray-600 border border-gray-300 hover:bg-gray-50 rounded-lg font-bold shadow-sm transition";
-                document.getElementById('tabStruct').className = "px-4 py-2 bg-teal-600 text-white rounded-lg font-bold shadow-sm transition";
-                renderStructure(); // Render saat tab dibuka
-            }
-        }
-
-        async function loadData() {
-            try {
-                const res = await fetch('sadigs_api_v3/menu_manager.php?t=' + new Date().getTime());
-                globalData = await res.json();
-                if (!globalData.success && globalData.message) throw new Error(globalData.message);
-                renderPermissions();
-            } catch (e) {
-                document.getElementById('permsBody').innerHTML = `<tr><td colspan="100%" class="p-8 text-center text-red-500 font-bold">Gagal memuat data: ${e.message}<br><button onclick="location.reload()" class="mt-2 text-blue-600 underline">Coba Refresh</button></td></tr>`;
-            }
-        }
-
-        function renderPermissions() {
-            const thead = document.querySelector('#permsTable thead tr');
-            const tbody = document.getElementById('permsBody');
+        function renderMatrix(roles, menus, perms) {
+            const headerRow = document.getElementById('headerRow');
+            const tbody = document.getElementById('matrixBody');
             
-            // Render Headers
-            let headerHTML = '<th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider sticky left-0 top-0 bg-gray-50 z-20 shadow-sm border-r">Menu / Fitur</th>';
-            globalData.roles.forEach(role => {
-                headerHTML += `<th class="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider min-w-[100px] sticky top-0 bg-gray-50 z-10 shadow-sm">${role}</th>`;
-            });
-            thead.innerHTML = headerHTML;
-
-            // Definisi Kelompok Widget (Sesuai Request Baru)
-            const widgetGroups = {
-                'formulir': { label: '1. FORMULIR', menus: [] },
-                'validasi': { label: '2. VALIDASI', menus: [] },
-                'data_pribadi': { label: '3. DATA PRIBADI', menus: [] },
-                'tabel_data': { label: '4. TABEL DATA', menus: [] },
-                'grafik': { label: '5. GRAFIK', menus: [] },
-                'lainnya': { label: 'LAINNYA', menus: [] }
-            };
-
-            // Kelompokkan Menu Berdasarkan Kata Pertama
-            Object.keys(globalData.menu_names).forEach(menuId => {
-                const menuName = globalData.menu_names[menuId] || menuId;
-                // Ambil kata pertama, bersihkan spasi, jadikan lowercase
-                const firstWord = menuName.trim().split(/\s+/)[0].toLowerCase();
-                
-                let groupKey = 'lainnya';
-                
-                // Logika Pengelompokan Otomatis
-                if (firstWord === 'formulir') groupKey = 'formulir';
-                else if (firstWord === 'validasi') groupKey = 'validasi';
-                else if (firstWord === 'data') groupKey = 'data_pribadi';
-                else if (firstWord === 'tabel') groupKey = 'tabel_data';
-                else if (firstWord === 'grafik') groupKey = 'grafik';
-                
-                widgetGroups[groupKey].menus.push(menuId);
+            // 1. Render Header (Roles)
+            // Reset header keep first col
+            headerRow.innerHTML = '<th class="px-4 py-3 text-left font-bold text-gray-700 uppercase sticky top-0 z-20 bg-gray-100 sticky-col border-r border-gray-200 shadow-sm min-w-[250px]">Menu Aplikasi</th>';
+            
+            roles.forEach(role => {
+                const th = document.createElement('th');
+                th.className = "px-4 py-3 text-center font-bold text-gray-600 sticky top-0 z-10 bg-gray-100 min-w-[100px] border-b border-gray-200";
+                th.innerHTML = `<div class="writing-mode-vertical transform -rotate-45 origin-bottom-left translate-x-4 mb-2">${role}</div>`; // Style miring biar muat
+                th.textContent = role; // Fallback normal text
+                headerRow.appendChild(th);
             });
 
-            // Render Body
+            // 2. Render Body (Menus & Checkboxes)
             tbody.innerHTML = '';
-            for (const [key, group] of Object.entries(widgetGroups)) {
-                if (group.menus.length === 0) continue;
+            let lastCategory = '';
 
-                // Category Row
-                tbody.innerHTML += `<tr class="bg-gray-100"><td colspan="${globalData.roles.length + 1}" class="px-6 py-2 text-xs font-bold text-gray-600 uppercase tracking-wider sticky left-0 bg-gray-100 z-10">${group.label}</td></tr>`;
+            menus.forEach(menu => {
+                // Group Header
+                const catLabel = menu.category_label || 'Lainnya';
+                if (catLabel !== lastCategory) {
+                    const trCat = document.createElement('tr');
+                    trCat.className = "bg-gray-50";
+                    trCat.innerHTML = `<td colspan="${roles.length + 1}" class="px-4 py-2 font-bold text-xs text-gray-500 uppercase tracking-wider sticky-col bg-gray-50">${catLabel}</td>`;
+                    tbody.appendChild(trCat);
+                    lastCategory = catLabel;
+                }
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-blue-50 transition";
                 
-                group.menus.forEach(menuId => {
-                    const menuName = globalData.menu_names[menuId] || menuId;
-                    let rowHTML = `<tr class="hover:bg-gray-50 transition">
-                        <td class="px-6 py-3 text-sm font-medium text-gray-800 sticky left-0 bg-white z-10 border-r shadow-sm flex items-center gap-2 group">
-                            <i data-lucide="${globalData.menu_icons?.[menuId] || 'circle'}" class="w-4 h-4 text-gray-400"></i> 
-                            <span class="flex-1">${menuName}</span>
-                            <button onclick="renameMenu('${menuId}', '${menuName.replace(/'/g, "\\'")}')" class="opacity-0 group-hover:opacity-100 text-blue-500 hover:text-blue-700 p-1 transition" title="Ubah Nama Menu">
-                                <i data-lucide="edit-2" class="w-3 h-3"></i>
-                            </button>
-                        </td>`;
-                    
-                    globalData.roles.forEach(role => {
-                        const isAllowed = globalData.matrix[menuId]?.[role] === 1;
-                        rowHTML += `
-                            <td class="px-4 py-3 text-center">
-                                <input type="checkbox" 
-                                    onchange="trackChange('${role}', '${menuId}', this.checked)"
-                                    ${isAllowed ? 'checked' : ''} 
-                                    class="w-5 h-5 text-teal-600 rounded border-gray-300 focus:ring-teal-500 cursor-pointer">
-                            </td>`;
-                    });
-                    rowHTML += '</tr>';
-                    tbody.innerHTML += rowHTML;
-                });
-            }
-            lucide.createIcons();
-        }
-
-        function trackChange(role, menu, isChecked) {
-            pendingUpdates.push({ role: role, menu: menu, state: isChecked ? 1 : 0 });
-        }
-
-        async function saveChanges() {
-            if(pendingUpdates.length === 0) return alert("Tidak ada perubahan.");
-            const res = await fetch('sadigs_api_v3/menu_manager.php', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ updates: pendingUpdates })
-            });
-            const result = await res.json();
-            if(result.success) { 
-                pendingUpdates = []; 
-                // Panggil susun ulang otomatis secara silent (tanpa confirm)
-                await autoReorganize(true); 
-            }
-            else alert("Gagal menyimpan.");
-        }
-
-        async function renameMenu(menuId, currentName) {
-            const newName = prompt("Masukkan nama baru untuk menu ini:", currentName);
-            if (newName && newName !== currentName) {
-                try {
-                    const res = await fetch('sadigs_api_v3/menu_manager.php', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ rename_menu: { id: menuId, name: newName } })
-                    });
-                    const result = await res.json();
-                    if(result.success) { loadData(); initSidebar(); } // Reload data & sidebar
-                    else alert(result.message || "Gagal mengubah nama.");
-                } catch(e) { alert("Terjadi kesalahan koneksi."); }
-            }
-        }
-
-        // --- LOGIKA DRAG & DROP ---
-        function renderStructure() {
-            const container = document.getElementById('structureContainer');
-            container.innerHTML = '';
-
-            // GUNAKAN DATA ASLI DARI DATABASE (Bukan logika permission)
-            // Ini memastikan tampilan di sini SAMA PERSIS dengan Sidebar
-            const categories = globalData.categories;
-
-            // 3. Render ke HTML
-            for (const [catId, cat] of Object.entries(categories)) {
-                const catDiv = document.createElement('div');
-                catDiv.className = "bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col";
-                catDiv.innerHTML = `
-                    <div class="p-3 bg-gray-50 border-b border-gray-200 font-bold text-xs text-gray-500 uppercase tracking-wider flex justify-between items-center">
-                        <span>${cat.label}</span>
-                        <span class="bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full text-[10px]">${cat.menus.length}</span>
-                    </div>
-                    <div class="p-2 flex-1 min-h-[50px] space-y-2 sortable-list" data-cat-id="${catId}">
-                        ${cat.menus.map(menuId => `
-                            <div class="menu-item bg-white border border-gray-200 p-2 rounded-lg shadow-sm text-sm flex items-center gap-2 hover:border-teal-400 transition" data-menu-id="${menuId}">
-                                <i data-lucide="${globalData.menu_icons?.[menuId] || 'circle'}" class="w-4 h-4 text-gray-400"></i>
-                                <span class="font-medium text-gray-700">${globalData.menu_names[menuId] || menuId}</span>
-                            </div>
-                        `).join('')}
-                    </div>
+                // Menu Name Column
+                tr.innerHTML = `
+                    <td class="px-4 py-2 font-medium text-gray-800 border-r border-gray-200 sticky-col bg-white">
+                        ${menu.menu_name}
+                        <div class="text-[10px] text-gray-400 font-mono">${menu.menu_id}</div>
+                    </td>
                 `;
-                container.appendChild(catDiv);
-            }
-            lucide.createIcons();
 
-            // Init SortableJS
-            document.querySelectorAll('.sortable-list').forEach(el => {
-                new Sortable(el, {
-                    group: 'shared', // Allow dragging between lists
-                    animation: 150,
-                    ghostClass: 'sortable-ghost',
-                    dragClass: 'sortable-drag'
+                // Checkbox Columns
+                roles.forEach(role => {
+                    const isAllowed = perms[role] && perms[role][menu.menu_id] == 1;
+                    const td = document.createElement('td');
+                    td.className = "px-2 py-2 text-center border-r border-gray-100";
+                    td.innerHTML = `
+                        <input type="checkbox" 
+                            class="w-5 h-5 text-teal-600 rounded focus:ring-teal-500 cursor-pointer transition transform hover:scale-110"
+                            data-role="${role}" 
+                            data-menu="${menu.menu_id}"
+                            ${isAllowed ? 'checked' : ''}>
+                    `;
+                    tr.appendChild(td);
                 });
+
+                tbody.appendChild(tr);
             });
         }
 
-        async function saveStructure() {
-            const structureUpdates = [];
-            const permissionUpdates = [];
+        async function savePermissions() {
+            const btn = document.getElementById('saveBtn');
+            const originalContent = btn.innerHTML;
+            
+            // --- UX: UBAH TOMBOL JADI LOADING ---
+            btn.disabled = true;
+            btn.classList.remove('bg-teal-600', 'hover:bg-teal-700');
+            btn.classList.add('bg-gray-400', 'cursor-not-allowed');
+            btn.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> <span>Menyimpan...</span>`;
+            lucide.createIcons();
 
-            // Mapping Kategori ke Role untuk Sinkronisasi Izin Otomatis
-            const categoryRoleMapping = {
-                'KetuaYayasan': ['Ketua Yayasan'],
-                'SekretarisYayasan': ['Sekretaris Yayasan'],
-                'BendaharaYayasan': ['Bendahara Yayasan'],
-                'KepalaSekolah': ['Kepala Sekolah'],
-                'AdminSekolah': ['Admin Sekolah'],
-                'SekretarisSekolah': ['Sekretaris Sekolah'],
-                'BendaharaSekolah': ['Bendahara Sekolah'],
-                'KepalaAsrama': ['Kepala Asrama Putra', 'Kepala Asrama Putri'],
-                'Musyrif': ['Musyrif', 'Musyrifah'],
-                'Ustadz': ['Ustadz', 'Ustadzah'],
-                'Santri': ['Santri Rijal', "Santri Nisa'"],
-                'Walisantri': ['Walisantri'],
-                'ManajemenYayasan': ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan'],
-                'ManajemenSekolah': ['Kepala Sekolah', 'Admin Sekolah', 'Sekretaris Sekolah', 'Bendahara Sekolah'],
-                'Kepegawaian': ['Kepala Sekolah', 'Admin Sekolah', 'Sekretaris Sekolah', 'Bendahara Sekolah', 'Kepala Asrama Putra', 'Kepala Asrama Putri', 'Musyrif', 'Musyrifah', 'Ustadz', 'Ustadzah'],
-                'Umum': globalData.roles // Semua role
-            };
-
-            document.querySelectorAll('.sortable-list').forEach(list => {
-                const catId = list.getAttribute('data-cat-id');
-                const targetRoles = categoryRoleMapping[catId];
-
-                list.querySelectorAll('.menu-item').forEach((item, index) => {
-                    const menuId = item.getAttribute('data-menu-id');
-                    
-                    // 1. Update Struktur (Urutan & Kategori)
-                    structureUpdates.push({
-                        menu_id: menuId,
-                        category_id: catId,
-                        sort_order: index + 1
-                    });
-
-                    // 2. Update Izin (Otomatis Centang/Hapus Centang)
-                    if (targetRoles) {
-                        globalData.roles.forEach(role => {
-                            const shouldHaveAccess = targetRoles.includes(role);
-                            permissionUpdates.push({
-                                role: role,
-                                menu: menuId,
-                                state: shouldHaveAccess ? 1 : 0
-                            });
-                        });
-                    }
+            // Collect Data
+            const updates = [];
+            document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                updates.push({
+                    role: cb.dataset.role,
+                    menu_id: cb.dataset.menu,
+                    allowed: cb.checked ? 1 : 0
                 });
             });
 
-            // Kirim Update Struktur
-            await fetch('sadigs_api_v3/menu_manager.php', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ structure_updates: structureUpdates })
-            });
-            
-            // Kirim Update Izin
-            if (permissionUpdates.length > 0) {
-                await fetch('sadigs_api_v3/menu_manager.php', {
+            try {
+                const res = await fetch('sadigs_api_v3/manage_access_api.php', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ updates: permissionUpdates })
+                    body: JSON.stringify({ updates })
                 });
-            }
-
-            alert("Susunan menu dan Izin Akses berhasil disimpan!");
-            loadData();
-        }
-
-        async function autoReorganize(silent = false) {
-            if(!silent) {
-                if(!confirm("Sistem akan menyusun ulang letak menu (Div) secara otomatis berdasarkan centang pada Tab Izin Akses.\n\nSusunan manual Anda mungkin akan berubah. Lanjutkan?")) return;
-            }
-            
-            try {
-                const res = await fetch('sadigs_api_v3/reorganize_menus.php');
                 const result = await res.json();
-                if(!silent) alert(result.message);
-                else console.log("Auto-reorganize: " + result.message);
-                if(result.success) { loadData(); initSidebar(); }
-            } catch(e) { alert("Gagal menyusun ulang."); }
+                
+                // --- UX: KEMBALIKAN TOMBOL ---
+                if(result.success) {
+                    btn.innerHTML = `<i data-lucide="check-circle" class="w-5 h-5"></i> <span>Tersimpan!</span>`;
+                    btn.classList.remove('bg-gray-400', 'cursor-not-allowed');
+                    btn.classList.add('bg-green-600');
+                    lucide.createIcons();
+                    
+                    // Reset ke normal setelah 2 detik
+                    setTimeout(() => {
+                        btn.innerHTML = originalContent;
+                        btn.classList.remove('bg-green-600');
+                        btn.classList.add('bg-teal-600', 'hover:bg-teal-700');
+                        btn.disabled = false;
+                        lucide.createIcons();
+                    }, 2000);
+                } else {
+                    alert('Gagal: ' + result.message);
+                    btn.disabled = false;
+                    btn.innerHTML = originalContent;
+                    btn.classList.remove('bg-gray-400', 'cursor-not-allowed');
+                    btn.classList.add('bg-teal-600');
+                }
+            } catch(e) {
+                alert('Terjadi kesalahan koneksi.');
+                btn.disabled = false;
+                btn.innerHTML = originalContent;
+                btn.classList.remove('bg-gray-400', 'cursor-not-allowed');
+                btn.classList.add('bg-teal-600');
+            }
         }
 
-        loadData();
-        initSidebar();
+        init();
     </script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sadigs-app-v4';
+const CACHE_NAME = 'sadigs-app-v5';
 const urlsToCache = [
   './',
   'index.html',
@@ -9,7 +9,8 @@ const urlsToCache = [
   'manifest.json',
   'subjects_management.html',
   'grade_input.html',
-  'academic_ledger.html'
+  'academic_ledger.html',
+  'menu_management.html'
 ];
 
 // 1. Install Service Worker & Cache Aset Statis
