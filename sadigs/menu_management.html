@@ -12,6 +12,10 @@
         /* Sticky Header & First Column for large tables */
         th.sticky-col, td.sticky-col { position: sticky; left: 0; z-index: 10; background-color: white; }
         th.sticky-col { z-index: 20; }
+        /* Drag & Drop Styles */
+        th.draggable-header { cursor: grab; user-select: none; }
+        th.draggable-header:active { cursor: grabbing; }
+        th.drag-over { background-color: #f0fdfa; border-left: 2px solid #0d9488; transition: all 0.2s; }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans antialiased">
@@ -90,7 +94,16 @@
             
             roles.forEach(role => {
                 const th = document.createElement('th');
-                th.className = "px-4 py-3 text-center font-bold text-gray-600 sticky top-0 z-10 bg-gray-100 min-w-[100px] border-b border-gray-200";
+                th.className = "px-4 py-3 text-center font-bold text-gray-600 sticky top-0 z-10 bg-gray-100 min-w-[100px] border-b border-gray-200 draggable-header";
+                
+                // --- DRAG & DROP EVENTS ---
+                th.draggable = true;
+                th.addEventListener('dragstart', handleDragStart);
+                th.addEventListener('dragover', handleDragOver);
+                th.addEventListener('drop', handleDrop);
+                th.addEventListener('dragenter', handleDragEnter);
+                th.addEventListener('dragleave', handleDragLeave);
+
                 th.innerHTML = `<div class="writing-mode-vertical transform -rotate-45 origin-bottom-left translate-x-4 mb-2">${role}</div>`; // Style miring biar muat
                 th.textContent = role; // Fallback normal text
                 headerRow.appendChild(th);
@@ -106,7 +119,7 @@
                 if (catLabel !== lastCategory) {
                     const trCat = document.createElement('tr');
                     trCat.className = "bg-gray-50";
-                    trCat.innerHTML = `<td colspan="${roles.length + 1}" class="px-4 py-2 font-bold text-xs text-gray-500 uppercase tracking-wider sticky-col bg-gray-50">${catLabel}</td>`;
+                    trCat.innerHTML = `<td class="px-4 py-2 font-bold text-xs text-gray-500 uppercase tracking-wider sticky-col bg-gray-50">${catLabel}</td><td colspan="${roles.length}" class="bg-gray-50"></td>`;
                     tbody.appendChild(trCat);
                     lastCategory = catLabel;
                 }
@@ -138,6 +151,61 @@
                 });
 
                 tbody.appendChild(tr);
+            });
+        }
+
+        // --- DRAG & DROP LOGIC ---
+        let dragSrcEl = null;
+
+        function handleDragStart(e) {
+            dragSrcEl = this;
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', this.innerHTML);
+            this.style.opacity = '0.4';
+        }
+
+        function handleDragOver(e) {
+            if (e.preventDefault) e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            return false;
+        }
+
+        function handleDragEnter(e) { this.classList.add('drag-over'); }
+        function handleDragLeave(e) { this.classList.remove('drag-over'); }
+
+        function handleDrop(e) {
+            if (e.stopPropagation) e.stopPropagation();
+            this.style.opacity = '1';
+            
+            // Bersihkan style drag-over dari semua header
+            document.querySelectorAll('th').forEach(th => th.classList.remove('drag-over'));
+
+            if (dragSrcEl !== this) {
+                // Hitung index kolom (karena ada sticky col di index 0, maka index header = index kolom tabel)
+                const headers = Array.from(this.parentNode.children);
+                const srcIdx = headers.indexOf(dragSrcEl);
+                const targetIdx = headers.indexOf(this);
+                
+                moveColumn(srcIdx, targetIdx);
+            }
+            return false;
+        }
+
+        function moveColumn(srcIdx, targetIdx) {
+            const table = document.querySelector('table');
+            const rows = table.querySelectorAll('tr');
+            
+            rows.forEach(row => {
+                const cells = row.children;
+                // Pastikan row punya cukup cell (untuk row kategori yang colspan mungkin beda, tapi kita handle row data)
+                if (cells.length > srcIdx && cells.length > targetIdx) {
+                    const srcCell = cells[srcIdx];
+                    const targetCell = cells[targetIdx];
+                    
+                    // Pindahkan elemen DOM
+                    if (srcIdx < targetIdx) { row.insertBefore(srcCell, targetCell.nextSibling); }
+                    else { row.insertBefore(srcCell, targetCell); }
+                }
             });
         }
 

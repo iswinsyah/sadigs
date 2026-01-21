@@ -14,7 +14,7 @@ try {
     // --- GET: AMBIL DATA MATRIKS ---
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         // 1. Ambil Daftar Role (Kolom)
-        $stmtRoles = $pdo->query("SELECT DISTINCT role_name FROM menu_permissions ORDER BY role_name");
+        $stmtRoles = $pdo->query("SELECT DISTINCT role_name FROM menu_permissions");
         $roles = $stmtRoles->fetchAll(PDO::FETCH_COLUMN);
 
         // 2. Ambil Daftar Menu (Baris)
