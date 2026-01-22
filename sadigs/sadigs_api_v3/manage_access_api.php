@@ -47,6 +47,22 @@ try {
     // --- POST: SIMPAN PERUBAHAN ---
     elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $input = json_decode(file_get_contents('php://input'), true);
+
+        // --- FITUR BARU: RENAME MENU ---
+        if (isset($input['action']) && $input['action'] === 'rename_menu') {
+            $menu_id = $input['menu_id'] ?? '';
+            $new_name = trim($input['new_name'] ?? '');
+
+            if (empty($menu_id) || empty($new_name)) {
+                sendJSONResponse(['success' => false, 'message' => 'Data tidak lengkap.'], 400);
+            }
+
+            $stmt = $pdo->prepare("UPDATE menus SET menu_name = ? WHERE menu_id = ?");
+            $stmt->execute([$new_name, $menu_id]);
+            sendJSONResponse(['success' => true, 'message' => 'Nama menu diperbarui.']);
+            exit;
+        }
+
         $updates = $input['updates'] ?? [];
 
         if (empty($updates)) {
