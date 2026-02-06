@@ -38,9 +38,15 @@ if (!isset($data['user_id']) || empty($data['user_id'])) {
 
 $user_id = $data['user_id'];
 
-// --- PENINGKATAN KEAMANAN KRITIS ---
-// Verifikasi bahwa user_id yang akan diubah sama dengan user_id yang ada di sesi.
-if (!isset($_SESSION['user_id']) || $_SESSION['user_id'] != $user_id) {
+// --- CEK OTORITAS (Admin/Yayasan boleh edit siapa saja) ---
+$stmtRoles = $pdo->prepare("SELECT role_name FROM user_roles WHERE user_id = ? AND status = 'approved'");
+$stmtRoles->execute([$_SESSION['user_id']]);
+$my_roles = $stmtRoles->fetchAll(PDO::FETCH_COLUMN);
+
+$is_admin = !empty(array_intersect(['Ketua Yayasan', 'Sekretaris Yayasan', 'Admin Sekolah', 'Kepala Sekolah'], $my_roles));
+
+// Jika bukan admin, hanya boleh edit diri sendiri
+if ((!isset($_SESSION['user_id']) || $_SESSION['user_id'] != $user_id) && !$is_admin) {
     sendJSONResponse(['success' => false, 'message' => 'Akses ditolak. Anda hanya dapat mengubah profil Anda sendiri.'], 403);
 }
 
@@ -48,6 +54,13 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_id'] != $user_id) {
 $full_name = $data['full_name'] ?? null;
 $bio = $data['bio'] ?? null;
 $email = $data['email'] ?? null; // Hati-hati mengubah email, mungkin perlu verifikasi ulang
+$username = $data['username'] ?? null; // Admin only
+$password = $data['password'] ?? null; // Admin only
+
+// Ambil data saat ini untuk perbandingan (agar tidak error duplicate jika nilai sama)
+$stmtCurr = $pdo->prepare("SELECT email, username FROM users WHERE user_id = ?");
+$stmtCurr->execute([$user_id]);
+$currUser = $stmtCurr->fetch(PDO::FETCH_ASSOC);
 
 try {
     // Persiapan untuk membangun query UPDATE secara dinamis
@@ -68,7 +81,7 @@ try {
 
     // 3. Email (Jika email disediakan, lakukan validasi dasar)
     // Optimasi: Hanya proses jika email yang dikirim berbeda dari yang ada di sesi
-    if (!is_null($email) && $email !== ($_SESSION['email'] ?? '')) {
+    if (!is_null($email) && $email !== ($currUser['email'] ?? '')) {
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             sendJSONResponse(['success' => false, 'message' => 'Format email tidak valid.'], 400);
         }
@@ -87,7 +100,27 @@ try {
         $params['email'] = $email;
 
         // Simpan juga email baru ke sesi agar pengecekan berikutnya konsisten
-        $_SESSION['email'] = $email;
+        if ($_SESSION['user_id'] == $user_id) {
+            $_SESSION['email'] = $email;
+        }
+    }
+
+    // 3b. Username (Khusus Admin)
+    if ($is_admin && !is_null($username) && $username !== ($currUser['username'] ?? '')) {
+        // Cek duplikat
+        $chk = $pdo->prepare("SELECT COUNT(*) FROM users WHERE username = ? AND user_id != ?");
+        $chk->execute([$username, $user_id]);
+        if ($chk->fetchColumn() > 0) {
+            sendJSONResponse(['success' => false, 'message' => 'Username sudah digunakan user lain.'], 409);
+        }
+        $updates[] = "username = :username";
+        $params['username'] = $username;
+    }
+
+    // 3c. Password (Khusus Admin)
+    if ($is_admin && !empty($password)) {
+        $updates[] = "password_hash = :password";
+        $params['password'] = password_hash($password, PASSWORD_DEFAULT);
     }
 
     // 4. Child Names (Logika Penghubungan Walisantri)
