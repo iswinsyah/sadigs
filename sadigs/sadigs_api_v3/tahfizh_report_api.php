@@ -31,13 +31,14 @@ try {
             $stmtUser->execute([$user_id]);
             $fullName = $stmtUser->fetchColumn();
 
-            // Cari ID anak-anak yang terhubung (Support Multi-Parent)
+            // REVISI: Prioritaskan pencarian lewat tabel student_guardians (Multi-Parent)
+            // Fallback ke student_details untuk kompatibilitas data lama
             $stmtKids = $pdo->prepare("
                 SELECT DISTINCT u.user_id 
                 FROM users u
                 LEFT JOIN student_details sd ON u.user_id = sd.user_id
                 LEFT JOIN student_guardians sg ON u.user_id = sg.student_id
-                WHERE sg.walisantri_id = ? OR sd.parent_username = ? OR sd.parent_name = ?
+                WHERE sg.walisantri_id = ? OR sd.parent_username = ? OR TRIM(LOWER(sd.parent_name)) = TRIM(LOWER(?))
             ");
             $stmtKids->execute([$user_id, $username, $fullName]);
             $kidIds = $stmtKids->fetchAll(PDO::FETCH_COLUMN);

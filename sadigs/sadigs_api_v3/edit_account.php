@@ -112,9 +112,10 @@ try {
                 $student = $stmtFind->fetch(PDO::FETCH_ASSOC);
 
                 if ($student) {
-                    // Link-kan: Update data santri agar parent_username-nya mengarah ke akun ini
-                    $stmtLink = $pdo->prepare("INSERT INTO student_details (user_id, parent_username) VALUES (?, ?) ON DUPLICATE KEY UPDATE parent_username = VALUES(parent_username)");
-                    $stmtLink->execute([$student['user_id'], $parent_username]);
+                    // REVISI: Gunakan tabel student_guardians untuk mendukung Multi-Parent (Ayah & Ibu)
+                    // Jangan menimpa parent_username di student_details agar data lama tidak hilang
+                    $stmtLink = $pdo->prepare("INSERT IGNORE INTO student_guardians (student_id, walisantri_id) VALUES (?, ?)");
+                    $stmtLink->execute([$student['user_id'], $user_id]);
                     $linking_messages[] = "Berhasil menghubungkan santri: $childName";
                 } else {
                     $linking_messages[] = "PERINGATAN: Santri '$childName' tidak ditemukan (Cek ejaan)";
