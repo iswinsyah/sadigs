@@ -36,6 +36,25 @@ if ($action === 'list_active') {
 
         foreach ($all_regulations as $reg) {
             $targets = array_map('trim', explode(',', $reg['target_role']));
+            
+            // --- LOGIKA CERDAS: INKLUSI GENDER & PERAN ---
+            // Jika target Musyrif, otomatis Musyrifah juga boleh lihat (dan sebaliknya)
+            // DAN Kepala Asrama (Putra/Putri) juga otomatis bisa melihat amanah Musyrif
+            if (in_array('Musyrif', $targets) || in_array('Musyrifah', $targets)) {
+                if (!in_array('Musyrif', $targets)) $targets[] = 'Musyrif';
+                if (!in_array('Musyrifah', $targets)) $targets[] = 'Musyrifah';
+                if (!in_array('Kepala Asrama Putra', $targets)) $targets[] = 'Kepala Asrama Putra';
+                if (!in_array('Kepala Asrama Putri', $targets)) $targets[] = 'Kepala Asrama Putri';
+            }
+            
+            // Jika target Ustadz, otomatis Ustadzah juga boleh lihat
+            if (in_array('Ustadz', $targets)) { $targets[] = 'Ustadzah'; }
+            if (in_array('Ustadzah', $targets)) { $targets[] = 'Ustadz'; }
+
+            // Jika target Kepala Asrama (Umum), otomatis Putra & Putri boleh lihat
+            if (in_array('Kepala Asrama', $targets)) { $targets[] = 'Kepala Asrama Putra'; $targets[] = 'Kepala Asrama Putri'; }
+            // ---------------------------------------------
+
             $is_umum = in_array('Umum', $targets);
             $is_staf = in_array('Staf', $targets);
             
