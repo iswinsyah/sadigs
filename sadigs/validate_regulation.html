@@ -3,175 +3,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Validasi Peraturan | SADIGS</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Validasi Amanah Staf - Ketua Yayasan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        body{font-family:'Inter',sans-serif;}
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        body { font-family: 'Poppins', sans-serif; background: #f4f6f9; padding: 20px; color: #333; }
+        .container { max-width: 1100px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        h1 { color: #26667F; margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 15px; }
+        
+        .card { border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px; margin-bottom: 20px; background: #fff; transition: transform 0.2s; }
+        .card:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        
+        .meta { font-size: 0.85rem; color: #666; margin-bottom: 10px; display: flex; justify-content: space-between; background: #f8f9fa; padding: 8px; border-radius: 5px; }
+        
+        .content-area { margin: 15px 0; }
+        .field-label { font-weight: bold; font-size: 0.8rem; color: #26667F; display: block; margin-bottom: 3px; }
+        
+        /* Tampilan Mode Baca */
+        .view-mode h3 { margin: 0 0 10px 0; color: #333; }
+        .view-mode p { white-space: pre-wrap; line-height: 1.6; background: #fafafa; padding: 10px; border-radius: 5px; border-left: 4px solid #26667F; }
+        
+        /* Tampilan Mode Edit */
+        .edit-mode { display: none; background: #fffbe6; padding: 15px; border: 1px solid #ffe58f; border-radius: 8px; }
+        .edit-mode input, .edit-mode textarea, .edit-mode select { width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; font-family: inherit; box-sizing: border-box; }
+        .edit-mode textarea { min-height: 100px; }
+
+        .actions { margin-top: 15px; display: flex; gap: 10px; align-items: center; }
+        
+        button { padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer; font-weight: 600; transition: 0.2s; }
+        .btn-approve { background: #28a745; color: white; }
+        .btn-approve:hover { background: #218838; }
+        
+        .btn-reject { background: #dc3545; color: white; }
+        .btn-reject:hover { background: #c82333; }
+        
+        .btn-edit { background: #ffc107; color: #333; }
+        .btn-edit:hover { background: #e0a800; }
+        
+        .btn-save { background: #17a2b8; color: white; }
+        .btn-save:hover { background: #138496; }
+        
+        .btn-cancel { background: #6c757d; color: white; }
+        
+        .empty-state { text-align: center; padding: 40px; color: #999; font-style: italic; }
+        .back-link { display: inline-block; margin-bottom: 20px; text-decoration: none; color: #666; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans antialiased">
-
-    <div class="flex h-screen overflow-hidden">
-        <!-- SIDEBAR -->
-        <aside id="sidebar" class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col hidden lg:flex">
-            <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-teal-600 text-white">
-                <h1 class="text-2xl font-extrabold tracking-wider">SADIGS</h1>
-            </div>
-            <div class="p-6 border-b border-gray-100 bg-teal-50">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-teal-200 flex items-center justify-center text-teal-800 font-bold text-lg shadow-sm"><span id="userInitial">U</span></div>
-                    <div class="overflow-hidden">
-                        <p id="sidebarUsername" class="font-bold text-gray-800 text-sm truncate">Memuat...</p>
-                        <p id="sidebarRole" class="text-xs text-gray-500 truncate font-medium">Role...</p>
-                    </div>
-                </div>
-            </div>
-            <nav id="sidebarNav" class="flex-1 overflow-y-auto py-4 px-3 space-y-2 no-scrollbar">
-                <div class="p-4 text-center text-gray-400 text-sm">Memuat menu...</div>
-            </nav>
-        </aside>
-
-        <!-- KONTEN UTAMA -->
-        <main class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative">
-            <div class="max-w-3xl mx-auto">
-        <div class="flex items-center gap-3 mb-6">
-            <a href="dashboard.html" class="p-2 bg-white rounded-full shadow-sm hover:bg-gray-100 transition"><i data-lucide="arrow-left" class="w-5 h-5 text-gray-600"></i></a>
-            <h1 class="text-2xl font-bold text-gray-800">Validasi Peraturan</h1>
+<body>
+    <div class="container">
+        <a href="dashboard.html" class="back-link">← Kembali ke Dashboard</a>
+        <h1>✅ Validasi Amanah & Peraturan</h1>
+        <p>Sebagai Ketua Yayasan, Anda dapat menyetujui, menolak, atau <strong>mengedit langsung</strong> redaksi amanah sebelum diterbitkan.</p>
+        
+        <div id="list-container">
+            <div class="empty-state">Memuat data...</div>
         </div>
-
-        <div id="listContainer" class="space-y-4">
-            <!-- Data akan dimuat di sini -->
-            <div class="text-center py-10 text-gray-500">Memuat data...</div>
-        </div>
-    </div>
-        </main>
     </div>
 
     <script>
-        lucide.createIcons();
-
-        // --- SIDEBAR LOGIC ---
-        async function initSidebar() {
-            try {
-                const sessionRes = await fetch('sadigs_api_v3/session_check.php');
-                const sessionData = await sessionRes.json();
-                if (!sessionData.success) { window.location.href = 'index.html'; return; }
-
-                document.getElementById('sidebarUsername').textContent = sessionData.username;
-                document.getElementById('userInitial').textContent = sessionData.username.charAt(0).toUpperCase();
-                const rawRoles = sessionData.raw_roles || [];
-                let rolesText = 'User';
-                if (rawRoles.length > 0) {
-                    rolesText = rawRoles.map(r => r.status === 'approved' ? r.role_name : `${r.role_name} (Pending)`).join(', ');
-                }
-                document.getElementById('sidebarRole').textContent = rolesText;
-
-                const permRes = await fetch('sadigs_api_v3/get_menu_permissions.php');
-                const permData = await permRes.json();
-                if (permData.success) {
-                    const sidebarNav = document.getElementById('sidebarNav');
-                    sidebarNav.innerHTML = '';
-                    const allowedMenus = permData.permissions || [];
-                    const categories = permData.categories || {};
-                    const menuNames = permData.menu_names || {};
-                    const menuIcons = permData.menu_icons || {};
-                    const menuLinks = permData.menu_links || {};
-
-                    for (const [catId, cat] of Object.entries(categories)) {
-                        const visibleMenus = cat.menus.filter(mId => allowedMenus.includes(mId));
-                        if (visibleMenus.length > 0) {
-                            const groupDiv = document.createElement('div');
-                            groupDiv.className = "bg-gray-50 rounded-lg p-2 mt-2";
-                            const title = document.createElement('h3');
-                            title.className = "px-2 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider";
-                            title.textContent = cat.label;
-                            groupDiv.appendChild(title);
-                            visibleMenus.forEach(menuId => {
-                                if (menuId === 'navYayasanWidget' || menuId === 'navMusyrifWidget') return;
-                                const link = document.createElement('a');
-                                link.href = menuLinks[menuId] || '#';
-                                const isActive = window.location.pathname.includes(link.href) && link.href !== '#';
-                                link.className = isActive ? "flex items-center gap-3 px-3 py-2.5 text-teal-700 bg-white rounded-md transition font-semibold text-sm shadow-sm" : "flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-white hover:text-teal-600 rounded-md transition font-medium text-sm";
-                                const iconName = menuIcons[menuId] || 'circle';
-                                link.innerHTML = `<i data-lucide="${iconName}" class="w-5 h-5"></i> ${menuNames[menuId] || menuId}`;
-                                groupDiv.appendChild(link);
-                            });
-                            sidebarNav.appendChild(groupDiv);
-                        }
-                    }
-                    const logoutDiv = document.createElement('div');
-                    logoutDiv.className = "pt-2";
-                    logoutDiv.innerHTML = `<button onclick="if(confirm('Keluar aplikasi?')) window.location.href='sadigs_api_v3/logout.php'" class="w-full flex items-center gap-3 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition font-medium"><i data-lucide="log-out" class="w-5 h-5"></i> Keluar</button>`;
-                    sidebarNav.appendChild(logoutDiv);
-                    lucide.createIcons();
-                }
-            } catch (e) { console.error(e); }
-        }
-        initSidebar();
-
         async function loadData() {
             try {
-                const res = await fetch('sadigs_api_v3/get_regulations.php?action=list_pending');
-                const result = await res.json();
-                const container = document.getElementById('listContainer');
+                const res = await fetch('sadigs_api_v3/regulation_operations.php?action=get_pending');
+                const json = await res.json();
+                
+                const container = document.getElementById('list-container');
                 container.innerHTML = '';
 
-                if (result.success && result.data.length > 0) {
-                    result.data.forEach(item => {
-                        const div = document.createElement('div');
-                        div.className = 'bg-white p-6 rounded-xl shadow-sm border border-gray-100';
-                        div.innerHTML = `
-                            <div class="flex justify-between items-start mb-3">
-                                <div>
-                                    <span class="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-1 rounded">Untuk: ${item.target_role}</span>
-                                    <h3 class="text-lg font-bold text-gray-800 mt-1">${item.title}</h3>
-                                    <p class="text-xs text-gray-500">Oleh: ${item.creator_name} • ${item.created_at}</p>
+                if (json.success && json.data.length > 0) {
+                    json.data.forEach(item => {
+                        const card = document.createElement('div');
+                        card.className = 'card';
+                        card.id = `card-${item.id}`;
+                        card.innerHTML = `
+                            <div class="meta">
+                                <span><strong>Pengusul:</strong> ${item.creator_name}</span>
+                                <span>${item.created_at}</span>
+                            </div>
+
+                            <!-- MODE BACA -->
+                            <div class="view-mode" id="view-${item.id}">
+                                <span class="field-label">Target: ${item.target_role}</span>
+                                <h3 id="disp-title-${item.id}">${item.title}</h3>
+                                <div class="content-area">
+                                    <span class="field-label">Isi Amanah:</span>
+                                    <p id="disp-content-${item.id}">${item.content}</p>
+                                </div>
+                                <div class="actions">
+                                    <button class="btn-approve" onclick="validate(${item.id}, 'approved')">✅ Setujui & Terbitkan</button>
+                                    <button class="btn-edit" onclick="toggleEdit(${item.id}, true)">✏️ Edit Redaksi</button>
+                                    <button class="btn-reject" onclick="validate(${item.id}, 'rejected')">❌ Tolak</button>
                                 </div>
                             </div>
-                            <div class="bg-gray-50 p-4 rounded-lg text-gray-700 text-sm mb-4 whitespace-pre-wrap">${item.content}</div>
-                            <div class="flex gap-3 justify-end">
-                                <button onclick="process(${item.id}, 'reject')" class="px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 font-medium transition">Tolak</button>
-                                <button onclick="process(${item.id}, 'approve')" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-bold transition shadow">Setujui & Terbitkan</button>
+
+                            <!-- MODE EDIT -->
+                            <div class="edit-mode" id="edit-${item.id}">
+                                <span class="field-label">Edit Target Role:</span>
+                                <select id="input-role-${item.id}">
+                                    <option value="Semua">Semua</option>
+                                    <option value="Musyrif">Musyrif</option>
+                                    <option value="Walisantri">Walisantri</option>
+                                    <option value="Ustadz">Ustadz</option>
+                                    <option value="Kepala Sekolah">Kepala Sekolah</option>
+                                </select>
+
+                                <span class="field-label">Edit Judul:</span>
+                                <input type="text" id="input-title-${item.id}" value="${item.title}">
+
+                                <span class="field-label">Edit Isi:</span>
+                                <textarea id="input-content-${item.id}">${item.content}</textarea>
+
+                                <div class="actions">
+                                    <button class="btn-save" onclick="saveChanges(${item.id})">💾 Simpan Perubahan</button>
+                                    <button class="btn-cancel" onclick="toggleEdit(${item.id}, false)">Batal</button>
+                                </div>
                             </div>
                         `;
-                        container.appendChild(div);
+                        container.appendChild(card);
+                        // Set initial select value
+                        document.getElementById(`input-role-${item.id}`).value = item.target_role;
                     });
                 } else {
-                    container.innerHTML = `
-                        <div class="text-center py-12 bg-white rounded-xl border border-gray-100">
-                            <div class="bg-green-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <i data-lucide="check" class="w-8 h-8 text-green-600"></i>
-                            </div>
-                            <h3 class="text-lg font-bold text-gray-800">Semua Bersih!</h3>
-                            <p class="text-gray-500">Tidak ada peraturan yang menunggu validasi.</p>
-                        </div>`;
-                    lucide.createIcons();
+                    container.innerHTML = '<div class="empty-state">Tidak ada amanah yang menunggu validasi saat ini.</div>';
                 }
-            } catch (err) {
-                console.error(err);
-                document.getElementById('listContainer').innerHTML = '<p class="text-red-500 text-center">Gagal memuat data.</p>';
+            } catch (e) {
+                alert('Gagal memuat data: ' + e);
             }
         }
 
-        async function process(id, action) {
-            if (!confirm(`Yakin ingin ${action === 'approve' ? 'menyetujui' : 'menolak'} peraturan ini?`)) return;
+        function toggleEdit(id, showEdit) {
+            document.getElementById(`view-${id}`).style.display = showEdit ? 'none' : 'block';
+            document.getElementById(`edit-${id}`).style.display = showEdit ? 'block' : 'none';
+        }
+
+        async function saveChanges(id) {
+            const title = document.getElementById(`input-title-${id}`).value;
+            const content = document.getElementById(`input-content-${id}`).value;
+            const role = document.getElementById(`input-role-${id}`).value;
 
             try {
-                const res = await fetch('sadigs_api_v3/validate_regulation.php', {
+                const res = await fetch('sadigs_api_v3/regulation_operations.php?action=update', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ id, action })
+                    body: JSON.stringify({ id, title, content, target_role: role })
                 });
-                const result = await res.json();
-                alert(result.message);
-                if (result.success) loadData();
-            } catch (err) {
-                alert('Error: ' + err.message);
-            }
+                const json = await res.json();
+                if (json.success) {
+                    alert('✅ Perubahan berhasil disimpan!');
+                    // Update tampilan tanpa reload
+                    document.getElementById(`disp-title-${id}`).innerText = title;
+                    document.getElementById(`disp-content-${id}`).innerText = content;
+                    toggleEdit(id, false);
+                } else {
+                    alert('Gagal: ' + json.message);
+                }
+            } catch (e) { alert('Error: ' + e); }
+        }
+
+        async function validate(id, status) {
+            if (!confirm(`Apakah Anda yakin ingin mengubah status menjadi ${status}?`)) return;
+
+            try {
+                const res = await fetch('sadigs_api_v3/regulation_operations.php?action=validate', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ id, status })
+                });
+                const json = await res.json();
+                if (json.success) {
+                    document.getElementById(`card-${id}`).remove();
+                    if (document.getElementById('list-container').children.length === 0) {
+                        document.getElementById('list-container').innerHTML = '<div class="empty-state">Semua tugas selesai!</div>';
+                    }
+                } else { alert('Gagal: ' + json.message); }
+            } catch (e) { alert('Error: ' + e); }
         }
 
         loadData();
