@@ -23,9 +23,11 @@ try {
                 dw.id, dw.report_date, dw.created_at,
                 u.full_name, u.username,
                 sd.grade,
-                dw.sdhajud, dw.dhuha, dw.quran_reading, dw.notes,
-                dw.status as validation_status
-            FROM ibadah_harian dwer_id = u.user_id
+                dw.shalat_subuh, dw.shalat_dzuhur, dw.shalat_ashar, dw.shalat_maghrib, dw.shalat_isya,
+                dw.shalat_tahajud, dw.shalat_dhuha, dw.quran_last_page, dw.notes,
+                dw.validation_status
+            FROM ibadah_harian dw
+            JOIN users u ON dw.user_id = u.user_id
             LEFT JOIN student_details sd ON u.user_id = sd.user_id
             WHERE dw.report_date = ?
             ORDER BY sd.grade ASC, u.full_name ASC";
@@ -44,7 +46,7 @@ try {
     foreach ($data as $row) {
         if ($row['validation_status'] === 'approved') $stats['validated']++;
         // Asumsi full jamaah jika semua 5 waktu = 'Jamaah'
-        if ($row['subuh'] == 'Jamaah' && $row['zuhur'] == 'Jamaah' && $row['ashar'] == 'Jamaah' && $row['maghrib'] == 'Jamaah' && $row['isya'] == 'Jamaah') {
+        if ($row['shalat_subuh'] == 'Jamaah' && $row['shalat_dzuhur'] == 'Jamaah' && $row['shalat_ashar'] == 'Jamaah' && $row['shalat_maghrib'] == 'Jamaah' && $row['shalat_isya'] == 'Jamaah') {
             $stats['full_jamaah']++;
         }
     }
