@@ -305,10 +305,11 @@
                     // Update sidebar and main role display
                     let rolesText = 'User';
                     if (rawRoles.length > 0) {
-                        rolesText = rawRoles.map(r => {
+                        const uniqueRoles = [...new Set(rawRoles.map(r => {
                             if (typeof r === 'string') return r;
                             return r.status === 'approved' ? r.role_name : `${r.role_name} (Pending)`;
-                        }).join(', ');
+                        }))];
+                        rolesText = uniqueRoles.join(', ');
                     }
                     document.getElementById('sidebarRole').textContent = rolesText;
                     document.getElementById('mainRoleDisplay').textContent = rolesText;

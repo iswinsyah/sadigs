@@ -246,7 +246,8 @@
                 const rawRoles = sessionData.raw_roles || [];
                 let rolesText = 'User';
                 if (rawRoles.length > 0) {
-                    rolesText = rawRoles.map(r => r.status === 'approved' ? r.role_name : `${r.role_name} (Pending)`).join(', ');
+                    const uniqueRoles = [...new Set(rawRoles.map(r => r.status === 'approved' ? r.role_name : `${r.role_name} (Pending)`))];
+                    rolesText = uniqueRoles.join(', ');
                 }
                 document.getElementById('sidebarRole').textContent = rolesText;
                 

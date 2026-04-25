@@ -1,11 +1,11 @@
 <?php
 // sadigs_api_v3/config.php
 
-// Pengaturan untuk Database Lokal (XAMPP)
+// Pengaturan untuk Database Hostinger
 define('DB_SERVER', 'localhost');
-define('DB_USERNAME', 'root');
-define('DB_PASSWORD', ''); // Password default XAMPP adalah kosong
-define('DB_NAME', 'sadigs_db');
+define('DB_USERNAME', 'u829486010_sadigsmysql');
+define('DB_PASSWORD', 'Khilafet@1924'); 
+define('DB_NAME', 'u829486010_sadigsdatabase');
 
 $config = [
     'app_id' => 'SADIGS_V3',

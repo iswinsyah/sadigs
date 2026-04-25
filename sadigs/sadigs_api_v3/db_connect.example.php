@@ -6,9 +6,9 @@
 
 // PENTING: Ganti nilai-nilai ini dengan kredensial database Anda yang sebenarnya.
 define('DB_HOST', 'localhost'); // Biasanya 'localhost' untuk Hostinger
-define('DB_USER', 'user_database_anda'); // Username database dari hPanel
-define('DB_PASS', 'password_database_anda'); // Password database dari hPanel
-define('DB_NAME', 'nama_database_anda'); // Nama database dari hPanel
+define('DB_USER', 'u829486010_sadigsmysql'); // Username database dari hPanel
+define('DB_PASS', 'Khilafet@1924'); // Password database dari hPanel
+define('DB_NAME', 'u829486010_sadigsdatabase'); // Nama database dari hPanel
 
 function getDBConnection() {
     $dsn = 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8mb4';
