@@ -110,7 +110,12 @@
             document.getElementById('sidebarUsername').textContent = sessionData.username;
             document.getElementById('userInitial').textContent = sessionData.username.charAt(0).toUpperCase();
             const rawRoles = sessionData.raw_roles || [];
-            document.getElementById('sidebarRole').textContent = rawRoles.length > 0 ? rawRoles.map(r => r.role_name).join(', ') : 'User';
+            if (rawRoles.length > 0) {
+                const uniqueRoles = [...new Set(rawRoles.map(r => r.role_name))];
+                document.getElementById('sidebarRole').textContent = uniqueRoles.join(', ');
+            } else {
+                document.getElementById('sidebarRole').textContent = 'User';
+            }
 
             try {
                 const permRes = await fetch('sadigs_api_v3/get_menu_permissions.php');
