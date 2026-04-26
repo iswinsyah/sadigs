@@ -75,6 +75,7 @@
                     <div class="overflow-hidden">
                         <p id="sidebarUsername" class="font-bold text-gray-800 text-sm truncate">Memuat...</p>
                         <div class="flex items-center gap-2">
+                            <p id="sidebarRole" class="hidden text-xs text-gray-500 truncate font-medium">Role...</p>
                             <button id="editRoleBtn" class="text-gray-400 hover:text-utama transition hidden" title="Edit/Tambah Peran"><i data-lucide="edit-2" class="w-3 h-3"></i></button>
                         </div>
                     </div>
@@ -289,25 +290,6 @@
                     const activeRoles = data.roles || [];
 
 
-                    // Update sidebar and main role display
-                    let rolesText = 'User';
-                    if (rawRoles.length > 0) {
-                        // Build a map to keep the best status for each role name
-                        const roleMap = {};
-                        rawRoles.forEach(r => {
-                            const name = typeof r === 'string' ? r : r.role_name;
-                            const status = typeof r === 'string' ? 'approved' : r.status;
-                            // Prefer approved over other statuses
-                            if (!roleMap[name] || (roleMap[name] !== 'approved' && status === 'approved')) {
-                                roleMap[name] = status;
-                            }
-                        });
-                        const uniqueRoles = Object.entries(roleMap).map(([name, status]) =>
-                            status === 'approved' ? name : `${name} (Pending)`
-                        );
-                        rolesText = uniqueRoles.join(', ');
-                    }
-                    document.getElementById('sidebarRole').textContent = rolesText;
                     document.getElementById('editRoleBtn').classList.remove('hidden');
 
                     // LOGIKA BARU: Jika user belum punya peran sama sekali, tampilkan form pemilihan peran.
@@ -500,10 +482,14 @@
                         })
                         .catch(e => console.error("Gagal memuat izin menu:", e));
                 } else {
+                    alert("Sesi tidak terbaca. Mengembalikan ke halaman login...");
                     window.location.href = 'index.html';
                 }
             })
-            .catch(() => window.location.href = 'index.html');
+            .catch((err) => {
+                console.error("Dashboard Error:", err);
+                alert("Sistem mendeteksi sisa cache error: " + err.message + "\n\nAbaikan pesan ini untuk tetap di halaman.");
+            });
 
         // Event Listener untuk Tombol Edit Peran
         document.getElementById('editRoleBtn').addEventListener('click', () => {
@@ -734,8 +720,10 @@
     <script>
         // --- PWA REGISTRATION ---
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('service-worker.js');
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                for(let registration of registrations) {
+                    registration.unregister();
+                }
             });
         }
     </script>

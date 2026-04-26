@@ -1,56 +1,28 @@
-const CACHE_NAME = 'sadigs-app-v10';
-const urlsToCache = [
-  './',
-  'index.html',
-  'dashboard.html',
-  'profile.html',
-  'tahfizh_history.html',
-  'tahfizh_recap.html',
-  'manifest.json',
-  'subjects_management.html',
-  'grade_input.html',
-  'academic_ledger.html',
-  'menu_management.html'
-];
+const CACHE_NAME = 'sadigs-app-v11-KILLED';
 
-// 1. Install Service Worker & Cache Aset Statis
+// 1. Install Service Worker (Langsung ambil alih)
 self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        console.log('SADIGS: Caching app shell');
-        return cache.addAll(urlsToCache);
-      })
-  );
+  self.skipWaiting();
 });
 
-// 2. Activate & Bersihkan Cache Lama
+// 2. Activate & Bersihkan SEMUA Cache Lama
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cacheName => {
-          if (cacheName !== CACHE_NAME) {
-            return caches.delete(cacheName);
-          }
+          return caches.delete(cacheName); // Hapus semuanya tanpa ampun
         })
       );
+    }).then(() => {
+      return self.clients.claim(); // Paksa browser pakai versi terbaru detik ini juga
     })
   );
 });
 
-// 3. Fetch Strategy: Cache First untuk Aset, Network First untuk API
+// 3. Fetch Strategy: NETWORK ONLY (Abaikan cache)
 self.addEventListener('fetch', event => {
-  // Jangan cache request ke API (agar data selalu fresh)
-  if (event.request.url.includes('sadigs_api_v3/') || event.request.method !== 'GET') {
-    return;
-  }
-
   event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        // Kembalikan cache jika ada, jika tidak ambil dari network
-        return response || fetch(event.request);
-      })
+    fetch(event.request).catch(err => console.log('Fetch error:', err))
   );
 });
