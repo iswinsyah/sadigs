@@ -52,12 +52,13 @@ $menuDetails = [
     'navKirimNotifikasi' => ['name' => 'Kirim Notifikasi', 'link' => 'admin_notifications.html', 'icon' => 'send'],
     'navLihatNotifikasi' => ['name' => 'Notifikasi Saya', 'link' => 'my_notifications.html', 'icon' => 'bell'],
     // Menu Akademik & Santri (Tambahan)
-    'navRiwayatIbadah' => ['name' => 'Riwayat Ibadah', 'link' => 'student_worship_view.html', 'icon' => 'history'],
-    'navMonitoringIbadah' => ['name' => 'Rekap Ibadah Santri', 'link' => 'global_worship_monitoring.html', 'icon' => 'bar-chart-2'],
+    'navRiwayatIbadah' => ['name' => 'Rekap Ibadah (Khusus Santri)', 'link' => 'student_worship_view.html', 'icon' => 'history'],
+    'navMonitoringIbadah' => ['name' => 'Rekap Ibadah (Global Admin)', 'link' => 'global_worship_monitoring.html', 'icon' => 'bar-chart-2'],
+    'navGrafikIbadah' => ['name' => 'Grafik Rekap Ibadah', 'link' => 'worship_recap_chart.html', 'icon' => 'pie-chart'],
     'navBiodataSantri' => ['name' => 'Biodata Santri', 'link' => 'student_data.html', 'icon' => 'book-user'],
     'navBukuIndukSantri' => ['name' => 'Buku Induk Santri', 'link' => 'student_master_book.html', 'icon' => 'book'],
     'navManajemenKelas' => ['name' => 'Manajemen Kelas', 'link' => 'class_management.html', 'icon' => 'users'],
-    'navRekapIbadahAnak' => ['name' => 'Rekap Ibadah Anak', 'link' => 'guardian_worship_view.html', 'icon' => 'clipboard-check'],
+    'navRekapIbadahAnak' => ['name' => 'Rekap Ibadah (Khusus Wali)', 'link' => 'guardian_worship_view.html', 'icon' => 'clipboard-check'],
     'navMonitoringAkademik' => ['name' => 'Monitoring Akademik', 'link' => 'academic_monitoring.html', 'icon' => 'monitor-check'],
     // Menu Akademik Baru (Leger & Mapel)
     'navManajemenMapel' => ['name' => 'Manajemen Mapel', 'link' => 'subjects_management.html', 'icon' => 'library'],
@@ -100,6 +101,7 @@ foreach ($menuDetails as $id => $detail) {
     // Memaksa menu-menu baru masuk ke deretan yang benar di Dashboard & Manajemen Akses
     $pdo->exec("INSERT INTO menu_categories (category_id, label, sort_order) VALUES ('Umum', '1. UMUM', 1), ('Walisantri', '16. WALISANTRI', 16), ('Santri', '15. SANTRI', 15), ('BendaharaSekolah', '11. BENDAHARA SEKOLAH', 11) ON DUPLICATE KEY UPDATE label=VALUES(label)");
     $pdo->exec("UPDATE menus SET category_id = 'Umum' WHERE menu_id IN ('navDashboard', 'navProfil', 'navLihatNotifikasi', 'navKalender', 'navJadwalPelajaran')");
+    $pdo->exec("UPDATE menus SET category_id = 'ManajemenYayasan' WHERE menu_id = 'navGrafikIbadah'");
     $pdo->exec("UPDATE menus SET category_id = 'Walisantri' WHERE menu_id IN ('navNilaiRapotAnak', 'navFormulirPembayaran', 'navRekapIbadahAnak', 'navViewTahfizh', 'navIzinWalisantri', 'navPocketMoneyDeposit', 'navMonitoringAnak')");
     $pdo->exec("UPDATE menus SET category_id = 'Santri' WHERE menu_id IN ('navNilaiRapotSantri', 'navBiodataSantri', 'navIbadahHarian', 'navRiwayatIbadah', 'navSantriPocketMoney', 'navViewTahfizhSantri')");
     $pdo->exec("UPDATE menus SET category_id = 'BendaharaSekolah' WHERE menu_id IN ('navValidasiPembayaran', 'navTabelPembayaran', 'navRekapPembayaran')");
@@ -199,6 +201,12 @@ foreach ($worshipPerms as $rName) {
 $monitoringPerms = ['Ketua Yayasan', 'Kepala Sekolah', 'Kepala Asrama Putra', 'Kepala Asrama Putri', 'Admin Sekolah'];
 foreach ($monitoringPerms as $rName) {
     $pdo->prepare("INSERT INTO menu_permissions (role_name, menu_id, is_allowed) VALUES (?, 'navMonitoringIbadah', 1) ON DUPLICATE KEY UPDATE is_allowed = 1")->execute([$rName]);
+}
+
+// --- FORCE UPDATE PERMISSIONS FOR GRAFIK IBADAH (YAYASAN ONLY) ---
+$grafikPerms = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan'];
+foreach ($grafikPerms as $rName) {
+    $pdo->prepare("INSERT INTO menu_permissions (role_name, menu_id, is_allowed) VALUES (?, 'navGrafikIbadah', 1) ON DUPLICATE KEY UPDATE is_allowed = 1")->execute([$rName]);
 }
 
 // --- FORCE UPDATE PERMISSIONS FOR GUARDIAN ---

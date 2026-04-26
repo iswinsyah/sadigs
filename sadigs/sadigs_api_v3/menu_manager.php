@@ -99,7 +99,8 @@ $master_structure = [
         'ManajemenYayasan' => [
             'label' => '2. MANAJEMEN YAYASAN',
             'items' => [
-                ['id' => 'navYayasanWidget', 'label' => 'Ringkasan Manajemen', 'icon' => 'activity'] // Widget khusus
+                ['id' => 'navYayasanWidget', 'label' => 'Ringkasan Manajemen', 'icon' => 'activity'], // Widget khusus
+                ['id' => 'navGrafikIbadah', 'label' => 'Grafik Rekap Ibadah', 'icon' => 'pie-chart']
             ]
         ],
         'KetuaYayasan' => [
@@ -124,7 +125,7 @@ $master_structure = [
                 ['id' => 'navBukuIndukSantri', 'label' => 'Buku Induk Santri', 'icon' => 'book'],
                 ['id' => 'navManajemenKelas', 'label' => 'Manajemen Kelas', 'icon' => 'users'],
                 ['id' => 'navAturKurikulum', 'label' => 'Formulir Atur Kurikulum', 'icon' => 'book-open-check'],
-                ['id' => 'navMonitoringIbadah', 'label' => 'Rekap Ibadah Santri', 'icon' => 'bar-chart-2']
+                ['id' => 'navMonitoringIbadah', 'label' => 'Rekap Ibadah (Global Admin)', 'icon' => 'bar-chart-2']
             ]
         ],
         'KepalaSekolah' => [
@@ -193,7 +194,7 @@ $master_structure = [
             'items' => [
                 ['id' => 'navBiodataSantri', 'label' => 'Biodata Santri', 'icon' => 'book-user'],
                 ['id' => 'navIbadahHarian', 'label' => 'Formulir Laporan Ibadah Harian', 'icon' => 'notebook-pen'],
-                ['id' => 'navRiwayatIbadah', 'label' => 'Riwayat Ibadah', 'icon' => 'history'],
+                ['id' => 'navRiwayatIbadah', 'label' => 'Rekap Ibadah (Khusus Santri)', 'icon' => 'history'],
                 ['id' => 'navSantriPocketMoney', 'label' => 'Uang Saku Saya', 'icon' => 'landmark'],
                 ['id' => 'navNilaiRapotSantri', 'label' => 'Nilai Rapot Santri', 'icon' => 'graduation-cap'],
                 ['id' => 'navViewTahfizhSantri', 'label' => 'Riwayat Tahfidz', 'icon' => 'history']
@@ -202,7 +203,7 @@ $master_structure = [
         'Walisantri' => [
             'label' => '16. WALISANTRI',
             'items' => [
-                ['id' => 'navRekapIbadahAnak', 'label' => 'Rekap Ibadah Anak', 'icon' => 'clipboard-check'],
+                ['id' => 'navRekapIbadahAnak', 'label' => 'Rekap Ibadah (Khusus Wali)', 'icon' => 'clipboard-check'],
                 ['id' => 'navViewTahfizh', 'label' => 'Laporan Tahfizh', 'icon' => 'book-open-check'],
                 ['id' => 'navIzinWalisantri', 'label' => 'Formulir Izin Walisantri', 'icon' => 'mail-question'],
                 ['id' => 'navPocketMoneyDeposit', 'label' => 'Formulir Deposit Uang Saku', 'icon' => 'wallet'],
