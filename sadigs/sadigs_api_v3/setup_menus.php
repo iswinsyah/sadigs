@@ -54,7 +54,7 @@ $menuDetails = [
     // Menu Akademik & Santri (Tambahan)
     'navRiwayatIbadah' => ['name' => 'Rekap Ibadah (Khusus Santri)', 'link' => 'student_worship_view.html', 'icon' => 'history'],
     'navMonitoringIbadah' => ['name' => 'Rekap Ibadah (Global Admin)', 'link' => 'global_worship_monitoring.html', 'icon' => 'bar-chart-2'],
-    'navGrafikIbadah' => ['name' => 'Grafik Rekap Ibadah', 'link' => 'worship_recap_chart.html', 'icon' => 'pie-chart'],
+    'navGrafikIbadah' => ['name' => 'Grafik Ibadah Santri', 'link' => 'worship_recap_chart.html', 'icon' => 'pie-chart'],
     'navBiodataSantri' => ['name' => 'Biodata Santri', 'link' => 'student_data.html', 'icon' => 'book-user'],
     'navBukuIndukSantri' => ['name' => 'Buku Induk Santri', 'link' => 'student_master_book.html', 'icon' => 'book'],
     'navManajemenKelas' => ['name' => 'Manajemen Kelas', 'link' => 'class_management.html', 'icon' => 'users'],
@@ -99,7 +99,7 @@ foreach ($menuDetails as $id => $detail) {
 
     // --- KOREKSI KATEGORI MENU (DATABASE) ---
     // Memaksa menu-menu baru masuk ke deretan yang benar di Dashboard & Manajemen Akses
-    $pdo->exec("INSERT INTO menu_categories (category_id, label, sort_order) VALUES ('Umum', '1. UMUM', 1), ('Walisantri', '16. WALISANTRI', 16), ('Santri', '15. SANTRI', 15), ('BendaharaSekolah', '11. BENDAHARA SEKOLAH', 11) ON DUPLICATE KEY UPDATE label=VALUES(label)");
+    $pdo->exec("INSERT INTO menu_categories (category_id, label, sort_order) VALUES ('ManajemenYayasan', '2. MANAJEMEN YAYASAN', 2), ('Umum', '1. UMUM', 1), ('Walisantri', '16. WALISANTRI', 16), ('Santri', '15. SANTRI', 15), ('BendaharaSekolah', '11. BENDAHARA SEKOLAH', 11) ON DUPLICATE KEY UPDATE label=VALUES(label)");
     $pdo->exec("UPDATE menus SET category_id = 'Umum' WHERE menu_id IN ('navDashboard', 'navProfil', 'navLihatNotifikasi', 'navKalender', 'navJadwalPelajaran')");
     $pdo->exec("UPDATE menus SET category_id = 'ManajemenYayasan' WHERE menu_id = 'navGrafikIbadah'");
     $pdo->exec("UPDATE menus SET category_id = 'Walisantri' WHERE menu_id IN ('navNilaiRapotAnak', 'navFormulirPembayaran', 'navRekapIbadahAnak', 'navViewTahfizh', 'navIzinWalisantri', 'navPocketMoneyDeposit', 'navMonitoringAnak')");
