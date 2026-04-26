@@ -100,7 +100,7 @@ $master_structure = [
             'label' => '2. MANAJEMEN YAYASAN',
             'items' => [
                 ['id' => 'navYayasanWidget', 'label' => 'Ringkasan Manajemen', 'icon' => 'activity'], // Widget khusus
-                ['id' => 'navGrafikIbadah', 'label' => 'Grafik Ibadah Santri', 'icon' => 'pie-chart']
+                ['id' => 'navGrafikIbadah', 'label' => 'Grafik Rekap Ibadah', 'icon' => 'pie-chart']
             ]
         ],
         'KetuaYayasan' => [

@@ -54,7 +54,7 @@ $menuDetails = [
     // Menu Akademik & Santri (Tambahan)
     'navRiwayatIbadah' => ['name' => 'Rekap Ibadah (Khusus Santri)', 'link' => 'student_worship_view.html', 'icon' => 'history'],
     'navMonitoringIbadah' => ['name' => 'Rekap Ibadah (Global Admin)', 'link' => 'global_worship_monitoring.html', 'icon' => 'bar-chart-2'],
-    'navGrafikIbadah' => ['name' => 'Grafik Ibadah Santri', 'link' => 'worship_recap_chart.html', 'icon' => 'pie-chart'],
+    'navGrafikIbadah' => ['name' => 'Grafik Rekap Ibadah', 'link' => 'worship_recap_chart.html', 'icon' => 'pie-chart'],
     'navBiodataSantri' => ['name' => 'Biodata Santri', 'link' => 'student_data.html', 'icon' => 'book-user'],
     'navBukuIndukSantri' => ['name' => 'Buku Induk Santri', 'link' => 'student_master_book.html', 'icon' => 'book'],
     'navManajemenKelas' => ['name' => 'Manajemen Kelas', 'link' => 'class_management.html', 'icon' => 'users'],
@@ -92,8 +92,8 @@ $pdo->exec("DELETE FROM menu_permissions WHERE menu_id = 'navInputNilai'");
 
 // 1. Pastikan Menu Terdaftar di Tabel 'menus'
 foreach ($menuDetails as $id => $detail) {
-    // Gunakan ON DUPLICATE KEY UPDATE untuk memperbaiki link/icon jika sebelumnya kosong
-    $stmt = $pdo->prepare("INSERT INTO menus (menu_id, menu_name, link, icon) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE menu_name = VALUES(menu_name), link = VALUES(link), icon = VALUES(icon)");
+    // Hapus menu_name = VALUES(menu_name) agar nama yang sudah diedit manual oleh admin (ikon pensil) tidak tertimpa/direset
+    $stmt = $pdo->prepare("INSERT INTO menus (menu_id, menu_name, link, icon) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE link = VALUES(link), icon = VALUES(icon)");
     $stmt->execute([$id, $detail['name'], $detail['link'], $detail['icon']]);
 }
 
