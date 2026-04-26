@@ -21,4 +21,4 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           # Sesuaikan folder di bawah ini jika lokasi web SADIGS Bos bukan di public_html utama
           server-dir: /domains/sadigs.villaquranbaronmalang.com/public_html/
-          danger-clean-delete: false
+          dangerous-clean-slate: false

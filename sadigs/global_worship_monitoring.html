@@ -3,160 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitoring Ibadah Global - SADIGS</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Poppins', sans-serif; background: #f4f6f9; padding: 20px; color: #333; }
-        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        
-        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 20px; }
-        h1 { color: #26667F; margin: 0; font-size: 1.5rem; }
-        
-        .controls { display: flex; gap: 10px; align-items: center; }
-        input[type="date"] { padding: 8px; border: 1px solid #ccc; border-radius: 5px; font-family: inherit; }
-        button { padding: 8px 15px; background: #26667F; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: 600; }
-        button:hover { background: #1e556b; }
-
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .stat-card { background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #e9ecef; }
-        .stat-val { font-size: 1.8rem; font-weight: bold; color: #26667F; }
-        .stat-label { font-size: 0.85rem; color: #666; }
-
-        .table-responsive { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-        th, td { padding: 10px; border-bottom: 1px solid #eee; text-align: left; white-space: nowrap; }
-        th { background: #26667F; color: white; position: sticky; top: 0; }
-        tr:hover { background: #f1f1f1; }
-        
-        .badge { padding: 3px 8px; border-radius: 10px; font-size: 0.75rem; font-weight: 600; }
-        .bg-green { background: #d4edda; color: #155724; }
-        .bg-yellow { background: #fff3cd; color: #856404; }
-        .bg-red { background: #f8d7da; color: #721c24; }
-        
-        .loading { text-align: center; padding: 40px; color: #666; font-style: italic; }
-        .back-link { display: inline-block; margin-bottom: 15px; text-decoration: none; color: #666; }
-    </style>
+    <title>Rekap Ibadah Semua Santri | SADIGS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>body{font-family:'Inter',sans-serif;}</style>
 </head>
-<body>
-    <div class="container">
-        <a href="dashboard.html" class="back-link">← Kembali ke Dashboard</a>
-        
-        <div class="header">
-            <h1>🕌 Monitoring Ibadah Harian</h1>
-            <div class="controls">
-                <input type="date" id="filterDate">
-                <button onclick="loadData()">Tampilkan</button>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar & Navigation -->
+        <aside id="sidebar" class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col hidden lg:flex">
+            <div class="h-16 flex items-center justify-center bg-teal-600 text-white font-bold text-xl tracking-wider">SADIGS</div>
+            <div class="p-6">
+                <button onclick="window.history.back()" class="flex items-center gap-2 text-gray-600 hover:text-teal-600 transition">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i> Kembali
+                </button>
+                <a href="dashboard.html" class="flex items-center gap-2 mt-4 text-gray-600 hover:text-teal-600">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard
+                </a>
             </div>
-        </div>
+            <nav id="sidebarNav" class="flex-1 overflow-y-auto py-4 px-3 space-y-2"></nav>
+        </aside>
 
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-val" id="stat-total">0</div>
-                <div class="stat-label">Total Laporan Masuk</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-val" id="stat-jamaah">0</div>
-                <div class="stat-label">Full Jamaah 5 Waktu</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-val" id="stat-valid">0</div>
-                <div class="stat-label">Sudah Divalidasi</div>
-            </div>
-        </div>
+        <main class="flex-1 overflow-y-auto p-4 lg:p-8 relative">
+            <div class="max-w-7xl mx-auto">
+                <header class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">Rekap Ibadah Semua Santri</h1>
+                        <p class="text-gray-500 text-sm mt-1">Pemantauan global laporan ibadah harian seluruh santri.</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <input type="date" id="filterDate" class="px-4 py-2 border border-gray-300 rounded-lg text-sm shadow-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500" onchange="loadData()">
+                        <button onclick="loadData()" class="px-4 py-2 bg-teal-600 text-white rounded-lg text-sm font-bold shadow-sm hover:bg-teal-700 flex items-center gap-2 transition">
+                            <i data-lucide="refresh-cw" class="w-4 h-4"></i> Refresh
+                        </button>
+                    </div>
+                </header>
 
-        <div class="table-responsive">
-            <table id="worshipTable">
-                <thead>
-                    <tr>
-                        <th>Nama Santri</th>
-                        <th>Kelas</th>
-                        <th>Subuh</th>
-                        <th>Dzuhur</th>
-                        <th>Ashar</th>
-                        <th>Maghrib</th>
-                        <th>Isya</th>
-                        <th>Tahajud</th>
-                        <th>Dhuha</th>
-                        <th>Quran</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody">
-                    <tr><td colspan="11" class="loading">Silakan pilih tanggal dan klik Tampilkan</td></tr>
-                </tbody>
-            </table>
-        </div>
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8" id="statsContainer">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                        <p class="text-sm font-bold text-gray-500 uppercase tracking-wider">Total Laporan</p>
+                        <h3 class="text-3xl font-extrabold text-blue-600 mt-2" id="statTotal">0</h3>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                        <p class="text-sm font-bold text-gray-500 uppercase tracking-wider">Full Jamaah (5 Waktu)</p>
+                        <h3 class="text-3xl font-extrabold text-green-600 mt-2" id="statJamaah">0</h3>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                        <p class="text-sm font-bold text-gray-500 uppercase tracking-wider">Tervalidasi Musyrif</p>
+                        <h3 class="text-3xl font-extrabold text-purple-600 mt-2" id="statValidated">0</h3>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm whitespace-nowrap">
+                            <thead class="bg-gray-50 text-gray-600 font-bold border-b border-gray-200">
+                                <tr>
+                                    <th class="px-6 py-4">Nama Santri</th>
+                                    <th class="px-6 py-4 text-center">Kelas</th>
+                                    <th class="px-6 py-4 text-center">Subuh</th>
+                                    <th class="px-6 py-4 text-center">Dzuhur</th>
+                                    <th class="px-6 py-4 text-center">Ashar</th>
+                                    <th class="px-6 py-4 text-center">Maghrib</th>
+                                    <th class="px-6 py-4 text-center">Isya</th>
+                                    <th class="px-6 py-4 text-center">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody" class="divide-y divide-gray-100">
+                                <tr>
+                                    <td colspan="8" class="px-6 py-8 text-center text-gray-500">
+                                        <i data-lucide="loader-2" class="w-8 h-8 animate-spin mx-auto mb-2 text-teal-500"></i> Memuat data...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
 
     <script>
-        // Set default date to today
+        lucide.createIcons();
         document.getElementById('filterDate').valueAsDate = new Date();
 
         async function loadData() {
-            const date = document.getElementById('filterDate').value;
             const tbody = document.getElementById('tableBody');
+            const date = document.getElementById('filterDate').value;
             
-            tbody.innerHTML = '<tr><td colspan="11" class="loading">Memuat data... ⏳</td></tr>';
+            tbody.innerHTML = `<tr><td colspan="8" class="px-6 py-8 text-center text-gray-500"><i data-lucide="loader-2" class="w-8 h-8 animate-spin mx-auto mb-2 text-teal-500"></i> Memuat data...</td></tr>`;
+            lucide.createIcons();
 
             try {
                 const res = await fetch(`sadigs_api_v3/global_worship_api.php?date=${date}`);
-                const json = await res.json();
+                const result = await res.json();
 
-                if (json.success) {
-                    // Update Stats
-                    document.getElementById('stat-total').innerText = json.stats.total_laporan;
-                    document.getElementById('stat-jamaah').innerText = json.stats.full_jamaah;
-                    document.getElementById('stat-valid').innerText = json.stats.validated;
+                if (result.success) {
+                    document.getElementById('statTotal').textContent = result.stats.total_laporan;
+                    document.getElementById('statJamaah').textContent = result.stats.full_jamaah;
+                    document.getElementById('statValidated').textContent = result.stats.validated;
 
-                    // Render Table
-                    tbody.innerHTML = '';
-                    if (json.data.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="11" class="loading">Belum ada laporan masuk pada tanggal ini.</td></tr>';
-                        return;
+                    if (result.data.length > 0) {
+                        tbody.innerHTML = result.data.map(item => `
+                            <tr class="hover:bg-gray-50 transition">
+                                <td class="px-6 py-4"><div class="font-bold text-gray-800">${item.full_name}</div><div class="text-xs text-gray-500">${item.username}</div></td>
+                                <td class="px-6 py-4 text-center font-medium text-gray-600">${item.grade || '-'}</td>
+                                ${['subuh', 'dzuhur', 'ashar', 'maghrib', 'isya'].map(w => `<td class="px-6 py-4 text-center">${getBadge(item['shalat_'+w])}</td>`).join('')}
+                                <td class="px-6 py-4 text-center">${item.validation_status === 'approved' ? '<span class="text-purple-600 text-xs font-bold">Valid</span>' : '<span class="text-orange-500 text-xs font-bold">Pending</span>'}</td>
+                            </tr>
+                        `).join('');
+                    } else {
+                        tbody.innerHTML = `<tr><td colspan="8" class="px-6 py-12 text-center text-gray-500">Belum ada laporan ibadah untuk tanggal ini.</td></tr>`;
                     }
-
-                    json.data.forEach(row => {
-                        const tr = document.createElement('tr');
-                        tr.innerHTML = `
-                            <td><strong>${row.full_name}</strong></td>
-                            <td>${row.grade || '-'}</td>
-                            <td>${renderShalat(row.shalat_subuh)}</td>
-                            <td>${renderShalat(row.shalat_dzuhur)}</td>
-                            <td>${renderShalat(row.shalat_ashar)}</td>
-                            <td>${renderShalat(row.shalat_maghrib)}</td>
-                            <td>${renderShalat(row.shalat_isya)}</td>
-                            <td>${row.shalat_tahajud == 1 ? '✅' : '-'}</td>
-                            <td>${row.shalat_dhuha == 1 ? '✅' : '-'}</td>
-                            <td>${row.quran_last_page > 0 ? 'Hal ' + row.quran_last_page : '-'}</td>
-                            <td>${renderStatus(row.validation_status)}</td>
-                        `;
-                        tbody.appendChild(tr);
-                    });
                 } else {
-                    tbody.innerHTML = `<tr><td colspan="11" class="loading" style="color:red">Gagal: ${json.message}</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="8" class="px-6 py-8 text-center text-red-500">${result.message}</td></tr>`;
                 }
             } catch (e) {
-                tbody.innerHTML = `<tr><td colspan="11" class="loading" style="color:red">Error koneksi: ${e}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" class="px-6 py-8 text-center text-red-500">Koneksi terputus.</td></tr>`;
             }
         }
 
-        function renderShalat(status) {
-            if (status === 'Jamaah') return '<span class="badge bg-green">Jamaah</span>';
-            if (status === 'Munfarid') return '<span class="badge bg-yellow">Munfarid</span>';
-            if (status === 'Masbuk') return '<span class="badge bg-yellow">Masbuk</span>';
-            if (status === 'Haid') return '<span class="badge" style="background:#ffc0cb;color:#880e4f">Haid</span>';
-            if (status === 'Sakit') return '<span class="badge bg-yellow">Sakit</span>';
-            if (status === 'Alpha') return '<span class="badge bg-red">Alpha</span>';
-            return '-';
+        function getBadge(val) {
+            const colors = {'Jamaah': 'bg-green-100 text-green-700', 'Sendiri': 'bg-yellow-100 text-yellow-700', 'Bolong': 'bg-red-100 text-red-700', 'Haid': 'bg-pink-100 text-pink-700'};
+            return `<span class="px-2 py-1 rounded text-xs font-bold ${colors[val] || 'bg-gray-100 text-gray-700'}">${val || '-'}</span>`;
         }
-
-        function renderStatus(status) {
-            if (status === 'approved') return '<span class="badge bg-green">Valid</span>';
-            if (status === 'rejected') return '<span class="badge bg-red">Ditolak</span>';
-            return '<span class="badge bg-yellow">Pending</span>';
-        }
-
-        // Load data on startup
         loadData();
     </script>
 </body>

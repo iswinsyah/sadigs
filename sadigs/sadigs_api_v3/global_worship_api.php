@@ -7,14 +7,25 @@ if (!isset($_SESSION['user_id'])) {
     sendJSONResponse(['success' => false, 'message' => 'Unauthorized'], 401);
 }
 
-// Cek Role (Hanya Manajemen & Admin)
-$allowed = ['Ketua Yayasan', 'Sekretaris Yayasan', 'Kepala Sekolah', 'Kepala Asrama Putra', 'Kepala Asrama Putri', 'Admin Sekolah'];
 $user_roles = $_SESSION['roles'] ?? [];
-if (empty(array_intersect($allowed, $user_roles))) {
-    sendJSONResponse(['success' => false, 'message' => 'Akses ditolak. Khusus Manajemen.'], 403);
+if (empty($user_roles)) {
+    sendJSONResponse(['success' => false, 'message' => 'Akses ditolak. Anda tidak memiliki peran aktif.'], 403);
+    exit;
 }
 
 $pdo = getDBConnection();
+
+// Cek dinamis: Apakah salah satu peran user punya centang hijau di Manajemen Akses untuk menu ini?
+$placeholders = implode(',', array_fill(0, count($user_roles), '?'));
+$stmtCheck = $pdo->prepare("SELECT COUNT(*) FROM menu_permissions WHERE menu_id = 'navMonitoringIbadah' AND is_allowed = 1 AND role_name IN ($placeholders)");
+$stmtCheck->execute($user_roles);
+$hasAccess = $stmtCheck->fetchColumn() > 0;
+
+if (!$hasAccess) {
+    sendJSONResponse(['success' => false, 'message' => 'Akses ditolak. Anda tidak memiliki izin untuk melihat rekap ibadah (Silakan atur di Manajemen Akses).'], 403);
+    exit;
+}
+
 $date = $_GET['date'] ?? date('Y-m-d');
 
 try {

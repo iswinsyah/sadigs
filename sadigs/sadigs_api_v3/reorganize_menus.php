@@ -19,7 +19,9 @@ try {
         'ManajemenYayasan' => ['Ketua Yayasan', 'Sekretaris Yayasan', 'Bendahara Yayasan'],
         'ManajemenSekolah' => ['Kepala Sekolah', 'Kepala Asrama Putra', 'Kepala Asrama Putri', 'Admin Sekolah'],
         'AdministrasiPegawai' => ['Kepala Sekolah', 'Admin Sekolah', 'Kepala Asrama Putra', 'Kepala Asrama Putri', 'Musyrif', 'Musyrifah', 'Ustadz', 'Ustadzah'],
-        'KepalaAsrama' => ['Kepala Asrama Putra', 'Kepala Asrama Putri']
+        'KepalaAsrama' => ['Kepala Asrama Putra', 'Kepala Asrama Putri'],
+        'Santri' => ['Santri Rijal', "Santri Nisa'"],
+        'Walisantri' => ['Walisantri']
     ];
 
     // 2. Pastikan Kategori Ada di Database
@@ -28,7 +30,9 @@ try {
         'ManajemenYayasan' => '2. MANAJEMEN YAYASAN',
         'ManajemenSekolah' => '3. MANAJEMEN SEKOLAH',
         'AdministrasiPegawai' => '4. ADMINISTRASI PEGAWAI',
-        'KepalaAsrama' => '8. KEPALA ASRAMA'
+        'KepalaAsrama' => '8. KEPALA ASRAMA',
+        'Santri' => '15. SANTRI',
+        'Walisantri' => '16. WALISANTRI'
     ];
 
     // Tambahkan kategori untuk setiap peran individual (untuk fallback)

@@ -91,6 +91,7 @@ $master_structure = [
             'items' => [
                 ['id' => 'navDashboard', 'label' => 'Dashboard', 'icon' => 'layout-dashboard'],
                 ['id' => 'navProfil', 'label' => 'Profil Saya', 'icon' => 'user'],
+                ['id' => 'navLihatNotifikasi', 'label' => 'Notifikasi Saya', 'icon' => 'bell'],
                 ['id' => 'navKalender', 'label' => 'Kalender Pendidikan', 'icon' => 'calendar'],
                 ['id' => 'navJadwalPelajaran', 'label' => 'Jadwal Pelajaran', 'icon' => 'calendar-days']
             ]
@@ -122,7 +123,8 @@ $master_structure = [
             'items' => [
                 ['id' => 'navBukuIndukSantri', 'label' => 'Buku Induk Santri', 'icon' => 'book'],
                 ['id' => 'navManajemenKelas', 'label' => 'Manajemen Kelas', 'icon' => 'users'],
-                ['id' => 'navAturKurikulum', 'label' => 'Formulir Atur Kurikulum', 'icon' => 'book-open-check']
+                ['id' => 'navAturKurikulum', 'label' => 'Formulir Atur Kurikulum', 'icon' => 'book-open-check'],
+                ['id' => 'navMonitoringIbadah', 'label' => 'Rekap Ibadah Semua Santri', 'icon' => 'bar-chart-2']
             ]
         ],
         'KepalaSekolah' => [
@@ -191,7 +193,10 @@ $master_structure = [
             'items' => [
                 ['id' => 'navBiodataSantri', 'label' => 'Biodata Santri', 'icon' => 'book-user'],
                 ['id' => 'navIbadahHarian', 'label' => 'Formulir Laporan Ibadah Harian', 'icon' => 'notebook-pen'],
-                ['id' => 'navSantriPocketMoney', 'label' => 'Uang Saku Saya', 'icon' => 'landmark']
+                ['id' => 'navRiwayatIbadah', 'label' => 'Riwayat Ibadah', 'icon' => 'history'],
+                ['id' => 'navSantriPocketMoney', 'label' => 'Uang Saku Saya', 'icon' => 'landmark'],
+                ['id' => 'navNilaiRapotSantri', 'label' => 'Nilai Rapot Santri', 'icon' => 'graduation-cap'],
+                ['id' => 'navViewTahfizhSantri', 'label' => 'Riwayat Tahfidz', 'icon' => 'history']
             ]
         ],
         'Walisantri' => [
@@ -202,7 +207,8 @@ $master_structure = [
                 ['id' => 'navIzinWalisantri', 'label' => 'Formulir Izin Walisantri', 'icon' => 'mail-question'],
                 ['id' => 'navPocketMoneyDeposit', 'label' => 'Formulir Deposit Uang Saku', 'icon' => 'wallet'],
                 ['id' => 'navMonitoringAnak', 'label' => 'Monitoring Perkembangan', 'icon' => 'activity'],
-                ['id' => 'navFormulirPembayaran', 'label' => 'Formulir Pembayaran', 'icon' => 'credit-card']
+                ['id' => 'navFormulirPembayaran', 'label' => 'Formulir Pembayaran', 'icon' => 'credit-card'],
+                ['id' => 'navNilaiRapotAnak', 'label' => 'Nilai Rapot Anak', 'icon' => 'graduation-cap']
             ]
         ]
     ];
@@ -212,7 +218,7 @@ $master_structure = [
     $pdo->beginTransaction();
     try {
         $stmtCat = $pdo->prepare("INSERT INTO menu_categories (category_id, label, sort_order) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE label=VALUES(label), sort_order=VALUES(sort_order)");
-        $stmtMenu = $pdo->prepare("INSERT INTO menus (menu_id, menu_name, category_id, sort_order, icon) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE icon=VALUES(icon)"); // Hapus menu_name=VALUES(menu_name) agar edit manual tidak tertimpa
+        $stmtMenu = $pdo->prepare("INSERT INTO menus (menu_id, menu_name, category_id, sort_order, icon) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE icon=VALUES(icon), category_id=VALUES(category_id), sort_order=VALUES(sort_order)"); // Hapus menu_name=VALUES(menu_name) agar edit manual tidak tertimpa
 
         $sort_cat = 1;
         foreach ($master_structure as $cat_id => $cat_data) {

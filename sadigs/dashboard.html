@@ -292,6 +292,33 @@
 
                     document.getElementById('editRoleBtn').classList.remove('hidden');
 
+                    // --- LOGIKA SIMPLIFIKASI PERAN (Mencegah Duplikat) ---
+                    let rolesText = 'User';
+                    if (rawRoles.length > 0) {
+                        let roleMap = new Map();
+                        rawRoles.forEach(r => {
+                            let rawName = (typeof r === 'string') ? r : r.role_name;
+                            let status = (typeof r === 'string') ? 'approved' : r.status;
+                            if (rawName) {
+                                rawName.split(',').forEach(part => {
+                                    let cleanName = part.trim();
+                                    if (cleanName) {
+                                        let key = cleanName.toLowerCase();
+                                        if (!roleMap.has(key) || status === 'approved') {
+                                            roleMap.set(key, { name: cleanName, status: status });
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                        rolesText = Array.from(roleMap.values()).map(r => r.status === 'approved' ? r.name : `${r.name} (Pending)`).join(', ');
+                    }
+                    const sidebarRoleEl = document.getElementById('sidebarRole');
+                    if (sidebarRoleEl) {
+                        sidebarRoleEl.textContent = rolesText;
+                        sidebarRoleEl.classList.remove('hidden');
+                    }
+
                     // LOGIKA BARU: Jika user belum punya peran sama sekali, tampilkan form pemilihan peran.
                     if (rawRoles.length === 0) {
                         document.getElementById('mainContent').classList.add('hidden');
@@ -378,6 +405,15 @@
                                 if (regData.general && regData.general.length > 0) {
                                     regData.general.forEach(item => allRegulationsMap[item.id] = item);
                                     generalContainer.innerHTML = regData.general.map(item => createAmanahCard(item, 'teal', isAdmin)).join('');
+                                    
+                                    // Tampilkan ke Marquee
+                                    const marqueeContainer = document.getElementById('marqueeContainer');
+                                    const marqueeText = document.getElementById('marqueeText');
+                                    if(marqueeContainer && marqueeText) {
+                                        const marqueeContent = regData.general.slice(0, 5).map(item => `📢 ${item.title} — ${item.creator_name} (${item.formatted_date})`).join(' &nbsp;&nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;&nbsp; ');
+                                        marqueeText.innerHTML = marqueeContent;
+                                        marqueeContainer.classList.remove('hidden');
+                                    }
                                 } else {
                                     generalContainer.innerHTML = '<p class="text-center text-gray-500 text-sm py-4 italic">Tidak ada amanah umum.</p>';
                                 }

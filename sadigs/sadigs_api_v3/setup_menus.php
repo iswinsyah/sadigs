@@ -46,13 +46,14 @@ $menuDetails = [
     // Menu Tahfidz Baru
     'navInputTahfizh' => ['name' => 'Input Tahfidz', 'link' => 'tahfizh_report_form.html', 'icon' => 'book-open'],
     'navViewTahfizh' => ['name' => 'Riwayat Tahfidz', 'link' => 'tahfizh_history.html', 'icon' => 'history'],
+    'navViewTahfizhSantri' => ['name' => 'Riwayat Tahfidz', 'link' => 'tahfizh_history.html', 'icon' => 'history'],
     'navRekapTahfizh' => ['name' => 'Rekap Grafik Tahfidz', 'link' => 'tahfizh_recap.html', 'icon' => 'bar-chart-2'],
     // Menu Notifikasi Baru
     'navKirimNotifikasi' => ['name' => 'Kirim Notifikasi', 'link' => 'admin_notifications.html', 'icon' => 'send'],
     'navLihatNotifikasi' => ['name' => 'Notifikasi Saya', 'link' => 'my_notifications.html', 'icon' => 'bell'],
     // Menu Akademik & Santri (Tambahan)
     'navRiwayatIbadah' => ['name' => 'Riwayat Ibadah', 'link' => 'student_worship_view.html', 'icon' => 'history'],
-    'navMonitoringIbadah' => ['name' => 'Monitoring Ibadah', 'link' => 'global_worship_monitoring.html', 'icon' => 'bar-chart-2'],
+    'navMonitoringIbadah' => ['name' => 'Rekap Ibadah Semua Santri', 'link' => 'global_worship_monitoring.html', 'icon' => 'bar-chart-2'],
     'navBiodataSantri' => ['name' => 'Biodata Santri', 'link' => 'student_data.html', 'icon' => 'book-user'],
     'navBukuIndukSantri' => ['name' => 'Buku Induk Santri', 'link' => 'student_master_book.html', 'icon' => 'book'],
     'navManajemenKelas' => ['name' => 'Manajemen Kelas', 'link' => 'class_management.html', 'icon' => 'users'],
@@ -65,7 +66,11 @@ $menuDetails = [
     // Menu Penggajian
     'navAturGaji' => ['name' => 'Pengaturan Gaji', 'link' => 'payroll_settings.html', 'icon' => 'settings'],
     // Menu Slip Gaji Real-time (Untuk Pegawai)
-    'navSlipGaji' => ['name' => 'Estimasi Gaji Saya', 'link' => 'my_salary_slip.html', 'icon' => 'wallet']
+    'navSlipGaji' => ['name' => 'Estimasi Gaji Saya', 'link' => 'my_salary_slip.html', 'icon' => 'wallet'],
+    // Menu Rapot Santri
+    'navNilaiRapotSantri' => ['name' => 'Nilai Rapot Santri', 'link' => 'student_grades_view.html', 'icon' => 'graduation-cap'],
+    // Menu Rapot Anak (Khusus Walisantri)
+    'navNilaiRapotAnak' => ['name' => 'Nilai Rapot Anak', 'link' => 'student_grades_view.html', 'icon' => 'graduation-cap']
 ];
 
 // Ambil semua role yang ada di sistem
@@ -90,6 +95,14 @@ foreach ($menuDetails as $id => $detail) {
     $stmt = $pdo->prepare("INSERT INTO menus (menu_id, menu_name, link, icon) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE menu_name = VALUES(menu_name), link = VALUES(link), icon = VALUES(icon)");
     $stmt->execute([$id, $detail['name'], $detail['link'], $detail['icon']]);
 }
+
+    // --- KOREKSI KATEGORI MENU (DATABASE) ---
+    // Memaksa menu-menu baru masuk ke deretan yang benar di Dashboard & Manajemen Akses
+    $pdo->exec("INSERT INTO menu_categories (category_id, label, sort_order) VALUES ('Umum', '1. UMUM', 1), ('Walisantri', '16. WALISANTRI', 16), ('Santri', '15. SANTRI', 15), ('BendaharaSekolah', '11. BENDAHARA SEKOLAH', 11) ON DUPLICATE KEY UPDATE label=VALUES(label)");
+    $pdo->exec("UPDATE menus SET category_id = 'Umum' WHERE menu_id IN ('navDashboard', 'navProfil', 'navLihatNotifikasi', 'navKalender', 'navJadwalPelajaran')");
+    $pdo->exec("UPDATE menus SET category_id = 'Walisantri' WHERE menu_id IN ('navNilaiRapotAnak', 'navFormulirPembayaran', 'navRekapIbadahAnak', 'navViewTahfizh', 'navIzinWalisantri', 'navPocketMoneyDeposit', 'navMonitoringAnak')");
+    $pdo->exec("UPDATE menus SET category_id = 'Santri' WHERE menu_id IN ('navNilaiRapotSantri', 'navBiodataSantri', 'navIbadahHarian', 'navRiwayatIbadah', 'navSantriPocketMoney', 'navViewTahfizhSantri')");
+    $pdo->exec("UPDATE menus SET category_id = 'BendaharaSekolah' WHERE menu_id IN ('navValidasiPembayaran', 'navTabelPembayaran', 'navRekapPembayaran')");
 
 $count = 0;
 
@@ -125,7 +138,8 @@ echo "<li><b style='color:blue'>Info:</b> Hak akses Ketua Yayasan untuk menu bar
 // --- FORCE UPDATE PERMISSIONS FOR TAHFIDZ (SANTRI & WALISANTRI) ---
 // Agar otomatis aktif tanpa perlu setting manual di Manajemen Akses
 $tahfidzPerms = [
-    'navViewTahfizh' => ['Walisantri', 'Santri', 'Santri Rijal', "Santri Nisa'", 'Musyrif', 'Musyrifah'],
+    'navViewTahfizh' => ['Walisantri', 'Musyrif', 'Musyrifah'],
+    'navViewTahfizhSantri' => ['Santri', 'Santri Rijal', "Santri Nisa'"],
     'navInputTahfizh' => ['Musyrif', 'Musyrifah', 'Ustadz', 'Ustadzah'],
     'navRekapTahfizh' => ['Ketua Yayasan', 'Kepala Sekolah', 'Kepala Asrama Putra', 'Kepala Asrama Putri']
 ];
@@ -203,6 +217,22 @@ foreach ($employeeRoles as $rName) {
     $pdo->prepare("INSERT INTO menu_permissions (role_name, menu_id, is_allowed) VALUES (?, 'navSlipGaji', 1) ON DUPLICATE KEY UPDATE is_allowed = 1")->execute([$rName]);
 }
 
+
+// --- FORCE UPDATE PERMISSIONS FOR RAPOT ---
+$pdo->prepare("INSERT INTO menu_permissions (role_name, menu_id, is_allowed) VALUES ('Walisantri', 'navNilaiRapotAnak', 1) ON DUPLICATE KEY UPDATE is_allowed = 1")->execute();
+$santriRoles = ['Santri Rijal', "Santri Nisa'"];
+foreach ($santriRoles as $rName) {
+    $pdo->prepare("INSERT INTO menu_permissions (role_name, menu_id, is_allowed) VALUES (?, 'navNilaiRapotSantri', 1) ON DUPLICATE KEY UPDATE is_allowed = 1")->execute([$rName]);
+}
+
+// --- CLEANUP: Hapus Akses Walisantri dari Menu Santri Lama ---
+$pdo->exec("DELETE FROM menu_permissions WHERE role_name = 'Walisantri' AND menu_id = 'navNilaiRapotSantri'");
+
+// --- CLEANUP EKSTRA: Rapikan & Hapus Akses Gaib Menu Santri ---
+$pdo->exec("DELETE FROM menu_permissions WHERE role_name IN ('Santri', 'Santri Rijal', 'Santri Nisa\'') AND menu_id NOT IN ('navDashboard', 'navProfil', 'navKalender', 'navJadwalPelajaran', 'navLihatNotifikasi', 'navNilaiRapotSantri', 'navBiodataSantri', 'navIbadahHarian', 'navRiwayatIbadah', 'navSantriPocketMoney', 'navViewTahfizhSantri')");
+$pdo->exec("DELETE FROM menu_permissions WHERE role_name IN ('Santri', 'Santri Rijal', 'Santri Nisa\'') AND menu_id = 'navViewTahfizh'");
+
+echo "<li><b style='color:blue'>Info:</b> Hak akses Menu Santri telah dirapikan dan dibersihkan dari menu yang tidak relevan secara otomatis.</li>";
 
 echo "</ul>";
 
