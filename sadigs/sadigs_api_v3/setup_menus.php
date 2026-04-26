@@ -53,7 +53,7 @@ $menuDetails = [
     'navLihatNotifikasi' => ['name' => 'Notifikasi Saya', 'link' => 'my_notifications.html', 'icon' => 'bell'],
     // Menu Akademik & Santri (Tambahan)
     'navRiwayatIbadah' => ['name' => 'Riwayat Ibadah', 'link' => 'student_worship_view.html', 'icon' => 'history'],
-    'navMonitoringIbadah' => ['name' => 'Rekap Ibadah Semua Santri', 'link' => 'global_worship_monitoring.html', 'icon' => 'bar-chart-2'],
+    'navMonitoringIbadah' => ['name' => 'Rekap Ibadah Santri', 'link' => 'global_worship_monitoring.html', 'icon' => 'bar-chart-2'],
     'navBiodataSantri' => ['name' => 'Biodata Santri', 'link' => 'student_data.html', 'icon' => 'book-user'],
     'navBukuIndukSantri' => ['name' => 'Buku Induk Santri', 'link' => 'student_master_book.html', 'icon' => 'book'],
     'navManajemenKelas' => ['name' => 'Manajemen Kelas', 'link' => 'class_management.html', 'icon' => 'users'],

@@ -124,7 +124,7 @@ $master_structure = [
                 ['id' => 'navBukuIndukSantri', 'label' => 'Buku Induk Santri', 'icon' => 'book'],
                 ['id' => 'navManajemenKelas', 'label' => 'Manajemen Kelas', 'icon' => 'users'],
                 ['id' => 'navAturKurikulum', 'label' => 'Formulir Atur Kurikulum', 'icon' => 'book-open-check'],
-                ['id' => 'navMonitoringIbadah', 'label' => 'Rekap Ibadah Semua Santri', 'icon' => 'bar-chart-2']
+                ['id' => 'navMonitoringIbadah', 'label' => 'Rekap Ibadah Santri', 'icon' => 'bar-chart-2']
             ]
         ],
         'KepalaSekolah' => [
