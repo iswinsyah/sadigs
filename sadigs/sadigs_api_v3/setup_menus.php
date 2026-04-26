@@ -9,6 +9,12 @@ try {
     die("Gagal koneksi database: " . $e->getMessage());
 }
 
+// --- FORCE INJECT MENU GRAFIK (JALUR VIP) ---
+$pdo->exec("INSERT INTO menu_categories (category_id, label, sort_order) VALUES ('ManajemenYayasan', '2. MANAJEMEN YAYASAN', 2) ON DUPLICATE KEY UPDATE label='2. MANAJEMEN YAYASAN'");
+$pdo->exec("INSERT INTO menus (menu_id, menu_name, category_id, link, icon) VALUES ('navGrafikIbadah', 'Grafik Rekap Ibadah', 'ManajemenYayasan', 'worship_recap_chart.html', 'pie-chart') ON DUPLICATE KEY UPDATE menu_name='Grafik Rekap Ibadah', category_id='ManajemenYayasan', link='worship_recap_chart.html'");
+$pdo->exec("INSERT INTO menu_permissions (role_name, menu_id, is_allowed) VALUES ('Ketua Yayasan', 'navGrafikIbadah', 1), ('Sekretaris Yayasan', 'navGrafikIbadah', 1), ('Bendahara Yayasan', 'navGrafikIbadah', 1) ON DUPLICATE KEY UPDATE is_allowed=1");
+// ---------------------------------------------
+
 // --- AUTO-MIGRATE SCHEMA (Jaring Pengaman Hosting) ---
 try {
     $check = $pdo->query("SHOW COLUMNS FROM menu_permissions LIKE 'can_view'");
