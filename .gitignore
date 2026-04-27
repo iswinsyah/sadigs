@@ -1,5 +1,22 @@
-# Abaikan file konfigurasi server
-.htaccess
+# Abaikan file konfigurasi database agar settingan Laptop tidak menimpa Hostinger
+sadigs_api_v3/db_connect.php
+sadigs_api_v3/db_connect_hostinger.php
 
-# Abaikan folder konfigurasi VS Code
+# Abaikan file log error PHP agar repo tetap bersih
+*.log
+error_log
+php_error.log
+
+# Abaikan file sistem
+.DS_Store
 .vscode/
+
+# Folder lama di server yang tidak boleh dihapus
+mitra/
+psb/
+seo/
+
+# File lama dan konfigurasi server
+.htaccess
+default_lama.php
+index_lama.html

@@ -1,0 +1,39 @@
+name: Deploy to Hostinger
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  ftp-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up PHP (for optional composer scripts)
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+
+      - name: Install lftp
+        run: sudo apt-get update && sudo apt-get install -y lftp
+
+      # Deploy via FTP to Hostinger
+      - name: Deploy via FTP
+        env:
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          FTP_USER: ${{ secrets.FTP_USER }}
+          FTP_PASS: ${{ secrets.FTP_PASS }}
+        run: |
+          echo "Starting FTP deployment..."
+          lftp -c "set ftp:ssl-allow no; open -u $FTP_USER,$FTP_PASS $FTP_HOST; mirror -R --delete --verbose ./public_html/sadigs ./"
+
+      # Optional: purge caches after successful deploy
+      - name: Purge caches (LiteSpeed, OPcache, Cloudflare)
+        if: success()
+        env:
+          PURGE_URL: ${{ secrets.PURGE_URL }}
+        run: |
+          echo "Calling remote cache purge..."
+          curl -s -o /dev/null $PURGE_URL || echo "Cache purge endpoint not reachable"
