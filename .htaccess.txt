@@ -1,0 +1,13 @@
+# 1. Mematikan fitur lihat isi folder (Keamanan wajib)
+Options -Indexes
+
+# 2. Mencegah orang luar mengunduh file rahasia/log
+<FilesMatch "\.(env|log|ini|json|git)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# 3. Mengaktifkan mesin pengubah URL (Persiapan jika ada URL ramah SEO)
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+</IfModule>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grafik Rekap Ibadah | SADIGS 3.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+
+    <div class="flex h-screen overflow-hidden">
+        <!-- SIDEBAR -->
+        <aside id="sidebar" class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col hidden lg:flex">
+            <div class="h-16 flex items-center justify-center border-b border-gray-200 bg-teal-600 text-white">
+                <h1 class="text-2xl font-extrabold tracking-wider">SADIGS</h1>
+            </div>
+            <div class="p-6">
+                <a href="dashboard.html" class="flex items-center gap-2 text-gray-600 hover:text-teal-600 transition font-medium">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i> Kembali ke Dashboard
+                </a>
+            </div>
+        </aside>
+
+        <!-- KONTEN UTAMA -->
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-8 w-full relative">
+            <div class="max-w-5xl mx-auto">
+                
+                <header class="mb-8 flex justify-between items-end">
+                    <div>
+                        <h2 class="text-2xl lg:text-3xl font-bold text-gray-800 flex items-center gap-2">
+                            <i data-lucide="pie-chart" class="w-8 h-8 text-teal-600"></i> Grafik Rekap Ibadah
+                        </h2>
+                        <p class="text-gray-500 text-sm mt-1">Pantau statistik kedisiplinan ibadah santri secara global.</p>
+                    </div>
+                    <button onclick="loadChartData()" class="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition shadow-sm">
+                        <i data-lucide="refresh-cw" class="w-4 h-4"></i> Segarkan Data
+                    </button>
+                </header>
+
+                <!-- Filter Section -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-6 flex flex-wrap gap-4 items-center">
+                    <div class="flex items-center gap-2">
+                        <label class="text-sm font-semibold text-gray-600">Bulan:</label>
+                        <select id="filterMonth" class="border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-teal-500">
+                            <option value="all">Semua Bulan</option>
+                            <option value="1">Januari</option>
+                            <option value="2">Februari</option>
+                            <option value="3">Maret</option>
+                            <option value="4">April</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-sm font-semibold text-gray-600">Tipe Grafik:</label>
+                        <select id="chartType" class="border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-teal-500" onchange="renderChart()">
+                            <option value="bar">Bar Chart (Batang)</option>
+                            <option value="line">Line Chart (Garis)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Chart Container -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <div id="loadingIndicator" class="text-center py-10 text-gray-500">
+                        <i data-lucide="loader" class="w-8 h-8 animate-spin mx-auto mb-2 text-teal-600"></i> Memuat data grafik...
+                    </div>
+                    <canvas id="worshipChart" style="max-height: 400px; display: none;"></canvas>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        let worshipChartInstance = null;
+        let currentChartData = null;
+
+        async function loadChartData() {
+            document.getElementById('loadingIndicator').style.display = 'block';
+            document.getElementById('worshipChart').style.display = 'none';
+            
+            try {
+                const response = await fetch('sadigs_api_v3/worship_recap_api.php');
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentChartData = result.data;
+                    renderChart();
+                } else {
+                    alert('Gagal memuat data: ' + result.message);
+                }
+            } catch (error) {
+                console.error(error);
+                alert('Terjadi kesalahan koneksi ke server.');
+            } finally {
+                document.getElementById('loadingIndicator').style.display = 'none';
+                document.getElementById('worshipChart').style.display = 'block';
+            }
+        }
+
+        function renderChart() {
+            if (!currentChartData) return;
+            
+            const ctx = document.getElementById('worshipChart').getContext('2d');
+            const type = document.getElementById('chartType').value;
+
+            // Hancurkan grafik lama jika ada (agar tidak menumpuk saat refresh)
+            if (worshipChartInstance) {
+                worshipChartInstance.destroy();
+            }
+
+            worshipChartInstance = new Chart(ctx, {
+                type: type,
+                data: {
+                    labels: currentChartData.labels,
+                    datasets: [
+                        {
+                            label: 'Jamaah',
+                            data: currentChartData.jamaah,
+                            backgroundColor: 'rgba(20, 184, 166, 0.7)', // Teal
+                            borderColor: 'rgba(20, 184, 166, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Munfarid',
+                            data: currentChartData.munfarid,
+                            backgroundColor: 'rgba(234, 179, 8, 0.7)', // Yellow
+                            borderColor: 'rgba(234, 179, 8, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Udzhur / Izin',
+                            data: currentChartData.udzhur,
+                            backgroundColor: 'rgba(59, 130, 246, 0.7)', // Blue
+                            borderColor: 'rgba(59, 130, 246, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        // Panggil saat halaman pertama kali dimuat
+        window.addEventListener('DOMContentLoaded', loadChartData);
+    </script>
+</body>
+</html>
