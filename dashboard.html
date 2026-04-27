@@ -438,7 +438,7 @@
                         });
 
                     // --- LOGIKA MENU DINAMIS (DATABASE) ---
-                    fetch('sadigs_api_v3/get_menu_permissions.php')
+                    fetch('sadigs_api_v3/get_menu_permissions.php?t=' + new Date().getTime())
                         .then(res => res.json())
                         .then(permData => {
                             if (permData.success) {
