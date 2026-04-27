@@ -20,8 +20,8 @@ jobs:
       - name: 📂 Sync files via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
-          server: ${{ secrets.FTP_HOST }}
-          username: ${{ secrets.FTP_USER }}
+          server: 145.79.14.7
+          username: u829486010.sadigs.villaquranbaronmalang.com
           password: ${{ secrets.FTP_PASS }}
           server-dir: /public_html/sadigs/
           exclude: |
