@@ -14,12 +14,12 @@ try {
     try {
         // Coba dengan kolom lengkap (agar muncul rapi di sidebar)
         // Catatan: Pastikan file HTML Bos bernama grafik_rekap_ibadah.html
-        $stmt = $pdo->prepare("INSERT INTO menus (menu_id, menu_name, category, link, icon, order_no) VALUES (?, ?, 'Manajemen Yayasan', 'grafik_rekap_ibadah.html', 'bar-chart-2', 99) ON DUPLICATE KEY UPDATE menu_name = ?");
+        $stmt = $pdo->prepare("INSERT INTO menus (menu_id, menu_name, category_id, link, icon) VALUES (?, ?, 'ManajemenYayasan', 'grafik_rekap_ibadah.html', 'pie-chart') ON DUPLICATE KEY UPDATE link = 'grafik_rekap_ibadah.html', icon = 'pie-chart', category_id = 'ManajemenYayasan'");
         $stmt->execute([$menu_id, $menu_name, $menu_name]);
     } catch (Exception $e) {
         // Fallback jika struktur tabel menus berbeda
-        $stmt = $pdo->prepare("INSERT IGNORE INTO menus (menu_id, menu_name) VALUES (?, ?)");
-        $stmt->execute([$menu_id, $menu_name]);
+        $stmt = $pdo->prepare("UPDATE menus SET link = 'grafik_rekap_ibadah.html', icon = 'pie-chart' WHERE menu_id = ?");
+        $stmt->execute([$menu_id]);
     }
     echo "<p>✅ Menu <b>'$menu_name'</b> berhasil didaftarkan ke Master Menu (akan muncul di Manajemen Akses).</p>";
 
