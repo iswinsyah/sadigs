@@ -16,24 +16,18 @@ jobs:
         with:
           php-version: '8.2'
 
-      - name: Install lftp
-        run: sudo apt-get update && sudo apt-get install -y lftp
-
       # Deploy via FTP to Hostinger
-      - name: Deploy via FTP
-        env:
-          FTP_HOST: ${{ secrets.FTP_HOST }}
-          FTP_USER: ${{ secrets.FTP_USER }}
-          FTP_PASS: ${{ secrets.FTP_PASS }}
-        run: |
-          echo "Starting FTP deployment..."
-          lftp <<EOF
-          set ssl:verify-certificate no
-          set ftp:passive-mode true
-          open -u $FTP_USER,$FTP_PASS $FTP_HOST
-          mirror -R --delete --verbose --exclude-glob .git/ --exclude-glob .github/ ./ /public_html/sadigs/
-          quit
-          EOF
+      - name: 📂 Sync files via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USER }}
+          password: ${{ secrets.FTP_PASS }}
+          server-dir: /public_html/sadigs/
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/.github*/**
 
       # Optional: purge caches after successful deploy
       - name: Purge caches (LiteSpeed, OPcache, Cloudflare)
