@@ -12,7 +12,8 @@ try {
         'navMenuManagement' => 'Manajemen Akses',
         'navVerifikasi' => 'Verifikasi Pengguna',
         'navQuota' => 'Atur Kuota',
-        'navCalendarSettings' => 'Atur Kalender'
+        'navCalendarSettings' => 'Atur Kalender',
+        'navGrafikIbadah' => 'Grafik Rekap Ibadah'
     ];
 
     $admin_role = 'Ketua Yayasan';
