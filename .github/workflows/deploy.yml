@@ -16,24 +16,5 @@ jobs:
         with:
           php-version: '8.2'
 
-      # Deploy via FTP to Hostinger
-      - name: 📂 Sync files via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
-        with:
-          server: 145.79.14.7
-          username: u829486010.sadigs.villaquranbaronmalang.com
-          password: ${{ secrets.FTP_PASS }}
-          server-dir: /public_html/sadigs/
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/.github*/**
-
-      # Optional: purge caches after successful deploy
-      - name: Purge caches (LiteSpeed, OPcache, Cloudflare)
-        if: success()
-        env:
-          PURGE_URL: ${{ secrets.PURGE_URL }}
-        run: |
-          echo "Calling remote cache purge..."
-          curl -s -o /dev/null $PURGE_URL || echo "Cache purge endpoint not reachable"
+      - name: 🚀 Ready for Hostinger GIT Deploy
+        run: echo "Kode sudah masuk GitHub. Silakan klik Deploy di hPanel Hostinger."
